@@ -1,0 +1,62 @@
+# Default
+
+ID: PROF-0001
+Название: Default
+Статус: Активен
+Связи: RULE-0001, RULE-0003, STD-0001, STD-0002, STD-0003, ROAD-0006
+Источник: Базовый режим BytePress
+Дата_создания: 2026-03-09
+Дата_изменения: 2026-03-10
+Бренд: BytePress
+Строгость: Максимальная
+Активный_путь: Pipeline/Golden_Path.md
+Активные_роли:
+- Research
+- Business_Analyst
+- System_Analyst
+- Architect
+- Developer
+- QA
+- Release
+- Support
+Резервные_роли:
+- Documentation
+- Security
+- DevOps
+Активные_правила:
+- Approval_Strictness
+- Repository_As_Source_Of_Truth
+- Runtime_Is_Temporary
+- Terms_Governance
+- Plans_Require_Approved_Backlog
+Активные_стандарты:
+- Coding
+- Documentation
+- Planning
+- Release
+- Terminology
+Активные_навыки:
+- Discussion
+- Interview
+- Research
+- Requirements
+- Planning
+- Implementation
+- Quality
+- Review
+- Release
+- Support
+Активные_адаптеры:
+- Codex
+Резервные_адаптеры:
+- Claude
+- Gemini
+- Local
+
+## Назначение
+Базовый профиль с максимальной строгостью и ручным утверждением на каждой фазе.
+
+## Особенности
+- ориентирован на ранний этап развития системы;
+- допускает высокую управляемость ценой скорости;
+- служит базой для брендовых профилей.

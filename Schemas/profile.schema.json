@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^PROF-[0-9]{4}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{4}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Название": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Краткое название сущности."
+    },
+    "Бренд": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Строгость": {
+      "type": "string",
+      "enum": [
+        "Максимальная",
+        "Средняя",
+        "Низкая"
+      ]
+    },
+    "Активный_путь": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Активные_роли": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Резервные_роли": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Активные_правила": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Активные_стандарты": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Активные_навыки": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Активные_адаптеры": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Резервные_адаптеры": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "ID",
+    "Название",
+    "Статус",
+    "Бренд",
+    "Строгость",
+    "Активный_путь",
+    "Активные_роли",
+    "Резервные_роли",
+    "Активные_правила",
+    "Активные_стандарты",
+    "Связи",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения",
+    "Резервные_адаптеры"
+  ]
+}
