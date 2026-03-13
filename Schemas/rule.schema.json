@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rule",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^RULE-[0-9]{4}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{4}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Название": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Краткое название сущности."
+    },
+    "Назначение": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Обязательность": {
+      "type": "string",
+      "enum": [
+        "Обязательно",
+        "Условно_обязательно"
+      ]
+    },
+    "Нарушение": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Проверка": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Связанные_стандарты": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "ID",
+    "Название",
+    "Статус",
+    "Назначение",
+    "Обязательность",
+    "Нарушение",
+    "Проверка",
+    "Связанные_стандарты",
+    "Связи",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения"
+  ]
+}

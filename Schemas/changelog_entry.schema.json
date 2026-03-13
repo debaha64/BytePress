@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ChangeLogEntry",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^CHG-[0-9]{4}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{4}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Дата": {
+      "type": "string",
+      "format": "date"
+    },
+    "Тип_изменения": {
+      "type": "string",
+      "enum": [
+        "Структура",
+        "Документация",
+        "Стандарт",
+        "Инструмент",
+        "Профиль",
+        "Роль",
+        "Правило",
+        "Исправление",
+        "Выпуск"
+      ]
+    },
+    "Описание": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Эффект": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "ID",
+    "Дата",
+    "Тип_изменения",
+    "Описание",
+    "Источник",
+    "Связи",
+    "Эффект",
+    "Дата_создания",
+    "Дата_изменения"
+  ]
+}
