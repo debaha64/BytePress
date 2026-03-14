@@ -104,6 +104,18 @@ cd ~/code/BytePress
 export CODEX_HOME="$PWD/.codex"
 ```
 
+## GitHub CLI и PR-контур
+Для Auto-PR требуется минимально настроенный GitHub CLI:
+
+```bash
+gh auth login
+gh auth status
+```
+
+На стороне GitHub для репозитория BytePress должны быть включены:
+- automatic deletion of head branches после merge;
+- защита `develop` и `main` в режиме PR-only.
+
 ## Проверка среды
 Запустить базовую проверку структуры:
 
