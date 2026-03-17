@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-014
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: `bp_bootstrap.py` требует `--name`, `--product-code`, `--brand-profile`, `--target`, валидирует существование brand profile в `BytePress`, не генерирует `product-code` автоматически, использует текущую дату выполнения, создаёт `Profiles/Product.md`, `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные `ROAD/BACK/PLAN/PROF ID`; `bp_lint.py` минимально синхронизирован с новым product bootstrap output contract; `Tools/README.md` и `Docs/Product/*` отражают фактический контракт; `Plans/Backlog.md` и `Plans/BP-000010-tools-contract-sync.md` фиксируют завершение прохода без изменения `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*`, semver и historical logs migration.
+Результат: bootstrap/lint contract и product bootstrap docs приведены к текущему naming/profile/language canon без большого рефакторинга tools.
+
+---
+
 ## QL-013
 Дата: 2026-03-17
 Статус: пройдено
