@@ -1,17 +1,17 @@
 # Registry
 
 ## Индекс кандидатов подключения
-- `MCP-0001` — GitHub
-- `MCP-0002` — Docker_Inspect
-- `MCP-0003` — Docs_Search
+- `MCP-000001` — GitHub
+- `MCP-000002` — Docker_Inspect
+- `MCP-000003` — Docs_Search
 
 ---
 
-## MCP-0001 — GitHub
-ID: MCP-0001
+## MCP-000001 — GitHub
+ID: MCP-000001
 Название: GitHub
 Статус: Резерв
-Связи: ADP-0001
+Связи: ADP-000001
 Источник: Каркас домена `MCP`
 Дата_создания: 2026-03-10
 Дата_изменения: 2026-03-10
@@ -21,11 +21,11 @@ ID: MCP-0001
 
 ---
 
-## MCP-0002 — Docker_Inspect
-ID: MCP-0002
+## MCP-000002 — Docker_Inspect
+ID: MCP-000002
 Название: Docker_Inspect
 Статус: Резерв
-Связи: ADP-0001, ADP-0004
+Связи: ADP-000001, ADP-000004
 Источник: Каркас домена `MCP`
 Дата_создания: 2026-03-10
 Дата_изменения: 2026-03-10
@@ -35,8 +35,8 @@ ID: MCP-0002
 
 ---
 
-## MCP-0003 — Docs_Search
-ID: MCP-0003
+## MCP-000003 — Docs_Search
+ID: MCP-000003
 Название: Docs_Search
 Статус: Резерв
 Связи:

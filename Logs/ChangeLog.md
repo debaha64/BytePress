@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000020 — Active non-log ID layer переведён на 6-значный формат без переписывания historical logs
 - CHG-000019 — Tool contract sync завершил приведение bootstrap и lint к текущим contracts
 - CHG-000018 — Terms layer мигрирован на канонические filenames и 6-значные TERM ID
 - CHG-000017 — Синхронизированы схемы, шаблоны, профили и language contract Git/PR
@@ -20,6 +21,23 @@
 - CHG-0003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-0002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-0001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000020 — Active non-log ID layer переведён на 6-значный формат без переписывания historical logs
+ID: CHG-000020
+Дата: 2026-03-18
+Тип_изменения: Контракт
+Источник: Следующая фаза repo-wide migration после term и tool sync-проходов
+Связи: PLAN-000011, BACK-000019, ADR-000015, ADR-000016
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+Активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Product/Bootstrap_Contract.md` приведены к 6-значному формату для `BACK`, `ROAD`, `PROF`, `RULE`, `STD`, `ROLE`, `SKILL`, `ADP`, `MEM` и `MCP`. Прямые ссылки на старые 4-значные active ID синхронизированы, создан `Plans/BP-000011-migrate-active-nonlog-ids.md`, а historical logs намеренно не переписывались.
+
+### Эффект
+Активный non-log слой BytePress перестал смешивать 4- и 6-значный формат внутренних ID; текущие рабочие связи по singleton- и registry-доменам согласованы с repo-wide naming migration policy без запуска historical log rewrite-pass.
 
 ---
 
