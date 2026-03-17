@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-011
+Дата: 2026-03-17
+Статус: пройдено
+Проверка: в `Standards/Naming.md` зафиксирована repo-wide policy фазной миграции ID, категории serial/hybrid/singleton-доменов, hybrid-правило для `Terms/` и `Profiles/`, а также поздняя отдельная фаза для historical logs; в `Docs/Technical/Model.md`, `Docs/Terms/README.md` и `Profiles/README.md` policy отражена согласованно; в `Plans/Backlog.md` уточнены scope `BACK-000021` и `BACK-000022`, добавлены `BACK-000023` и `BACK-000024`; создан `Plans/BP-000007-id-migration-policy-and-phase-plan.md`; журналы обновлены только фактами policy-прохода без запуска rewrite-pass.
+Результат: repo-wide policy фазной ID migration закреплена документно и планово; `Schemas/*`, `Templates/*`, `Docs/Terms/TERM-*`, `Profiles/Default.md`, `Profiles/Speculorg.md`, `Tools/*` и historical logs намеренно оставлены без содержательной миграции в этом проходе.
+
+---
+
 ## QL-010
 Дата: 2026-03-17
 Статус: пройдено
