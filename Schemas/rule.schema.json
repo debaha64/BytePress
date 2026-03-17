@@ -6,7 +6,7 @@
   "properties": {
     "ID": {
       "type": "string",
-      "pattern": "^RULE-[0-9]{4}$",
+      "pattern": "^RULE-[0-9]{6}$",
       "description": "Стабильный идентификатор сущности."
     },
     "Статус": {
@@ -17,7 +17,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[A-Z]+-[0-9]{4}$"
+        "pattern": "^[A-Z]+-[0-9]{6}$"
       },
       "description": "Список идентификаторов связанных сущностей."
     },

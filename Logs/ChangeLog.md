@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000017 — Синхронизированы схемы, шаблоны, профили и language contract Git/PR
 - CHG-000016 — Зафиксирована repo-wide policy фазной ID migration без запуска rewrite-pass
 - CHG-000015 — Remaining plan layer приведён к каноническим именам и 6-значным plan ID
 - CHG-000014 — Нормализован foundation-план BytePress и удалён legacy-дубль
@@ -17,6 +18,23 @@
 - CHG-0003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-0002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-0001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000017 — Синхронизированы схемы, шаблоны, профили и language contract Git/PR
+ID: CHG-000017
+Дата: 2026-03-17
+Тип_изменения: Контракт
+Источник: Первый migration-pass после фиксации repo-wide policy
+Связи: ADR-000016, PLAN-000008, BACK-000021, BACK-000022, BACK-000025
+Дата_создания: 2026-03-17
+Дата_изменения: 2026-03-17
+
+### Описание
+`Schemas/*` и `Templates/*` переведены на 6-значную числовую часть `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом, а `profile.schema.json` и `Templates/Profile.md` расширены полями `Тип_профиля`, `Код_продукта` и `Язык_взаимодействия`. `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` приведены к актуальной модели brand profiles с semantic filename и 6-значными внутренними `PROF ID`. В `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксировано правило английского языка для commit/PR artifacts и `branch slug`. Создан `Plans/BP-000008-schemas-templates-profiles-and-language-sync.md`.
+
+### Эффект
+Первый repo-wide migration-pass замкнул контракт между схемами, шаблонами, профилями и Git/PR-языком без запуска миграции `Terms/*`, `Tools/*`, semver и historical logs.
 
 ---
 
