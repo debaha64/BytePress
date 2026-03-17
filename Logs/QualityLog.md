@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-012
+Дата: 2026-03-17
+Статус: пройдено
+Проверка: `Schemas/*` и `Templates/*` приведены к 6-значной числовой части `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом; `profile.schema.json`, `Templates/Profile.md`, `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` согласованно отражают `Тип_профиля`, `Код_продукта`, `Язык_взаимодействия`, semantic filename для brand profiles и хранение product profiles только в product repo; в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксирован английский язык для commit/PR artifacts и `branch slug`; `Plans/Backlog.md` и `Plans/BP-000008-schemas-templates-profiles-and-language-sync.md` обновлены только в пределах текущего migration-pass; журналы отражают только факты этого прохода.
+Результат: schema/template/profile layer и language contract Git/PR синхронизированы без изменения `Tools/*`, `Docs/Terms/TERM-*`, semver и historical logs migration.
+
+---
+
 ## QL-011
 Дата: 2026-03-17
 Статус: пройдено

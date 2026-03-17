@@ -6,7 +6,7 @@
   "properties": {
     "ID": {
       "type": "string",
-      "pattern": "^PLAN-[0-9]{4}$",
+      "pattern": "^PLAN-[0-9]{6}$",
       "description": "Стабильный идентификатор сущности."
     },
     "Статус": {
@@ -17,7 +17,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^[A-Z]+-[0-9]{4}$"
+        "pattern": "^[A-Z]+-[0-9]{6}$"
       },
       "description": "Список идентификаторов связанных сущностей."
     },
@@ -54,14 +54,14 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^BACK-[0-9]{4}$"
+        "pattern": "^BACK-[0-9]{6}$"
       }
     },
     "Связанные_ADR": {
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^ADR-[0-9]{4}$"
+        "pattern": "^ADR-[0-9]{6}$"
       }
     },
     "Шаги": {
