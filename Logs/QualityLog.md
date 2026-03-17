@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-009
+Дата: 2026-03-17
+Статус: пройдено
+Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/BP-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, `Docs/Product/Implementation_Plan.md` перепривязан к актуальному plan-file, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
+Результат: foundation-контур `Plans/` больше не содержит двух конкурирующих канонов для первого плана BytePress; актуальная точка ссылок и имени сведена к одному plan-file.
+
+---
+
 ## QL-008
 Дата: 2026-03-17
 Статус: пройдено
