@@ -23,9 +23,9 @@
 - `Super VBank -> SVB`
 
 ## Канон текущего слоя
-Foundation-план BytePress приведён к каноническому имени `Plans/BP-000001-foundation.md` и больше не имеет legacy-дубля.
+Актуальный слой `Plans/` использует канонические plan-files вида `Plans/BP-000001-foundation.md` ... `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`.
 
-Исторические ссылки на удалённый legacy-план должны считаться недействительными и заменяться ссылкой на актуальный канонический файл.
+Текущий плановый слой BytePress больше не смешивает legacy-имена файлов и 4-значные plan ID.
 
 ## Правило
 `Runtime/Plan.md` не считается источником истины для плана.
