@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000016 — Зафиксирована repo-wide policy фазной ID migration без запуска rewrite-pass
 - CHG-000015 — Remaining plan layer приведён к каноническим именам и 6-значным plan ID
 - CHG-000014 — Нормализован foundation-план BytePress и удалён legacy-дубль
 - CHG-000013 — Зафиксирован контракт 6-значных ID, naming plan-file и модель профилей
@@ -16,6 +17,23 @@
 - CHG-0003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-0002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-0001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000016 — Зафиксирована repo-wide policy фазной ID migration без запуска rewrite-pass
+ID: CHG-000016
+Дата: 2026-03-17
+Тип_изменения: Контракт
+Источник: Policy-проход после нормализации current plan layer
+Связи: ADR-000015, PLAN-000007, BACK-000021, BACK-000022, BACK-000023, BACK-000024
+Дата_создания: 2026-03-17
+Дата_изменения: 2026-03-17
+
+### Описание
+Уточнены `Standards/Naming.md`, `Docs/Technical/Model.md`, `Docs/Terms/README.md`, `Profiles/README.md` и `Plans/Backlog.md`: зафиксирована repo-wide policy фазной миграции ID и правил filename по доменам, различены serial-, hybrid- и singleton-домены, зафиксирован целевой контракт для `Docs/Terms/*`, подтверждено semantic-filename правило для brand profiles в `BytePress`, а historical logs вынесены в отдельную позднюю фазу миграции. Создан `Plans/BP-000007-id-migration-policy-and-phase-plan.md` как план policy-прохода без запуска самой миграции.
+
+### Эффект
+Репозиторий получил явный phase plan для remaining ID migration: новые артефакты создаются только по новому контракту, а legacy-слои переходят на него управляемыми отдельными проходами.
 
 ---
 

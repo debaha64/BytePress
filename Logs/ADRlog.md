@@ -1,6 +1,7 @@
 # ADRlog
 
 ## Индекс
+- ADR-000015 — Принята repo-wide policy фазной миграции ID и правил filename по доменам
 - ADR-000014 — Принят контракт 6-значных ID, plan-file naming и разделение brand/product profiles
 - ADR-0013 — Зафиксирован жизненный цикл ветки и целевой Auto-PR процесс
 - ADR-0012 — Принят единый формат рабочих веток `<type>/<NNNNNN>-<slug>`
@@ -15,6 +16,27 @@
 - ADR-0003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-0002 — Развести знание, оперативную среду, планы и журналы
 - ADR-0001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000015 — Принята repo-wide policy фазной миграции ID и правил filename по доменам
+ID: ADR-000015
+Дата: 2026-03-17
+Статус: Принято
+Связи: PLAN-000007, CHG-000016, BACK-000021, BACK-000022, BACK-000023, BACK-000024
+Утверждено: Человек
+Источник: Policy-проход после нормализации current plan layer
+Дата_создания: 2026-03-17
+Дата_изменения: 2026-03-17
+
+### Контекст
+После фиксации 6-значного naming contract и нормализации current plan layer в репозитории оставались разные категории доменов с разными требованиями к filename и внутренним ID. Без отдельной repo-wide policy существовал риск смешать миграцию serial-доменов, hybrid-доменов и historical logs в один rewrite-pass.
+
+### Решение
+Принять repo-wide policy, в которой миграция 4-значных ID в `BytePress` выполняется полностью, но фазами. `Docs/Terms/` признаётся serial-доменом с целевым контрактом `Docs/Terms/TERM-<NNNNNN>-<slug>.md` и 6-значным внутренним ID. Brand profiles в `BytePress` остаются с семантическими filenames по бренду, но их внутренние `profile ID` переходят на 6 знаков; product profiles хранятся только в product repo. Singleton-домены `Rules`, `Standards`, `Roles`, `Skills`, `Adapters`, `Memory`, `MCP` и аналогичные не переводятся на ID в filenames. Historical logs также подлежат миграции, но в отдельной поздней фазе. Новые артефакты создаются только по новому контракту, а legacy-слой мигрируется отдельными проходами.
+
+### Последствия
+Policy отделяет migration planning от migration execution: текущий проход не переписывает `Schemas/*`, `Templates/*`, `Docs/Terms/TERM-*`, `Profiles/*.md`, `Tools/*` и historical logs, но фиксирует их порядок и scope для следующих фаз.
 
 ---
 
