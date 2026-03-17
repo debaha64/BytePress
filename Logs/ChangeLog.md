@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000018 — Terms layer мигрирован на канонические filenames и 6-значные TERM ID
 - CHG-000017 — Синхронизированы схемы, шаблоны, профили и language contract Git/PR
 - CHG-000016 — Зафиксирована repo-wide policy фазной ID migration без запуска rewrite-pass
 - CHG-000015 — Remaining plan layer приведён к каноническим именам и 6-значным plan ID
@@ -18,6 +19,23 @@
 - CHG-0003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-0002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-0001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000018 — Terms layer мигрирован на канонические filenames и 6-значные TERM ID
+ID: CHG-000018
+Дата: 2026-03-17
+Тип_изменения: Документация
+Источник: Исполнение term migration phase из repo-wide naming policy
+Связи: PLAN-000009, BACK-000023, ADR-000015
+Дата_создания: 2026-03-17
+Дата_изменения: 2026-03-17
+
+### Описание
+`Docs/Terms/*` приведены к каноническим filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы. `bp_normalize_terms.py` минимально обновлён под новый filename pattern, а `Docs/Terms/README.md` и `Plans/Backlog.md` приведены к фактическому состоянию migration-pass.
+
+### Эффект
+Term layer перестал смешивать legacy filenames и 4-значные `TERM ID`; индекс словаря и прямые ссылки по репозиторию теперь согласованы с принятым naming contract без запуска migration для `Schemas/*`, `Templates/*`, `Profiles/*`, semver и historical logs.
 
 ---
 

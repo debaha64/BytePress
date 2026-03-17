@@ -406,14 +406,14 @@ ID: BACK-000023
 Название: Нормализовать Docs/Terms по filename contract и 6-значным term ID
 Тип: Документация
 Приоритет: Средний
-Статус: Черновик
-Связи: PLAN-000007, ADR-000015, CHG-000016
+Статус: Завершено
+Связи: PLAN-000007, PLAN-000009, ADR-000015, CHG-000016, CHG-000018
 Источник: Policy-проход по фазной ID migration
 Дата_создания: 2026-03-17
 Дата_изменения: 2026-03-17
 
 ### Описание
-В отдельной фазе привести `Docs/Terms/*` к целевому контракту `Docs/Terms/TERM-<NNNNNN>-<slug>.md` и 6-значным внутренним `TERM ID`, не смешивая этот проход с обновлением term schemas/templates и без переписывания других доменов.
+`Docs/Terms/*` приведены к контракту `Docs/Terms/TERM-<NNNNNN>-<slug>.md` и 6-значным внутренним `TERM ID`, `Base_Terms.md` и прямые term-ссылки синхронизированы, а `bp_normalize_terms.py` минимально обновлён под новый filename pattern без изменения `Schemas/*`, `Templates/*`, `Profiles/*`, semver и historical logs.
 
 ---
 

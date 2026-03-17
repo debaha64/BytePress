@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-013
+Дата: 2026-03-17
+Статус: пройдено
+Проверка: `Docs/Terms/*` приведены к filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы; `bp_normalize_terms.py` принимает новый 6-значный filename pattern и продолжает пересобирать `Base_Terms.md`; `Plans/Backlog.md` и `Plans/BP-000009-migrate-terms-layer.md` отражают фактическое завершение migration-pass без изменения `Schemas/*`, `Templates/*`, `Profiles/*`, `bp_bootstrap.py`, `bp_lint.py`, semver и historical logs.
+Результат: term layer и его прямые зависимости приведены к принятому naming contract, а инструмент нормализации терминов остаётся рабочим без архитектурного рефакторинга.
+
+---
+
 ## QL-012
 Дата: 2026-03-17
 Статус: пройдено

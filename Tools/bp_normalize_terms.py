@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 from typing import List, Tuple
 
-TERM_FILE = re.compile(r"^TERM-\d{4}.*\.md$")
+TERM_FILE = re.compile(r"^TERM-\d{6}-[a-z0-9-]+\.md$")
 
 
 def extract_value(text: str, key: str) -> str:
