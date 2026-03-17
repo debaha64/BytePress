@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000019 — Tool contract sync завершил приведение bootstrap и lint к текущим contracts
 - CHG-000018 — Terms layer мигрирован на канонические filenames и 6-значные TERM ID
 - CHG-000017 — Синхронизированы схемы, шаблоны, профили и language contract Git/PR
 - CHG-000016 — Зафиксирована repo-wide policy фазной ID migration без запуска rewrite-pass
@@ -19,6 +20,23 @@
 - CHG-0003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-0002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-0001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000019 — Tool contract sync завершил приведение bootstrap и lint к текущим contracts
+ID: CHG-000019
+Дата: 2026-03-18
+Тип_изменения: Инструмент
+Источник: Исполнение tool contract sync после naming/profile/language migration passes
+Связи: PLAN-000010, BACK-000022, ADR-000015, ADR-000016
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+`bp_bootstrap.py` переведён на обязательные параметры `--name`, `--product-code`, `--brand-profile`, `--target`; bootstrap теперь валидирует brand profile в `BytePress`, использует текущую дату выполнения, создаёт `Profiles/Product.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные ID. `bp_lint.py` минимально обновлён под новый product bootstrap output contract, а `Tools/README.md`, `Docs/Product/Bootstrap_Contract.md`, `Docs/Product/Bootstrap_Validation.md` и `Docs/Product/Profiles.md` синхронизированы с фактическим поведением инструментов.
+
+### Эффект
+Инструментальный контур больше не расходится с принятыми naming/profile/language contracts: bootstrap и lint работают по одному минимальному product bootstrap contract без большого рефакторинга tools.
 
 ---
 
