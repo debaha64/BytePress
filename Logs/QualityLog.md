@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-015
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Product/Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/BP-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
+Результат: активный non-log слой BytePress согласован с repo-wide 6-значным ID contract без затрагивания historical logs migration и без выхода за пределы утверждённого scope.
+
+---
+
 ## QL-014
 Дата: 2026-03-18
 Статус: пройдено
