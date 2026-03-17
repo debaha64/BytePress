@@ -1,12 +1,12 @@
-# PLAN-0006 — Branch lifecycle, Auto-PR process и подготовка к большому аудиту
+# PLAN-000006 — Branch lifecycle, Auto-PR process и подготовка к большому аудиту
 
-ID: PLAN-0006
+ID: PLAN-000006
 Название: Branch lifecycle, Auto-PR process и подготовка к большому аудиту
-Статус: Утверждено
+Статус: Завершено
 Связи: BACK-0017, BACK-0018, BACK-0019, ADR-0013
 Источник: Следующий проход после фиксации минимального Git/PR-контура
 Дата_создания: 2026-03-14
-Дата_изменения: 2026-03-14
+Дата_изменения: 2026-03-17
 Основание: После фиксации базового branch/PR-контура нужно довести жизненный цикл веток до полностью управляемого вида, определить рабочий Auto-PR процесс и подготовить вход для отдельного глубокого аудита системы.
 Связанные_требования:
 Связанные_backlog: BACK-0017, BACK-0018, BACK-0019
@@ -27,7 +27,7 @@ ID: PLAN-0006
 - `Setup_Guide.md`
 - `Docs/Technical/Platform_Contracts.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-0006_Branch_Lifecycle_Auto_PR_And_Audit_Preparation.md`
+- `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

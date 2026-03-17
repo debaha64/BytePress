@@ -70,9 +70,9 @@ def main() -> int:
     for rel in [
         "Profiles/Default.md",
         "Profiles/Speculorg.md",
-        "Plans/PLAN-0001_BytePress_V1.md",
-        "Plans/PLAN-0004_Fill_Skills_And_Tools.md",
-        "Plans/PLAN-0005_Adapters_Memory_MCP_And_Bootstrap.md",
+        "Plans/BP-000001-foundation.md",
+        "Plans/BP-000004-fill-skills-and-tools.md",
+        "Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md",
         "Skills/Discussion.md",
         "Skills/Implementation.md",
         "Skills/Quality.md",

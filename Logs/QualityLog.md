@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-010
+Дата: 2026-03-17
+Статус: пройдено
+Проверка: remaining plan layer переведён в канонические файлы `BP-000002`...`BP-000006`, внутренние `ID` планов выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Docs/Product/Bootstrap_Validation.md` и `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено`, так как его DoD уже фактически закрыт артефактами branch lifecycle, Auto-PR process и подготовкой входа в большой аудит, отражёнными в `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md` и предыдущем `QL-007`.
+Результат: актуальный plan layer BytePress больше не смешивает 4- и 6-значные plan ID; remaining plan-files сведены к одному каноническому naming contract без нового архитектурного решения.
+
+---
+
 ## QL-009
 Дата: 2026-03-17
 Статус: пройдено
@@ -19,7 +27,7 @@
 ## QL-007
 Дата: 2026-03-14
 Статус: пройдено
-Проверка: branch lifecycle и целевой Auto-PR process зафиксированы в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Setup_Guide.md`; добавлены `BACK-0017`, `BACK-0018`, `BACK-0019` и `PLAN-0006`; журналы обновлены только фактами этого прохода.
+Проверка: branch lifecycle и целевой Auto-PR process зафиксированы в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Setup_Guide.md`; добавлены `BACK-0017`, `BACK-0018`, `BACK-0019` и `PLAN-000006`; журналы обновлены только фактами этого прохода.
 Результат: управляемый процесс веток и PR закреплён документно, следующий проход подготовлен без запуска semver-миграции, cleanup `Plans/*` и рефакторинга `Tools/*`.
 
 ---
