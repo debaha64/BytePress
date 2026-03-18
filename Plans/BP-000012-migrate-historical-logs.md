@@ -20,7 +20,7 @@ ID: PLAN-000012
 2. Синхронизировать прямые ссылки на historical log IDs в активных non-log документах.
    - DoD: `Plans/*`, `Docs/Technical/*`, `Docs/Product/*`, `Rules/*`, `Standards/*`, `Adapters/*`, `Tools/README.md` и `Plans/Backlog.md` не ссылаются на старый формат historical log IDs.
 3. Не переписывать историю как содержание.
-   - DoD: смысл записей, порядок записей, даты и текст history blocks сохранены; `BP-REQ-0001` и `PIPE-0001` не меняются.
+   - DoD: смысл записей, порядок записей, даты и текст history blocks сохранены; orphan requirement и orphan pipeline reference не меняются в рамках этого migration-pass.
 
 ## Риски
 - механическая замена может затронуть нецелевые идентификаторы вне scope late-phase migration;
