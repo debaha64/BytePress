@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000023 — Orphan IDs removed from active plans and approval rule without new namespaces
 - CHG-000022 — Semver operationalized for active BytePress documents at baseline 0.1.0
 - CHG-000021 — Historical logs migrated to six-digit IDs and active references synced
 - CHG-000020 — Active non-log ID layer переведён на 6-значный формат без переписывания historical logs
@@ -23,6 +24,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000023 — Orphan IDs removed from active plans and approval rule without new namespaces
+ID: CHG-000023
+Дата: 2026-03-18
+Тип_изменения: Контракт
+Источник: Orphan ID cleanup after semver operationalization
+Связи: PLAN-000014, BACK-000019
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+Из `Plans/BP-000001-foundation.md` и `Plans/BP-000002-seed-docs-and-standards.md` удалён orphan ID `BP-REQ-0001` без введения нового requirement namespace и без замены его новой сущностью требований. Из `Rules/Approval_Strictness.md` удалён orphan ID `PIPE-0001`; смысл зависимости от конвейерных фаз сохраняется в текстовом описании и проверке правила без нового pipeline namespace.
+
+### Эффект
+Активный non-log слой BytePress больше не содержит оставшихся orphan ID `BP-REQ-0001` и `PIPE-0001`; ссылки и смысл документов сохранены без расширения модели и без добавления новых registry-доменов.
 
 ---
 

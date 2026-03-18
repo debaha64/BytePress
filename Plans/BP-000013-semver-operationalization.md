@@ -21,7 +21,7 @@ ID: PLAN-000013
 2. Синхронизировать active non-log документы.
    - DoD: `Docs/Technical/*`, `Docs/Product/*`, `Adapters/*`, `Memory/*`, `MCP/*`, `Pipeline/*`, `Plans/Backlog.md`, `Plans/Roadmap.md`, релевантные `Plans/BP-*`, `Tools/README.md`, `Rules/README.md`, `Standards/README.md` и `Skills/README.md` используют `0.1.0` там, где раньше `v1` обозначал текущий baseline.
 3. Не переписывать историю и не трогать вне-scope артефакты.
-   - DoD: `Logs/*`, `BP-REQ-0001`, `PIPE-0001`, `Schemas/*`, `Templates/*` и `Tools/*.py` остаются вне содержательного rewrite.
+   - DoD: `Logs/*`, orphan requirement и orphan pipeline reference, `Schemas/*`, `Templates/*` и `Tools/*.py` остаются вне содержательного rewrite.
 
 ## Риски
 - механическая замена `v1` может затронуть текст, где semver не является operational label;

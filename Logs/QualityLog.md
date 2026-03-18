@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000018
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: orphan ID `BP-REQ-0001` удалён из `Plans/BP-000001-foundation.md` и `Plans/BP-000002-seed-docs-and-standards.md` без введения нового requirement ID; orphan ID `PIPE-0001` удалён из `Rules/Approval_Strictness.md` без введения нового pipeline ID namespace; смысл планов и правила сохранён через существующие `Основание`, `Связанные_backlog`, `Связанные_ADR`, описание и проверку; `Plans/BP-000014-cleanup-orphan-ids.md` и факт-записи текущего прохода добавлены без изменения historical logs, semver, `Schemas/*`, `Templates/*` и `Tools/*.py`.
+Результат: оставшиеся orphan IDs в активном non-log слое устранены без расширения модели и без создания новых сущностей.
+
+---
+
 ## QL-000017
 Дата: 2026-03-18
 Статус: пройдено
