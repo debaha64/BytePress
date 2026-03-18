@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000017
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: `Standards/Naming.md` и `Docs/Technical/Platform_Contracts.md` фиксируют current operational baseline `BytePress` как `0.1.0`, а активные non-log документы в `Docs/Technical/*`, `Docs/Product/*`, `Adapters/*`, `Memory/*`, `MCP/*`, `Pipeline/*`, `Plans/Backlog.md`, `Plans/Roadmap.md`, релевантных `Plans/BP-*`, `Tools/README.md`, `Rules/README.md`, `Standards/README.md` и `Skills/README.md` используют semver-метку `0.1.0` вместо `v1` там, где `v1` обозначал текущий baseline. `Logs/*`, `BP-REQ-0001`, `PIPE-0001`, `Schemas/*`, `Templates/*` и `Tools/*.py` не изменялись.
+Результат: semver operationalization выполнена для активного non-log слоя BytePress без переписывания historical logs и без выхода за пределы утверждённого scope.
+
+---
+
 ## QL-000016
 Дата: 2026-03-18
 Статус: пройдено

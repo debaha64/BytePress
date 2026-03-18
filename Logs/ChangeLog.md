@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000022 — Semver operationalized for active BytePress documents at baseline 0.1.0
 - CHG-000021 — Historical logs migrated to six-digit IDs and active references synced
 - CHG-000020 — Active non-log ID layer переведён на 6-значный формат без переписывания historical logs
 - CHG-000019 — Tool contract sync завершил приведение bootstrap и lint к текущим contracts
@@ -22,6 +23,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000022 — Semver operationalized for active BytePress documents at baseline 0.1.0
+ID: CHG-000022
+Дата: 2026-03-18
+Тип_изменения: Контракт
+Источник: Semver operationalization pass after historical log migration
+Связи: PLAN-000013, BACK-000019
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+В `Standards/Naming.md` и `Docs/Technical/Platform_Contracts.md` зафиксирован current operational baseline `BytePress` как `0.1.0`, а активные non-log документы переведены с использования `v1` на semver-метку `0.1.0` там, где `v1` обозначал текущий baseline-состояние системы. Historical logs намеренно не переписывались.
+
+### Эффект
+Текущий operational contract `BytePress` теперь маркируется через semver, а не через размытое обозначение `v1`, что снимает двусмысленность между baseline системы и историческими фазами её развития.
 
 ---
 

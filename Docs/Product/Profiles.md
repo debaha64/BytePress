@@ -13,7 +13,7 @@
 - `Брендовый_профиль`
 - `Язык_взаимодействия`
 
-## Product profile `v1`
+## Product profile `0.1.0`
 `Profiles/Product.md` хранит минимально нужные поля:
 - `ID`
 - `Тип_профиля: product`
