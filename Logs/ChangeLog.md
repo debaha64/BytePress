@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000024 — Planning truth aligned with logs truth for release preparation
 - CHG-000023 — Orphan IDs removed from active plans and approval rule without new namespaces
 - CHG-000022 — Semver operationalized for active BytePress documents at baseline 0.1.0
 - CHG-000021 — Historical logs migrated to six-digit IDs and active references synced
@@ -24,6 +25,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000024 — Planning truth aligned with logs truth for release preparation
+ID: CHG-000024
+Дата: 2026-03-18
+Тип_изменения: Контракт
+Источник: Release-readiness alignment pass for planning truth
+Связи: PLAN-000006, BACK-000017, BACK-000018
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+В `Plans/Backlog.md` статусы `BACK-000017` и `BACK-000018` выровнены до `Завершено`, чтобы planning truth соответствовал уже зафиксированным `PLAN-000006`, `CHG-000012` и `QL-000007` перед подготовкой release branch `0.1.0`.
+
+### Эффект
+Planning truth и logs truth больше не расходятся по закрытию branch lifecycle и Auto-PR preparation pass.
 
 ---
 
