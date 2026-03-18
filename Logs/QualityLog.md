@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000020
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: `README.md` коротко фиксирует ценность `BytePress` как устойчивого контекста вокруг продукта, управляемого agent contour и снижения недетерминированности в SDLC; `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Release.md` согласованно описывают `release/*` как временную stabilizing branch только от `develop`, без feature-work, с PR только в `main`, удалением ветки после merge и возвратом release-only fixes в `develop` при необходимости.
+Результат: release governance и README product value formalized before main preparation без изменения semver, schemas, templates, terms, profiles, tools.py и historical logs.
+
+---
+
 ## QL-000019
 Дата: 2026-03-18
 Статус: пройдено
