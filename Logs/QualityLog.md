@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000019
+Дата: 2026-03-18
+Статус: пройдено
+Проверка: `BACK-000017` и `BACK-000018` в `Plans/Backlog.md` переведены в `Завершено`, а их статус теперь согласован с `PLAN-000006`, `CHG-000012` и `QL-000007`; scope ограничен только `Plans/Backlog.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` без изменения ADR, semver, tools, schemas, templates, terms, profiles и historical logs.
+Результат: последний release-blocker в planning truth снят; planning truth выровнен с logs truth перед подготовкой release branch `0.1.0`.
+
+---
+
 ## QL-000018
 Дата: 2026-03-18
 Статус: пройдено
