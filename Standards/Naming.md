@@ -3,6 +3,12 @@
 ## Версии
 Версии оформляются в формате `MAJOR.MINOR.PATCH`.
 
+Текущая baseline-version `BytePress`: `0.1.0`.
+
+Активные документы используют semver, а не метки вида `vN`, когда речь идёт о текущем operational contract системы.
+
+Semver применяется к текущему operational contract `BytePress`, а не к rewrite истории журналов.
+
 ## ID сущностей
 Числовая часть ID содержит 6 знаков.
 
