@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000025 — Release governance and README product value formalized before main preparation
 - CHG-000024 — Planning truth aligned with logs truth for release preparation
 - CHG-000023 — Orphan IDs removed from active plans and approval rule without new namespaces
 - CHG-000022 — Semver operationalized for active BytePress documents at baseline 0.1.0
@@ -25,6 +26,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000025 — Release governance and README product value formalized before main preparation
+ID: CHG-000025
+Дата: 2026-03-18
+Тип_изменения: Документация
+Источник: Release branch workflow formalization before main preparation
+Связи: STD-000004, CHG-000024, QL-000020
+Дата_создания: 2026-03-18
+Дата_изменения: 2026-03-18
+
+### Описание
+В `README.md` кратко усилено описание ценности `BytePress` как системы, которая формирует устойчивый контекст вокруг продукта, удерживает агента в управляемом контуре и снижает недетерминированность в SDLC. В `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Release.md` зафиксирован release-branch workflow для `release/*` как временной стабилизационной ветки от `develop` с PR только в `main`, без feature-work и с возвратом release-only fixes в `develop` при необходимости.
+
+### Эффект
+Release governance и краткое product value message формализованы до подготовки первого выхода `BytePress` в `main`.
 
 ---
 
