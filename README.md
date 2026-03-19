@@ -1,10 +1,38 @@
-
 # BytePress
 
-**BytePress** is an open MIT-licensed **AI factory for building digital products**.
+BytePress — файловая фабрика цифровых продуктов: доменная база знаний, плановый контур и журналы фактов в одном репозитории.
 
-It provides a structured environment where **roles, skills, and pipelines** orchestrate AI agents to design, build, review, and deliver software and digital content through reproducible production workflows.
+`README.md` — карта для человека.  
+`AGENTS.md` — карта для агента: см. `AGENTS.md`.
 
-The goal of BytePress is to make **AI-driven product development systematic, modular, and scalable** — similar to an industrial assembly line for software.
+## Для чего нужен BytePress
+- держать систему и продукт в проверяемом файловом контуре;
+- формировать устойчивый контекст вокруг продукта;
+- удерживать агента в управляемом контуре;
+- снижать недетерминированность в SDLC;
+- вести работу через `Roadmap -> Backlog -> Plan`;
+- фиксировать решения и изменения в журналах;
+- поддерживать воспроизводимую работу человека и агента через Git/PR.
 
-Status: early architecture and experimentation.
+## Доменная карта
+- `Docs/` — долговременное знание.
+- `Docs/Technical/` — архитектура, модель, интерфейсы, платформенные контракты.
+- `Plans/` — дорожная карта, backlog, планы.
+- `Logs/` — ADR, ChangeLog, QualityLog, ReleaseLog, SupportLog.
+- `Rules/` — обязательные ограничения.
+- `Standards/` — нормативы качества и формы.
+- `Tools/` — проектные утилиты проверки и генерации.
+- `Profiles/`, `Roles/`, `Skills/` — рабочий контур режимов и исполнения.
+- `Schemas/`, `Templates/` — формальные контракты и заготовки.
+
+## Текущий рабочий принцип
+Человек направляет. Агент исполняет.
+
+## Дальнейшая навигация
+- среда и запуск: `Setup_Guide.md`
+- техкарта системы: `Docs/Technical/README.md`
+- правила: `Rules/README.md`
+- стандарты: `Standards/README.md`
+- планы: `Plans/README.md`
+- журналы: `Logs/README.md`
+- инструменты: `Tools/README.md`

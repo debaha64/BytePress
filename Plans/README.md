@@ -1,0 +1,31 @@
+# Plans
+
+`Plans/` хранит утверждённые планы и плановый контур продукта.
+
+## Состав
+- `Roadmap.md` — дорожная карта.
+- `Backlog.md` — реестр работ.
+- `Plans/<PRODUCT_CODE>-<NNNNNN>-<slug>.md` — канонический формат имени plan-file.
+
+## Контракт именования
+- числовая часть ID содержит 6 знаков;
+- типовой префикс сущности сохраняется;
+- `slug` оформляется в `kebab-case`;
+- имя файла не дублирует родительский каталог;
+- `PRODUCT_CODE` содержит 2-3 символа в верхнем регистре;
+- кандидат `PRODUCT_CODE` генерируется из имени продукта;
+- итоговый `PRODUCT_CODE` утверждается человеком.
+
+Примеры `PRODUCT_CODE`:
+- `BytePress -> BP`
+- `Speculorg.Terminal -> ST`
+- `MicroCalc -> MC`
+- `Super VBank -> SVB`
+
+## Канон текущего слоя
+Актуальный слой `Plans/` использует канонические plan-files вида `Plans/BP-000001-foundation.md` ... `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`.
+
+Текущий плановый слой BytePress больше не смешивает legacy-имена файлов и 4-значные plan ID.
+
+## Правило
+`Runtime/Plan.md` не считается источником истины для плана.

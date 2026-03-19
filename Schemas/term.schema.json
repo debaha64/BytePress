@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Term",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^TERM-[0-9]{6}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{6}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Термин": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Определение": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Синонимы": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Связанные_термины": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TERM-[0-9]{6}$"
+      }
+    },
+    "Решение_по_конфликту": {
+      "type": "string",
+      "enum": [
+        "Не_требуется",
+        "Принять",
+        "Запретить",
+        "Заменить"
+      ]
+    }
+  },
+  "required": [
+    "ID",
+    "Термин",
+    "Определение",
+    "Статус",
+    "Связи",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения",
+    "Решение_по_конфликту"
+  ]
+}

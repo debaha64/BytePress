@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^PLAN-[0-9]{6}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{6}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Название": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Краткое название сущности."
+    },
+    "Основание": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Связанные_требования": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Связанные_backlog": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^BACK-[0-9]{6}$"
+      }
+    },
+    "Связанные_ADR": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]{6}$"
+      }
+    },
+    "Шаги": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Номер": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "Название": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Описание": {
+            "type": "string",
+            "minLength": 1
+          },
+          "DoD": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Номер",
+          "Название",
+          "Описание",
+          "DoD"
+        ]
+      }
+    },
+    "Риски": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Артефакты": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "DoD": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "ID",
+    "Название",
+    "Статус",
+    "Основание",
+    "Связанные_backlog",
+    "Шаги",
+    "Риски",
+    "Артефакты",
+    "DoD",
+    "Связи",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения"
+  ]
+}

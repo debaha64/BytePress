@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RoadmapItem",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^ROAD-[0-9]{6}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{6}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Этап": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Цель": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Описание": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Зависимости": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(ROAD|BACK|PLAN|ADR)-[0-9]{6}$"
+      }
+    },
+    "Связанные_backlog": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^BACK-[0-9]{6}$"
+      }
+    }
+  },
+  "required": [
+    "ID",
+    "Этап",
+    "Цель",
+    "Описание",
+    "Статус",
+    "Связи",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения",
+    "Зависимости",
+    "Связанные_backlog"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ADREntry",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ID": {
+      "type": "string",
+      "pattern": "^ADR-[0-9]{6}$",
+      "description": "Стабильный идентификатор сущности."
+    },
+    "Статус": {
+      "type": "string",
+      "description": "Текущее состояние сущности."
+    },
+    "Связи": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]{6}$"
+      },
+      "description": "Список идентификаторов связанных сущностей."
+    },
+    "Источник": {
+      "type": "string",
+      "description": "Основание появления сущности."
+    },
+    "Дата_создания": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата первого появления записи."
+    },
+    "Дата_изменения": {
+      "type": "string",
+      "format": "date",
+      "description": "Дата последнего обновления записи."
+    },
+    "Название": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Краткое название сущности."
+    },
+    "Дата": {
+      "type": "string",
+      "format": "date"
+    },
+    "Контекст": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Решение": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Последствия": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Утверждено": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "ID",
+    "Дата",
+    "Статус",
+    "Контекст",
+    "Решение",
+    "Последствия",
+    "Связи",
+    "Утверждено",
+    "Источник",
+    "Дата_создания",
+    "Дата_изменения"
+  ]
+}
