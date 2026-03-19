@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000026 — Release branch example aligned with canonical branch naming
 - CHG-000025 — Release governance and README product value formalized before main preparation
 - CHG-000024 — Planning truth aligned with logs truth for release preparation
 - CHG-000023 — Orphan IDs removed from active plans and approval rule without new namespaces
@@ -26,6 +27,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000026 — Release branch example aligned with canonical branch naming
+ID: CHG-000026
+Дата: 2026-03-19
+Тип_изменения: Документация
+Источник: Release-readiness cleanup before recreating the 0.1.0 release branch
+Связи: CHG-000025, QL-000021
+Дата_создания: 2026-03-19
+Дата_изменения: 2026-03-19
+
+### Описание
+В `Setup_Guide.md` пример release-ветки приведён к каноническому формату `<type>/<NNNNNN>-<slug>` и заменён с `release/0.1.0` на `release/000019-0.1.0-rc2` в командах создания, открытия PR и удаления ветки.
+
+### Эффект
+Практический release workflow больше не противоречит принятому branch naming contract перед пересозданием release branch `0.1.0`.
 
 ---
 
