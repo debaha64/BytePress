@@ -18,3 +18,4 @@
 ## Шаблоны продукта
 - `JTBD.md` — минимальный шаблон Jobs To Be Done.
 - `PRD.md` — минимальный шаблон Product Requirements Document.
+- `Delivery.md` — минимальный шаблон модели поставки продукта.
