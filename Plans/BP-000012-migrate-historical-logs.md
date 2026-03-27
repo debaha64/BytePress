@@ -46,8 +46,8 @@ ID: PLAN-000012
 - `Plans/BP-000011-migrate-active-nonlog-ids.md`
 - `Plans/BP-000012-migrate-historical-logs.md`
 - `Docs/Technical/*.md`
-- `Docs/Product/Bootstrap_Contract.md`
-- `Docs/Product/Bootstrap_Validation.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
+- `Docs/Technical/Product_Bootstrap_Validation.md`
 - `Rules/*.md`
 - `Standards/*.md`
 - `Adapters/*.md`

@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000022
+Дата: 2026-03-27
+Статус: пройдено
+Проверка: `Docs/Product/` содержит только `README.md`, `JTBD.md`, `PRD.md`, `Delivery.md`; `Docs/Product/PRD.md` и `Docs/Product/JTBD.md` выровнены по `Templates/PRD.md` и `Templates/JTBD.md` без смешения с внутренними системными сущностями; `Docs/Product/Implementation_Plan.md` и `Docs/Product/Profiles.md` удалены как дубль и внепродуктовый документ; `Docs/Product/Bootstrap_Contract.md` и `Docs/Product/Bootstrap_Validation.md` перенесены в `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md`; прямые ссылки в `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md`, `Plans/BP-000010-tools-contract-sync.md`, `Plans/BP-000011-migrate-active-nonlog-ids.md`, `Plans/BP-000012-migrate-historical-logs.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` синхронизированы; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
+Результат: продуктовый слой BytePress приведён к каноническому минимальному составу, технические bootstrap-docs живут в `Docs/Technical/`, planning truth и logs truth закрыты без нового архитектурного решения.
+
+---
+
 ## QL-000021
 Дата: 2026-03-19
 Статус: пройдено
@@ -51,7 +59,7 @@
 ## QL-000015
 Дата: 2026-03-18
 Статус: пройдено
-Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Product/Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/BP-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
+Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/BP-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
 Результат: активный non-log слой BytePress согласован с repo-wide 6-значным ID contract без затрагивания historical logs migration и без выхода за пределы утверждённого scope.
 
 ---
@@ -91,7 +99,7 @@
 ## QL-000010
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: remaining plan layer переведён в канонические файлы `BP-000002`...`BP-000006`, внутренние `ID` планов выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Docs/Product/Bootstrap_Validation.md` и `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено`, так как его DoD уже фактически закрыт артефактами branch lifecycle, Auto-PR process и подготовкой входа в большой аудит, отражёнными в `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md` и предыдущем `QL-000007`.
+Проверка: remaining plan layer переведён в канонические файлы `BP-000002`...`BP-000006`, внутренние `ID` планов выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено`, так как его DoD уже фактически закрыт артефактами branch lifecycle, Auto-PR process и подготовкой входа в большой аудит, отражёнными в `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md` и предыдущем `QL-000007`.
 Результат: актуальный plan layer BytePress больше не смешивает 4- и 6-значные plan ID; remaining plan-files сведены к одному каноническому naming contract без нового архитектурного решения.
 
 ---
@@ -99,7 +107,7 @@
 ## QL-000009
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/BP-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, `Docs/Product/Implementation_Plan.md` перепривязан к актуальному plan-file, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
+Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/BP-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, продуктовый слой больше не хранит отдельный дубль foundation-плана, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
 Результат: foundation-контур `Plans/` больше не содержит двух конкурирующих канонов для первого плана BytePress; актуальная точка ссылок и имени сведена к одному plan-file.
 
 ---

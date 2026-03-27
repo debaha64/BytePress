@@ -2,8 +2,8 @@
 
 ID: PLAN-000015
 Название: Нормализовать продуктовый слой `Docs/Product/` по каноническим шаблонам
-Статус: В_работе
-Связи: BACK-000026
+Статус: Завершено
+Связи: BACK-000026, CHG-000027
 Источник: Документный проход после утверждения шаблонов `PRD` и `JTBD`
 Дата_создания: 2026-03-27
 Дата_изменения: 2026-03-27
@@ -37,15 +37,18 @@ ID: PLAN-000015
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/BP-000015-align-product-layer.md`
+- `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md`
+- `Plans/BP-000010-tools-contract-sync.md`
+- `Plans/BP-000011-migrate-active-nonlog-ids.md`
+- `Plans/BP-000012-migrate-historical-logs.md`
 - `Docs/Product/README.md`
 - `Docs/Product/JTBD.md`
 - `Docs/Product/PRD.md`
 - `Docs/Product/Delivery.md`
 - `Docs/Technical/README.md`
-- `Docs/Technical/Model.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
+- `Docs/Technical/Product_Bootstrap_Validation.md`
 - `Profiles/README.md`
-- `Plans/README.md`
-- `Templates/README.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

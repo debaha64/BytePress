@@ -17,7 +17,7 @@ ID: PLAN-000005
 2. Оформить `Memory/` как каркас будущей долговременной памяти. DoD: есть модель, границы, интерфейсы и реестр будущих типов памяти.
 3. Оформить `MCP/` как каркас будущих подключений. DoD: есть политика, интерфейсы и реестр кандидатов подключения.
 4. Усилить `bp_bootstrap.py` до полезного минимального продукта. DoD: bootstrap создаёт не только каркас папок, но и минимальные рабочие документы, журналы и скрипты.
-5. Подтвердить результат тестовым вызовом bootstrap и зафиксировать его в документации и журналах. DoD: есть документ `Bootstrap_Validation.md` и записи в `ADRlog`, `ChangeLog`, `QualityLog`, `ReleaseLog`.
+5. Подтвердить результат тестовым вызовом bootstrap и зафиксировать его в документации и журналах. DoD: есть документ `Product_Bootstrap_Validation.md` и записи в `ADRlog`, `ChangeLog`, `QualityLog`, `ReleaseLog`.
 
 ## Риски
 - расширяющие домены могут незаметно начать подменять ядро знания;
@@ -28,8 +28,8 @@ ID: PLAN-000005
 - `Adapters/*`
 - `Memory/*`
 - `MCP/*`
-- `Docs/Product/Bootstrap_Contract.md`
-- `Docs/Product/Bootstrap_Validation.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
+- `Docs/Technical/Product_Bootstrap_Validation.md`
 - `Tools/bp_bootstrap.py`
 - `Tools/bp_lint.py`
 - `Plans/Roadmap.md`
