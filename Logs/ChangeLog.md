@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000028 — Delivery template, bootstrap, and lint contracts synchronized with product layer canon
 - CHG-000027 — Product layer aligned with canonical templates and minimal document scope
 - CHG-000026 — Release branch example aligned with canonical branch naming
 - CHG-000025 — Release governance and README product value formalized before main preparation
@@ -28,6 +29,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000028 — Delivery template, bootstrap, and lint contracts synchronized with product layer canon
+ID: CHG-000028
+Дата: 2026-03-28
+Тип_изменения: Контракт
+Источник: Delivery/bootstrap/lint sync pass after product-layer normalization
+Связи: PLAN-000016, BACK-000028, QL-000023
+Дата_создания: 2026-03-28
+Дата_изменения: 2026-03-28
+
+### Описание
+Добавлен `Templates/Delivery.md`, а `Templates/README.md` и `Docs/Product/Delivery.md` приведены к новому минимальному шаблону поставки. `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md` синхронизированы с каноническим продуктовым набором `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`. `bp_bootstrap.py` теперь материализует весь этот набор в product repo, а `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет наличие полного минимального `Docs/Product/*` слоя в bootstrap-продукте. Краткая синхронизация добавлена в `Tools/README.md`.
+
+### Эффект
+Шаблоны, bootstrap-documentation, генерация продукта и lint используют один и тот же минимальный contract продуктового слоя; bootstrap smoke-check подтверждает, что этот contract действительно материализуется и валидируется.
 
 ---
 
@@ -177,7 +195,7 @@ ID: CHG-000019
 Дата_изменения: 2026-03-18
 
 ### Описание
-`bp_bootstrap.py` переведён на обязательные параметры `--name`, `--product-code`, `--brand-profile`, `--target`; bootstrap теперь валидирует brand profile в `BytePress`, использует текущую дату выполнения, создаёт `Profiles/Product.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные ID. `bp_lint.py` минимально обновлён под новый product bootstrap output contract, а `Tools/README.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и `Profiles/README.md` синхронизированы с фактическим поведением инструментов.
+`bp_bootstrap.py` переведён на обязательные параметры `--name`, `--product-code`, `--brand-profile`, `--target`; bootstrap теперь валидирует brand profile в `BytePress`, использует текущую дату выполнения, создаёт `Profiles/Product.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные ID. `bp_lint.py` минимально обновлён под новый product bootstrap output contract, а `Tools/README.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и `Profiles/README.md` синхронизированы с фактическим поведением инструментов; позднее contract дополнительно расширен каноническим `Delivery` template и полным минимальным `Docs/Product/*` набором.
 
 ### Эффект
 Инструментальный контур больше не расходится с принятыми naming/profile/language contracts: bootstrap и lint работают по одному минимальному product bootstrap contract без большого рефакторинга tools.

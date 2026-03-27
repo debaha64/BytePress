@@ -2,8 +2,8 @@
 
 ID: PLAN-000016
 Название: Синхронизировать Delivery template, bootstrap и lint с каноном продуктового слоя
-Статус: В_работе
-Связи: BACK-000028
+Статус: Завершено
+Связи: BACK-000028, CHG-000028
 Источник: Delivery/bootstrap/lint sync pass после нормализации продуктового слоя
 Дата_создания: 2026-03-28
 Дата_изменения: 2026-03-28
@@ -47,6 +47,7 @@ ID: PLAN-000016
 - `Tools/README.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
+- `/tmp/bytepress-delivery-bJeblG`
 
 ## DoD
 - `Templates/Delivery.md` существует и отражён в `Templates/README.md`.
