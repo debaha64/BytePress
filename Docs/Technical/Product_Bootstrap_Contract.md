@@ -21,6 +21,9 @@
 - `Setup_Guide.md`
 - `Docs/User/README.md`
 - `Docs/Product/README.md`
+- `Docs/Product/JTBD.md`
+- `Docs/Product/PRD.md`
+- `Docs/Product/Delivery.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/Interfaces.md`
@@ -39,6 +42,7 @@
 - продукт не содержит копию системных доменов `BytePress`, не относящихся к продукту;
 - продукт не зависит на выполнение от исходного репозитория `BytePress`;
 - продукт получает только минимальный пригодный каркас и может далее развиваться отдельно;
+- продуктовый слой bootstrap ограничен каноническим набором `README`, `JTBD`, `PRD`, `Delivery`;
 - bootstrap использует 6-значные ID: `ROAD-000001`, `BACK-000001`, `PLAN-000001`, `PROF-000001` и аналогичные;
 - bootstrap использует текущую дату выполнения, а не жёстко зашитые даты;
 - из brand profile наследуются только `Брендовый_профиль` и `Язык_взаимодействия`.

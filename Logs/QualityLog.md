@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000023
+Дата: 2026-03-28
+Статус: пройдено
+Проверка: `Templates/Delivery.md` существует, `Templates/README.md` перечисляет `JTBD.md`, `PRD.md`, `Delivery.md`, а `Docs/Product/Delivery.md` приведён к тем же разделам `Назначение`, `Модель передачи`, `Обязательные элементы поставки`, `Ограничения поставки`; `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md` отражают канонический минимальный набор `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`; `bp_bootstrap.py` материализует этот набор, а `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет полный минимальный `Docs/Product/*` слой в product repo; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; bootstrap smoke-check выполнен через `python3 Tools/bp_bootstrap.py --name "Smoke Product" --product-code SP --brand-profile Default --target /tmp/bytepress-delivery-bJeblG`, затем `python3 Tools/bp_lint.py --repo /tmp/bytepress-delivery-bJeblG` прошёл, а файлы `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md` реально присутствуют в сгенерированном продукте.
+Результат: template contract, product-layer contract, bootstrap generation и lint validation синхронизированы; новый `Delivery` canon замкнут на документацию, генерацию и фактическую проверку.
+
+---
+
 ## QL-000022
 Дата: 2026-03-27
 Статус: пройдено

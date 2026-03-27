@@ -10,6 +10,7 @@
 - продукт создаётся вне репозитория `BytePress`;
 - bootstrap валидирует существование выбранного `brand profile` в `BytePress`;
 - создаётся минимальный контур `Docs/`, `Runtime/`, `Plans/`, `Logs/`, `Profiles/`, `Adapters/`, `scripts/`;
+- создаётся канонический минимальный продуктовый слой `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`;
 - создаётся `Profiles/Product.md` с минимальными product-profile полями;
 - создаётся initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` с внутренним `ID: PLAN-000001`;
 - `Roadmap`, `Backlog`, `Plan` и `Product profile` используют 6-значные ID;
@@ -18,7 +19,7 @@
 - созданный продукт проходит структурную проверку базового уровня.
 
 ## Вывод
-`bp_bootstrap.py` в текущей версии синхронизирован с naming, profile и language contracts и достаточен как отправная точка для первого продукта без автоматической генерации `product-code` и без глубокого наследования brand profile.
+`bp_bootstrap.py` в текущей версии должен быть синхронизирован с naming, profile, language и product-layer contracts: он материализует канонический минимальный слой `Docs/Product/*`, не генерирует `product-code` автоматически и не добавляет глубокое наследование brand profile.
 
 ## Связи
 - `PLAN-000005`

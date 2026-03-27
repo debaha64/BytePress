@@ -17,7 +17,7 @@ REQUIRED_SCHEMAS = [
 ]
 REQUIRED_TEMPLATES = [
     "Document.md", "Term.md", "Roadmap.md", "Backlog.md", "Plan.md", "ADRlog.md",
-    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md"
+    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md", "Delivery.md"
 ]
 REQUIRED_SKILLS = [
     "Discussion.md", "Interview.md", "Research.md", "Requirements.md", "Planning.md",
@@ -70,6 +70,9 @@ def check_product_repo(root: Path) -> int:
     required_paths = [
         "Docs/User/README.md",
         "Docs/Product/README.md",
+        "Docs/Product/JTBD.md",
+        "Docs/Product/PRD.md",
+        "Docs/Product/Delivery.md",
         "Docs/Technical/README.md",
         "Docs/Technical/Architecture.md",
         "Docs/Technical/Interfaces.md",
