@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000027 — Product layer aligned with canonical templates and minimal document scope
 - CHG-000026 — Release branch example aligned with canonical branch naming
 - CHG-000025 — Release governance and README product value formalized before main preparation
 - CHG-000024 — Planning truth aligned with logs truth for release preparation
@@ -27,6 +28,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000027 — Product layer aligned with canonical templates and minimal document scope
+ID: CHG-000027
+Дата: 2026-03-27
+Тип_изменения: Документация
+Источник: Product-layer normalization pass after accepted JTBD and PRD templates
+Связи: PLAN-000015, BACK-000026, QL-000022
+Дата_создания: 2026-03-27
+Дата_изменения: 2026-03-27
+
+### Описание
+`Docs/Product/PRD.md` и `Docs/Product/JTBD.md` приведены к каноническим шаблонам с сохранением продуктового смысла и без смешения с внутренними техническими слоями. `Docs/Product/README.md` и `Docs/Product/Delivery.md` сокращены до минимального продуктового канона, а `Docs/Product/Implementation_Plan.md` и `Docs/Product/Profiles.md` удалены как дубли или документы вне продуктовой границы. Технические документы bootstrap перенесены в `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md`, после чего прямые ссылки в активных `Plans/*` и текущих журналах синхронизированы.
+
+### Эффект
+Продуктовый слой BytePress больше не смешивает продуктовые требования с внутренними системными описаниями и содержит только канонический минимальный набор документов, а технический bootstrap knowledge живёт в профильном слое `Docs/Technical/`.
 
 ---
 
@@ -142,7 +160,7 @@ ID: CHG-000020
 Дата_изменения: 2026-03-18
 
 ### Описание
-Активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Product/Bootstrap_Contract.md` приведены к 6-значному формату для `BACK`, `ROAD`, `PROF`, `RULE`, `STD`, `ROLE`, `SKILL`, `ADP`, `MEM` и `MCP`. Прямые ссылки на старые 4-значные active ID синхронизированы, создан `Plans/BP-000011-migrate-active-nonlog-ids.md`, а historical logs намеренно не переписывались.
+Активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату для `BACK`, `ROAD`, `PROF`, `RULE`, `STD`, `ROLE`, `SKILL`, `ADP`, `MEM` и `MCP`. Прямые ссылки на старые 4-значные active ID синхронизированы, создан `Plans/BP-000011-migrate-active-nonlog-ids.md`, а historical logs намеренно не переписывались.
 
 ### Эффект
 Активный non-log слой BytePress перестал смешивать 4- и 6-значный формат внутренних ID; текущие рабочие связи по singleton- и registry-доменам согласованы с repo-wide naming migration policy без запуска historical log rewrite-pass.
@@ -159,7 +177,7 @@ ID: CHG-000019
 Дата_изменения: 2026-03-18
 
 ### Описание
-`bp_bootstrap.py` переведён на обязательные параметры `--name`, `--product-code`, `--brand-profile`, `--target`; bootstrap теперь валидирует brand profile в `BytePress`, использует текущую дату выполнения, создаёт `Profiles/Product.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные ID. `bp_lint.py` минимально обновлён под новый product bootstrap output contract, а `Tools/README.md`, `Docs/Product/Bootstrap_Contract.md`, `Docs/Product/Bootstrap_Validation.md` и `Docs/Product/Profiles.md` синхронизированы с фактическим поведением инструментов.
+`bp_bootstrap.py` переведён на обязательные параметры `--name`, `--product-code`, `--brand-profile`, `--target`; bootstrap теперь валидирует brand profile в `BytePress`, использует текущую дату выполнения, создаёт `Profiles/Product.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные ID. `bp_lint.py` минимально обновлён под новый product bootstrap output contract, а `Tools/README.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и `Profiles/README.md` синхронизированы с фактическим поведением инструментов.
 
 ### Эффект
 Инструментальный контур больше не расходится с принятыми naming/profile/language contracts: bootstrap и lint работают по одному минимальному product bootstrap contract без большого рефакторинга tools.
@@ -227,7 +245,7 @@ ID: CHG-000015
 Дата_изменения: 2026-03-17
 
 ### Описание
-Remaining plan-files приведены к каноническим именам `Plans/BP-000002-seed-docs-and-standards.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md` и `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`. Их внутренние `ID` выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Docs/Product/Bootstrap_Validation.md` и минимально в `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено` по фактически закрытому DoD.
+Remaining plan-files приведены к каноническим именам `Plans/BP-000002-seed-docs-and-standards.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md` и `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`. Их внутренние `ID` выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и минимально в `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено` по фактически закрытому DoD.
 
 ### Эффект
 Весь текущий plan layer BytePress теперь использует один naming contract и 6-значные plan ID без смешения 4- и 6-значного формата в актуальных плановых артефактах.
@@ -244,7 +262,7 @@ ID: CHG-000014
 Дата_изменения: 2026-03-17
 
 ### Описание
-Foundation-план BytePress приведён к каноническому имени `Plans/BP-000001-foundation.md`, его внутренний `ID` выровнен до `PLAN-000001`, статус приведён к фактическому состоянию `Завершено`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, а `Plans/README.md` и `Docs/Product/Implementation_Plan.md` перепривязаны к актуальному файлу. Прямые ссылки в `Roadmap`, `Backlog` и связанных журнальных записях обновлены на новый `ID`.
+Foundation-план BytePress приведён к каноническому имени `Plans/BP-000001-foundation.md`, его внутренний `ID` выровнен до `PLAN-000001`, статус приведён к фактическому состоянию `Завершено`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, а `Plans/README.md` и продуктовый слой перепривязаны к актуальному plan-layer без отдельного дубля плана. Прямые ссылки в `Roadmap`, `Backlog` и связанных журнальных записях обновлены на новый `ID`.
 
 ### Эффект
 В слое `Plans/` устранён параллельный канон для foundation-плана BytePress: остался один актуальный файл, один актуальный `ID` и одна рабочая точка ссылок для связанных документов.

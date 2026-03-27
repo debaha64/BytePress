@@ -22,7 +22,7 @@ ID: PLAN-000011
 1. Перевести active non-log ID в singleton- и registry-доменах на 6-значный формат.
    - DoD: `Profiles/`, `Rules/`, `Standards/`, `Roles/`, `Skills/`, `Adapters/`, `Memory/` и `MCP/` используют 6-значные internal ID без переименования singleton filenames.
 2. Синхронизировать прямые ссылки в плановом и техническом слоях.
-   - DoD: `Plans/Backlog.md`, `Plans/Roadmap.md`, `Plans/BP-*`, `Docs/Technical/*` и `Docs/Product/Bootstrap_Contract.md` больше не ссылаются на 4-значные active non-log ID.
+   - DoD: `Plans/Backlog.md`, `Plans/Roadmap.md`, `Plans/BP-*`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` больше не ссылаются на 4-значные active non-log ID.
 3. Не затрагивать historical logs и инструментальный код.
    - DoD: `Logs/ADRlog.md`, существующие sections `Logs/ChangeLog.md` и `Logs/QualityLog.md`, `Schemas/*`, `Templates/*`, `Docs/Terms/*` и `Tools/*.py` остаются вне rewrite-pass, кроме новых фактических записей текущего прохода.
 
@@ -50,7 +50,7 @@ ID: PLAN-000011
 - `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`
 - `Plans/BP-000011-migrate-active-nonlog-ids.md`
 - `Docs/Technical/*.md`
-- `Docs/Product/Bootstrap_Contract.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

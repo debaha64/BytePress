@@ -1,4 +1,4 @@
-# Bootstrap_Contract
+# Product Bootstrap Contract
 
 ## Назначение
 Этот документ фиксирует, какой минимальный продуктовый каркас обязан уметь материализовать `bp_bootstrap.py` в `BytePress 0.1.0`.

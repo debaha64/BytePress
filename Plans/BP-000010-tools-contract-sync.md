@@ -25,7 +25,7 @@ ID: PLAN-000010
 3. Минимально обновить lint под product bootstrap output.
    - DoD: `bp_lint.py` понимает новый product plan filename pattern, `Profiles/Product.md` и базовый bootstrap output contract без архитектурного рефакторинга.
 4. Синхронизировать product bootstrap docs и журналы.
-   - DoD: `Tools/README.md`, `Docs/Product/*`, `Plans/Backlog.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` отражают только факты этого прохода.
+   - DoD: `Tools/README.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Profiles/README.md`, `Plans/Backlog.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` отражают только факты этого прохода.
 
 ## Риски
 - частичная синхронизация bootstrap и lint оставит расхождение между генерацией и проверкой продукта;
@@ -36,9 +36,9 @@ ID: PLAN-000010
 - `Tools/README.md`
 - `Tools/bp_bootstrap.py`
 - `Tools/bp_lint.py`
-- `Docs/Product/Bootstrap_Contract.md`
-- `Docs/Product/Bootstrap_Validation.md`
-- `Docs/Product/Profiles.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
+- `Docs/Technical/Product_Bootstrap_Validation.md`
+- `Profiles/README.md`
 - `Plans/Backlog.md`
 - `Plans/BP-000010-tools-contract-sync.md`
 - `Logs/ChangeLog.md`
