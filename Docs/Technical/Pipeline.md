@@ -31,18 +31,9 @@
 - после `Проверки` должны существовать подтверждённые записи в журналах.
 
 ## Синхронизация артефактов
-После изменения канонического артефакта исполнитель обязан проверить связанные точки знания, планирования и журналов.
+Краткая роль `Pipeline.md` — указать, что после изменения канонического артефакта исполнитель обязан проверить связанные точки знания, планирования, технических контрактов и журналов.
 
-- изменение `Docs/Discovery/Interview.md`:
-  проверить `Plans/Roadmap.md`, `Plans/Backlog.md`, активные `Plans/*`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, а при необходимости `Logs/ADRlog.md`;
-- изменение `Docs/Product/*`:
-  проверить релевантные `Templates/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Docs/Technical/Product_Bootstrap_*` и `Logs/*`;
-- изменение `Templates/*`:
-  проверить соответствующие документы, `Tools/bp_bootstrap.py` если шаблон влияет на генерацию, и `Tools/bp_lint.py` если шаблон влияет на контракт;
-- изменение `Tools/bp_bootstrap.py` или `Tools/bp_lint.py`:
-  проверить связанные technical-contract документы и `Logs/*`;
-- изменение `Plans/Roadmap.md`:
-  проверить `Plans/Backlog.md`, активные `Plans/*` и `Docs/Discovery/Interview.md`, если сдвиг roadmap вызван изменением аналитических ответов.
+Детальный порядок обязательной синхронизации, список источников истины и минимальный task-close checklist закреплены в `Docs/Technical/Artifact_Lifecycle.md`.
 
 ## Техническая граница
 `Pipeline/` описывает движение работы, но не заменяет:
