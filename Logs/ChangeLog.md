@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000031 — Branch and PR process contract finalized and residual process noise removed
 - CHG-000030 — Repo-wide active layer audit aligned maps, roles, skills and technical references
 - CHG-000029 — Discovery layer, interview current truth and sync contract surfaced
 - CHG-000028 — Delivery template, bootstrap, and lint contracts synchronized with product layer canon
@@ -31,6 +32,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000031 — Branch and PR process contract finalized and residual process noise removed
+ID: CHG-000031
+Дата: 2026-03-28
+Тип_изменения: Документация
+Источник: Branch/PR process cleanup pass after repo-wide active layer audit
+Связи: PLAN-000019, BACK-000027, QL-000026
+Дата_создания: 2026-03-28
+Дата_изменения: 2026-03-28
+
+### Описание
+Завершён process-contract для task-branch, local commits, self-check, final push, проверки существующего PR и создания PR в `develop`. `AGENTS.md`, `Setup_Guide.md` и `Docs/Technical/Platform_Contracts.md` синхронизированы по правилу не использовать `--dry-run`, если текущий `gh` его не поддерживает, и по fallback без автоматической переавторизации `gh` при ошибке команды PR. `Plans/README.md` очищен от устаревшей привязки к раннему диапазону plan-files, а в `Roles/Developer.md`, `Roles/QA.md` и `Roles/Release.md` заменены остаточные ссылки `Plans/PLAN-*.md` на `Plans/BP-*.md`. `bp_lint.py` и `ADRlog` не менялись, так как обязательный contract и архитектурные решения в этом проходе не изменились.
+
+### Эффект
+Process-facing слой BytePress теперь описывает один и тот же практический branch/PR workflow без двусмысленностей по моменту `push`, созданию PR, `gh` fallback и повторному использованию head-ветки после merge.
 
 ---
 

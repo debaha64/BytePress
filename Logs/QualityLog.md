@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000026
+Дата: 2026-03-28
+Статус: пройдено
+Проверка: `BACK-000027` и `PLAN-000019` переведены в финальный статус; `AGENTS.md`, `Setup_Guide.md` и `Docs/Technical/Platform_Contracts.md` согласованно описывают `develop -> task branch -> серия локальных коммитов -> self-check после каждого коммита -> final push -> проверка существующего PR -> создание PR`; зафиксированы правило не использовать `--dry-run`, если установленный `gh` его не поддерживает, и fallback без автоматической переавторизации; `Plans/README.md` больше не содержит устаревшей конкретики о диапазоне plan-files; `Roles/Developer.md`, `Roles/QA.md` и `Roles/Release.md` больше не используют `Plans/PLAN-*.md`; follow-up в `Skills/*` не потребовался; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
+Результат: process-contract task-branch/push/PR/gh завершён без нового архитектурного решения и без изменения lint contract; активный process-facing слой очищен от остаточного шума.
+
+---
+
 ## QL-000025
 Дата: 2026-03-28
 Статус: пройдено
