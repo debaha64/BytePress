@@ -1,6 +1,7 @@
 # Backlog
 
 ## Индекс
+- BACK-000031 — Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
 - BACK-000030 — Зафиксировать technical-contract жизненного цикла артефактов и порядка их обновления
 - BACK-000029 — Проявить Discovery layer, current-truth Interview и sync-contract артефактов
 - BACK-000028 — Синхронизировать Delivery template, bootstrap и lint с каноном продуктового слоя
@@ -499,6 +500,22 @@ ID: BACK-000028
 
 ### Описание
 Добавить канонический `Templates/Delivery.md`, выровнять `Docs/Product/Delivery.md`, синхронизировать bootstrap-документацию и обновить `bp_bootstrap.py` вместе с `bp_lint.py`, чтобы минимальный продуктовый слой и инструментальные проверки использовали один и тот же contract.
+
+---
+
+## BACK-000031 — Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
+ID: BACK-000031
+Название: Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
+Тип: Документация
+Приоритет: Средний
+Статус: В_работе
+Связи: PLAN-000021
+Источник: Следующий technical pass после artifact lifecycle contract
+Дата_создания: 2026-03-29
+Дата_изменения: 2026-03-29
+
+### Описание
+Уточнить в общей технической модели и в README доменов роль `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/`: их назначение, статус в текущей версии, участие в lifecycle, признак источника истины и границы того, какие домены они не должны подменять. Проход ограничен синхронизацией текущего канона без новых доменов и без большого рефакторинга.
 
 ---
 
