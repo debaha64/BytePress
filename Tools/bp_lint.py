@@ -17,7 +17,7 @@ REQUIRED_SCHEMAS = [
 ]
 REQUIRED_TEMPLATES = [
     "Document.md", "Term.md", "Roadmap.md", "Backlog.md", "Plan.md", "ADRlog.md",
-    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md", "Delivery.md"
+    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md", "Delivery.md", "Interview.md"
 ]
 REQUIRED_SKILLS = [
     "Discussion.md", "Interview.md", "Research.md", "Requirements.md", "Planning.md",
@@ -156,6 +156,7 @@ def main() -> int:
     missing.extend(collect_missing(root, REQUIRED_ADAPTERS, "Adapters"))
     missing.extend(collect_missing(root, REQUIRED_MEMORY, "Memory"))
     missing.extend(collect_missing(root, REQUIRED_MCP, "MCP"))
+    missing.extend(collect_missing(root, ["README.md", "Interview.md"], "Docs/Discovery"))
 
     id_errors: list[str] = []
     for rel in [

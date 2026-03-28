@@ -34,6 +34,7 @@
 
 ### Слой знания
 - `Docs/`
+- `Docs/Discovery/`
 - `Docs/Technical/`
 - `Docs/Terms/`
 
