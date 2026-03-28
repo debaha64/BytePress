@@ -50,7 +50,6 @@ ID: PLAN-000017
 - `Docs/Technical/README.md`
 - `Tools/bp_lint.py`
 - `Logs/ADRlog.md`
-- `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 
