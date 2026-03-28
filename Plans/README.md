@@ -23,7 +23,7 @@
 - `Super VBank -> SVB`
 
 ## Канон текущего слоя
-Актуальный слой `Plans/` использует канонические plan-files вида `Plans/BP-000001-foundation.md` ... `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`.
+Актуальный слой `Plans/` использует канонические plan-files вида `Plans/BP-<NNNNNN>-<slug>.md` без фиксации конкретного диапазона в этом README.
 
 Текущий плановый слой BytePress больше не смешивает legacy-имена файлов и 4-значные plan ID.
 
