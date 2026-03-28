@@ -2,8 +2,8 @@
 
 ID: PLAN-000017
 Название: Проявить Discovery layer и закрепить sync-contract артефактов
-Статус: В_работе
-Связи: BACK-000029
+Статус: Завершено
+Связи: BACK-000029, ADR-000017, CHG-000029
 Источник: Discovery/sync-contract pass после выравнивания продуктового и bootstrap-layer contracts
 Дата_создания: 2026-03-28
 Дата_изменения: 2026-03-28
@@ -13,7 +13,7 @@ ID: PLAN-000017
 Связанные_backlog:
 - BACK-000029
 Связанные_ADR:
-- отсутствуют
+- ADR-000017
 
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
@@ -49,6 +49,7 @@ ID: PLAN-000017
 - `Docs/Technical/Model.md`
 - `Docs/Technical/README.md`
 - `Tools/bp_lint.py`
+- `Logs/ADRlog.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

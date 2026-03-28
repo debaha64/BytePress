@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000024
+Дата: 2026-03-28
+Статус: пройдено
+Проверка: существуют `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md`; `Docs/README.md` отражает новый слой `Discovery/`; `Plans/Roadmap.md` хранит только крупные этапы уровня системы и не перечисляет отдельные документные проходы; `Docs/Technical/Pipeline.md` содержит минимальную sync-matrix по проверке связанных артефактов после изменения `Interview`, `Docs/Product/*`, `Templates/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и `Plans/Roadmap.md`; `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/README.md` и `Plans/README.md` синхронизированы с новой моделью только в необходимой степени; `bp_lint.py` требует `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md`; `ADR-000017` зафиксировал discovery-domain, current-truth интервью и sync-contract как устойчивое архитектурное решение; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
+Результат: discovery-contract BytePress стал явным и проверяемым; аналитический слой, roadmap-level planning и artifact sync rules теперь согласованы между `Docs`, `Plans`, `Pipeline`, `Logs` и lint.
+
+---
+
 ## QL-000023
 Дата: 2026-03-28
 Статус: пройдено

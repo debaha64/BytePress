@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000029 — Discovery layer, interview current truth and sync contract surfaced
 - CHG-000028 — Delivery template, bootstrap, and lint contracts synchronized with product layer canon
 - CHG-000027 — Product layer aligned with canonical templates and minimal document scope
 - CHG-000026 — Release branch example aligned with canonical branch naming
@@ -29,6 +30,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000029 — Discovery layer, interview current truth and sync contract surfaced
+ID: CHG-000029
+Дата: 2026-03-28
+Тип_изменения: Контракт
+Источник: Discovery/sync-contract pass after delivery/bootstrap/lint alignment
+Связи: PLAN-000017, BACK-000029, ADR-000017, QL-000024
+Дата_создания: 2026-03-28
+Дата_изменения: 2026-03-28
+
+### Описание
+Добавлен новый аналитический слой `Docs/Discovery/` с `README.md` и каноническим `Interview.md`, а также создан `Templates/Interview.md` как минимальный шаблон current-truth интервью. `Plans/Roadmap.md` приведён к уровню крупных этапов системы, `Docs/Technical/Pipeline.md` дополнен минимальной sync-matrix обязательной проверки связанных артефактов, `Docs/README.md`, `Plans/README.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/README.md` и `Templates/README.md` синхронизированы с новой моделью. `bp_lint.py` расширен так, чтобы валидировать `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md`. В `ADR-000017` зафиксированы discovery-domain, current-truth модель интервью и sync-contract pipeline.
+
+### Эффект
+Аналитический слой BytePress стал явной частью `Docs/`, интервью закреплено как текущая истина, roadmap перестал дублировать backlog мелкими проходами, а pipeline contract получил обязательные правила синхронизации после изменения ключевых артефактов.
 
 ---
 
