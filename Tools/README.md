@@ -21,6 +21,7 @@
 - bootstrap создаёт канонический минимальный продуктовый слой `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`;
 - bootstrap создаёт `Profiles/Product.md` и initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md`;
 - `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет наличие полного минимального `Docs/Product/*` набора в product repo;
+- `bp_lint.py` требует `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md` в `BytePress`;
 - bootstrap использует 6-значные ID и текущую дату выполнения, без жёстко прошитых дат;
 - из brand profile наследуются только `Брендовый_профиль` и `Язык_взаимодействия`.
 

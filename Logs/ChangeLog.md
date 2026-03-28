@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000030 — Repo-wide active layer audit aligned maps, roles, skills and technical references
 - CHG-000029 — Discovery layer, interview current truth and sync contract surfaced
 - CHG-000028 — Delivery template, bootstrap, and lint contracts synchronized with product layer canon
 - CHG-000027 — Product layer aligned with canonical templates and minimal document scope
@@ -30,6 +31,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000030 — Repo-wide active layer audit aligned maps, roles, skills and technical references
+ID: CHG-000030
+Дата: 2026-03-28
+Тип_изменения: Документация
+Источник: Repo-wide audit pass after product, discovery and sync-contract canon alignment
+Связи: PLAN-000018, BACK-000019, QL-000025
+Дата_создания: 2026-03-28
+Дата_изменения: 2026-03-28
+
+### Описание
+Проведён repo-wide аудит активного слоя `BytePress` после отдельных проходов по product-layer, discovery-layer и pipeline sync-contract. В `README.md`, `AGENTS.md` и `Tools/README.md` устранены устаревшие формулировки и закреплена текущая модель discovery-layer, крупноэтапного `Roadmap` и lint-checks. В `Docs/Technical/Product_Bootstrap_Validation.md` выровнена фактическая формулировка validation-контракта, в `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` исправлены реальные рассогласования по `Docs/Discovery/`, current-truth интервью и каноническому виду `Plans/BP-*.md`. В `Plans/BP-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`; `bp_lint.py` не менялся, потому что обязательный contract в этом audit-pass не изменился.
+
+### Эффект
+Активный слой BytePress снова согласован repo-wide: карты, validation-контракт, роли, навыки и активные планы используют один и тот же текущий канон product/discovery/pipeline без большого рефакторинга и без переписывания historical layer.
 
 ---
 
