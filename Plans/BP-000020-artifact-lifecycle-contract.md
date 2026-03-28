@@ -2,8 +2,8 @@
 
 ID: PLAN-000020
 Название: Зафиксировать technical-contract жизненного цикла артефактов
-Статус: В_работе
-Связи: BACK-000030
+Статус: Завершено
+Связи: BACK-000030, CHG-000032, QL-000027
 Источник: Technical cleanup pass после закрепления discovery, sync-contract и branch/PR process contract
 Дата_создания: 2026-03-29
 Дата_изменения: 2026-03-29
@@ -52,3 +52,10 @@ ID: PLAN-000020
 - `Tools/bp_lint.py` требует новый обязательный technical artifact.
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только при реальной необходимости.
+
+## Фактический результат
+- Создан `Docs/Technical/Artifact_Lifecycle.md` как единая точка для источников истины, производных артефактов, порядка обязательной синхронизации и минимального task-close checklist.
+- `Docs/Technical/Pipeline.md` сокращён до краткой роли конвейера и ссылки на `Artifact_Lifecycle.md` как на точку детализации lifecycle-порядка.
+- `Docs/Technical/README.md` и `Docs/README.md` синхронизированы с новым technical artifact без побочного рефакторинга `Model.md` и `System_Invariants.md`.
+- `Tools/bp_lint.py` минимально расширен и теперь требует `Docs/Technical/Artifact_Lifecycle.md` как обязательный technical artifact репозитория `BytePress`.
+- `ADRlog` не менялся, потому что проход только собрал уже принятый канон в один technical-contract без нового устойчивого архитектурного решения.

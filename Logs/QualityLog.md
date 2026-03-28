@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000027
+Дата: 2026-03-29
+Статус: пройдено
+Проверка: существует `Docs/Technical/Artifact_Lifecycle.md`; документ кратко фиксирует источники истины, производные артефакты, порядок обязательной синхронизации и минимальный task-close checklist без дублирования полного `Pipeline.md`; `Docs/Technical/Pipeline.md` сокращён и ссылается на `Artifact_Lifecycle.md` как на точку детализации; `Docs/Technical/README.md` и `Docs/README.md` отражают новый technical artifact; `Tools/bp_lint.py` требует `Docs/Technical/Artifact_Lifecycle.md`; `Model.md` и `System_Invariants.md` не менялись, потому что новый lifecycle contract не создаёт противоречия в их текущем содержании; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
+Результат: lifecycle contract артефактов собран в одну техническую точку, distributed process-noise уменьшен, lint-contract расширен ровно на новый обязательный technical artifact без нового архитектурного решения.
+
+---
+
 ## QL-000026
 Дата: 2026-03-28
 Статус: пройдено

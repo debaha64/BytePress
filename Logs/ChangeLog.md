@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000032 — Artifact lifecycle contract consolidated update order and reduced technical process noise
 - CHG-000031 — Branch and PR process contract finalized and residual process noise removed
 - CHG-000030 — Repo-wide active layer audit aligned maps, roles, skills and technical references
 - CHG-000029 — Discovery layer, interview current truth and sync contract surfaced
@@ -32,6 +33,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000032 — Artifact lifecycle contract consolidated update order and reduced technical process noise
+ID: CHG-000032
+Дата: 2026-03-29
+Тип_изменения: Контракт
+Источник: Artifact lifecycle pass after branch/PR process cleanup
+Связи: PLAN-000020, BACK-000030, QL-000027
+Дата_создания: 2026-03-29
+Дата_изменения: 2026-03-29
+
+### Описание
+Добавлен `Docs/Technical/Artifact_Lifecycle.md` как короткий канонический technical-contract жизненного цикла артефактов, их источников истины и обязательного порядка синхронизации после типов изменений. `Docs/Technical/Pipeline.md` сокращён до краткой роли конвейера и ссылки на новую точку детализации, а `Docs/Technical/README.md` и `Docs/README.md` синхронизированы с новым technical artifact. `bp_lint.py` минимально расширен и теперь требует `Docs/Technical/Artifact_Lifecycle.md` в репозитории `BytePress`; `ADRlog` не менялся, так как новый устойчивый architectural decision в этом проходе не появился.
+
+### Эффект
+Lifecycle-порядок артефактов больше не размазан между discovery, pipeline, roadmap, plans и logs: у `BytePress` теперь есть одна короткая technical-contract точка, а lint гарантирует её наличие в активном слое.
 
 ---
 
