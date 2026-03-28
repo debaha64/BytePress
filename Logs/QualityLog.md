@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000028
+Дата: 2026-03-29
+Статус: пройдено
+Проверка: `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Docs/Technical/README.md` согласованно описывают назначение, статус `0.1.0`, участие в lifecycle, признак источника истины и границы подмены для `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/`; `Pipeline/README.md`, `Runtime/README.md`, `Adapters/README.md`, `Memory/README.md` и `MCP/README.md` приведены к тому же краткому participation contract; `README.md` не требовал обновления; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
+Результат: участие доменов исполнения и расширения в системе и lifecycle зафиксировано без двусмысленности, без нового архитектурного решения и без изменения обязательного lint contract.
+
+---
+
 ## QL-000027
 Дата: 2026-03-29
 Статус: пройдено

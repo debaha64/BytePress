@@ -508,8 +508,8 @@ ID: BACK-000031
 Название: Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
 Тип: Документация
 Приоритет: Средний
-Статус: В_работе
-Связи: PLAN-000021
+Статус: Завершено
+Связи: PLAN-000021, CHG-000033, QL-000028
 Источник: Следующий technical pass после artifact lifecycle contract
 Дата_создания: 2026-03-29
 Дата_изменения: 2026-03-29

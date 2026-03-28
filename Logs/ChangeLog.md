@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000033 — Domain participation contract clarified execution and extension domains
 - CHG-000032 — Artifact lifecycle contract consolidated update order and reduced technical process noise
 - CHG-000031 — Branch and PR process contract finalized and residual process noise removed
 - CHG-000030 — Repo-wide active layer audit aligned maps, roles, skills and technical references
@@ -33,6 +34,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000033 — Domain participation contract clarified execution and extension domains
+ID: CHG-000033
+Дата: 2026-03-29
+Тип_изменения: Документация
+Источник: Domain participation pass after artifact lifecycle contract
+Связи: PLAN-000021, BACK-000031, QL-000028
+Дата_создания: 2026-03-29
+Дата_изменения: 2026-03-29
+
+### Описание
+Уточнён participation contract доменов `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/` в общей технической модели и в локальных README этих доменов. `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Docs/Technical/README.md` теперь согласованно фиксируют назначение доменов, их статус `0.1.0`, участие в lifecycle, признак источника истины и границы подмены. `Pipeline/README.md`, `Runtime/README.md`, `Adapters/README.md`, `Memory/README.md` и `MCP/README.md` приведены к тому же краткому контракту. `README.md`, `bp_lint.py` и `ADRlog` не менялись, потому что корневая карта, обязательный contract и архитектурные решения не потребовали расширения.
+
+### Эффект
+Исполнительные и расширяющие домены BytePress больше не описаны разрозненно: роль `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/` в системе и lifecycle читается одинаково в общей technical model и в локальных domain maps.
 
 ---
 

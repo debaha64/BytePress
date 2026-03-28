@@ -2,8 +2,8 @@
 
 ID: PLAN-000021
 Название: Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
-Статус: В_работе
-Связи: BACK-000031
+Статус: Завершено
+Связи: BACK-000031, CHG-000033, QL-000028
 Источник: Technical cleanup pass после artifact lifecycle contract
 Дата_создания: 2026-03-29
 Дата_изменения: 2026-03-29
@@ -56,3 +56,9 @@ ID: PLAN-000021
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только если реально нужен.
 - `bp_lint.py` меняется только если обязательный contract действительно изменяется.
+
+## Фактический результат
+- `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Docs/Technical/README.md` теперь коротко и согласованно описывают назначение, статус `0.1.0`, участие в lifecycle, признак источника истины и границы подмены для `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/`.
+- `Pipeline/README.md`, `Runtime/README.md`, `Adapters/README.md`, `Memory/README.md` и `MCP/README.md` приведены к тому же краткому participation contract без новых сущностей и без расширения scope.
+- `README.md` не менялся, потому что после выравнивания technical layer корневая карта не содержала оставшейся двусмысленности.
+- `bp_lint.py` не менялся, потому что обязательные пути, шаблоны и домены в этом проходе не изменялись.
