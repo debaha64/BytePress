@@ -19,7 +19,7 @@
 - созданный продукт проходит структурную проверку базового уровня.
 
 ## Вывод
-`bp_bootstrap.py` в текущей версии должен быть синхронизирован с naming, profile, language и product-layer contracts: он материализует канонический минимальный слой `Docs/Product/*`, не генерирует `product-code` автоматически и не добавляет глубокое наследование brand profile.
+`bp_bootstrap.py` в текущей версии синхронизирован с naming, profile, language и product-layer contracts: он материализует канонический минимальный слой `Docs/Product/*`, не генерирует `product-code` автоматически и не добавляет глубокое наследование brand profile.
 
 ## Связи
 - `PLAN-000005`
