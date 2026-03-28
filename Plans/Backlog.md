@@ -469,13 +469,13 @@ ID: BACK-000026
 
 ---
 
-## BACK-000027 — Уточнить task-branch workflow, момент push/PR и диагностику gh в агентной среде
+## BACK-000027 — Завершить process-contract для task-branch, push, PR и gh fallback
 ID: BACK-000027
 Название: Завершить process-contract для task-branch, push, PR и gh fallback
 Тип: Инфраструктура
 Приоритет: Средний
-Статус: В_работе
-Связи: BACK-000017, BACK-000018, PLAN-000019
+Статус: Завершено
+Связи: BACK-000017, BACK-000018, PLAN-000019, CHG-000031, QL-000026
 Источник: Process-cleanup pass после repo-wide audit активного слоя
 Дата_создания: 2026-03-27
 Дата_изменения: 2026-03-28
