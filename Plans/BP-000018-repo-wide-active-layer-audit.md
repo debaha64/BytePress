@@ -2,8 +2,8 @@
 
 ID: PLAN-000018
 Название: Провести repo-wide аудит активного слоя BytePress
-Статус: В_работе
-Связи: BACK-000019
+Статус: Завершено
+Связи: BACK-000019, CHG-000030, QL-000025
 Источник: Audit-pass после введения product-layer canon, discovery-layer canon и artifact sync-contract
 Дата_создания: 2026-03-28
 Дата_изменения: 2026-03-28
@@ -39,18 +39,16 @@ ID: PLAN-000018
 - `Plans/BP-000018-repo-wide-active-layer-audit.md`
 - `README.md`
 - `AGENTS.md`
-- `Setup_Guide.md`
-- `Docs/README.md`
-- `Docs/Technical/*`
-- `Plans/README.md`
-- `Templates/README.md`
 - `Tools/README.md`
-- `Roles/*`
-- `Skills/*`
-- активные `Plans/BP-*`
+- `Docs/Technical/Product_Bootstrap_Validation.md`
+- `Roles/Business_Analyst.md`
+- `Roles/System_Analyst.md`
+- `Roles/Architect.md`
+- `Skills/Interview.md`
+- `Skills/Planning.md`
+- `Plans/BP-000017-discovery-and-sync-contract.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
-- `Logs/ADRlog.md`
 
 ## DoD
 - `BACK-000019` отражает актуальный смысл repo-wide audit-pass.
@@ -59,3 +57,10 @@ ID: PLAN-000018
 - historical layer, release governance и process-docs не переписываются.
 - `bp_lint.py` меняется только если audit доказывает изменение обязательного contract; иначе фиксируется `bp_lint contract unaffected`.
 - `ChangeLog` и `QualityLog` фиксируют факты audit-pass.
+
+## Фактический результат
+- Обновлены `README.md`, `AGENTS.md` и `Tools/README.md`, чтобы root maps и tool map отражали discovery-layer, крупноэтапный `Roadmap` и текущий lint contract.
+- В `Docs/Technical/Product_Bootstrap_Validation.md` выровнена фактическая формулировка о синхронизации bootstrap validation с минимальным product-layer canon.
+- В `Roles/*` и `Skills/*` исправлены только реальные рассогласования: discovery добавлен в допустимые артефакты аналитиков, `Plans/PLAN-*.md` заменён на `Plans/BP-*.md`, а `Interview` и `Planning` привязаны к current-truth интервью и roadmap уровня крупных этапов.
+- В `Plans/BP-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`.
+- `bp_lint.py` не менялся, потому что audit-pass не изменил обязательный contract путей, шаблонов или доменов.

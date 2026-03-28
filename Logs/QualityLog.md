@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000025
+Дата: 2026-03-28
+Статус: пройдено
+Проверка: выполнен repo-wide аудит активного слоя после product/discovery/sync-contract проходов; `README.md`, `AGENTS.md` и `Tools/README.md` отражают `Docs/Discovery/`, roadmap уровня крупных этапов и текущий lint contract; `Docs/Technical/Product_Bootstrap_Validation.md` согласован с фактическим минимальным product-layer canon; `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` больше не используют устаревшие ссылки `Plans/PLAN-*.md` и учитывают `Docs/Discovery/Interview.md` как current-truth артефакт там, где это нужно; `Plans/BP-000017-discovery-and-sync-contract.md` очищен от дублирующегося артефакта; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
+Результат: repo-wide active layer audit завершён без нового архитектурного решения и без изменения обязательного lint contract; активные карты, technical references, роли, навыки и планы согласованы с текущим каноном BytePress.
+
+---
+
 ## QL-000024
 Дата: 2026-03-28
 Статус: пройдено
