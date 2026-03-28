@@ -19,3 +19,6 @@
 - `JTBD.md` — минимальный шаблон Jobs To Be Done.
 - `PRD.md` — минимальный шаблон Product Requirements Document.
 - `Delivery.md` — минимальный шаблон модели поставки продукта.
+
+## Шаблоны discovery-слоя
+- `Interview.md` — минимальный шаблон current-truth интервью.
