@@ -615,17 +615,17 @@ ID: BACK-000036
 
 #### BACK-000038 — Ввести Discussion как канонический артефакт ROAD-000008
 ID: BACK-000038
-Название: Ввести Discussion как канонический артефакт ROAD-000008
+Название: Ввести Research как следующий канонический артефакт ROAD-000008
 Тип: Документация
 Приоритет: Высокий
 Статус: В_работе
-Связи: ROAD-000008, PLAN-000025, CHG-000037, QL-000032
-Источник: Первый реальный pass этапа Research and Requirements
+Связи: ROAD-000008, PLAN-000026, CHG-000038, QL-000033
+Источник: Следующий discovery pass после введения `Discussion`
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
 
 ##### Описание
-Ввести `Docs/Discovery/Discussion.md` как первый реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, не вводя в этом pass `Research.md` и `Requirements.md`. Остаточный scope после текущего pass: перевести следующий discovery-цикл к `Research` и затем к `Requirements`, не ломая уже введённый `Discussion`.
+Ввести `Docs/Discovery/Research.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, сохранив `Requirements` как следующий шаг, а не текущий pass. Остаточный scope после текущего pass: перевести следующий discovery-цикл к `Requirements`, не ломая уже введённые `Discussion` и `Research`.
 
 ### Завершённые
 
@@ -644,8 +644,6 @@ ID: BACK-000037
 Закрыть governance-хвост `ROAD-000007`, активировать `ROAD-000008`, зафиксировать место `Discussion`, `Research`, `Requirements` в системе, добавить их канонические шаблоны и синхронизировать `Pipeline`, `Roadmap` и `Backlog` без введения самих discovery-артефактов в `Docs/Discovery/`.
 
 ### Кандидаты задач этапа
-- Зафиксировать место `Research` в системе
-- Ввести артефакт `Research`
 - Зафиксировать место `Requirements` в системе
 - Ввести артефакт `Requirements`
 - Зафиксировать переход `Discussion -> Research -> Requirements -> Roadmap`
