@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000035 — Analytical, product, and planning contours aligned for ROAD-000007
 - CHG-000034 — Pipeline, roadmap, and backlog governance aligned to the accepted stage model
 - CHG-000033 — Domain participation contract clarified execution and extension domains
 - CHG-000032 — Artifact lifecycle contract consolidated update order and reduced technical process noise
@@ -35,6 +36,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000035 — Analytical, product, and planning contours aligned for ROAD-000007
+ID: CHG-000035
+Дата: 2026-03-31
+Тип_изменения: Документация
+Источник: Planning alignment pass after pipeline governance rewrite
+Связи: PLAN-000023, BACK-000036, QL-000030
+Дата_создания: 2026-03-31
+Дата_изменения: 2026-03-31
+
+### Описание
+`Docs/Discovery/Interview.md` минимально уточнён и теперь прямо фиксирует, что `Backlog` является производным от `Roadmap`, а `Plan` порождается из backlog-задачи. `Docs/Product/JTBD.md` и `Docs/Product/PRD.md` проверены и не потребовали изменений, потому что их текущая продуктовая рамка не противоречит current-truth интервью и текущему roadmap. В planning-layer исправлена синхронизация этапа `ROAD-000007`: `BACK-000032` убран из секции `Активные`, `Plans/Roadmap.md` теперь ссылается на фактический набор backlog-задач этапа, а текущий pass закреплён отдельным `PLAN-000023`. `ADRlog` и `bp_lint.py` не менялись, потому что новый архитектурный contract и обязательный lint contract в этом проходе не изменились.
+
+### Эффект
+Current-truth интервью, продуктовая рамка и planning-контур `ROAD-000007` больше не расходятся по роли backlog, статусам задач и связям текущего этапа.
 
 ---
 

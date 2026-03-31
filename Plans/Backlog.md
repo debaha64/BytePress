@@ -534,19 +534,7 @@ ID: BACK-000031
 
 ### Активные
 
-#### BACK-000036 — Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
-ID: BACK-000036
-Название: Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
-Тип: Документация
-Приоритет: Средний
-Статус: В_работе
-Связи: ROAD-000007, PLAN-000023
-Источник: Следующий governance pass после сборки roadmap-derived backlog
-Дата_создания: 2026-03-31
-Дата_изменения: 2026-03-31
-
-##### Описание
-Согласовать `Docs/Discovery/Interview.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Plans/Roadmap.md`, `Plans/Backlog.md` и активный `Plan` как единый planning-контур текущего этапа `ROAD-000007`: убрать остаточные рассогласования по статусам, связям и формулировкам, не расширяя продуктовый scope и не вводя новые типы артефактов.
+- отсутствуют
 
 ### Завершённые
 
@@ -605,6 +593,20 @@ ID: BACK-000035
 
 ##### Описание
 Явно закрепить в `Docs/Technical/Pipeline.md`, что `Roadmap` задаёт этапы, `Backlog` порождается из этапов, а `Plan` порождается только из backlog-задачи.
+
+#### BACK-000036 — Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
+ID: BACK-000036
+Название: Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
+Тип: Документация
+Приоритет: Средний
+Статус: Завершено
+Связи: ROAD-000007, PLAN-000023, CHG-000035, QL-000030
+Источник: Следующий governance pass после сборки roadmap-derived backlog
+Дата_создания: 2026-03-31
+Дата_изменения: 2026-03-31
+
+##### Описание
+Согласовать `Docs/Discovery/Interview.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Plans/Roadmap.md`, `Plans/Backlog.md` и активный `Plan` как единый planning-контур текущего этапа `ROAD-000007`: убрать остаточные рассогласования по статусам, связям и формулировкам, не расширяя продуктовый scope и не вводя новые типы артефактов.
 
 ---
 
