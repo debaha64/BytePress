@@ -7,7 +7,7 @@
 - ROAD-000004 — Продуктовый слой и product bootstrap (Product Layer and Product Bootstrap) | Активные: нет | Завершённые: 3
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
-- ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: BACK-000036 | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035
+- ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: BACK-000037 | Кандидаты задач этапа
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
@@ -533,7 +533,6 @@ ID: BACK-000031
 ## ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan)
 
 ### Активные
-
 - отсутствуют
 
 ### Завершённые
