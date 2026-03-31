@@ -539,8 +539,8 @@ ID: BACK-000032
 Название: Обновить Pipeline, Roadmap и Backlog под governance canon
 Тип: Документация
 Приоритет: Высокий
-Статус: В_работе
-Связи: ROAD-000007, PLAN-000022
+Статус: Завершено
+Связи: ROAD-000007, PLAN-000022, CHG-000034, QL-000029
 Источник: Strategic governance pass после уточнения domain participation contract
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-03-31
