@@ -1,6 +1,7 @@
 # Backlog
 
 ## Индекс
+- BACK-000032 — Обновить Pipeline, Roadmap и Backlog под governance canon
 - BACK-000031 — Уточнить participation contract доменов Runtime, Pipeline, Adapters, Memory и MCP
 - BACK-000030 — Зафиксировать technical-contract жизненного цикла артефактов и порядка их обновления
 - BACK-000029 — Проявить Discovery layer, current-truth Interview и sync-contract артефактов
@@ -500,6 +501,22 @@ ID: BACK-000028
 
 ### Описание
 Добавить канонический `Templates/Delivery.md`, выровнять `Docs/Product/Delivery.md`, синхронизировать bootstrap-документацию и обновить `bp_bootstrap.py` вместе с `bp_lint.py`, чтобы минимальный продуктовый слой и инструментальные проверки использовали один и тот же contract.
+
+---
+
+## BACK-000032 — Обновить Pipeline, Roadmap и Backlog под governance canon
+ID: BACK-000032
+Название: Обновить Pipeline, Roadmap и Backlog под governance canon
+Тип: Документация
+Приоритет: Высокий
+Статус: В_работе
+Связи: PLAN-000022
+Источник: Strategic governance pass после уточнения domain participation contract
+Дата_создания: 2026-03-31
+Дата_изменения: 2026-03-31
+
+### Описание
+Зафиксировать полный канон `Pipeline`, заменить текущий `Roadmap` на непрерывный дальний путь без разрыва `ROAD-ID`, перестроить `Backlog` как производный слой от `Roadmap`, исправить индекс и порядок последних записей и завести реальные активные задачи для `ROAD-000007`, оставив для будущих этапов только кандидаты задач без `BACK-ID`.
 
 ---
 
