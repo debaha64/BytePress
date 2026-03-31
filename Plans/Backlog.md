@@ -7,7 +7,7 @@
 - ROAD-000004 — Продуктовый слой и product bootstrap (Product Layer and Product Bootstrap) | Активные: нет | Завершённые: 3
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
-- ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: BACK-000032, BACK-000036 | Завершённые: BACK-000033, BACK-000034, BACK-000035
+- ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: BACK-000036 | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Кандидаты задач этапа
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
@@ -534,6 +534,10 @@ ID: BACK-000031
 
 ### Активные
 
+- отсутствуют
+
+### Завершённые
+
 #### BACK-000032 — Обновить Pipeline, Roadmap и Backlog под governance canon
 ID: BACK-000032
 Название: Обновить Pipeline, Roadmap и Backlog под governance canon
@@ -547,22 +551,6 @@ ID: BACK-000032
 
 ##### Описание
 Зафиксировать полный канон `Pipeline`, заменить текущий `Roadmap` на непрерывный дальний путь без разрыва `ROAD-ID`, перестроить `Backlog` как производный слой от `Roadmap`, исправить индекс и порядок последних записей и завести реальные активные задачи для `ROAD-000007`, оставив для будущих этапов только кандидаты задач без `BACK-ID`.
-
-#### BACK-000036 — Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
-ID: BACK-000036
-Название: Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
-Тип: Документация
-Приоритет: Средний
-Статус: В_работе
-Связи: ROAD-000007
-Источник: Следующий governance pass после переписывания roadmap и backlog
-Дата_создания: 2026-03-31
-Дата_изменения: 2026-03-31
-
-##### Описание
-Проверить, что аналитическая current truth, продуктовый слой и плановый контур используют одну и ту же управленческую модель и не расходятся по терминам, приоритетам и статусам.
-
-### Завершённые
 
 #### BACK-000033 — Переписать `Roadmap.md` на новый дальний путь BytePress
 ID: BACK-000033
@@ -605,6 +593,20 @@ ID: BACK-000035
 
 ##### Описание
 Явно закрепить в `Docs/Technical/Pipeline.md`, что `Roadmap` задаёт этапы, `Backlog` порождается из этапов, а `Plan` порождается только из backlog-задачи.
+
+#### BACK-000036 — Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
+ID: BACK-000036
+Название: Согласовать Interview, PRD, JTBD, Roadmap, Backlog, Plan
+Тип: Документация
+Приоритет: Средний
+Статус: Завершено
+Связи: ROAD-000007, PLAN-000023, CHG-000035, QL-000030
+Источник: Следующий governance pass после сборки roadmap-derived backlog
+Дата_создания: 2026-03-31
+Дата_изменения: 2026-03-31
+
+##### Описание
+Согласовать `Docs/Discovery/Interview.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Plans/Roadmap.md`, `Plans/Backlog.md` и активный `Plan` как единый planning-контур текущего этапа `ROAD-000007`: убрать остаточные рассогласования по статусам, связям и формулировкам, не расширяя продуктовый scope и не вводя новые типы артефактов.
 
 ---
 
