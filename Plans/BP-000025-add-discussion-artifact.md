@@ -2,8 +2,8 @@
 
 ID: PLAN-000025
 Название: Ввести Discussion как канонический артефакт ROAD-000008
-Статус: Черновик
-Связи: BACK-000038
+Статус: Завершено
+Связи: BACK-000038, CHG-000037, QL-000032
 Источник: First real artifact pass after ROAD-000008 activation
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
@@ -54,3 +54,10 @@ ID: PLAN-000025
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только если реально нужен.
 - `bp_lint.py` меняется только если обязательный contract действительно изменяется.
+
+## Фактический результат
+- `Docs/Discovery/Discussion.md` введён как первый реальный discovery-артефакт этапа `ROAD-000008` и использует существующий шаблон `Templates/Discussion.md`.
+- `Docs/Discovery/README.md` синхронизирован с фактическим минимальным составом discovery-layer: `Discussion.md` и `Interview.md`.
+- `Plans/Roadmap.md` и `Plans/Backlog.md` теперь отражают, что `Discussion` уже введён, а `Research` и `Requirements` остаются следующими задачами этапа без преждевременного ввода.
+- `Tools/bp_lint.py` минимально расширен и теперь требует `Docs/Discovery/Discussion.md` как обязательный discovery-артефакт BytePress repo.
+- `BACK-000038` оставлен в статусе `В_работе` как текущая активная задача этапа `ROAD-000008`; остаточный scope ограничен следующими проходами по `Research` и `Requirements`.
