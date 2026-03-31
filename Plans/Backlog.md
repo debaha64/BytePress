@@ -8,7 +8,7 @@
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
-- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: BACK-000037 | Кандидаты задач этапа
+- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000037 | Кандидаты задач этапа
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
 - ROAD-000011 — Тиражирование product repo (Product Repository Replication) | Кандидаты задач этапа
@@ -612,14 +612,17 @@ ID: BACK-000036
 ## ROAD-000008 — Исследование и требования (Research and Requirements)
 
 ### Активные
+- отсутствуют
+
+### Завершённые
 
 #### BACK-000037 — Запустить ROAD-000008 и добавить discovery templates
 ID: BACK-000037
 Название: Запустить ROAD-000008 и добавить discovery templates
 Тип: Документация
 Приоритет: Высокий
-Статус: В_работе
-Связи: ROAD-000008, PLAN-000024
+Статус: Завершено
+Связи: ROAD-000008, PLAN-000024, CHG-000036, QL-000031
 Источник: Переходный pass после выравнивания `ROAD-000007`
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
@@ -629,13 +632,10 @@ ID: BACK-000037
 
 ### Кандидаты задач этапа
 - Зафиксировать место `Discussion` в системе
-- Добавить шаблон `Discussion`
 - Ввести артефакт `Discussion`
 - Зафиксировать место `Research` в системе
-- Добавить шаблон `Research`
 - Ввести артефакт `Research`
 - Зафиксировать место `Requirements` в системе
-- Добавить шаблон `Requirements`
 - Ввести артефакт `Requirements`
 - Зафиксировать переход `Discussion -> Research -> Requirements -> Roadmap`
 

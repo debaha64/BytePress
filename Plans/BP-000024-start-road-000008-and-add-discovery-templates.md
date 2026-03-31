@@ -2,8 +2,8 @@
 
 ID: PLAN-000024
 Название: Запустить ROAD-000008 и добавить discovery templates
-Статус: Черновик
-Связи: BACK-000037
+Статус: Завершено
+Связи: BACK-000037, CHG-000036, QL-000031
 Источник: Transition pass after analytical-product-planning contour alignment
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
@@ -57,3 +57,10 @@ ID: PLAN-000024
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только если реально нужен.
 - `bp_lint.py` меняется только если обязательный contract действительно изменяется.
+
+## Фактический результат
+- `ROAD-000007` закрыт без остаточного governance-рассогласования: активных задач не осталось, а `Roadmap` и `Backlog` используют согласованный набор завершённых задач этапа.
+- `ROAD-000008` переведён в `В_работе` как текущий этап `Research and Requirements`, а `BACK-000037` зафиксировал стартовый transition pass этого этапа.
+- `Docs/Technical/Pipeline.md` теперь явно фиксирует выходы фаз `Discussion`, `Research`, `Requirements` и правило последовательного ввода новых типов артефактов: место -> шаблон -> сам артефакт.
+- Добавлены канонические шаблоны `Templates/Discussion.md`, `Templates/Research.md`, `Templates/Requirements.md`; сами discovery-артефакты в `Docs/Discovery/` не вводились.
+- `Tools/bp_lint.py` расширен минимально и теперь требует новые обязательные discovery-stage templates как часть BytePress repo contract.
