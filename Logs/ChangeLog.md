@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000034 — Pipeline, roadmap, and backlog governance aligned to the accepted stage model
 - CHG-000033 — Domain participation contract clarified execution and extension domains
 - CHG-000032 — Artifact lifecycle contract consolidated update order and reduced technical process noise
 - CHG-000031 — Branch and PR process contract finalized and residual process noise removed
@@ -34,6 +35,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000034 — Pipeline, roadmap, and backlog governance aligned to the accepted stage model
+ID: CHG-000034
+Дата: 2026-03-31
+Тип_изменения: Контракт
+Источник: Pipeline governance pass after domain participation contract
+Связи: PLAN-000022, BACK-000032, QL-000029
+Дата_создания: 2026-03-31
+Дата_изменения: 2026-03-31
+
+### Описание
+`Docs/Technical/Pipeline.md` приведён к полному канону фаз и теперь явно фиксирует правило `Roadmap -> Backlog -> Plan`, а также запрет на произвольное пополнение backlog вне этапов roadmap. `Plans/Roadmap.md` переписан как непрерывный дальний путь `ROAD-000001`...`ROAD-000014` без разрыва `ROAD-ID`, с крупноэтапным уровнем и новым текущим этапом `ROAD-000007`. `Plans/Backlog.md` перестроен как производный слой roadmap: карточки сгруппированы по `ROAD-*`, внутри этапов используются секции `Активные` и `Завершённые`, последние записи выровнены по порядку, для `ROAD-000007` заведены реальные текущие задачи, а для будущих этапов оставлены только кандидаты задач без `BACK-ID`. `ADRlog` и `bp_lint.py` не менялись, потому что новый архитектурный contract и обязательные пути репозитория в этом pass не изменились.
+
+### Эффект
+Governance-контур `Pipeline`, `Roadmap` и `Backlog` снова согласован: roadmap задаёт непрерывный дальний путь, backlog строго порождается из этапов roadmap, а текущий этап `ROAD-000007` получил реальные активные задачи вместо разрозненного process-noise.
 
 ---
 
