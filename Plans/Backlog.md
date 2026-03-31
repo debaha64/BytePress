@@ -619,13 +619,13 @@ ID: BACK-000038
 Тип: Документация
 Приоритет: Высокий
 Статус: В_работе
-Связи: ROAD-000008, PLAN-000026
+Связи: ROAD-000008, PLAN-000026, CHG-000038, QL-000033
 Источник: Следующий discovery pass после введения `Discussion`
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
 
 ##### Описание
-Ввести `Docs/Discovery/Research.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, сохранив `Requirements` как следующий шаг, а не текущий pass.
+Ввести `Docs/Discovery/Research.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, сохранив `Requirements` как следующий шаг, а не текущий pass. Остаточный scope после текущего pass: перевести следующий discovery-цикл к `Requirements`, не ломая уже введённые `Discussion` и `Research`.
 
 ### Завершённые
 

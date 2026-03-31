@@ -2,8 +2,8 @@
 
 ID: PLAN-000026
 Название: Ввести Research как следующий канонический артефакт ROAD-000008
-Статус: Черновик
-Связи: BACK-000038
+Статус: Завершено
+Связи: BACK-000038, CHG-000038, QL-000033
 Источник: Next real artifact pass after Discussion introduction
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
@@ -57,3 +57,10 @@ ID: PLAN-000026
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только если реально нужен.
 - `bp_lint.py` меняется только если обязательный contract действительно изменяется.
+
+## Фактический результат
+- `Docs/Discovery/Research.md` введён как следующий реальный discovery-артефакт этапа `ROAD-000008` и использует существующий шаблон `Templates/Research.md`.
+- `Docs/Discovery/README.md` синхронизирован с фактическим минимальным discovery-layer: `Discussion.md`, `Interview.md`, `Research.md`.
+- `Plans/Roadmap.md` и `Plans/Backlog.md` отражают, что `Discussion` и `Research` уже введены, а `Requirements` остаётся следующим слоем работ без преждевременного ввода.
+- `Tools/bp_lint.py` минимально расширен и теперь требует `Docs/Discovery/Research.md` как обязательный discovery-артефакт BytePress repo.
+- `BACK-000038` оставлен в статусе `В_работе` как текущая активная задача этапа `ROAD-000008`; остаточный scope ограничен следующим pass по `Requirements`.
