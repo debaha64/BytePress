@@ -17,7 +17,8 @@ REQUIRED_SCHEMAS = [
 ]
 REQUIRED_TEMPLATES = [
     "Document.md", "Term.md", "Roadmap.md", "Backlog.md", "Plan.md", "ADRlog.md",
-    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md", "Delivery.md", "Interview.md"
+    "ChangeLog.md", "Profile.md", "Role.md", "Rule.md", "Standard.md", "Delivery.md", "Interview.md",
+    "Discussion.md", "Research.md", "Requirements.md"
 ]
 REQUIRED_SKILLS = [
     "Discussion.md", "Interview.md", "Research.md", "Requirements.md", "Planning.md",

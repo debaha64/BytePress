@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000036 — ROAD-000007 closed, ROAD-000008 activated, and discovery templates introduced
 - CHG-000035 — Analytical, product, and planning contours aligned for ROAD-000007
 - CHG-000034 — Pipeline, roadmap, and backlog governance aligned to the accepted stage model
 - CHG-000033 — Domain participation contract clarified execution and extension domains
@@ -36,6 +37,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000036 — ROAD-000007 closed, ROAD-000008 activated, and discovery templates introduced
+ID: CHG-000036
+Дата: 2026-04-01
+Тип_изменения: Контракт
+Источник: Transition pass from governance stage to research-and-requirements stage
+Связи: PLAN-000024, BACK-000037, QL-000031
+Дата_создания: 2026-04-01
+Дата_изменения: 2026-04-01
+
+### Описание
+`Plans/Roadmap.md` и `Plans/Backlog.md` синхронизированы для перехода между этапами: `ROAD-000007` закрыт как завершённый governance-stage, а `ROAD-000008` активирован как текущий этап `Research and Requirements`. `BACK-000037` использован как стартовый pass этого этапа и после завершения перенесён в правильную секцию backlog без нарушения индексного канона. `Docs/Technical/Pipeline.md` закрепил место `Discussion`, `Research` и `Requirements` в конвейере и явное правило ввода новых типов артефактов по цепочке `место -> шаблон -> артефакт`. В `Templates/` добавлены канонические шаблоны `Discussion.md`, `Research.md`, `Requirements.md`, а `Tools/bp_lint.py` расширен ровно на требование этих новых обязательных template-файлов.
+
+### Эффект
+Governance-переход между `ROAD-000007` и `ROAD-000008` больше не содержит хвостов по статусам и секциям backlog, а discovery-stage получил каноническое место в `Pipeline` и обязательный template contract без преждевременного ввода рабочих discovery-документов.
 
 ---
 
