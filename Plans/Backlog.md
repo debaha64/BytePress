@@ -8,7 +8,7 @@
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
-- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000037 | Кандидаты задач этапа
+- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: BACK-000038 | Завершённые: BACK-000037 | Кандидаты задач этапа
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
 - ROAD-000011 — Тиражирование product repo (Product Repository Replication) | Кандидаты задач этапа
@@ -612,7 +612,20 @@ ID: BACK-000036
 ## ROAD-000008 — Исследование и требования (Research and Requirements)
 
 ### Активные
-- отсутствуют
+
+#### BACK-000038 — Ввести Discussion как канонический артефакт ROAD-000008
+ID: BACK-000038
+Название: Ввести Discussion как канонический артефакт ROAD-000008
+Тип: Документация
+Приоритет: Высокий
+Статус: В_работе
+Связи: ROAD-000008, PLAN-000025, CHG-000037, QL-000032
+Источник: Первый реальный pass этапа Research and Requirements
+Дата_создания: 2026-04-01
+Дата_изменения: 2026-04-01
+
+##### Описание
+Ввести `Docs/Discovery/Discussion.md` как первый реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, не вводя в этом pass `Research.md` и `Requirements.md`. Остаточный scope после текущего pass: перевести следующий discovery-цикл к `Research` и затем к `Requirements`, не ломая уже введённый `Discussion`.
 
 ### Завершённые
 
@@ -631,8 +644,6 @@ ID: BACK-000037
 Закрыть governance-хвост `ROAD-000007`, активировать `ROAD-000008`, зафиксировать место `Discussion`, `Research`, `Requirements` в системе, добавить их канонические шаблоны и синхронизировать `Pipeline`, `Roadmap` и `Backlog` без введения самих discovery-артефактов в `Docs/Discovery/`.
 
 ### Кандидаты задач этапа
-- Зафиксировать место `Discussion` в системе
-- Ввести артефакт `Discussion`
 - Зафиксировать место `Research` в системе
 - Ввести артефакт `Research`
 - Зафиксировать место `Requirements` в системе

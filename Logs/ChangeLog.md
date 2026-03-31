@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000037 — Discussion introduced as the first canonical artifact of ROAD-000008
 - CHG-000036 — ROAD-000007 closed, ROAD-000008 activated, and discovery templates introduced
 - CHG-000035 — Analytical, product, and planning contours aligned for ROAD-000007
 - CHG-000034 — Pipeline, roadmap, and backlog governance aligned to the accepted stage model
@@ -37,6 +38,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000037 — Discussion introduced as the first canonical artifact of ROAD-000008
+ID: CHG-000037
+Дата: 2026-04-01
+Тип_изменения: Документация
+Источник: First real ROAD-000008 pass after discovery template bootstrap
+Связи: PLAN-000025, BACK-000038, QL-000032
+Дата_создания: 2026-04-01
+Дата_изменения: 2026-04-01
+
+### Описание
+`Docs/Discovery/Discussion.md` введён как первый реальный рабочий артефакт этапа `ROAD-000008` на основе уже существующего `Templates/Discussion.md`. `Docs/Discovery/README.md` обновлён под фактический discovery-layer, а `Plans/Roadmap.md` и `Plans/Backlog.md` синхронизированы так, чтобы `Discussion` считался уже введённым артефактом текущего этапа, а `Research` и `Requirements` оставались следующими задачами без преждевременного ввода. `Tools/bp_lint.py` минимально расширен и теперь требует `Docs/Discovery/Discussion.md` как обязательный discovery-артефакт BytePress repo. Новый `ADR` не создавался, потому что проход исполнил уже утверждённый порядок `место -> шаблон -> артефакт` без нового устойчивого архитектурного решения.
+
+### Эффект
+`ROAD-000008` получил первый реальный discovery-документ, а planning-контур и lint-contract теперь согласованно учитывают `Discussion` как канонический артефакт текущего этапа.
 
 ---
 

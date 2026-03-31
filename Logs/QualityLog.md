@@ -1,5 +1,13 @@
 # QualityLog
 
+## QL-000032
+Дата: 2026-04-01
+Статус: пройдено
+Проверка: существует `Docs/Discovery/Discussion.md` и он использует канонический шаблон `Templates/Discussion.md` без превращения в стенограмму; `Docs/Discovery/README.md` отражает фактический discovery-layer; `Plans/Roadmap.md` и `Plans/Backlog.md` согласованы по текущему этапу `ROAD-000008`, при этом `Research` и `Requirements` остаются будущими задачами; `Tools/bp_lint.py` требует `Docs/Discovery/Discussion.md`; обязательная финальная governance-сверка пройдена: статус текущей backlog-задачи `BACK-000038` — `В_работе`, она находится в секции `Активные`, индекс `Backlog.md` это отражает, `ROAD-000008` имеет статус `В_работе` и актуальные `Связанные_backlog`, `PLAN-000025` имеет статус `Завершено`; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
+Результат: `Discussion` введён как первый канонический артефакт `ROAD-000008`, planning-контур согласован, `Research` и `Requirements` не введены преждевременно, а lint-contract расширен ровно на новый обязательный discovery-артефакт.
+
+---
+
 ## QL-000031
 Дата: 2026-04-01
 Статус: пройдено
