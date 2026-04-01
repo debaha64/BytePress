@@ -2,8 +2,8 @@
 
 ID: PLAN-000027
 Название: Ввести Requirements как следующий канонический артефакт ROAD-000008
-Статус: Черновик
-Связи: BACK-000039
+Статус: Завершено
+Связи: BACK-000039, CHG-000039, QL-000034
 Источник: Next real artifact pass after Research introduction
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
@@ -47,6 +47,13 @@ ID: PLAN-000027
 - `Plans/BP-000027-add-requirements-artifact.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
+
+## Фактический результат
+- `BACK-000038` закрыт как завершённый pass по `Research` без двусмысленного residual scope.
+- `Docs/Discovery/Requirements.md` введён как следующий канонический discovery-артефакт и выровнен с `Docs/Discovery/README.md`.
+- `Plans/Roadmap.md` и `Plans/Backlog.md` синхронизированы под фактическое состояние `ROAD-000008`.
+- `Tools/bp_lint.py` теперь требует `Docs/Discovery/Requirements.md` как обязательный discovery-артефакт BytePress repo.
+- Финальная governance-сверка пройдена: `BACK-000039`, его секция, индекс backlog, статус `ROAD-000008`, его `Связанные_backlog` и статус `PLAN-000027` согласованы.
 
 ## DoD
 - рассогласование по `BACK-000038` устранено.
