@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000040 — ROAD-000008 governance state repaired and the stage closed consistently
 - CHG-000039 — Requirements introduced as the next canonical artifact of ROAD-000008
 - CHG-000038 — Research introduced as the next canonical artifact of ROAD-000008
 - CHG-000037 — Discussion introduced as the first canonical artifact of ROAD-000008
@@ -40,6 +41,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000040 — ROAD-000008 governance state repaired and the stage closed consistently
+ID: CHG-000040
+Дата: 2026-04-02
+Тип_изменения: Документация
+Источник: Short governance repair pass after Requirements introduction
+Связи: PLAN-000028, BACK-000040, QL-000035
+Дата_создания: 2026-04-02
+Дата_изменения: 2026-04-02
+
+### Описание
+Остаточный candidate-level хвост этапа `ROAD-000008` переведён в реальную backlog-задачу `BACK-000040`, после чего `Docs/Technical/Pipeline.md`, `Plans/Roadmap.md` и `Plans/Backlog.md` синхронизированы под правило, что этап roadmap со статусом `В_работе` не может оставаться без активной backlog-задачи. По результату pass `BACK-000040`, `PLAN-000028` и сам `ROAD-000008` закрыты как завершённые без рассогласования между статусом этапа, составом `Связанные_backlog`, индексом backlog и положением задачи в секции `Завершённые`. `bp_lint.py` и `ADRlog` не менялись, потому что обязательный contract путей, шаблонов и доменов не изменился и новый устойчивый архитектурный выбор не появился.
+
+### Эффект
+`ROAD-000008` больше не остаётся активным без реальной задачи и больше не держит переход `Discussion -> Research -> Requirements -> Roadmap` только как кандидат: этап закрыт, а governance-контур согласован перед переходом к следующим roadmap-stage задачам.
 
 ---
 

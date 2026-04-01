@@ -8,7 +8,7 @@
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
-- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000037, BACK-000038, BACK-000039 | Кандидаты задач этапа
+- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
 - ROAD-000011 — Тиражирование product repo (Product Repository Replication) | Кандидаты задач этапа
@@ -616,6 +616,20 @@ ID: BACK-000036
 
 ### Завершённые
 
+#### BACK-000040 — Зафиксировать переход Discussion -> Research -> Requirements -> Roadmap
+ID: BACK-000040
+Название: Зафиксировать переход Discussion -> Research -> Requirements -> Roadmap
+Тип: Документация
+Приоритет: Высокий
+Статус: Завершено
+Связи: ROAD-000008, PLAN-000028, CHG-000040, QL-000035
+Источник: Переходный governance pass после введения `Requirements`
+Дата_создания: 2026-04-02
+Дата_изменения: 2026-04-02
+
+##### Описание
+Зафиксировать переход `Discussion -> Research -> Requirements -> Roadmap` как реальную текущую backlog-задачу этапа `ROAD-000008`, синхронизировать `Pipeline`, `Roadmap` и `Backlog`, убрать остаточный governance-шум и закрыть этап без рассогласования между статусом этапа и наличием активной задачи.
+
 #### BACK-000039 — Ввести Requirements как следующий канонический артефакт ROAD-000008
 ID: BACK-000039
 Название: Ввести Requirements как следующий канонический артефакт ROAD-000008
@@ -657,9 +671,6 @@ ID: BACK-000037
 
 ##### Описание
 Закрыть governance-хвост `ROAD-000007`, активировать `ROAD-000008`, зафиксировать место `Discussion`, `Research`, `Requirements` в системе, добавить их канонические шаблоны и синхронизировать `Pipeline`, `Roadmap` и `Backlog` без введения самих discovery-артефактов в `Docs/Discovery/`.
-
-### Кандидаты задач этапа
-- Зафиксировать переход `Discussion -> Research -> Requirements -> Roadmap`
 
 ---
 
