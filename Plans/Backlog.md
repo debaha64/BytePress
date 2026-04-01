@@ -8,7 +8,7 @@
 - ROAD-000005 — Discovery-слой и текущая истина (Discovery Layer and Current Truth) | Активные: нет | Завершённые: 1
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
-- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: BACK-000038 | Завершённые: BACK-000037 | Кандидаты задач этапа
+- ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: BACK-000039 | Завершённые: BACK-000037, BACK-000038 | Кандидаты задач этапа
 - ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
 - ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
 - ROAD-000011 — Тиражирование product repo (Product Repository Replication) | Кандидаты задач этапа
@@ -613,21 +613,35 @@ ID: BACK-000036
 
 ### Активные
 
-#### BACK-000038 — Ввести Discussion как канонический артефакт ROAD-000008
+#### BACK-000039 — Ввести Requirements как следующий канонический артефакт ROAD-000008
+ID: BACK-000039
+Название: Ввести Requirements как следующий канонический артефакт ROAD-000008
+Тип: Документация
+Приоритет: Высокий
+Статус: В_работе
+Связи: ROAD-000008, PLAN-000027
+Источник: Следующий discovery pass после введения `Research`
+Дата_создания: 2026-04-01
+Дата_изменения: 2026-04-01
+
+##### Описание
+Ввести `Docs/Discovery/Requirements.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Research`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, не превращая `BACK-000038` в контейнер для нового pass.
+
+### Завершённые
+
+#### BACK-000038 — Ввести Research как следующий канонический артефакт ROAD-000008
 ID: BACK-000038
 Название: Ввести Research как следующий канонический артефакт ROAD-000008
 Тип: Документация
 Приоритет: Высокий
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000008, PLAN-000026, CHG-000038, QL-000033
 Источник: Следующий discovery pass после введения `Discussion`
 Дата_создания: 2026-04-01
 Дата_изменения: 2026-04-01
 
 ##### Описание
-Ввести `Docs/Discovery/Research.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, сохранив `Requirements` как следующий шаг, а не текущий pass. Остаточный scope после текущего pass: перевести следующий discovery-цикл к `Requirements`, не ломая уже введённые `Discussion` и `Research`.
-
-### Завершённые
+Ввести `Docs/Discovery/Research.md` как следующий реальный рабочий артефакт этапа `ROAD-000008`, согласовать его с `Discussion`, `Interview`, `Pipeline`, `Roadmap`, `Backlog` и `Plan`, сохранив `Requirements` как следующий шаг, а не текущий pass.
 
 #### BACK-000037 — Запустить ROAD-000008 и добавить discovery templates
 ID: BACK-000037
