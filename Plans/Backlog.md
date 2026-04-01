@@ -658,8 +658,6 @@ ID: BACK-000037
 Закрыть governance-хвост `ROAD-000007`, активировать `ROAD-000008`, зафиксировать место `Discussion`, `Research`, `Requirements` в системе, добавить их канонические шаблоны и синхронизировать `Pipeline`, `Roadmap` и `Backlog` без введения самих discovery-артефактов в `Docs/Discovery/`.
 
 ### Кандидаты задач этапа
-- Зафиксировать место `Requirements` в системе
-- Ввести артефакт `Requirements`
 - Зафиксировать переход `Discussion -> Research -> Requirements -> Roadmap`
 
 ---
