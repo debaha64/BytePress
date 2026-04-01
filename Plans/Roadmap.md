@@ -148,8 +148,8 @@ ID: ROAD-000007
 ## ROAD-000008 — Исследование и требования (Research and Requirements)
 ID: ROAD-000008
 Этап: Исследование и требования (Research and Requirements)
-Статус: В_работе
-Связи: BACK-000037, BACK-000038, BACK-000039, BACK-000040
+Статус: Завершено
+Связи: BACK-000037, BACK-000038, BACK-000039, BACK-000040, CHG-000040
 Источник: PLAN-000024, PLAN-000025, PLAN-000026, PLAN-000027, PLAN-000028
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-02
@@ -158,7 +158,7 @@ ID: ROAD-000008
 Связанные_backlog: BACK-000037, BACK-000038, BACK-000039, BACK-000040
 
 ### Описание
-Текущий этап: после фиксации места и шаблонов уже введены `Discussion`, `Research` и `Requirements` как реальные discovery-артефакты, а активный pass `BACK-000040` закрепляет переход `Discussion -> Research -> Requirements -> Roadmap`, синхронизирует governance-контур и снимает остаточный шум этапа без преждевременного расширения discovery-layer.
+Этап закрыт: после фиксации места и шаблонов введены `Discussion`, `Research` и `Requirements` как реальные discovery-артефакты, а `BACK-000040` завершил переход `Discussion -> Research -> Requirements -> Roadmap`, синхронизировал governance-контур и снял остаточный шум этапа без расширения discovery-layer.
 
 ---
 

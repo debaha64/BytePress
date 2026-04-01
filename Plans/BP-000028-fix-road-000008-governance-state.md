@@ -2,8 +2,8 @@
 
 ID: PLAN-000028
 Название: Зафиксировать переход Discussion -> Research -> Requirements -> Roadmap
-Статус: В_работе
-Связи: BACK-000040
+Статус: Завершено
+Связи: BACK-000040, CHG-000040, QL-000035
 Источник: Transition governance repair pass after Requirements introduction
 Дата_создания: 2026-04-02
 Дата_изменения: 2026-04-02
@@ -52,3 +52,10 @@ ID: PLAN-000028
 - `python3 Tools/bp_lint.py --repo .` проходит.
 - новый `ADR` создаётся только если реально нужен.
 - `bp_lint.py` меняется только если обязательный contract действительно изменяется.
+
+## Фактический результат
+- `BACK-000040` перевёл оставшийся переход `Discussion -> Research -> Requirements -> Roadmap` из candidate-level хвоста в реальный pass и затем закрыл его как завершённую задачу.
+- `Docs/Technical/Pipeline.md`, `Plans/Roadmap.md` и `Plans/Backlog.md` синхронизированы под правило, что активный этап roadmap не может оставаться без активной backlog-задачи.
+- `ROAD-000008` закрыт как завершённый этап без остаточного governance-рассогласования по статусу, `Связанные_backlog` и секциям backlog.
+- `bp_lint.py` не менялся, потому что обязательный contract путей, шаблонов и доменов не изменился; `bp_lint contract unaffected`.
+- Новый `ADR` не создавался, потому что pass не вводил нового устойчивого архитектурного решения.
