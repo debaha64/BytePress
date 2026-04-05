@@ -11,10 +11,10 @@
 - ROAD-000008 — Исследование и требования (Research and Requirements)
 - ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour)
 - ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
-- ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer)
-- ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
-- ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer)
-- ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory)
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour)
+- ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
+- ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
+- ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 
 ## Легенда статусов
 - Черновик
@@ -166,16 +166,16 @@ ID: ROAD-000008
 ID: ROAD-000009
 Этап: Операционная модель и governance-контур (Operating Model and Governance Contour)
 Статус: В_работе
-Связи: BACK-000041, PLAN-000029
-Источник: PLAN-000029
+Связи: BACK-000041, BACK-000042, PLAN-000029, PLAN-000030
+Источник: PLAN-000029, PLAN-000030
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
-Цель: Зафиксировать новую операционную модель `BytePress`: терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan`, единый planning-contour и hard-close governance contract без полной ID migration и без массового архива.
+Цель: Зафиксировать новую операционную модель `BytePress`, planning-contour и единую схему идентификаторов на уровне governance-contract, включая терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan` и hard-close contour без полной migration исторического слоя.
 Зависимости: ROAD-000008
-Связанные_backlog: BACK-000041
+Связанные_backlog: BACK-000041, BACK-000042
 
 ### Описание
-Этап переводит `BytePress` на новый governance-pass operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, а `Runtime/Plan.md` выводится из канона как неисточник истины.
+Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, а переходный legacy-слой явно отделяется от целевого planning-канона до отдельных migration-pass.
 
 ---
 
@@ -196,68 +196,68 @@ ID: ROAD-000010
 
 ---
 
-## ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer)
+## ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour)
 ID: ROAD-000011
-Этап: Пакет основания и пользовательский слой (Foundation Package and User Layer)
+Этап: Контур проверок и верификации (Verification and Validation Contour)
 Статус: Черновик
 Связи: отсутствуют
-Источник: Следующий этап после technical layer cleanup
+Источник: Следующий этап после technical layer and system contracts
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
-Цель: Уточнить пакет основания и проявить устойчивый пользовательский слой поверх уже нормализованной операционной и технической базы.
+Цель: Собрать контур проверок и верификации поверх обновлённой operating model и технической карты системы без смешения verification-work с самой нормализацией техслоя.
 Зависимости: ROAD-000010
 Связанные_backlog: отсутствуют
 
 ### Описание
-Этап возвращает в horizon `foundation package` и `Docs/User/*`, но уже после фиксации governance-модели и технической карты.
+Этап подготавливает verification-layer, contract checks и модель верификации как отдельный следующий горизонт после фиксации системных контрактов.
 
 ---
 
-## ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
+## ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 ID: ROAD-000012
-Этап: Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
+Этап: Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 Статус: Черновик
 Связи: отсутствуют
-Источник: Следующий этап после foundation package and user layer
+Источник: Следующий этап после verification contour
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
-Цель: Снизить ручной noise в governance и contracts через более декларативные проверки и инструменты после того, как смысл сущностей и жизненный цикл закреплены.
+Цель: Проявить устойчивую точку входа агента и согласованный пользовательский слой после того, как planning и verification-контуры перестанут противоречить друг другу.
 Зависимости: ROAD-000011
 Связанные_backlog: отсутствуют
 
 ### Описание
-Этап рассматривает декларативные contracts и дальнейшее усиление lint/tooling уже на стабилизированном основании.
+Этап объединяет agent entry point и `Docs/User/*` в один следующий продуктовый горизонт, не раскрывая его здесь в список мелких задач.
 
 ---
 
-## ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer)
+## ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 ID: ROAD-000013
-Этап: Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer)
+Этап: Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 Статус: Черновик
 Связи: отсутствуют
-Источник: Следующий этап после declarative tooling
+Источник: Следующий этап после agent entry and user layer
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
-Цель: Подготовить повторяемое создание product repo и развить `Adapters/`, `Memory/` и `MCP/` до управляемого интеграционного слоя на основе уже согласованных contracts.
+Цель: Подготовить повторяемое тиражирование product repo и следующий baseline `0.2.0` как отдельный управляемый этап после проявления точки входа агента и пользовательского слоя.
 Зависимости: ROAD-000012
 Связанные_backlog: отсутствуют
 
 ### Описание
-Этап объединяет replication-path и integration-layer в один следующий системный горизонт без детального расписывания дальних подэтапов.
+Этап связывает replication-path и подготовку к `0.2.0`, не смешивая это с последующим интеграционным контуром и будущими расширениями.
 
 ---
 
-## ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory)
+## ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 ID: ROAD-000014
-Этап: BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory)
+Этап: Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 Статус: Черновик
 Связи: отсутствуют
 Источник: Дальний стратегический этап
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
-Цель: Довести `BytePress` до продуктового режима для solo founders и далее до многопродуктовой agent-first фабрики с повторяемой системой развития и поставки.
+Цель: Развить интеграционный контур, будущие расширения и дальний growth-horizon `BytePress` после replication-stage и baseline `0.2.0`.
 Зависимости: ROAD-000013
 Связанные_backlog: отсутствуют
 
 ### Описание
-Дальний этап, в котором productization, replication и integration-layer сходятся в многопродуктовую фабрику без дополнительной детализации текущим pass.
+Дальний этап, в котором интеграции, расширения и последующее масштабирование сходятся в следующий горизонт развития без дополнительной детализации текущим corrective pass.
