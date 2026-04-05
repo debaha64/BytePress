@@ -15,6 +15,7 @@
 - `slug` оформляется в `kebab-case`;
 - имя файла не дублирует родительский каталог;
 - целевой типовой префикс текущего `Plan` — `PLAN`.
+- repo-wide classes `serial / hybrid / singleton` и migration-order определяются в `Standards/Naming.md`.
 
 ## Целевая модель
 Активный слой `Plans/` использует один текущий `Plan` в целевом filename-contract `Plans/PLAN-<NNNNNN>-<slug>.md`.

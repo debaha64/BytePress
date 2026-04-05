@@ -9,7 +9,7 @@
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043 | Кандидаты задач этапа
 - ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Кандидаты задач этапа
 - ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Кандидаты задач этапа
 - ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer) | Кандидаты задач этапа
@@ -709,8 +709,21 @@ ID: BACK-000042
 ##### Описание
 Согласовать `Roadmap` с утверждённым горизонтом `ROAD-000009`–`ROAD-000014`, снять противоречия между целевой planning-моделью и текущим переходным состоянием дерева, а также явно зафиксировать transitional policy для historical backlog-записей, `BP-*` plan-files и legacy-артефакта `Runtime/Plan.md`.
 
+#### BACK-000043 — Определить unified ID scheme для репозитория
+ID: BACK-000043
+Название: Определить unified ID scheme для репозитория
+Тип: Стандарт
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000009, PLAN-000031
+Источник: Следующий узкий pass внутри `ROAD-000009` после выравнивания planning transition
+Дата_создания: 2026-04-06
+Дата_изменения: 2026-04-06
+
+##### Описание
+Зафиксировать целевую единую схему идентификаторов для всего репозитория: классы артефактов по модели идентификации, правила `ID` и filename для serial / hybrid / singleton domains, правила внутренних ссылок и порядок будущей migration по доменам без запуска самой migration.
+
 ### Кандидаты задач этапа
-- Завершить единый contract идентификаторов без массовой migration старого слоя
 - Подготовить правило управляемого вывода завершённых `Plan` в `Plans/Archive/`
 - Уточнить контур hard-close для следующих governance-pass этапа
 
