@@ -9,12 +9,12 @@
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042 | Кандидаты задач этапа
 - ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Кандидаты задач этапа
-- ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
-- ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
-- ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer) | Кандидаты задач этапа
-- ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory) | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Кандидаты задач этапа
+- ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer) | Кандидаты задач этапа
+- ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`) | Кандидаты задач этапа
+- ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions) | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -695,6 +695,20 @@ ID: BACK-000041
 ##### Описание
 Закрепить терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan`, правило неканоничности `Runtime/Plan.md` и hard-close contour задачи на уровне planning-contract без полной ID migration, без массового архива и без переписывания `AGENTS.md`.
 
+#### BACK-000042 — Снять противоречия planning transition внутри ROAD-000009
+ID: BACK-000042
+Название: Снять противоречия planning transition внутри ROAD-000009
+Тип: Стандарт
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000009, PLAN-000030
+Источник: Corrective pass после merge `docs/000034-activate-road-000009-operating-model`
+Дата_создания: 2026-04-06
+Дата_изменения: 2026-04-06
+
+##### Описание
+Согласовать `Roadmap` с утверждённым горизонтом `ROAD-000009`–`ROAD-000014`, снять противоречия между целевой planning-моделью и текущим переходным состоянием дерева, а также явно зафиксировать transitional policy для historical backlog-записей, `BP-*` plan-files и legacy-артефакта `Runtime/Plan.md`.
+
 ### Кандидаты задач этапа
 - Завершить единый contract идентификаторов без массовой migration старого слоя
 - Подготовить правило управляемого вывода завершённых `Plan` в `Plans/Archive/`
@@ -711,40 +725,36 @@ ID: BACK-000041
 
 ---
 
-## ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer)
+## ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour)
 
 ### Кандидаты задач этапа
-- Зафиксировать место `Foundation Package` в системе
-- Уточнить минимальный состав foundation package
+- Зафиксировать verification contour после обновления технического слоя
+- Уточнить место contract checks и validation-проходов
+- Согласовать verification-model с `Roadmap`, `Backlog` и `Plan`
+
+---
+
+## ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
+
+### Кандидаты задач этапа
+- Зафиксировать agent entry point как отдельный слой системы
 - Проявить пользовательский слой `Docs/User/`
-- Согласовать пакет основания с `Roadmap`, `Backlog` и `Plan`
+- Согласовать вход агента и user-layer с `Roadmap`, `Backlog` и `Plan`
 
 ---
 
-## ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
-
-### Кандидаты задач этапа
-- Зафиксировать место декларативных contracts в системе
-- Уточнить, какие проверки могут стать декларативными
-- Перевести часть lint-checks в более декларативный contract
-- Согласовать декларативные проверки с `Pipeline`, `Roadmap` и `Backlog`
-
----
-
-## ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer)
+## ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 
 ### Кандидаты задач этапа
 - Зафиксировать contract тиражирования product repo
-- Уточнить минимальный replicated product repo contract
-- Перевести интеграционный контур из каркаса в управляемый layer
-- Проверить границы между `BytePress` и replicated product repositories
+- Уточнить следующий baseline `0.2.0`
+- Согласовать replication-path и baseline-переход без детализации дальних подэтапов
 
 ---
 
-## ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory)
+## ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 
 ### Кандидаты задач этапа
-- Уточнить продуктовую гипотезу BytePress для solo founders
-- Согласовать `JTBD`, `PRD` и delivery-модель самого BytePress
-- Зафиксировать governance для нескольких product repositories
-- Определить дальнюю модель масштабирования BytePress как многопродуктовой agent-first фабрики
+- Зафиксировать место интеграционного контура после baseline `0.2.0`
+- Уточнить будущие расширения `Adapters/`, `Memory/` и `MCP/`
+- Определить дальний growth-horizon без детализации на мелкие шаги

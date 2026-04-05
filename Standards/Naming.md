@@ -27,20 +27,16 @@ Semver применяется к текущему operational contract `BytePres
 Имя файла не должно дублировать родительский каталог.
 
 ## Имена plan-file
-Каноническое имя файла плана:
+Целевое каноническое имя файла плана:
 
-`Plans/<PRODUCT_CODE>-<NNNNNN>-<slug>.md`
+`Plans/PLAN-<NNNNNN>-<slug>.md`
 
 Где:
-- `PRODUCT_CODE` состоит из 2-3 символов в верхнем регистре;
-- кандидат `PRODUCT_CODE` генерируется из имени продукта;
-- итоговый код утверждается человеком.
+- `PLAN` — типовой префикс plan-file;
+- числовая часть содержит 6 знаков;
+- `slug` оформляется в `kebab-case`.
 
-Примеры:
-- `BytePress -> BP`
-- `Speculorg.Terminal -> ST`
-- `MicroCalc -> MC`
-- `Super VBank -> SVB`
+До отдельной migration-задачи historical `BP-*` plan-files могут физически оставаться в `Plans/` как legacy/transitional слой.
 
 ## Категории доменов по filename policy
 Домены делятся на три группы:
@@ -51,7 +47,7 @@ Semver применяется к текущему operational contract `BytePres
 ### Серийные домены
 Для серийных доменов новые артефакты создаются только по новому контракту, а legacy-слой мигрируется отдельными проходами.
 
-- `Plans/`: `Plans/<PRODUCT_CODE>-<NNNNNN>-<slug>.md`
+- `Plans/`: целевой формат `Plans/PLAN-<NNNNNN>-<slug>.md`, historical `BP-*` допустимы только как transitional legacy-слой до отдельной migration-задачи
 - `Docs/Terms/`: целевой формат `Docs/Terms/TERM-<NNNNNN>-<slug>.md`
 
 ### Гибридные домены
