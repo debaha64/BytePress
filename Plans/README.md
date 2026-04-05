@@ -1,12 +1,13 @@
 # Plans
 
-`Plans/` хранит roadmap, backlog, текущий canonical `Plan` и historical planning-layer.
+`Plans/` хранит roadmap, активный backlog текущего этапа, текущий canonical `Plan` и historical planning-layer.
 
 ## Состав
 - `Roadmap.md` — дорожная карта крупных этапов уровня системы.
-- `Backlog.md` — файл planning-backlog, в котором целевой active layer принадлежит текущему этапу.
+- `Backlog.md` — active planning-backlog, который хранит только текущий этап.
 - `Plans/PLAN-<NNNNNN>-<slug>.md` — целевой канонический формат имени plan-file для одного pass.
 - `Plans/Archive/PLAN-<NNNNNN>-<slug>.md` — реализованный архив завершённых `Plan`.
+- `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` — реализованный архив backlog прошлых завершённых этапов.
 
 ## Контракт именования
 - числовая часть ID содержит 6 знаков;
@@ -23,18 +24,20 @@
 
 В активном слое существует только один текущий `Plan`; завершённые `Plan` хранятся в `Plans/Archive/` и не смешиваются с текущим pass.
 
-Целевой active `Backlog` хранит задачи только текущего этапа, а статусы этапов принадлежат `Roadmap.md`.
+Активный `Backlog.md` хранит задачи только текущего этапа, а historical backlog прошлых этапов вынесен в `Plans/Archive/Backlog/`.
+
+Статусы этапов и дальний горизонт принадлежат `Roadmap.md`.
 
 ## Переходное состояние
-После migration plan-files репозиторий всё ещё остаётся в transitional state только в части:
-- historical backlog-записей прошлых этапов в `Plans/Backlog.md`;
-- `Runtime/Plan.md` как legacy runtime draft.
+После migration plan-files и backlog history-layer репозиторий остаётся в transitional state только в части `Runtime/Plan.md` как legacy runtime draft.
 
 Historical `Plan` больше не остаются в active `Plans/`: они migrated в `Plans/Archive/`.
+
+Historical backlog прошлых этапов больше не остаётся в active `Plans/Backlog.md`: он migrated в `Plans/Archive/Backlog/`.
 
 ## Правило
 `Runtime/Plan.md` не считается источником истины для плана, не является каноническим `Plan` и до отдельного pass остаётся только legacy-артефактом runtime-layer.
 
-Целевая модель `Backlog.md` хранит только задачи текущего этапа; дальний горизонт и статусы этапов принадлежат `Roadmap.md`.
+`Backlog.md` хранит только задачи текущего этапа; historical backlog хранится в `Plans/Archive/Backlog/`, а дальний горизонт и статусы этапов принадлежат `Roadmap.md`.
 
 `Roadmap.md` не дублирует backlog и не перечисляет каждый документный или контрактный проход.

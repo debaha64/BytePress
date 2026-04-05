@@ -44,7 +44,7 @@ ID: PLAN-000032
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000032-migrate-plan-history-to-archive.md`
+- `Plans/Archive/PLAN-000032-migrate-plan-history-to-archive.md`
 - `Plans/Archive/*`
 - `Standards/Naming.md`
 - `Standards/Planning.md`
@@ -63,5 +63,5 @@ ID: PLAN-000032
 ## Фактический результат
 - `BACK-000044` и `PLAN-000032` зафиксировали только pass на migration plan-files и archive policy.
 - historical `BP-*` и завершённые `PLAN-*` перемещены в `Plans/Archive/` и приведены к `PLAN-*` filename-contract.
-- active `Plans/` оставил только singleton files и текущий `PLAN-000032`.
+- active `Plans/` на момент закрытия pass оставил только singleton files и текущий `PLAN-000032`, после чего сам план стал частью historical archive-layer.
 - `Standards/Naming.md`, `Standards/Planning.md`, `Plans/README.md` и `bp_lint.py` синхронизированы под фактически реализованный active/archive plan-layer.

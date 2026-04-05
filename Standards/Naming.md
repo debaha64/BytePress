@@ -89,6 +89,11 @@ Singleton domains не используют serial `ID` в filename и не ма
 - внутренний `ID` используется там, где singleton-артефакт является нормируемой сущностью;
 - serial `ID` в filename не требуется и не вводится по умолчанию.
 
+Исторический backlog прошлых этапов использует stage-keyed archive path contract:
+- `Plans/Archive/Backlog/ROAD-<NNNNNN>.md`
+
+Этот archive contract не делает `Backlog` serial domain: активный backlog остаётся singleton-файлом `Plans/Backlog.md`, а archive files служат stage-scoped historical records.
+
 ## Правила ссылок и упоминания ID
 - Внутренний `ID` является канонической ссылкой на сущность в текстах, связях и зависимостях.
 - Для serial domains ссылка по `ID` является основной; filename/path добавляется только когда нужна файловая навигация или указание конкретного serial-файла.
@@ -103,7 +108,6 @@ Singleton domains не используют serial `ID` в filename и не ма
 - singleton domains сохраняют semantic filenames и не переводятся на serial filename без отдельного решения.
 
 Transitional legacy-state:
-- historical backlog прошлых этапов ещё физически существует в `Plans/Backlog.md`;
 - `Runtime/Plan.md` ещё физически существует как legacy runtime artifact;
 - transitional state не меняет целевую схему и не разрешает создавать новые legacy-артефакты там, где уже определён target contract.
 
@@ -117,7 +121,7 @@ Migration `ID scheme` в `BytePress` выполняется полностью, 
 - прямые зависимости домена нормализуются вместе с целевой фазой migration, а не заранее по всему репозиторию.
 
 Целевой порядок будущей migration по доменам:
-1. `planning contour`: завершено для plan-files и archive layout; backlog history-layer остаётся отдельным transitional слоем и не входит в этот pass.
+1. `planning contour`: завершено для plan-files, archive layout и backlog history-layer; active `Backlog.md` и `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` уже приведены к целевому contract.
 2. `logs`: serial и внутренние `ID` журнальных сущностей и прямые ссылки на них.
 3. `rules / standards / templates / schemas`: выравнивание внутренних `ID`, semantic filenames и ссылочного слоя.
 4. остальные домены: `Profiles/` и прочие hybrid/singleton domains, которые ещё требуют синхронизации под общую схему.
