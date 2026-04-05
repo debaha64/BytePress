@@ -166,16 +166,16 @@ ID: ROAD-000008
 ID: ROAD-000009
 Этап: Операционная модель и governance-контур (Operating Model and Governance Contour)
 Статус: В_работе
-Связи: BACK-000041, BACK-000042, PLAN-000029, PLAN-000030
-Источник: PLAN-000029, PLAN-000030
+Связи: BACK-000041, BACK-000042, BACK-000043, PLAN-000029, PLAN-000030, PLAN-000031
+Источник: PLAN-000029, PLAN-000030, PLAN-000031
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
 Цель: Зафиксировать новую операционную модель `BytePress`, planning-contour и единую схему идентификаторов на уровне governance-contract, включая терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan` и hard-close contour без полной migration исторического слоя.
 Зависимости: ROAD-000008
-Связанные_backlog: BACK-000041, BACK-000042
+Связанные_backlog: BACK-000041, BACK-000042, BACK-000043
 
 ### Описание
-Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, а переходный legacy-слой явно отделяется от целевого planning-канона до отдельных migration-pass.
+Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, переходный legacy-слой явно отделяется от целевого planning-канона, а единая `ID scheme` и порядок её будущей migration фиксируются как отдельные governance-pass без физической migration в рамках текущего этапа.
 
 ---
 
