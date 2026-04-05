@@ -14,7 +14,7 @@ ID: STD-000003
 ## Обязательные_требования
 - Первичный пакет основания создаётся после исследования и требований, до `Roadmap` и `Backlog`.
 - `Roadmap` хранит этапы (`stage`), их цели, зависимости и статусы; `Roadmap` владеет статусами этапов и не превращается в список мелких шагов.
-- `Backlog` хранит задачи (`task`) только текущего этапа, а дальний горизонт остаётся в `Roadmap`; `Backlog` владеет статусами задач активного этапа.
+- `Backlog` хранит задачи (`task`) только текущего этапа, backlog прошлых этапов хранится в `Plans/Archive/Backlog/`, а дальний горизонт остаётся в `Roadmap`; `Backlog` владеет статусами задач активного этапа.
 - Будущие работы следующего этапа могут фиксироваться только как кандидаты задач этапа без предварительной раздачи `BACK-ID`.
 - `Plan` создаётся только на основе backlog-задачи текущего этапа и описывает один проход (`pass`), а не глобальный статус этапа или backlog.
 - Для planning-contour действует целевая serial `ID scheme`: backlog-задачи ссылаются на `BACK-*`, текущие `Plan` используют `PLAN-*`, а naming/migration policy задаётся `Standards/Naming.md`.
@@ -26,16 +26,16 @@ ID: STD-000003
 - В `Plan` шаги оформляются нумерованным списком с кратким DoD по каждому шагу.
 
 ## Transitional_policy
-- Целевая модель planning-контура задаёт состояние active layer, а не утверждает, что весь historical слой уже физически мигрирован.
-- До отдельной migration-задачи historical backlog-записи прошлых этапов могут оставаться в `Plans/Backlog.md`; это transitional state, а не целевой active backlog.
+- Целевая модель planning-контура задаёт состояние active layer, а не утверждает, что весь historical слой каждого домена уже физически мигрирован.
+- Для planning-контура active/archive policy уже реализована и для `Plan`, и для backlog history-layer: завершённые `Plan` хранятся в `Plans/Archive/`, а historical backlog прошлых этапов хранится в `Plans/Archive/Backlog/ROAD-<NNNNNN>.md`.
 - До отдельной cleanup/migration-задачи `Runtime/Plan.md` может физически существовать как legacy runtime draft, но не считается каноническим `Plan` и не участвует в ownership planning-state.
-- Transitional policy не отменяет целевую модель и не даёт права создавать новые legacy-артефакты там, где pass уже может использовать целевой contract.
-- Transitional policy не отменяет целевую `ID scheme`: planning plan-files уже migrated в active/archive layout, а transition-state planning-conтура теперь ограничен backlog history-layer и legacy `Runtime/Plan.md`.
+- Transitional policy не отменяет целевую модель и не даёт права создавать новые legacy-артефакты там, где pass уже реализовал целевой contract.
+- Transitional policy не отменяет целевую `ID scheme`: переходное состояние planning-контура теперь ограничено legacy `Runtime/Plan.md`, а не active backlog или plan-layer.
 
 ## Критерии_соблюдения
 - `Roadmap`, `Backlog` и `Plan` связаны по ID и не спорят о владении статусом.
 - У каждого backlog-элемента текущего этапа есть тип, приоритет и статус.
-- Целевой активный `Backlog` не смешивает задачи разных этапов, даже если historical записи ещё временно остаются в том же файле как transitional layer.
+- Активный `Backlog` не смешивает задачи разных этапов, а historical backlog прошлых этапов вынесен в `Plans/Archive/Backlog/`.
 - В каждом `Plan` указаны источник, основание, связи и явные границы pass.
 - В `Runtime/` не хранится утверждённый план как источник истины, даже если legacy `Runtime/Plan.md` ещё физически существует.
 

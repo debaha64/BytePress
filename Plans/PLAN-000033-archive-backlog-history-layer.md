@@ -2,7 +2,7 @@
 
 ID: PLAN-000033
 Название: Вывести historical backlog прошлых этапов в archive layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000045
 Источник: Narrow backlog archive pass inside `ROAD-000009`
 Дата_создания: 2026-04-06
@@ -59,3 +59,10 @@ ID: PLAN-000033
 - historical backlog прошлых этапов migrated в `Plans/Archive/Backlog/`.
 - в активном `Plans/Backlog.md` остался только текущий этап `ROAD-000009`.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Фактический результат
+- `BACK-000045` и `PLAN-000033` зафиксировали только pass на archive migration historical backlog прошлых этапов.
+- historical backlog `ROAD-000001`–`ROAD-000008` выведен в `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` с сохранением `BACK-ID`, порядка и связи с соответствующим `ROAD-*`.
+- active `Plans/Backlog.md` теперь содержит только текущий этап `ROAD-000009`, его индекс и краткую навигацию к backlog archive-layer.
+- `Standards/Planning.md`, `Plans/README.md` и `Standards/Naming.md` синхронизированы под уже реализованный backlog archive-layer.
+- `bp_lint.py` не менялся, потому что pass не меняет обязательный набор путей, который уже требовался structural contract; `bp_lint contract unaffected`.
