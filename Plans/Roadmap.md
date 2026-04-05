@@ -166,16 +166,16 @@ ID: ROAD-000008
 ID: ROAD-000009
 Этап: Операционная модель и governance-контур (Operating Model and Governance Contour)
 Статус: В_работе
-Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032
-Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032
+Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033
+Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
 Цель: Зафиксировать новую операционную модель `BytePress`, planning-contour и единую схему идентификаторов на уровне governance-contract, включая терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan` и hard-close contour без полной migration исторического слоя.
 Зависимости: ROAD-000008
-Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044
+Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045
 
 ### Описание
-Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, а plan-layer приводится к фактическому active/archive layout без затрагивания migration других доменов.
+Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, а active/archive layout planning-layer поэтапно реализуется для plan-files и backlog history-layer без затрагивания migration других доменов.
 
 ---
 
