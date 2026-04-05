@@ -18,7 +18,7 @@ ID: PLAN-000015
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить backlog-элемент текущей задачи, capture следующего цикла по Git/PR subsystem и отдельный plan-file для этого прохода.
-   - DoD: `Plans/Backlog.md` содержит `BACK-000026` и `BACK-000027`, а `Plans/BP-000015-align-product-layer.md` описывает scope и ограничения текущей задачи.
+   - DoD: `Plans/Backlog.md` содержит `BACK-000026` и `BACK-000027`, а `Plans/Archive/PLAN-000015-align-product-layer.md` описывает scope и ограничения текущей задачи.
 2. Привести `JTBD` и `PRD` к каноническим шаблонам.
    - Описание: Минимально выровнять `Docs/Product/JTBD.md` по `Templates/JTBD.md`, а основной фокус прохода направить на `Docs/Product/PRD.md`, убрав из него внутренние системно-технические сущности и избыточные дубли.
    - DoD: `JTBD` использует шаблон без лишней переписи, а `PRD` использует шаблон `Templates/PRD.md` и описывает только продуктовый слой первой версии.
@@ -36,11 +36,11 @@ ID: PLAN-000015
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000015-align-product-layer.md`
-- `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md`
-- `Plans/BP-000010-tools-contract-sync.md`
-- `Plans/BP-000011-migrate-active-nonlog-ids.md`
-- `Plans/BP-000012-migrate-historical-logs.md`
+- `Plans/Archive/PLAN-000015-align-product-layer.md`
+- `Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md`
+- `Plans/Archive/PLAN-000010-tools-contract-sync.md`
+- `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`
+- `Plans/Archive/PLAN-000012-migrate-historical-logs.md`
 - `Docs/Product/README.md`
 - `Docs/Product/JTBD.md`
 - `Docs/Product/PRD.md`

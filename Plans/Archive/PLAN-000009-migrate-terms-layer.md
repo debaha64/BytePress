@@ -39,10 +39,10 @@ ID: PLAN-000009
 - `Docs/Terms/Term_Change_Policy.md`
 - `Docs/Terms/TERM-*.md`
 - `Docs/Technical/Model.md`
-- `Plans/BP-000003-fill-technical-and-rules.md`
-- `Plans/BP-000004-fill-skills-and-tools.md`
+- `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`
+- `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000009-migrate-terms-layer.md`
+- `Plans/Archive/PLAN-000009-migrate-terms-layer.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

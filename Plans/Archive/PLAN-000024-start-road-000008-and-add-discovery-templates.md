@@ -43,7 +43,7 @@ ID: PLAN-000024
 - `Templates/Requirements.md`
 - `Templates/README.md`
 - `Tools/bp_lint.py`
-- `Plans/BP-000024-start-road-000008-and-add-discovery-templates.md`
+- `Plans/Archive/PLAN-000024-start-road-000008-and-add-discovery-templates.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

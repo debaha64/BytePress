@@ -164,9 +164,9 @@ def main() -> int:
     for rel in [
         "Profiles/Default.md",
         "Profiles/Speculorg.md",
-        "Plans/BP-000001-foundation.md",
-        "Plans/BP-000004-fill-skills-and-tools.md",
-        "Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md",
+        "Plans/Archive/PLAN-000001-foundation.md",
+        "Plans/Archive/PLAN-000004-fill-skills-and-tools.md",
+        "Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md",
         "Skills/Discussion.md",
         "Skills/Implementation.md",
         "Skills/Quality.md",

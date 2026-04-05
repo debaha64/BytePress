@@ -18,7 +18,7 @@ ID: PLAN-000018
 ## Шаги
 1. Зафиксировать управляемый контур audit-pass.
    - Описание: Обновить `BACK-000019` под фактический смысл текущего repo-wide аудита и создать отдельный plan-file.
-   - DoD: `BACK-000019` переведён в `В_работе`, а `Plans/BP-000018-repo-wide-active-layer-audit.md` фиксирует scope и ограничения прохода.
+   - DoD: `BACK-000019` переведён в `В_работе`, а `Plans/Archive/PLAN-000018-repo-wide-active-layer-audit.md` фиксирует scope и ограничения прохода.
 2. Проверить и минимально выровнять карты и technical docs.
    - Описание: Аудировать root maps, layer README и `Docs/Technical/*` только в части реальных рассогласований с product/discovery/sync-contract canon.
    - DoD: карты системы и technical docs не содержат устаревшей модели product/discovery/roadmap/pipeline.
@@ -36,7 +36,7 @@ ID: PLAN-000018
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000018-repo-wide-active-layer-audit.md`
+- `Plans/Archive/PLAN-000018-repo-wide-active-layer-audit.md`
 - `README.md`
 - `AGENTS.md`
 - `Tools/README.md`
@@ -46,7 +46,7 @@ ID: PLAN-000018
 - `Roles/Architect.md`
 - `Skills/Interview.md`
 - `Skills/Planning.md`
-- `Plans/BP-000017-discovery-and-sync-contract.md`
+- `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 
@@ -62,5 +62,5 @@ ID: PLAN-000018
 - Обновлены `README.md`, `AGENTS.md` и `Tools/README.md`, чтобы root maps и tool map отражали discovery-layer, крупноэтапный `Roadmap` и текущий lint contract.
 - В `Docs/Technical/Product_Bootstrap_Validation.md` выровнена фактическая формулировка о синхронизации bootstrap validation с минимальным product-layer canon.
 - В `Roles/*` и `Skills/*` исправлены только реальные рассогласования: discovery добавлен в допустимые артефакты аналитиков, `Plans/PLAN-*.md` заменён на `Plans/BP-*.md`, а `Interview` и `Planning` привязаны к current-truth интервью и roadmap уровня крупных этапов.
-- В `Plans/BP-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`.
+- В `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`.
 - `bp_lint.py` не менялся, потому что audit-pass не изменил обязательный contract путей, шаблонов или доменов.

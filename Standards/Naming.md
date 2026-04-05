@@ -50,7 +50,7 @@ Semver применяется к текущему operational contract `BytePres
 - `slug` оформляется в `kebab-case`.
 
 Целевые serial domains в текущем репозитории:
-- `Plans/`: `Plans/PLAN-<NNNNNN>-<slug>.md`
+- `Plans/`: активный текущий `Plan` хранится как `Plans/PLAN-<NNNNNN>-<slug>.md`, завершённые `Plan` хранятся как `Plans/Archive/PLAN-<NNNNNN>-<slug>.md`
 - `Docs/Terms/`: `Docs/Terms/TERM-<NNNNNN>-<slug>.md`
 
 Для serial domains:
@@ -103,7 +103,6 @@ Singleton domains не используют serial `ID` в filename и не ма
 - singleton domains сохраняют semantic filenames и не переводятся на serial filename без отдельного решения.
 
 Transitional legacy-state:
-- historical `BP-*` plan-files ещё физически существуют в `Plans/`;
 - historical backlog прошлых этапов ещё физически существует в `Plans/Backlog.md`;
 - `Runtime/Plan.md` ещё физически существует как legacy runtime artifact;
 - transitional state не меняет целевую схему и не разрешает создавать новые legacy-артефакты там, где уже определён target contract.
@@ -118,7 +117,7 @@ Migration `ID scheme` в `BytePress` выполняется полностью, 
 - прямые зависимости домена нормализуются вместе с целевой фазой migration, а не заранее по всему репозиторию.
 
 Целевой порядок будущей migration по доменам:
-1. `planning contour`: текущие `Plan`, historical `BP-*` plan-files, связанный naming/backlog-link layer.
+1. `planning contour`: завершено для plan-files и archive layout; backlog history-layer остаётся отдельным transitional слоем и не входит в этот pass.
 2. `logs`: serial и внутренние `ID` журнальных сущностей и прямые ссылки на них.
 3. `rules / standards / templates / schemas`: выравнивание внутренних `ID`, semantic filenames и ссылочного слоя.
 4. остальные домены: `Profiles/` и прочие hybrid/singleton domains, которые ещё требуют синхронизации под общую схему.

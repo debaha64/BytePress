@@ -47,7 +47,7 @@ ID: PLAN-000008
 - `Profiles/Default.md`
 - `Profiles/Speculorg.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000008-schemas-templates-profiles-and-language-sync.md`
+- `Plans/Archive/PLAN-000008-schemas-templates-profiles-and-language-sync.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

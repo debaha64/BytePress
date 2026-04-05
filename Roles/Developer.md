@@ -13,7 +13,7 @@ ID: ROLE-000005
 
 ## Допустимые_артефакты
 - Продуктовые артефакты
-- Plans/BP-*.md
+- Plans/PLAN-<NNNNNN>-<slug>.md
 - Logs/ChangeLog.md
 
 ## Подключаемые_правила

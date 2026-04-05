@@ -18,7 +18,7 @@ ID: PLAN-000019
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Перевести `BACK-000027` в `В_работе`, уточнить его process-scope и создать отдельный plan-file.
-   - DoD: `Plans/Backlog.md` и `Plans/BP-000019-branch-pr-contract-cleanup.md` отражают фактическую задачу без расширения области.
+   - DoD: `Plans/Backlog.md` и `Plans/Archive/PLAN-000019-branch-pr-contract-cleanup.md` отражают фактическую задачу без расширения области.
 2. Синхронизировать process-contract.
    - Описание: Минимально обновить `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md` и `Plans/README.md` только там, где не хватает единого алгоритма `develop -> task branch -> local commits -> self-check -> final push -> PR`.
    - DoD: process-facing документы согласованно фиксируют `gh` diagnostics, fallback без автопереавторизации и правило не использовать `--dry-run`, если флаг не поддерживается.
@@ -36,7 +36,7 @@ ID: PLAN-000019
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000019-branch-pr-contract-cleanup.md`
+- `Plans/Archive/PLAN-000019-branch-pr-contract-cleanup.md`
 - `AGENTS.md`
 - `Setup_Guide.md`
 - `Docs/Technical/Platform_Contracts.md`

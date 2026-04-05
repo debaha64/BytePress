@@ -41,7 +41,7 @@ ID: PLAN-000025
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - `Tools/bp_lint.py`
-- `Plans/BP-000025-add-discussion-artifact.md`
+- `Plans/Archive/PLAN-000025-add-discussion-artifact.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

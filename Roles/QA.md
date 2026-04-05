@@ -13,7 +13,7 @@ ID: ROLE-000006
 
 ## Допустимые_артефакты
 - Logs/QualityLog.md
-- Plans/BP-*.md
+- Plans/PLAN-<NNNNNN>-<slug>.md
 
 ## Подключаемые_правила
 - Repository_As_Source_Of_Truth

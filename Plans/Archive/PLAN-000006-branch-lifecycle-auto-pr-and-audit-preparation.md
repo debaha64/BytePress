@@ -27,7 +27,7 @@ ID: PLAN-000006
 - `Setup_Guide.md`
 - `Docs/Technical/Platform_Contracts.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`
+- `Plans/Archive/PLAN-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

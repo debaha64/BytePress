@@ -40,7 +40,7 @@ ID: PLAN-000010
 - `Docs/Technical/Product_Bootstrap_Validation.md`
 - `Profiles/README.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000010-tools-contract-sync.md`
+- `Plans/Archive/PLAN-000010-tools-contract-sync.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

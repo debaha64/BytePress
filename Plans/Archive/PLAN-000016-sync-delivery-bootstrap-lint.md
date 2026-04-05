@@ -18,7 +18,7 @@ ID: PLAN-000016
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить текущий backlog-item и отдельный plan-file для синхронизации `Delivery`, bootstrap и lint.
-   - DoD: `Plans/Backlog.md` содержит `BACK-000028`, а `Plans/BP-000016-sync-delivery-bootstrap-lint.md` фиксирует scope и ограничения текущего прохода.
+   - DoD: `Plans/Backlog.md` содержит `BACK-000028`, а `Plans/Archive/PLAN-000016-sync-delivery-bootstrap-lint.md` фиксирует scope и ограничения текущего прохода.
 2. Добавить канонический шаблон `Delivery` и выровнять продуктовый документ.
    - Описание: Создать `Templates/Delivery.md`, обновить `Templates/README.md` и привести `Docs/Product/Delivery.md` к новому минимальному шаблону без технической реализации.
    - DoD: `Templates/Delivery.md` существует, `Templates/README.md` перечисляет три продуктовых шаблона, а `Docs/Product/Delivery.md` следует каноническим разделам.
@@ -36,7 +36,7 @@ ID: PLAN-000016
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000016-sync-delivery-bootstrap-lint.md`
+- `Plans/Archive/PLAN-000016-sync-delivery-bootstrap-lint.md`
 - `Templates/Delivery.md`
 - `Templates/README.md`
 - `Docs/Product/Delivery.md`

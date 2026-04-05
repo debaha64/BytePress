@@ -38,7 +38,7 @@ ID: PLAN-000007
 - `Docs/Terms/README.md`
 - `Profiles/README.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000007-id-migration-policy-and-phase-plan.md`
+- `Plans/Archive/PLAN-000007-id-migration-policy-and-phase-plan.md`
 - `Logs/ADRlog.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`

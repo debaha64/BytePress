@@ -44,7 +44,7 @@ ID: PLAN-000027
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - `Tools/bp_lint.py`
-- `Plans/BP-000027-add-requirements-artifact.md`
+- `Plans/Archive/PLAN-000027-add-requirements-artifact.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

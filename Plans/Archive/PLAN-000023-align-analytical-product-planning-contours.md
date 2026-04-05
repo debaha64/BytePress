@@ -41,7 +41,7 @@ ID: PLAN-000023
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - `Docs/Technical/Pipeline.md`
-- `Plans/BP-000023-align-analytical-product-planning-contours.md`
+- `Plans/Archive/PLAN-000023-align-analytical-product-planning-contours.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

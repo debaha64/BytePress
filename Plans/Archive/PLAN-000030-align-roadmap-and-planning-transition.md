@@ -45,7 +45,7 @@ ID: PLAN-000030
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000030-align-roadmap-and-planning-transition.md`
+- `Plans/Archive/PLAN-000030-align-roadmap-and-planning-transition.md`
 - `Standards/Planning.md`
 - `Plans/README.md`
 - `Standards/Naming.md`
