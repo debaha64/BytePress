@@ -9,12 +9,12 @@
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039
-- ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
-- ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
-- ROAD-000011 — Тиражирование product repo (Product Repository Replication) | Кандидаты задач этапа
-- ROAD-000012 — Расширения и интеграционный контур (Extensions and Integration Layer) | Кандидаты задач этапа
-- ROAD-000013 — BytePress как продукт для solo founders (BytePress as a Product for Solo Founders) | Кандидаты задач этапа
-- ROAD-000014 — Многопродуктовая agent-first фабрика (Multi-product Agent-first Factory) | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041 | Кандидаты задач этапа
+- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Кандидаты задач этапа
+- ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer) | Кандидаты задач этапа
+- ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks) | Кандидаты задач этапа
+- ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer) | Кандидаты задач этапа
+- ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory) | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -674,7 +674,44 @@ ID: BACK-000037
 
 ---
 
-## ROAD-000009 — Пакет основания и пользовательский слой (Foundation Package and User Layer)
+## ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour)
+
+### Активные
+- отсутствуют
+
+### Завершённые
+
+#### BACK-000041 — Зафиксировать operating model pass для ROAD-000009
+ID: BACK-000041
+Название: Зафиксировать operating model pass для ROAD-000009
+Тип: Стандарт
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000009, PLAN-000029
+Источник: Первый governance-pass новой operating model `BytePress`
+Дата_создания: 2026-04-06
+Дата_изменения: 2026-04-06
+
+##### Описание
+Закрепить терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan`, правило неканоничности `Runtime/Plan.md` и hard-close contour задачи на уровне planning-contract без полной ID migration, без массового архива и без переписывания `AGENTS.md`.
+
+### Кандидаты задач этапа
+- Завершить единый contract идентификаторов без массовой migration старого слоя
+- Подготовить правило управляемого вывода завершённых `Plan` в `Plans/Archive/`
+- Уточнить контур hard-close для следующих governance-pass этапа
+
+---
+
+## ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
+
+### Кандидаты задач этапа
+- Очистить и уточнить `Docs/Technical/*` под новую operating model
+- Собрать карту системных контрактов и их границ
+- Согласовать технический слой с `Roadmap`, `Backlog` и `Plan`
+
+---
+
+## ROAD-000011 — Пакет основания и пользовательский слой (Foundation Package and User Layer)
 
 ### Кандидаты задач этапа
 - Зафиксировать место `Foundation Package` в системе
@@ -684,7 +721,7 @@ ID: BACK-000037
 
 ---
 
-## ROAD-000010 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
+## ROAD-000012 — Декларативные инструменты и контрактные проверки (Declarative Tools and Contract Checks)
 
 ### Кандидаты задач этапа
 - Зафиксировать место декларативных contracts в системе
@@ -694,40 +731,20 @@ ID: BACK-000037
 
 ---
 
-## ROAD-000011 — Тиражирование product repo (Product Repository Replication)
+## ROAD-000013 — Тиражирование product repo и интеграционный контур (Product Repository Replication and Integration Layer)
 
 ### Кандидаты задач этапа
 - Зафиксировать contract тиражирования product repo
 - Уточнить минимальный replicated product repo contract
-- Согласовать bootstrap и replication-путь для product repo
+- Перевести интеграционный контур из каркаса в управляемый layer
 - Проверить границы между `BytePress` и replicated product repositories
 
 ---
 
-## ROAD-000012 — Расширения и интеграционный контур (Extensions and Integration Layer)
-
-### Кандидаты задач этапа
-- Зафиксировать место расширений в lifecycle системы
-- Уточнить дорожную карту развития `Adapters/`, `Memory/` и `MCP/`
-- Перевести интеграционный контур из каркаса в управляемый layer
-- Согласовать расширения с базовым governance-контуром
-
----
-
-## ROAD-000013 — BytePress как продукт для solo founders (BytePress as a Product for Solo Founders)
+## ROAD-000014 — BytePress как продукт и многопродуктовая agent-first фабрика (BytePress as a Product and Multi-product Agent-first Factory)
 
 ### Кандидаты задач этапа
 - Уточнить продуктовую гипотезу BytePress для solo founders
-- Зафиксировать ценностное предложение BytePress
 - Согласовать `JTBD`, `PRD` и delivery-модель самого BytePress
-- Подготовить продуктовый путь внедрения для solo founders
-
----
-
-## ROAD-000014 — Многопродуктовая agent-first фабрика (Multi-product Agent-first Factory)
-
-### Кандидаты задач этапа
-- Зафиксировать модель многопродуктовой agent-first фабрики
-- Уточнить governance для нескольких product repositories
-- Согласовать orchestration-контур с `Roadmap -> Backlog -> Plan`
-- Определить дальнюю модель масштабирования BytePress как фабрики
+- Зафиксировать governance для нескольких product repositories
+- Определить дальнюю модель масштабирования BytePress как многопродуктовой agent-first фабрики
