@@ -43,7 +43,7 @@ ID: PLAN-000026
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - `Tools/bp_lint.py`
-- `Plans/BP-000026-add-research-artifact.md`
+- `Plans/Archive/PLAN-000026-add-research-artifact.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

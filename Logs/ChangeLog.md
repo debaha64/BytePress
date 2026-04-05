@@ -224,7 +224,7 @@ ID: CHG-000030
 Дата_изменения: 2026-03-28
 
 ### Описание
-Проведён repo-wide аудит активного слоя `BytePress` после отдельных проходов по product-layer, discovery-layer и pipeline sync-contract. В `README.md`, `AGENTS.md` и `Tools/README.md` устранены устаревшие формулировки и закреплена текущая модель discovery-layer, крупноэтапного `Roadmap` и lint-checks. В `Docs/Technical/Product_Bootstrap_Validation.md` выровнена фактическая формулировка validation-контракта, в `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` исправлены реальные рассогласования по `Docs/Discovery/`, current-truth интервью и каноническому виду `Plans/BP-*.md`. В `Plans/BP-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`; `bp_lint.py` не менялся, потому что обязательный contract в этом audit-pass не изменился.
+Проведён repo-wide аудит активного слоя `BytePress` после отдельных проходов по product-layer, discovery-layer и pipeline sync-contract. В `README.md`, `AGENTS.md` и `Tools/README.md` устранены устаревшие формулировки и закреплена текущая модель discovery-layer, крупноэтапного `Roadmap` и lint-checks. В `Docs/Technical/Product_Bootstrap_Validation.md` выровнена фактическая формулировка validation-контракта, в `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` исправлены реальные рассогласования по `Docs/Discovery/`, current-truth интервью и каноническому виду `Plans/BP-*.md`. В `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md` удалён дублирующийся артефакт `Logs/ADRlog.md`; `bp_lint.py` не менялся, потому что обязательный contract в этом audit-pass не изменился.
 
 ### Эффект
 Активный слой BytePress снова согласован repo-wide: карты, validation-контракт, роли, навыки и активные планы используют один и тот же текущий канон product/discovery/pipeline без большого рефакторинга и без переписывания historical layer.
@@ -343,7 +343,7 @@ ID: CHG-000023
 Дата_изменения: 2026-03-18
 
 ### Описание
-Из `Plans/BP-000001-foundation.md` и `Plans/BP-000002-seed-docs-and-standards.md` удалён orphan ID `BP-REQ-0001` без введения нового requirement namespace и без замены его новой сущностью требований. Из `Rules/Approval_Strictness.md` удалён orphan ID `PIPE-0001`; смысл зависимости от конвейерных фаз сохраняется в текстовом описании и проверке правила без нового pipeline namespace.
+Из `Plans/Archive/PLAN-000001-foundation.md` и `Plans/Archive/PLAN-000002-seed-docs-and-standards.md` удалён orphan ID `BP-REQ-0001` без введения нового requirement namespace и без замены его новой сущностью требований. Из `Rules/Approval_Strictness.md` удалён orphan ID `PIPE-0001`; смысл зависимости от конвейерных фаз сохраняется в текстовом описании и проверке правила без нового pipeline namespace.
 
 ### Эффект
 Активный non-log слой BytePress больше не содержит оставшихся orphan ID `BP-REQ-0001` и `PIPE-0001`; ссылки и смысл документов сохранены без расширения модели и без добавления новых registry-доменов.
@@ -394,7 +394,7 @@ ID: CHG-000020
 Дата_изменения: 2026-03-18
 
 ### Описание
-Активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату для `BACK`, `ROAD`, `PROF`, `RULE`, `STD`, `ROLE`, `SKILL`, `ADP`, `MEM` и `MCP`. Прямые ссылки на старые 4-значные active ID синхронизированы, создан `Plans/BP-000011-migrate-active-nonlog-ids.md`, а historical logs намеренно не переписывались.
+Активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату для `BACK`, `ROAD`, `PROF`, `RULE`, `STD`, `ROLE`, `SKILL`, `ADP`, `MEM` и `MCP`. Прямые ссылки на старые 4-значные active ID синхронизированы, создан `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`, а historical logs намеренно не переписывались.
 
 ### Эффект
 Активный non-log слой BytePress перестал смешивать 4- и 6-значный формат внутренних ID; текущие рабочие связи по singleton- и registry-доменам согласованы с repo-wide naming migration policy без запуска historical log rewrite-pass.
@@ -428,7 +428,7 @@ ID: CHG-000018
 Дата_изменения: 2026-03-17
 
 ### Описание
-`Docs/Terms/*` приведены к каноническим filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы. `bp_normalize_terms.py` минимально обновлён под новый filename pattern, а `Docs/Terms/README.md` и `Plans/Backlog.md` приведены к фактическому состоянию migration-pass.
+`Docs/Terms/*` приведены к каноническим filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`, `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы. `bp_normalize_terms.py` минимально обновлён под новый filename pattern, а `Docs/Terms/README.md` и `Plans/Backlog.md` приведены к фактическому состоянию migration-pass.
 
 ### Эффект
 Term layer перестал смешивать legacy filenames и 4-значные `TERM ID`; индекс словаря и прямые ссылки по репозиторию теперь согласованы с принятым naming contract без запуска migration для `Schemas/*`, `Templates/*`, `Profiles/*`, semver и historical logs.
@@ -445,7 +445,7 @@ ID: CHG-000017
 Дата_изменения: 2026-03-17
 
 ### Описание
-`Schemas/*` и `Templates/*` переведены на 6-значную числовую часть `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом, а `profile.schema.json` и `Templates/Profile.md` расширены полями `Тип_профиля`, `Код_продукта` и `Язык_взаимодействия`. `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` приведены к актуальной модели brand profiles с semantic filename и 6-значными внутренними `PROF ID`. В `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксировано правило английского языка для commit/PR artifacts и `branch slug`. Создан `Plans/BP-000008-schemas-templates-profiles-and-language-sync.md`.
+`Schemas/*` и `Templates/*` переведены на 6-значную числовую часть `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом, а `profile.schema.json` и `Templates/Profile.md` расширены полями `Тип_профиля`, `Код_продукта` и `Язык_взаимодействия`. `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` приведены к актуальной модели brand profiles с semantic filename и 6-значными внутренними `PROF ID`. В `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксировано правило английского языка для commit/PR artifacts и `branch slug`. Создан `Plans/Archive/PLAN-000008-schemas-templates-profiles-and-language-sync.md`.
 
 ### Эффект
 Первый repo-wide migration-pass замкнул контракт между схемами, шаблонами, профилями и Git/PR-языком без запуска миграции `Terms/*`, `Tools/*`, semver и historical logs.
@@ -462,7 +462,7 @@ ID: CHG-000016
 Дата_изменения: 2026-03-17
 
 ### Описание
-Уточнены `Standards/Naming.md`, `Docs/Technical/Model.md`, `Docs/Terms/README.md`, `Profiles/README.md` и `Plans/Backlog.md`: зафиксирована repo-wide policy фазной миграции ID и правил filename по доменам, различены serial-, hybrid- и singleton-домены, зафиксирован целевой контракт для `Docs/Terms/*`, подтверждено semantic-filename правило для brand profiles в `BytePress`, а historical logs вынесены в отдельную позднюю фазу миграции. Создан `Plans/BP-000007-id-migration-policy-and-phase-plan.md` как план policy-прохода без запуска самой миграции.
+Уточнены `Standards/Naming.md`, `Docs/Technical/Model.md`, `Docs/Terms/README.md`, `Profiles/README.md` и `Plans/Backlog.md`: зафиксирована repo-wide policy фазной миграции ID и правил filename по доменам, различены serial-, hybrid- и singleton-домены, зафиксирован целевой контракт для `Docs/Terms/*`, подтверждено semantic-filename правило для brand profiles в `BytePress`, а historical logs вынесены в отдельную позднюю фазу миграции. Создан `Plans/Archive/PLAN-000007-id-migration-policy-and-phase-plan.md` как план policy-прохода без запуска самой миграции.
 
 ### Эффект
 Репозиторий получил явный phase plan для remaining ID migration: новые артефакты создаются только по новому контракту, а legacy-слои переходят на него управляемыми отдельными проходами.
@@ -479,7 +479,7 @@ ID: CHG-000015
 Дата_изменения: 2026-03-17
 
 ### Описание
-Remaining plan-files приведены к каноническим именам `Plans/BP-000002-seed-docs-and-standards.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md` и `Plans/BP-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`. Их внутренние `ID` выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и минимально в `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено` по фактически закрытому DoD.
+Remaining plan-files приведены к каноническим именам `Plans/Archive/PLAN-000002-seed-docs-and-standards.md`, `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`, `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`, `Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md` и `Plans/Archive/PLAN-000006-branch-lifecycle-auto-pr-and-audit-preparation.md`. Их внутренние `ID` выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и минимально в `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено` по фактически закрытому DoD.
 
 ### Эффект
 Весь текущий plan layer BytePress теперь использует один naming contract и 6-значные plan ID без смешения 4- и 6-значного формата в актуальных плановых артефактах.
@@ -496,7 +496,7 @@ ID: CHG-000014
 Дата_изменения: 2026-03-17
 
 ### Описание
-Foundation-план BytePress приведён к каноническому имени `Plans/BP-000001-foundation.md`, его внутренний `ID` выровнен до `PLAN-000001`, статус приведён к фактическому состоянию `Завершено`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, а `Plans/README.md` и продуктовый слой перепривязаны к актуальному plan-layer без отдельного дубля плана. Прямые ссылки в `Roadmap`, `Backlog` и связанных журнальных записях обновлены на новый `ID`.
+Foundation-план BytePress приведён к каноническому имени `Plans/Archive/PLAN-000001-foundation.md`, его внутренний `ID` выровнен до `PLAN-000001`, статус приведён к фактическому состоянию `Завершено`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, а `Plans/README.md` и продуктовый слой перепривязаны к актуальному plan-layer без отдельного дубля плана. Прямые ссылки в `Roadmap`, `Backlog` и связанных журнальных записях обновлены на новый `ID`.
 
 ### Эффект
 В слое `Plans/` устранён параллельный канон для foundation-плана BytePress: остался один актуальный файл, один актуальный `ID` и одна рабочая точка ссылок для связанных документов.

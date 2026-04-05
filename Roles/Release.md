@@ -14,7 +14,7 @@ ID: ROLE-000007
 ## Допустимые_артефакты
 - Logs/ReleaseLog.md
 - Docs/Product/
-- Plans/BP-*.md
+- Plans/PLAN-<NNNNNN>-<slug>.md
 
 ## Подключаемые_правила
 - Repository_As_Source_Of_Truth

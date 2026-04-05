@@ -83,7 +83,7 @@
 ## QL-000025
 Дата: 2026-03-28
 Статус: пройдено
-Проверка: выполнен repo-wide аудит активного слоя после product/discovery/sync-contract проходов; `README.md`, `AGENTS.md` и `Tools/README.md` отражают `Docs/Discovery/`, roadmap уровня крупных этапов и текущий lint contract; `Docs/Technical/Product_Bootstrap_Validation.md` согласован с фактическим минимальным product-layer canon; `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` больше не используют устаревшие ссылки `Plans/PLAN-*.md` и учитывают `Docs/Discovery/Interview.md` как current-truth артефакт там, где это нужно; `Plans/BP-000017-discovery-and-sync-contract.md` очищен от дублирующегося артефакта; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
+Проверка: выполнен repo-wide аудит активного слоя после product/discovery/sync-contract проходов; `README.md`, `AGENTS.md` и `Tools/README.md` отражают `Docs/Discovery/`, roadmap уровня крупных этапов и текущий lint contract; `Docs/Technical/Product_Bootstrap_Validation.md` согласован с фактическим минимальным product-layer canon; `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` больше не используют устаревшие ссылки `Plans/PLAN-*.md` и учитывают `Docs/Discovery/Interview.md` как current-truth артефакт там, где это нужно; `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md` очищен от дублирующегося артефакта; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
 Результат: repo-wide active layer audit завершён без нового архитектурного решения и без изменения обязательного lint contract; активные карты, technical references, роли, навыки и планы согласованы с текущим каноном BytePress.
 
 ---
@@ -107,7 +107,7 @@
 ## QL-000022
 Дата: 2026-03-27
 Статус: пройдено
-Проверка: `Docs/Product/` содержит только `README.md`, `JTBD.md`, `PRD.md`, `Delivery.md`; `Docs/Product/PRD.md` и `Docs/Product/JTBD.md` выровнены по `Templates/PRD.md` и `Templates/JTBD.md` без смешения с внутренними системными сущностями; `Docs/Product/Implementation_Plan.md` и `Docs/Product/Profiles.md` удалены как дубль и внепродуктовый документ; `Docs/Product/Bootstrap_Contract.md` и `Docs/Product/Bootstrap_Validation.md` перенесены в `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md`; прямые ссылки в `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md`, `Plans/BP-000010-tools-contract-sync.md`, `Plans/BP-000011-migrate-active-nonlog-ids.md`, `Plans/BP-000012-migrate-historical-logs.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` синхронизированы; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
+Проверка: `Docs/Product/` содержит только `README.md`, `JTBD.md`, `PRD.md`, `Delivery.md`; `Docs/Product/PRD.md` и `Docs/Product/JTBD.md` выровнены по `Templates/PRD.md` и `Templates/JTBD.md` без смешения с внутренними системными сущностями; `Docs/Product/Implementation_Plan.md` и `Docs/Product/Profiles.md` удалены как дубль и внепродуктовый документ; `Docs/Product/Bootstrap_Contract.md` и `Docs/Product/Bootstrap_Validation.md` перенесены в `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md`; прямые ссылки в `Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md`, `Plans/Archive/PLAN-000010-tools-contract-sync.md`, `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`, `Plans/Archive/PLAN-000012-migrate-historical-logs.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` синхронизированы; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
 Результат: продуктовый слой BytePress приведён к каноническому минимальному составу, технические bootstrap-docs живут в `Docs/Technical/`, planning truth и logs truth закрыты без нового архитектурного решения.
 
 ---
@@ -139,7 +139,7 @@
 ## QL-000018
 Дата: 2026-03-18
 Статус: пройдено
-Проверка: orphan ID `BP-REQ-0001` удалён из `Plans/BP-000001-foundation.md` и `Plans/BP-000002-seed-docs-and-standards.md` без введения нового requirement ID; orphan ID `PIPE-0001` удалён из `Rules/Approval_Strictness.md` без введения нового pipeline ID namespace; смысл планов и правила сохранён через существующие `Основание`, `Связанные_backlog`, `Связанные_ADR`, описание и проверку; `Plans/BP-000014-cleanup-orphan-ids.md` и факт-записи текущего прохода добавлены без изменения historical logs, semver, `Schemas/*`, `Templates/*` и `Tools/*.py`.
+Проверка: orphan ID `BP-REQ-0001` удалён из `Plans/Archive/PLAN-000001-foundation.md` и `Plans/Archive/PLAN-000002-seed-docs-and-standards.md` без введения нового requirement ID; orphan ID `PIPE-0001` удалён из `Rules/Approval_Strictness.md` без введения нового pipeline ID namespace; смысл планов и правила сохранён через существующие `Основание`, `Связанные_backlog`, `Связанные_ADR`, описание и проверку; `Plans/Archive/PLAN-000014-cleanup-orphan-ids.md` и факт-записи текущего прохода добавлены без изменения historical logs, semver, `Schemas/*`, `Templates/*` и `Tools/*.py`.
 Результат: оставшиеся orphan IDs в активном non-log слое устранены без расширения модели и без создания новых сущностей.
 
 ---
@@ -163,7 +163,7 @@
 ## QL-000015
 Дата: 2026-03-18
 Статус: пройдено
-Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/BP-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
+Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
 Результат: активный non-log слой BytePress согласован с repo-wide 6-значным ID contract без затрагивания historical logs migration и без выхода за пределы утверждённого scope.
 
 ---
@@ -171,7 +171,7 @@
 ## QL-000014
 Дата: 2026-03-18
 Статус: пройдено
-Проверка: `bp_bootstrap.py` требует `--name`, `--product-code`, `--brand-profile`, `--target`, валидирует существование brand profile в `BytePress`, не генерирует `product-code` автоматически, использует текущую дату выполнения, создаёт `Profiles/Product.md`, `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные `ROAD/BACK/PLAN/PROF ID`; `bp_lint.py` минимально синхронизирован с новым product bootstrap output contract; `Tools/README.md` и `Docs/Product/*` отражают фактический контракт; `Plans/Backlog.md` и `Plans/BP-000010-tools-contract-sync.md` фиксируют завершение прохода без изменения `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*`, semver и historical logs migration.
+Проверка: `bp_bootstrap.py` требует `--name`, `--product-code`, `--brand-profile`, `--target`, валидирует существование brand profile в `BytePress`, не генерирует `product-code` автоматически, использует текущую дату выполнения, создаёт `Profiles/Product.md`, `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные `ROAD/BACK/PLAN/PROF ID`; `bp_lint.py` минимально синхронизирован с новым product bootstrap output contract; `Tools/README.md` и `Docs/Product/*` отражают фактический контракт; `Plans/Backlog.md` и `Plans/Archive/PLAN-000010-tools-contract-sync.md` фиксируют завершение прохода без изменения `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*`, semver и historical logs migration.
 Результат: bootstrap/lint contract и product bootstrap docs приведены к текущему naming/profile/language canon без большого рефакторинга tools.
 
 ---
@@ -179,7 +179,7 @@
 ## QL-000013
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: `Docs/Terms/*` приведены к filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/BP-000003-fill-technical-and-rules.md`, `Plans/BP-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы; `bp_normalize_terms.py` принимает новый 6-значный filename pattern и продолжает пересобирать `Base_Terms.md`; `Plans/Backlog.md` и `Plans/BP-000009-migrate-terms-layer.md` отражают фактическое завершение migration-pass без изменения `Schemas/*`, `Templates/*`, `Profiles/*`, `bp_bootstrap.py`, `bp_lint.py`, semver и historical logs.
+Проверка: `Docs/Terms/*` приведены к filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`, `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы; `bp_normalize_terms.py` принимает новый 6-значный filename pattern и продолжает пересобирать `Base_Terms.md`; `Plans/Backlog.md` и `Plans/Archive/PLAN-000009-migrate-terms-layer.md` отражают фактическое завершение migration-pass без изменения `Schemas/*`, `Templates/*`, `Profiles/*`, `bp_bootstrap.py`, `bp_lint.py`, semver и historical logs.
 Результат: term layer и его прямые зависимости приведены к принятому naming contract, а инструмент нормализации терминов остаётся рабочим без архитектурного рефакторинга.
 
 ---
@@ -187,7 +187,7 @@
 ## QL-000012
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: `Schemas/*` и `Templates/*` приведены к 6-значной числовой части `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом; `profile.schema.json`, `Templates/Profile.md`, `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` согласованно отражают `Тип_профиля`, `Код_продукта`, `Язык_взаимодействия`, semantic filename для brand profiles и хранение product profiles только в product repo; в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксирован английский язык для commit/PR artifacts и `branch slug`; `Plans/Backlog.md` и `Plans/BP-000008-schemas-templates-profiles-and-language-sync.md` обновлены только в пределах текущего migration-pass; журналы отражают только факты этого прохода.
+Проверка: `Schemas/*` и `Templates/*` приведены к 6-значной числовой части `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом; `profile.schema.json`, `Templates/Profile.md`, `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` согласованно отражают `Тип_профиля`, `Код_продукта`, `Язык_взаимодействия`, semantic filename для brand profiles и хранение product profiles только в product repo; в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксирован английский язык для commit/PR artifacts и `branch slug`; `Plans/Backlog.md` и `Plans/Archive/PLAN-000008-schemas-templates-profiles-and-language-sync.md` обновлены только в пределах текущего migration-pass; журналы отражают только факты этого прохода.
 Результат: schema/template/profile layer и language contract Git/PR синхронизированы без изменения `Tools/*`, `Docs/Terms/TERM-*`, semver и historical logs migration.
 
 ---
@@ -195,7 +195,7 @@
 ## QL-000011
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: в `Standards/Naming.md` зафиксирована repo-wide policy фазной миграции ID, категории serial/hybrid/singleton-доменов, hybrid-правило для `Terms/` и `Profiles/`, а также поздняя отдельная фаза для historical logs; в `Docs/Technical/Model.md`, `Docs/Terms/README.md` и `Profiles/README.md` policy отражена согласованно; в `Plans/Backlog.md` уточнены scope `BACK-000021` и `BACK-000022`, добавлены `BACK-000023` и `BACK-000024`; создан `Plans/BP-000007-id-migration-policy-and-phase-plan.md`; журналы обновлены только фактами policy-прохода без запуска rewrite-pass.
+Проверка: в `Standards/Naming.md` зафиксирована repo-wide policy фазной миграции ID, категории serial/hybrid/singleton-доменов, hybrid-правило для `Terms/` и `Profiles/`, а также поздняя отдельная фаза для historical logs; в `Docs/Technical/Model.md`, `Docs/Terms/README.md` и `Profiles/README.md` policy отражена согласованно; в `Plans/Backlog.md` уточнены scope `BACK-000021` и `BACK-000022`, добавлены `BACK-000023` и `BACK-000024`; создан `Plans/Archive/PLAN-000007-id-migration-policy-and-phase-plan.md`; журналы обновлены только фактами policy-прохода без запуска rewrite-pass.
 Результат: repo-wide policy фазной ID migration закреплена документно и планово; `Schemas/*`, `Templates/*`, `Docs/Terms/TERM-*`, `Profiles/Default.md`, `Profiles/Speculorg.md`, `Tools/*` и historical logs намеренно оставлены без содержательной миграции в этом проходе.
 
 ---
@@ -211,7 +211,7 @@
 ## QL-000009
 Дата: 2026-03-17
 Статус: пройдено
-Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/BP-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, продуктовый слой больше не хранит отдельный дубль foundation-плана, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
+Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/Archive/PLAN-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, продуктовый слой больше не хранит отдельный дубль foundation-плана, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
 Результат: foundation-контур `Plans/` больше не содержит двух конкурирующих канонов для первого плана BytePress; актуальная точка ссылок и имени сведена к одному plan-file.
 
 ---

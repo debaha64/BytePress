@@ -18,7 +18,7 @@ ID: PLAN-000022
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить backlog-item текущей governance-задачи и отдельный plan-file.
-   - DoD: `Plans/Backlog.md` и `Plans/BP-000022-pipeline-roadmap-backlog-governance.md` отражают scope и ограничения текущего pass.
+   - DoD: `Plans/Backlog.md` и `Plans/Archive/PLAN-000022-pipeline-roadmap-backlog-governance.md` отражают scope и ограничения текущего pass.
 2. Выровнять `Pipeline` и `Roadmap`.
    - Описание: Зафиксировать полный канон фаз, правило `Roadmap -> Backlog -> Plan` и переписать `Plans/Roadmap.md` в непрерывный дальний путь `ROAD-000001`...`ROAD-000014`.
    - DoD: `Pipeline.md` и `Roadmap.md` согласованы с принятым governance canon без дублирования lifecycle contract.
@@ -36,7 +36,7 @@ ID: PLAN-000022
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000022-pipeline-roadmap-backlog-governance.md`
+- `Plans/Archive/PLAN-000022-pipeline-roadmap-backlog-governance.md`
 - `Docs/Technical/Pipeline.md`
 - `Plans/Roadmap.md`
 - `Logs/ChangeLog.md`

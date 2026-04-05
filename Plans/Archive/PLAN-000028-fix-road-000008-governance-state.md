@@ -38,7 +38,7 @@ ID: PLAN-000028
 - `Docs/Technical/Pipeline.md`
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000028-fix-road-000008-governance-state.md`
+- `Plans/Archive/PLAN-000028-fix-road-000008-governance-state.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 - `Tools/bp_lint.py`

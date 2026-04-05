@@ -18,7 +18,7 @@ ID: PLAN-000017
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить один backlog-item текущей задачи и отдельный plan-file для discovery/sync-contract pass.
-   - DoD: `Plans/Backlog.md` содержит `BACK-000029`, а `Plans/BP-000017-discovery-and-sync-contract.md` фиксирует scope и ограничения прохода.
+   - DoD: `Plans/Backlog.md` содержит `BACK-000029`, а `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md` фиксирует scope и ограничения прохода.
 2. Проявить discovery-domain и current-truth interview.
    - Описание: Создать `Docs/Discovery/README.md`, `Templates/Interview.md` и `Docs/Discovery/Interview.md`, где интервью описывает текущую истину, а не журнал сессий.
    - DoD: `Docs/Discovery/` существует, `Interview.md` фиксирует краткие актуальные ответы по BytePress, а `Docs/README.md` отражает новый слой.
@@ -36,7 +36,7 @@ ID: PLAN-000017
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000017-discovery-and-sync-contract.md`
+- `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md`
 - `Docs/Discovery/README.md`
 - `Docs/Discovery/Interview.md`
 - `Docs/README.md`

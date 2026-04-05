@@ -37,7 +37,7 @@ DoD:
 ## Канон файла
 Файл плана нормализован по принятому контракту именования:
 - `PRODUCT_CODE`: `BP`
-- имя файла: `Plans/BP-000001-foundation.md`
+- имя файла: `Plans/Archive/PLAN-000001-foundation.md`
 - `slug`: `foundation`
 
 ## Шаги

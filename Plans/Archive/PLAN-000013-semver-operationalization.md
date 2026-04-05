@@ -39,10 +39,10 @@ ID: PLAN-000013
 - `Pipeline/*.md`
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/BP-000003-fill-technical-and-rules.md`
-- `Plans/BP-000004-fill-skills-and-tools.md`
-- `Plans/BP-000005-adapters-memory-mcp-and-bootstrap.md`
-- `Plans/BP-000013-semver-operationalization.md`
+- `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`
+- `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`
+- `Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md`
+- `Plans/Archive/PLAN-000013-semver-operationalization.md`
 - `Tools/README.md`
 - `Rules/README.md`
 - `Standards/README.md`

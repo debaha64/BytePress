@@ -45,7 +45,7 @@ ID: PLAN-000031
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000031-define-unified-id-scheme.md`
+- `Plans/Archive/PLAN-000031-define-unified-id-scheme.md`
 - `Standards/Naming.md`
 - `Standards/Planning.md`
 - `Plans/README.md`

@@ -18,7 +18,7 @@ ID: PLAN-000021
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить backlog-item текущей задачи и отдельный plan-file для participation pass.
-   - DoD: `Plans/Backlog.md` и `Plans/BP-000021-domain-participation-contract.md` отражают scope без лишнего расширения.
+   - DoD: `Plans/Backlog.md` и `Plans/Archive/PLAN-000021-domain-participation-contract.md` отражают scope без лишнего расширения.
 2. Выровнять общий technical contract.
    - Описание: Минимально обновить `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/README.md` и `README.md` только там, где роли доменов остаются двусмысленными.
    - DoD: участие `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/` в системе и lifecycle описано коротко и согласованно.
@@ -36,7 +36,7 @@ ID: PLAN-000021
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000021-domain-participation-contract.md`
+- `Plans/Archive/PLAN-000021-domain-participation-contract.md`
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/Model.md`
 - `Docs/Technical/Artifact_Lifecycle.md`

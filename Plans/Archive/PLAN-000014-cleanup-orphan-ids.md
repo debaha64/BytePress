@@ -16,7 +16,7 @@ ID: PLAN-000014
 
 ## Шаги
 1. Убрать orphan requirement reference из ранних plan-файлов.
-   - DoD: `Plans/BP-000001-foundation.md` и `Plans/BP-000002-seed-docs-and-standards.md` больше не содержат orphan requirement reference, при этом смысл оснований и связей сохранён через существующие поля плана.
+   - DoD: `Plans/Archive/PLAN-000001-foundation.md` и `Plans/Archive/PLAN-000002-seed-docs-and-standards.md` больше не содержат orphan requirement reference, при этом смысл оснований и связей сохранён через существующие поля плана.
 2. Убрать orphan pipeline reference из правила строгости утверждений.
    - DoD: `Rules/Approval_Strictness.md` больше не содержит orphan pipeline reference, а зависимость от фаз конвейера описана только текстом правила.
 3. Зафиксировать cleanup-pass без расширения модели.
@@ -28,10 +28,10 @@ ID: PLAN-000014
 - избыточные правки за пределами трёх целевых файлов выведут проход за утверждённый scope.
 
 ## Артефакты
-- `Plans/BP-000001-foundation.md`
-- `Plans/BP-000002-seed-docs-and-standards.md`
+- `Plans/Archive/PLAN-000001-foundation.md`
+- `Plans/Archive/PLAN-000002-seed-docs-and-standards.md`
 - `Rules/Approval_Strictness.md`
-- `Plans/BP-000014-cleanup-orphan-ids.md`
+- `Plans/Archive/PLAN-000014-cleanup-orphan-ids.md`
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 

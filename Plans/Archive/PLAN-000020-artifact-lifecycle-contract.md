@@ -18,7 +18,7 @@ ID: PLAN-000020
 ## Шаги
 1. Зафиксировать управляемый контур прохода.
    - Описание: Добавить backlog-item текущей задачи и отдельный plan-file для lifecycle-pass.
-   - DoD: `Plans/Backlog.md` и `Plans/BP-000020-artifact-lifecycle-contract.md` отражают scope без расширения области.
+   - DoD: `Plans/Backlog.md` и `Plans/Archive/PLAN-000020-artifact-lifecycle-contract.md` отражают scope без расширения области.
 2. Добавить канонический lifecycle contract.
    - Описание: Создать `Docs/Technical/Artifact_Lifecycle.md` как короткий практический документ про источники истины, производные артефакты, порядок синхронизации и task-close checklist.
    - DoD: lifecycle contract не дублирует целиком `Pipeline.md`, а собирает в одном месте обязательный порядок обновления артефактов.
@@ -36,7 +36,7 @@ ID: PLAN-000020
 
 ## Артефакты
 - `Plans/Backlog.md`
-- `Plans/BP-000020-artifact-lifecycle-contract.md`
+- `Plans/Archive/PLAN-000020-artifact-lifecycle-contract.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Pipeline.md`

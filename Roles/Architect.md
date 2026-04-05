@@ -14,7 +14,7 @@ ID: ROLE-000004
 ## Допустимые_артефакты
 - Docs/Technical/
 - Logs/ADRlog.md
-- Plans/BP-*.md
+- Plans/PLAN-<NNNNNN>-<slug>.md
 
 ## Подключаемые_правила
 - Repository_As_Source_Of_Truth

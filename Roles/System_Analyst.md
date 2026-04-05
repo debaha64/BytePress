@@ -16,7 +16,7 @@ ID: ROLE-000002
 - Docs/Product/
 - Docs/Technical/
 - Plans/Backlog.md
-- Plans/BP-*.md
+- Plans/PLAN-<NNNNNN>-<slug>.md
 
 ## Подключаемые_правила
 - Repository_As_Source_Of_Truth

@@ -44,7 +44,7 @@ ID: PLAN-000029
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/BP-000029-activate-road-000009-operating-model-pass.md`
+- `Plans/Archive/PLAN-000029-activate-road-000009-operating-model-pass.md`
 - `Standards/Planning.md`
 - `Plans/README.md`
 - `Docs/Terms/TERM-000007-roadmap.md`
