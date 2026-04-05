@@ -9,7 +9,7 @@
 - ROAD-000006 — Process contract и жизненный цикл артефактов (Process Contract and Artifact Lifecycle) | Активные: нет | Завершённые: 7
 - ROAD-000007 — Управление развитием: Pipeline, Roadmap, Backlog и Plan (Development Governance: Pipeline, Roadmap, Backlog, and Plan) | Активные: нет | Завершённые: BACK-000032, BACK-000033, BACK-000034, BACK-000035, BACK-000036
 - ROAD-000008 — Исследование и требования (Research and Requirements) | Активные: нет | Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044 | Кандидаты задач этапа
 - ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Кандидаты задач этапа
 - ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Кандидаты задач этапа
 - ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer) | Кандидаты задач этапа
@@ -484,7 +484,7 @@ ID: BACK-000020
 Дата_изменения: 2026-03-17
 
 ##### Описание
-Foundation-план BytePress приведён к каноническому контракту именования `Plans/BP-000001-foundation.md`, legacy-дубль удалён, а прямые ссылки перепривязаны на канонический файл и `ID: PLAN-000001` без захода в semver-миграцию исторического слоя и без рефакторинга инструментов.
+Foundation-план BytePress приведён к каноническому контракту именования `Plans/Archive/PLAN-000001-foundation.md`, legacy-дубль удалён, а прямые ссылки перепривязаны на канонический файл и `ID: PLAN-000001` без захода в semver-миграцию исторического слоя и без рефакторинга инструментов.
 
 #### BACK-000027 — Завершить process-contract для task-branch, push, PR и gh fallback
 ID: BACK-000027
@@ -723,8 +723,21 @@ ID: BACK-000043
 ##### Описание
 Зафиксировать целевую единую схему идентификаторов для всего репозитория: классы артефактов по модели идентификации, правила `ID` и filename для serial / hybrid / singleton domains, правила внутренних ссылок и порядок будущей migration по доменам без запуска самой migration.
 
+#### BACK-000044 — Перевести history plan-files в archive layer
+ID: BACK-000044
+Название: Перевести history plan-files в archive layer
+Тип: Стандарт
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000009, PLAN-000032
+Источник: Следующий узкий pass внутри `ROAD-000009` после фиксации unified `ID scheme`
+Дата_создания: 2026-04-06
+Дата_изменения: 2026-04-06
+
+##### Описание
+Выполнить migration plan-files внутри planning-contour: перевести historical legacy `BP-*` в целевой `PLAN-*` filename-contract, ввести archive policy через `Plans/Archive/`, переместить туда завершённые `Plan` и оставить в активном слое только один текущий `Plan`.
+
 ### Кандидаты задач этапа
-- Подготовить правило управляемого вывода завершённых `Plan` в `Plans/Archive/`
 - Уточнить контур hard-close для следующих governance-pass этапа
 
 ---
