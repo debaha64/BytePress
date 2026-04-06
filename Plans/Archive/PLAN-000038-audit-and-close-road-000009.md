@@ -46,7 +46,7 @@ ID: PLAN-000038
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000038-audit-and-close-road-000009.md`
+- `Plans/Archive/PLAN-000038-audit-and-close-road-000009.md`
 - `Plans/README.md`
 - `Standards/Planning.md`
 - `Standards/Naming.md`
