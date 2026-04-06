@@ -166,16 +166,16 @@ ID: ROAD-000008
 ID: ROAD-000009
 Этап: Операционная модель и governance-контур (Operating Model and Governance Contour)
 Статус: В_работе
-Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034
-Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034
+Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035
+Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-06
 Цель: Зафиксировать новую операционную модель `BytePress`, planning-contour и единую схему идентификаторов на уровне governance-contract, включая терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan`, завершённый active/archive planning-layer и hard-close contour без полной migration всех остальных historical доменов.
 Зависимости: ROAD-000008
-Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046
+Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047
 
 ### Описание
-Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, а active/archive layout planning-layer уже реализован для plan-files, backlog history-layer и cleanup финального runtime legacy tail без затрагивания migration других доменов.
+Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, active/archive layout planning-layer уже реализован, а текущий pass довёл log-layer до утверждённого serial-entry contract без затрагивания redesign других доменов.
 
 ---
 
