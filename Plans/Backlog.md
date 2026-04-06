@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: BACK-000050 | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049, BACK-000050 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,12 +38,16 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
+- нет
+
+### Завершённые
+
 #### BACK-000050 — Провести финальный audit и закрыть ROAD-000009
 ID: BACK-000050
 Название: Провести финальный audit и закрыть ROAD-000009
 Тип: Стандарт
 Приоритет: Критический
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000009, PLAN-000038
 Источник: Финальный audit-pass после закрытия remaining governance/supporting tail
 Дата_создания: 2026-04-07
@@ -51,8 +55,6 @@ ID: BACK-000050
 
 ##### Описание
 Провести финальный audit активного governance-layer и planning-contour внутри `ROAD-000009`, проверить, подтверждается ли последний candidate про hard-close contour, и по результату либо закрыть этап, либо оставить ровно один доказанный остаточный gap без открытия нового redesign.
-
-### Завершённые
 
 #### BACK-000049 — Закрыть remaining governance/supporting ID tail
 ID: BACK-000049
@@ -181,4 +183,4 @@ ID: BACK-000044
 Выполнить migration plan-files внутри planning-contour: перевести historical legacy `BP-*` в целевой `PLAN-*` filename-contract, ввести archive policy через `Plans/Archive/`, переместить туда завершённые `Plan` и оставить в активном слое только один текущий `Plan`.
 
 ### Кандидаты задач этапа
-- Уточнить контур hard-close для следующих governance-pass этапа
+- нет

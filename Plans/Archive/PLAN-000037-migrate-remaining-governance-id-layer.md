@@ -46,7 +46,7 @@ ID: PLAN-000037
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000037-migrate-remaining-governance-id-layer.md`
+- `Plans/Archive/PLAN-000037-migrate-remaining-governance-id-layer.md`
 - `Profiles/*`
 - `Docs/Terms/*`
 - `Standards/Naming.md`

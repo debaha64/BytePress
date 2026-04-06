@@ -2,7 +2,7 @@
 
 ID: PLAN-000038
 Название: Провести финальный audit-pass и закрыть ROAD-000009
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000050
 Источник: Final audit-pass inside `ROAD-000009`
 Дата_создания: 2026-04-07
@@ -58,3 +58,10 @@ ID: PLAN-000038
 - выполнен явный audit активного governance/supporting layer.
 - `ROAD-000009` либо переведён в `Завершено`, либо оставлен ровно один доказанный gap.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- Audit активного governance-layer и planning-contour не подтвердил реального residual gap: candidate про hard-close contour не опирался на активное рассогласование и снят как неподтверждённый.
+- `ROAD-000009` переведён в `Завершено`; `ROAD-000010` не активирован автоматически и остаётся следующим черновым горизонтом без новой backlog-задачи.
+- `Plans/Backlog.md`, `Plans/Roadmap.md` и текущий `Plan` синхронизированы на closure-state без открытия нового redesign.
+
+bp_lint contract unaffected
