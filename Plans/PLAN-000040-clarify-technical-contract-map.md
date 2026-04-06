@@ -2,7 +2,7 @@
 
 ID: PLAN-000040
 Название: Уточнить карту системных контрактов technical-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000052
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -59,3 +59,9 @@ ID: PLAN-000040
 - `Docs/Technical/README.md` фиксирует required ядро и карту документов technical-layer.
 - разведение `Docs/Technical/*` и `Pipeline/*` описано ясно и без новой двусмысленности.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Docs/Technical/README.md` теперь явно делит current technical-documents на required core и supporting layer и фиксирует роль каждого документа в слое.
+- `Docs/Technical/Pipeline.md` возвращён к supporting technical view: из active layer убран дублирующий process-canon, а приоритет `Pipeline/*` как process-domain закреплён явно.
+- дополнительные изменения в `Standards/*`, `Plans/README.md` и `bp_lint.py` не потребовались: audit не подтвердил реального contract contradiction за пределами entrypoint technical-layer и его supporting pipeline view.
+- `bp_lint contract unaffected`
