@@ -192,7 +192,7 @@ ID: ROAD-000010
 Связанные_backlog: BACK-000051
 
 ### Описание
-Этап стартует с boundary-pass: сначала фиксируются назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, а уже затем возможны более узкие technical contract passes без широкого рефакторинга всего слоя.
+Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы, а следующие technical contract passes могут уточнять слой дальше без широкого рефакторинга всего technical-layer.
 
 ---
 

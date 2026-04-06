@@ -2,7 +2,7 @@
 
 ID: PLAN-000039
 Название: Зафиксировать границы и минимальный состав technical-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000051
 Источник: Первый узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -58,3 +58,11 @@ ID: PLAN-000039
 - создан новый текущий `Plan` только под этот pass.
 - `Docs/Technical/README.md` фиксирует границы и минимальный состав слоя.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `ROAD-000010` активирован как текущий этап без переоткрытия `ROAD-000009`.
+- `Docs/Technical/README.md` зафиксировал назначение technical-layer, его включения, исключения, отношение к `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, а также минимальный required состав слоя.
+- `Pipeline/Artifacts.md` синхронизирован с уже реализованным plan filename-contract и больше не ссылается на legacy `Plan_<ID>.md`.
+- Дополнительные contracts, `Plans/README.md`, `Standards/Planning.md`, `Standards/Naming.md` и `bp_lint.py` не потребовали изменения в этом pass.
+
+bp_lint contract unaffected
