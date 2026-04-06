@@ -108,7 +108,6 @@ Singleton domains не используют serial `ID` в filename и не ма
 - singleton domains сохраняют semantic filenames и не переводятся на serial filename без отдельного решения.
 
 Transitional legacy-state:
-- `Runtime/Plan.md` ещё физически существует как legacy runtime artifact;
 - transitional state не меняет целевую схему и не разрешает создавать новые legacy-артефакты там, где уже определён target contract.
 
 ## Политика фазной миграции

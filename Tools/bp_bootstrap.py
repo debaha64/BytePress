@@ -219,7 +219,6 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(target / "Runtime/README.md", "# Runtime\n\nОперативная среда текущего исполнения.\n")
     write(target / "Runtime/Context.md", "# Context\n\nТекущий контекст исполнения.\n")
     write(target / "Runtime/Task.md", "# Task\n\nТекущая задача.\n")
-    write(target / "Runtime/Plan.md", "# Plan\n\nЧерновой оперативный план исполнения.\n")
     write(target / "Runtime/Session_Log.md", "# Session_Log\n\nЖурнал текущей сессии.\n")
     write(target / "Runtime/Handover.md", "# Handover\n\nПередача текущего состояния между сессиями.\n")
 

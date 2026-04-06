@@ -47,7 +47,7 @@ ID: PLAN-000033
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000033-archive-backlog-history-layer.md`
+- `Plans/Archive/PLAN-000033-archive-backlog-history-layer.md`
 - `Plans/Archive/Backlog/*`
 - `Standards/Planning.md`
 - `Plans/README.md`
