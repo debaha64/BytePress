@@ -82,12 +82,17 @@ Singleton domains не используют serial `ID` в filename и не ма
 - `Adapters/`
 - `Memory/`
 - `MCP/`
-- singleton-документы верхнего уровня, такие как `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`
+- singleton-документы верхнего уровня, такие как `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Logs/ReleaseLog.md`, `Logs/SupportLog.md`
 
 Для singleton domains:
 - semantic filename является каноническим способом локализации файла;
 - внутренний `ID` используется там, где singleton-артефакт является нормируемой сущностью;
 - serial `ID` в filename не требуется и не вводится по умолчанию.
+
+Для singleton log-files:
+- сам файл остаётся singleton path-артефактом;
+- serial `ID` получают не файлы, а внутренние log entries там, где журнал ведёт serial реестр фактов;
+- ссылки на журнал как на файл используют semantic path, а ссылки на конкретную запись используют её внутренний `ID` и при необходимости дополняются path к singleton-файлу.
 
 Исторический backlog прошлых этапов использует stage-keyed archive path contract:
 - `Plans/Archive/Backlog/ROAD-<NNNNNN>.md`
@@ -121,7 +126,7 @@ Migration `ID scheme` в `BytePress` выполняется полностью, 
 
 Целевой порядок будущей migration по доменам:
 1. `planning contour`: завершено для plan-files, archive layout и backlog history-layer; active `Backlog.md` и `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` уже приведены к целевому contract.
-2. `logs`: serial и внутренние `ID` журнальных сущностей и прямые ссылки на них.
+2. `logs`: завершено для существующего log-layer; singleton journal files сохранены, а serial `ID` и ссылочный слой log entries приведены к целевому contract без redesign других доменов.
 3. `rules / standards / templates / schemas`: выравнивание внутренних `ID`, semantic filenames и ссылочного слоя.
 4. остальные домены: `Profiles/` и прочие hybrid/singleton domains, которые ещё требуют синхронизации под общую схему.
 

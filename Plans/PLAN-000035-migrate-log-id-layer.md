@@ -2,7 +2,7 @@
 
 ID: PLAN-000035
 Название: Привести `Logs/*` и ссылочный слой журналов к unified `ID scheme`
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000047
 Источник: Narrow log-layer migration pass inside `ROAD-000009`
 Дата_создания: 2026-04-06
@@ -59,3 +59,10 @@ ID: PLAN-000035
 - `Logs/*` приведены к unified `ID scheme` в реально необходимом объёме.
 - все реально затронутые ссылки на log-layer синхронизированы.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Фактический результат
+- `BACK-000047` и `PLAN-000035` зафиксировали только узкий pass по migration log-layer без открытия других доменов.
+- `Logs/QualityLog.md` получил явные `ID:` для всех serial quality entries, а `Logs/ReleaseLog.md` переведён на шестизначный `RL-<NNNNNN>` contract с явными внутренними `ID`.
+- singleton log-files остались singleton-артефактами: migration затронула только serial entry layer и не вводила serial filenames для `Logs/*`.
+- `Standards/Naming.md` и `Logs/README.md` синхронизированы с фактически реализованной log model и правилом ссылок на singleton log-files и их serial entries.
+- `bp_lint.py` не менялся, потому что structural contract репозитория и обязательный file set log-layer не изменились; `bp_lint contract unaffected`.
