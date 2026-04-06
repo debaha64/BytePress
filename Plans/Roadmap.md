@@ -166,13 +166,13 @@ ID: ROAD-000008
 ID: ROAD-000009
 Этап: Операционная модель и governance-контур (Operating Model and Governance Contour)
 Статус: В_работе
-Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035, PLAN-000036, PLAN-000037
-Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035, PLAN-000036, PLAN-000037
+Связи: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049, BACK-000050, PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035, PLAN-000036, PLAN-000037, PLAN-000038
+Источник: PLAN-000029, PLAN-000030, PLAN-000031, PLAN-000032, PLAN-000033, PLAN-000034, PLAN-000035, PLAN-000036, PLAN-000037, PLAN-000038
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Зафиксировать новую операционную модель `BytePress`, planning-contour и единую схему идентификаторов на уровне governance-contract, включая терминологию `этап / задача / проход`, ownership состояния, lifecycle `Plan`, завершённый active/archive planning-layer и hard-close contour без полной migration всех остальных historical доменов.
 Зависимости: ROAD-000008
-Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049
+Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049, BACK-000050
 
 ### Описание
 Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, active/archive layout planning-layer уже реализован, log-layer приведён к утверждённому serial-entry contract, а active governance/supporting singleton-hybrid tail закрыт для `Profiles/*` и оставшихся support-files вокруг `Docs/Terms/*` без открытия нового redesign.
