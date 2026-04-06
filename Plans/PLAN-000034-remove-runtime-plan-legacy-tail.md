@@ -2,7 +2,7 @@
 
 ID: PLAN-000034
 Название: Удалить `Runtime/Plan.md` и закрыть legacy-tail planning-контура
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000046
 Источник: Narrow planning cleanup pass inside `ROAD-000009`
 Дата_создания: 2026-04-06
@@ -60,3 +60,10 @@ ID: PLAN-000034
 - `Runtime/Plan.md` удалён из рабочего дерева.
 - active-layer больше не содержит рабочих правил и зависимостей, завязанных на legacy runtime plan.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Фактический результат
+- `BACK-000046` и `PLAN-000034` зафиксировали только cleanup-pass по legacy runtime tail planning-контура.
+- `Runtime/Plan.md` удалён из рабочего дерева, а `Tools/bp_bootstrap.py` больше не материализует этот legacy artifact.
+- предыдущий завершённый current `PLAN-000033` перемещён в `Plans/Archive/`, поэтому active `Plans/` снова содержит только singleton files и текущий `PLAN-000034`.
+- `Standards/Planning.md`, `Plans/README.md`, `Standards/Naming.md` и `Docs/Terms/TERM-000009-plan.md` синхронизированы под завершённый planning-layer без legacy runtime plan.
+- `bp_lint.py` не менялся, потому что обязательный structural contract для репозитория не зависит от `Runtime/Plan.md`; `bp_lint contract unaffected`.

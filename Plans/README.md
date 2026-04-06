@@ -28,15 +28,15 @@
 
 Статусы этапов и дальний горизонт принадлежат `Roadmap.md`.
 
-## Переходное состояние
-После migration plan-files и backlog history-layer репозиторий остаётся в transitional state только в части `Runtime/Plan.md` как legacy runtime draft.
-
+## Реализованное состояние
 Historical `Plan` больше не остаются в active `Plans/`: они migrated в `Plans/Archive/`.
 
 Historical backlog прошлых этапов больше не остаётся в active `Plans/Backlog.md`: он migrated в `Plans/Archive/Backlog/`.
 
+Planning-contour в рабочем дереве больше не использует отдельный runtime plan artifact.
+
 ## Правило
-`Runtime/Plan.md` не считается источником истины для плана, не является каноническим `Plan` и до отдельного pass остаётся только legacy-артефактом runtime-layer.
+`Runtime/` остаётся только временным рабочим контекстом и не подменяет канонический `Plan`.
 
 `Backlog.md` хранит только задачи текущего этапа; historical backlog хранится в `Plans/Archive/Backlog/`, а дальний горизонт и статусы этапов принадлежат `Roadmap.md`.
 
