@@ -46,7 +46,7 @@ ID: PLAN-000039
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000039-activate-road-000010-technical-boundaries.md`
+- `Plans/Archive/PLAN-000039-activate-road-000010-technical-boundaries.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Pipeline.md`
 - `Pipeline/*`
