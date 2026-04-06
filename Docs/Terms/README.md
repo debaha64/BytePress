@@ -18,6 +18,11 @@
 
 Новые term-артефакты должны создаваться только по этому контракту.
 
+Поддерживающие singleton files внутри `Docs/Terms/` не считаются term-card entities:
+- `Docs/Terms/README.md` — navigator и карта домена;
+- `Docs/Terms/Base_Terms.md` — индекс словаря;
+- `Docs/Terms/Term_Change_Policy.md` — policy-файл терминологических изменений.
+
 ## Текущий слой
 Актуальные term-card files уже приведены к контракту `Docs/Terms/TERM-<NNNNNN>-<slug>.md` и используют 6-значный внутренний `TERM ID`.
 
