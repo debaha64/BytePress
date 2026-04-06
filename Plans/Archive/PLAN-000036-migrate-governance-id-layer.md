@@ -46,7 +46,7 @@ ID: PLAN-000036
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000036-migrate-governance-id-layer.md`
+- `Plans/Archive/PLAN-000036-migrate-governance-id-layer.md`
 - `Rules/*`
 - `Standards/*`
 - `Templates/*`
@@ -65,5 +65,5 @@ ID: PLAN-000036
 - `BACK-000048` и `PLAN-000036` зафиксировали только узкий pass по active governance/supporting domains без открытия других доменов.
 - `Rules/*` подтвердили singleton contract без filename-migration; `Standards/Naming.md`, `Standards/Quality.md` и `Standards/Traceability.md` доведены до явных `STD-*`.
 - `Templates/*` приведены к hybrid artifact-ID contract через внутренние `TPL-*` markers, а `Schemas/*` — через top-level `SCH-*` в `$id`, при сохранении semantic filenames.
-- `Plans/Archive/PLAN-000035-migrate-log-id-layer.md` выведен в archive, поэтому active `Plans/` снова содержит только singleton files и текущий `PLAN-000036`.
+- `Plans/Archive/PLAN-000035-migrate-log-id-layer.md` выведен в archive, поэтому active `Plans/` на момент закрытия pass снова содержал только singleton files и текущий `PLAN-000036`, после чего и этот план стал частью archive-layer.
 - `bp_bootstrap.py` не менялся, потому что filename/path-contract bootstrap не затронут; `bp_lint.py` минимально расширен под новые обязательные IDs active governance/supporting layer.
