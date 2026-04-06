@@ -183,16 +183,16 @@ ID: ROAD-000009
 ID: ROAD-000010
 Этап: Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
 Статус: В_работе
-Связи: BACK-000051, PLAN-000039
-Источник: PLAN-000039
+Связи: BACK-000051, BACK-000052, PLAN-000039, PLAN-000040
+Источник: PLAN-000039, PLAN-000040
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Определить границы `Docs/Technical/*`, минимальный состав technical-layer и карту системных контрактов без смешения technical knowledge-layer с `Pipeline/*` и planning/governance контуром.
 Зависимости: ROAD-000009
-Связанные_backlog: BACK-000051
+Связанные_backlog: BACK-000051, BACK-000052
 
 ### Описание
-Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы, а следующие technical contract passes могут уточнять слой дальше без широкого рефакторинга всего technical-layer.
+Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer без широкого рефакторинга всего technical-layer.
 
 ---
 
