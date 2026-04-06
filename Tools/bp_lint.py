@@ -35,6 +35,15 @@ SCHEMA_ARTIFACT_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
 PRODUCT_PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULTILINE)
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
+PROFILE_LIST_PATTERNS = {
+    "Активные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
+    "Резервные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
+    "Активные_правила": re.compile(r"^RULE-[0-9]{6}$"),
+    "Активные_стандарты": re.compile(r"^STD-[0-9]{6}$"),
+    "Активные_навыки": re.compile(r"^SKILL-[0-9]{6}$"),
+    "Активные_адаптеры": re.compile(r"^ADP-[0-9]{6}$"),
+    "Резервные_адаптеры": re.compile(r"^ADP-[0-9]{6}$"),
+}
 
 
 def collect_missing(root: Path, names: list[str], base: str) -> list[str]:
@@ -77,6 +86,31 @@ def contains_pattern(path: Path, pattern: re.Pattern[str]) -> bool:
         return False
     text = path.read_text(encoding="utf-8")
     return bool(pattern.search(text))
+
+
+def check_profile_reference_lists(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    errors: list[str] = []
+    for field, pattern in PROFILE_LIST_PATTERNS.items():
+        header = f"{field}:"
+        try:
+            index = lines.index(header)
+        except ValueError:
+            errors.append(f"{path}: missing `{field}` section")
+            continue
+        entries: list[str] = []
+        cursor = index + 1
+        while cursor < len(lines) and lines[cursor].startswith("- "):
+            entries.append(lines[cursor][2:])
+            cursor += 1
+        if not entries:
+            errors.append(f"{path}: empty `{field}` section")
+            continue
+        if any(not pattern.fullmatch(item) for item in entries):
+            errors.append(f"{path}: non-canonical IDs in `{field}` section")
+    return errors
 
 
 def is_bytepress_repo(root: Path) -> bool:
@@ -235,7 +269,13 @@ def main() -> int:
         if err:
             schema_id_errors.append(err)
 
-    if missing or id_errors or template_id_errors or schema_id_errors:
+    profile_reference_errors: list[str] = []
+    for path in sorted((root / "Profiles").glob("*.md")):
+        if path.name == "README.md":
+            continue
+        profile_reference_errors.extend(check_profile_reference_lists(path))
+
+    if missing or id_errors or template_id_errors or schema_id_errors or profile_reference_errors:
         if missing:
             print("Отсутствуют обязательные пути:")
             for item in missing:
@@ -251,6 +291,10 @@ def main() -> int:
         if schema_id_errors:
             print("Схемы без обязательного artifact ID:")
             for item in schema_id_errors:
+                print(f"- {item}")
+        if profile_reference_errors:
+            print("Профили с неканоничными ссылочными списками:")
+            for item in profile_reference_errors:
                 print(f"- {item}")
         return 1
     print("Структура BytePress, интеграционный и исполнительный контуры выглядят полными.")

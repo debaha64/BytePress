@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: BACK-000049 | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048, BACK-000049 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,12 +38,16 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
+- нет
+
+### Завершённые
+
 #### BACK-000049 — Закрыть remaining governance/supporting ID tail
 ID: BACK-000049
 Название: Закрыть remaining governance/supporting ID tail
 Тип: Стандарт
 Приоритет: Критический
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000009, PLAN-000037
 Источник: Следующий узкий pass внутри `ROAD-000009` после migration active governance/supporting layer
 Дата_создания: 2026-04-07
@@ -51,8 +55,6 @@ ID: BACK-000049
 
 ##### Описание
 Привести `Profiles/*` и только те remaining active governance/supporting domains, которые реально ещё расходятся с unified `ID scheme`, к согласованному contract состоянию, синхронизируя только реально затронутые path-references и не открывая другие домены.
-
-### Завершённые
 
 #### BACK-000048 — Привести governance/supporting domains к unified ID scheme
 ID: BACK-000048

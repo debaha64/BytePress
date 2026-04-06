@@ -2,7 +2,7 @@
 
 ID: PLAN-000037
 Название: Закрыть remaining governance/supporting `ID` tail для `Profiles/*`
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000049
 Источник: Narrow remaining governance/supporting migration pass inside `ROAD-000009`
 Дата_создания: 2026-04-07
@@ -59,3 +59,11 @@ ID: PLAN-000037
 - `Profiles/*` приведены к unified `ID scheme` в реально необходимом объёме.
 - другие remaining domains затронуты только при доказанном рассогласовании.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Profiles/*` доведены до implemented hybrid contract без migration semantic filenames: внутренние `PROF-*` сохранены, а ссылочные списки `Активные_*` и `Резервные_*` нормализованы на canonical `ID`.
+- `Docs/Terms/*` не потребовал file migration: `TERM-*` уже соответствовали serial contract, а singleton support-files внутри домена явно разведены с term-card layer.
+- `Roles/*` дополнительной migration не потребовал: domain уже соответствовал singleton contract и использовал canonical internal `ROLE-*`.
+- `Tools/bp_lint.py` минимально синхронизирован с новым profile-reference contract; `bp_bootstrap.py` не затронут, потому что filename/path generation не менялся.
+
+bp_lint contract affected

@@ -65,6 +65,13 @@ Semver применяется к текущему operational contract `BytePres
 - `Plans/`: активный текущий `Plan` хранится как `Plans/PLAN-<NNNNNN>-<slug>.md`, завершённые `Plan` хранятся как `Plans/Archive/PLAN-<NNNNNN>-<slug>.md`
 - `Docs/Terms/`: `Docs/Terms/TERM-<NNNNNN>-<slug>.md`
 
+В serial domain `Docs/Terms/` serial term-card entities ограничены только файлами `TERM-*`.
+
+Поддерживающие singleton files внутри `Docs/Terms/` не считаются term-card entities и не переводятся на serial filename-contract:
+- `Docs/Terms/README.md`
+- `Docs/Terms/Base_Terms.md`
+- `Docs/Terms/Term_Change_Policy.md`
+
 Для serial domains:
 - внутренний `ID` обязан совпадать с `ID`, выраженным в filename;
 - прямые ссылки между документами по смыслу идут через внутренний `ID`;
@@ -84,9 +91,10 @@ Semver применяется к текущему operational contract `BytePres
 - ссылка по одному внутреннему `ID` обычно достаточна, а filename/path добавляется только для навигации или когда semantic filename важен сам по себе.
 
 Для active governance/supporting hybrid domains:
+- `Profiles/*.md`, кроме `Profiles/README.md`, используют semantic filename и внутренний `ID: PROF-<NNNNNN>`; поля `Активные_*` и `Резервные_*`, которые ссылаются на canonical entities, используют именно эти canonical `ID`;
 - `Templates/*.md` используют semantic filename и внутренний artifact `ID` в форме `<!-- ID: TPL-<NNNNNN> -->`;
 - `Schemas/*.json` используют semantic filename и внутренний artifact `ID` в форме top-level `"$id": "SCH-<NNNNNN>"`;
-- `Templates/README.md` и `Schemas/README.md` остаются singleton navigator-файлами и не получают hybrid artifact `ID` по умолчанию.
+- `Profiles/README.md`, `Templates/README.md` и `Schemas/README.md` остаются singleton navigator-файлами и не получают hybrid artifact `ID` по умолчанию.
 
 ### Singleton domains
 Singleton domains не используют serial `ID` в filename и не масштабируются как serial-реестр файлов.
@@ -150,7 +158,7 @@ Migration `ID scheme` в `BytePress` выполняется полностью, 
 1. `planning contour`: завершено для plan-files, archive layout и backlog history-layer; active `Backlog.md` и `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` уже приведены к целевому contract.
 2. `logs`: завершено для существующего log-layer; singleton journal files сохранены, а serial `ID` и ссылочный слой log entries приведены к целевому contract без redesign других доменов.
 3. `rules / standards / templates / schemas`: завершено для active governance/supporting layer; singleton filenames сохранены для `Rules/*` и `Standards/*`, а `Templates/*` и `Schemas/*` приведены к hybrid internal-ID contract без redesign других доменов.
-4. остальные домены: `Profiles/` и прочие hybrid/singleton domains, которые ещё требуют синхронизации под общую схему.
+4. remaining active governance/supporting singleton/hybrid tail: завершено для `Profiles/*`; `Roles/*` и `Docs/Terms/TERM-*` уже соответствовали target contract, а singleton support-files внутри `Docs/Terms/*` явно разведены с serial term-card layer.
 
 Домены, уже приведённые к целевой схеме, не открываются повторно без отдельного pass на доказанное рассогласование.
 
