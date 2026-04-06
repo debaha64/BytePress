@@ -2,7 +2,7 @@
 
 ID: PLAN-000036
 Название: Привести `Rules/*`, `Standards/*`, `Templates/*` и `Schemas/*` к unified `ID scheme`
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000048
 Источник: Narrow governance/supporting migration pass inside `ROAD-000009`
 Дата_создания: 2026-04-06
@@ -60,3 +60,10 @@ ID: PLAN-000036
 - `Rules/*`, `Standards/*`, `Templates/*`, `Schemas/*` приведены к unified `ID scheme` в реально необходимом объёме.
 - все реально затронутые ссылки на migrated domains синхронизированы.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Фактический результат
+- `BACK-000048` и `PLAN-000036` зафиксировали только узкий pass по active governance/supporting domains без открытия других доменов.
+- `Rules/*` подтвердили singleton contract без filename-migration; `Standards/Naming.md`, `Standards/Quality.md` и `Standards/Traceability.md` доведены до явных `STD-*`.
+- `Templates/*` приведены к hybrid artifact-ID contract через внутренние `TPL-*` markers, а `Schemas/*` — через top-level `SCH-*` в `$id`, при сохранении semantic filenames.
+- `Plans/Archive/PLAN-000035-migrate-log-id-layer.md` выведен в archive, поэтому active `Plans/` снова содержит только singleton files и текущий `PLAN-000036`.
+- `bp_bootstrap.py` не менялся, потому что filename/path-contract bootstrap не затронут; `bp_lint.py` минимально расширен под новые обязательные IDs active governance/supporting layer.

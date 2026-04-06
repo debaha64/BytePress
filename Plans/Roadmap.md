@@ -175,7 +175,7 @@ ID: ROAD-000009
 Связанные_backlog: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048
 
 ### Описание
-Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, active/archive layout planning-layer уже реализован, log-layer приведён к утверждённому serial-entry contract, а следующий узкий pass доводит active governance/supporting domains до той же схемы без открытия других доменов.
+Этап переводит `BytePress` на новую operating model: `Roadmap` владеет стадиями, `Backlog` владеет задачами текущего этапа, `Plan` описывает только один текущий проход, единая `ID scheme` и порядок её migration фиксируются отдельными governance-pass, active/archive layout planning-layer уже реализован, log-layer приведён к утверждённому serial-entry contract, а active governance/supporting domains синхронизированы с той же схемой без открытия других доменов.
 
 ---
 

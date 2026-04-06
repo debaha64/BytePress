@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: BACK-000048 | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047 | Кандидаты задач этапа
+- ROAD-000009 — Операционная модель и governance-контур (Operating Model and Governance Contour) | Активные: нет | Завершённые: BACK-000041, BACK-000042, BACK-000043, BACK-000044, BACK-000045, BACK-000046, BACK-000047, BACK-000048 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,12 +38,16 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
+- нет
+
+### Завершённые
+
 #### BACK-000048 — Привести governance/supporting domains к unified ID scheme
 ID: BACK-000048
 Название: Привести governance/supporting domains к unified ID scheme
 Тип: Стандарт
 Приоритет: Критический
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000009, PLAN-000036
 Источник: Следующий узкий pass внутри `ROAD-000009` после log-layer migration
 Дата_создания: 2026-04-06
@@ -51,8 +55,6 @@ ID: BACK-000048
 
 ##### Описание
 Привести `Rules/*`, `Standards/*`, `Templates/*` и `Schemas/*` к уже утверждённой unified `ID scheme` в реально необходимом объёме, не меняя лишние filename/path-contract и синхронизируя только тот ссылочный слой, который действительно затрагивается этим migration-pass.
-
-### Завершённые
 
 #### BACK-000047 — Привести log-layer к unified ID scheme
 ID: BACK-000047
