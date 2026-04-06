@@ -1,5 +1,13 @@
 # Naming
 
+ID: STD-000006
+Название: Naming
+Статус: Активно
+Связи: RULE-000003, RULE-000010, STD-000002, STD-000005
+Источник: BytePress + полезные практики Speculorg
+Дата_создания: 2026-03-10
+Дата_изменения: 2026-04-06
+
 ## Версии
 Версии оформляются в формате `MAJOR.MINOR.PATCH`.
 
@@ -15,6 +23,10 @@ Semver применяется к текущему operational contract `BytePres
 Типовой префикс сущности сохраняется:
 - `PLAN-000001`
 - `BACK-000001`
+- `RULE-000001`
+- `STD-000001`
+- `TPL-000001`
+- `SCH-000001`
 - `ADR-000001`
 - `CHG-000001`
 - `PROF-000001`
@@ -71,6 +83,11 @@ Semver применяется к текущему operational contract `BytePres
 - внутренний `ID` остаётся каноническим идентификатором для ссылок и зависимостей;
 - ссылка по одному внутреннему `ID` обычно достаточна, а filename/path добавляется только для навигации или когда semantic filename важен сам по себе.
 
+Для active governance/supporting hybrid domains:
+- `Templates/*.md` используют semantic filename и внутренний artifact `ID` в форме `<!-- ID: TPL-<NNNNNN> -->`;
+- `Schemas/*.json` используют semantic filename и внутренний artifact `ID` в форме top-level `"$id": "SCH-<NNNNNN>"`;
+- `Templates/README.md` и `Schemas/README.md` остаются singleton navigator-файлами и не получают hybrid artifact `ID` по умолчанию.
+
 ### Singleton domains
 Singleton domains не используют serial `ID` в filename и не масштабируются как serial-реестр файлов.
 
@@ -88,6 +105,11 @@ Singleton domains не используют serial `ID` в filename и не ма
 - semantic filename является каноническим способом локализации файла;
 - внутренний `ID` используется там, где singleton-артефакт является нормируемой сущностью;
 - serial `ID` в filename не требуется и не вводится по умолчанию.
+
+Для active governance singleton domains:
+- `Rules/*.md` используют semantic filename и внутренний `RULE-*` без migration filename;
+- `Standards/*.md` используют semantic filename и внутренний `STD-*` без migration filename;
+- domain `README.md` внутри singleton domains остаётся navigation-файлом и не получает отдельный artifact `ID`, если это не требуется отдельным contract.
 
 Для singleton log-files:
 - сам файл остаётся singleton path-артефактом;
@@ -127,7 +149,7 @@ Migration `ID scheme` в `BytePress` выполняется полностью, 
 Целевой порядок будущей migration по доменам:
 1. `planning contour`: завершено для plan-files, archive layout и backlog history-layer; active `Backlog.md` и `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` уже приведены к целевому contract.
 2. `logs`: завершено для существующего log-layer; singleton journal files сохранены, а serial `ID` и ссылочный слой log entries приведены к целевому contract без redesign других доменов.
-3. `rules / standards / templates / schemas`: выравнивание внутренних `ID`, semantic filenames и ссылочного слоя.
+3. `rules / standards / templates / schemas`: завершено для active governance/supporting layer; singleton filenames сохранены для `Rules/*` и `Standards/*`, а `Templates/*` и `Schemas/*` приведены к hybrid internal-ID contract без redesign других доменов.
 4. остальные домены: `Profiles/` и прочие hybrid/singleton domains, которые ещё требуют синхронизации под общую схему.
 
 Домены, уже приведённые к целевой схеме, не открываются повторно без отдельного pass на доказанное рассогласование.

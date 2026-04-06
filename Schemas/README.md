@@ -16,6 +16,7 @@
 
 ## Текущий контракт
 - внутренняя числовая часть `ID` во всех схемах `BytePress` содержит 6 знаков;
+- каждый active schema-file, кроме `Schemas/README.md`, несёт внутренний artifact `ID` в форме top-level `"$id": "SCH-<NNNNNN>"`;
 - схемы для serial- и hybrid-доменов фиксируют только внутренний `ID`, а не filename-правило;
 - `Profiles/` в `BytePress` сохраняют semantic filename, но внутренний `PROF ID` уже следует 6-значному формату;
 - `Schemas/*` и `Templates/*` должны оставаться синхронизированными по обязательным полям и примерам `ID`.

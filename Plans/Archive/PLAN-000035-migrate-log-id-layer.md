@@ -47,7 +47,7 @@ ID: PLAN-000035
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000035-migrate-log-id-layer.md`
+- `Plans/Archive/PLAN-000035-migrate-log-id-layer.md`
 - `Logs/*`
 - `Standards/Naming.md`
 - `Standards/Planning.md`

@@ -24,12 +24,14 @@ REQUIRED_SKILLS = [
     "Discussion.md", "Interview.md", "Research.md", "Requirements.md", "Planning.md",
     "Implementation.md", "Quality.md", "Review.md", "Release.md", "Support.md"
 ]
-REQUIRED_STANDARDS = ["Coding.md", "Documentation.md", "Planning.md", "Release.md", "Terminology.md"]
+REQUIRED_STANDARDS = ["Coding.md", "Documentation.md", "Naming.md", "Planning.md", "Quality.md", "Release.md", "Terminology.md", "Traceability.md"]
 REQUIRED_TOOLS = ["bp_lint.py", "bp_bootstrap.py", "bp_normalize_terms.py"]
 REQUIRED_ADAPTERS = ["README.md", "Policy.md", "Registry.md", "Codex/README.md", "Claude/README.md", "Gemini/README.md", "Local/README.md"]
 REQUIRED_MEMORY = ["README.md", "Model.md", "Boundaries.md", "Interfaces.md", "Registry.md"]
 REQUIRED_MCP = ["README.md", "Policy.md", "Interfaces.md", "Registry.md"]
 ID_LINE = re.compile(r"^ID:\s+\S+", re.MULTILINE)
+TEMPLATE_ID_LINE = re.compile(r"^<!-- ID:\s+TPL-[0-9]{6} -->$", re.MULTILINE)
+SCHEMA_ARTIFACT_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
 PRODUCT_PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULTILINE)
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
@@ -48,6 +50,24 @@ def check_has_id(path: Path) -> str | None:
         return None
     text = path.read_text(encoding="utf-8")
     if not ID_LINE.search(text):
+        return str(path)
+    return None
+
+
+def check_template_artifact_id(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if not TEMPLATE_ID_LINE.search(text):
+        return str(path)
+    return None
+
+
+def check_schema_artifact_id(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if not SCHEMA_ARTIFACT_ID.search(text):
         return str(path)
     return None
 
@@ -177,7 +197,45 @@ def main() -> int:
         if err:
             id_errors.append(err)
 
-    if missing or id_errors:
+    for rel in [
+        "Rules/Approval_Strictness.md",
+        "Rules/Contracts_Before_Mass_Content.md",
+        "Rules/Domain_Boundaries_Are_Explicit.md",
+        "Rules/Logs_Record_Facts_Only.md",
+        "Rules/No_Secrets_In_Git.md",
+        "Rules/Plans_Require_Approved_Backlog.md",
+        "Rules/Repository_As_Source_Of_Truth.md",
+        "Rules/Rules_Are_Not_Standards.md",
+        "Rules/Runtime_Is_Temporary.md",
+        "Rules/Terms_Governance.md",
+        "Standards/Coding.md",
+        "Standards/Documentation.md",
+        "Standards/Naming.md",
+        "Standards/Planning.md",
+        "Standards/Quality.md",
+        "Standards/Release.md",
+        "Standards/Terminology.md",
+        "Standards/Traceability.md",
+    ]:
+        err = check_has_id(root / rel)
+        if err:
+            id_errors.append(err)
+
+    template_id_errors: list[str] = []
+    for path in sorted((root / "Templates").glob("*.md")):
+        if path.name == "README.md":
+            continue
+        err = check_template_artifact_id(path)
+        if err:
+            template_id_errors.append(err)
+
+    schema_id_errors: list[str] = []
+    for path in sorted((root / "Schemas").glob("*.json")):
+        err = check_schema_artifact_id(path)
+        if err:
+            schema_id_errors.append(err)
+
+    if missing or id_errors or template_id_errors or schema_id_errors:
         if missing:
             print("Отсутствуют обязательные пути:")
             for item in missing:
@@ -185,6 +243,14 @@ def main() -> int:
         if id_errors:
             print("Файлы без обязательного поля ID:")
             for item in id_errors:
+                print(f"- {item}")
+        if template_id_errors:
+            print("Шаблоны без обязательного artifact ID:")
+            for item in template_id_errors:
+                print(f"- {item}")
+        if schema_id_errors:
+            print("Схемы без обязательного artifact ID:")
+            for item in schema_id_errors:
                 print(f"- {item}")
         return 1
     print("Структура BytePress, интеграционный и исполнительный контуры выглядят полными.")
