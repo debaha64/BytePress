@@ -47,7 +47,7 @@ ID: PLAN-000034
 ## Артефакты
 - `Plans/Backlog.md`
 - `Plans/Roadmap.md`
-- `Plans/PLAN-000034-remove-runtime-plan-legacy-tail.md`
+- `Plans/Archive/PLAN-000034-remove-runtime-plan-legacy-tail.md`
 - `Runtime/Plan.md`
 - `Standards/Planning.md`
 - `Plans/README.md`
@@ -64,6 +64,6 @@ ID: PLAN-000034
 ## Фактический результат
 - `BACK-000046` и `PLAN-000034` зафиксировали только cleanup-pass по legacy runtime tail planning-контура.
 - `Runtime/Plan.md` удалён из рабочего дерева, а `Tools/bp_bootstrap.py` больше не материализует этот legacy artifact.
-- предыдущий завершённый current `PLAN-000033` перемещён в `Plans/Archive/`, поэтому active `Plans/` снова содержит только singleton files и текущий `PLAN-000034`.
+- предыдущий завершённый current `PLAN-000033` перемещён в `Plans/Archive/`, поэтому active `Plans/` на момент закрытия pass снова содержал только singleton files и текущий `PLAN-000034`, после чего и этот план стал частью archive-layer.
 - `Standards/Planning.md`, `Plans/README.md`, `Standards/Naming.md` и `Docs/Terms/TERM-000009-plan.md` синхронизированы под завершённый planning-layer без legacy runtime plan.
 - `bp_lint.py` не менялся, потому что обязательный structural contract для репозитория не зависит от `Runtime/Plan.md`; `bp_lint contract unaffected`.

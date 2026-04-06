@@ -1,6 +1,7 @@
 # QualityLog
 
 ## QL-000035
+ID: QL-000035
 Дата: 2026-04-02
 Статус: пройдено
 Проверка: `BACK-000040` существует как реальная backlog-задача для перехода `Discussion -> Research -> Requirements -> Roadmap` и после завершения находится в секции `Завершённые`; индекс `Plans/Backlog.md` для `ROAD-000008` показывает `Активные: нет` и `Завершённые: BACK-000040, BACK-000037, BACK-000038, BACK-000039`; `Plans/Roadmap.md` переводит `ROAD-000008` в `Завершено`, содержит актуальные `Связанные_backlog: BACK-000037, BACK-000038, BACK-000039, BACK-000040` и больше не держит этап активным без активной задачи; `PLAN-000028` имеет статус `Завершено`; `Docs/Technical/Pipeline.md` явно фиксирует правило, что этап roadmap со статусом `В_работе` обязан иметь хотя бы одну backlog-задачу со статусом `В_работе`; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -9,6 +10,7 @@
 ---
 
 ## QL-000034
+ID: QL-000034
 Дата: 2026-04-01
 Статус: пройдено
 Проверка: существует `Docs/Discovery/Requirements.md` и он использует канонический шаблон `Templates/Requirements.md` без дублирования `Discussion` или `Research`; `Docs/Discovery/README.md` отражает фактический discovery-layer; `BACK-000038` закрыт как завершённый pass по `Research` без двусмысленного residual scope; `Plans/Roadmap.md` и `Plans/Backlog.md` согласованы по текущему этапу `ROAD-000008`, при этом `Requirements` уже введён как реальный артефакт, а следующий переход остаётся только candidate-level задачей этапа; `Tools/bp_lint.py` требует `Docs/Discovery/Requirements.md`; обязательная финальная governance-сверка пройдена: статус текущей backlog-задачи `BACK-000039` — `Завершено`, она находится в секции `Завершённые`, индекс `Backlog.md` это отражает, `ROAD-000008` имеет статус `В_работе` и актуальные `Связанные_backlog: BACK-000037, BACK-000038, BACK-000039`, `PLAN-000027` имеет статус `Завершено`; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -17,6 +19,7 @@
 ---
 
 ## QL-000033
+ID: QL-000033
 Дата: 2026-04-01
 Статус: пройдено
 Проверка: существует `Docs/Discovery/Research.md` и он использует канонический шаблон `Templates/Research.md` без дублирования `Discussion` или `Interview`; `Docs/Discovery/README.md` отражает фактический discovery-layer; `Plans/Roadmap.md` и `Plans/Backlog.md` согласованы по текущему этапу `ROAD-000008`, при этом `Requirements` остаётся будущей задачей; `Tools/bp_lint.py` требует `Docs/Discovery/Research.md`; обязательная финальная governance-сверка пройдена: статус текущей backlog-задачи `BACK-000038` — `В_работе`, она находится в секции `Активные`, индекс `Backlog.md` это отражает, `ROAD-000008` имеет статус `В_работе` и актуальные `Связанные_backlog`, `PLAN-000026` имеет статус `Завершено`; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -25,6 +28,7 @@
 ---
 
 ## QL-000032
+ID: QL-000032
 Дата: 2026-04-01
 Статус: пройдено
 Проверка: существует `Docs/Discovery/Discussion.md` и он использует канонический шаблон `Templates/Discussion.md` без превращения в стенограмму; `Docs/Discovery/README.md` отражает фактический discovery-layer; `Plans/Roadmap.md` и `Plans/Backlog.md` согласованы по текущему этапу `ROAD-000008`, при этом `Research` и `Requirements` остаются будущими задачами; `Tools/bp_lint.py` требует `Docs/Discovery/Discussion.md`; обязательная финальная governance-сверка пройдена: статус текущей backlog-задачи `BACK-000038` — `В_работе`, она находится в секции `Активные`, индекс `Backlog.md` это отражает, `ROAD-000008` имеет статус `В_работе` и актуальные `Связанные_backlog`, `PLAN-000025` имеет статус `Завершено`; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -33,6 +37,7 @@
 ---
 
 ## QL-000031
+ID: QL-000031
 Дата: 2026-04-01
 Статус: пройдено
 Проверка: `Plans/Roadmap.md` переводит `ROAD-000007` в `Завершено` и `ROAD-000008` в `В_работе`; `Plans/Backlog.md` больше не держит незавершённых хвостов у `ROAD-000007`, а `BACK-000037` переведён в `Завершено` и расположен в секции `Завершённые` этапа `ROAD-000008`; индекс backlog синхронизирован с фактическими секциями обоих этапов; `Docs/Technical/Pipeline.md` фиксирует место `Discussion`, `Research`, `Requirements` и правило `место -> шаблон -> артефакт`; существуют `Templates/Discussion.md`, `Templates/Research.md`, `Templates/Requirements.md`; `Tools/bp_lint.py` требует новые обязательные шаблоны; обязательная финальная governance-сверка пройдена: статус текущей backlog-задачи, её положение в секции, индекс `Backlog.md`, статус и `Связанные_backlog` текущего `ROAD-*`, а также статус текущего `Plan` согласованы; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -41,6 +46,7 @@
 ---
 
 ## QL-000030
+ID: QL-000030
 Дата: 2026-03-31
 Статус: пройдено
 Проверка: `Docs/Discovery/Interview.md` теперь явно фиксирует, что `Backlog` является производным от `Roadmap`, а `Plan` порождается из backlog-задачи; `Docs/Product/JTBD.md` и `Docs/Product/PRD.md` проверены и не противоречат current-truth интервью, текущему roadmap и product scope первой версии; `Plans/Backlog.md` больше не держит `BACK-000032` в секции `Активные` при статусе `Завершено`, а `BACK-000036` переведён в `Завершено` после закрытия pass; `Plans/Roadmap.md` использует актуальные `Связанные_backlog` и `Источник` для `ROAD-000007`; `PLAN-000023` и `BACK-000036` переведены в финальный статус по факту результата; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -49,6 +55,7 @@
 ---
 
 ## QL-000029
+ID: QL-000029
 Дата: 2026-03-31
 Статус: пройдено
 Проверка: `Docs/Technical/Pipeline.md` фиксирует полный канон фаз, условность `Release`, `Handover`, `Support` и правило `Roadmap -> Backlog -> Plan`; `Plans/Roadmap.md` приведён к непрерывной нумерации `ROAD-000001`...`ROAD-000014` с текущим этапом `ROAD-000007`; `Plans/Backlog.md` перегруппирован по `ROAD-*`, использует секции `Активные` и `Завершённые`, сохраняет историю закрытых задач, содержит реальные активные задачи `BACK-000032` и `BACK-000036` для `ROAD-000007` и candidate-only секции для `ROAD-000008`...`ROAD-000014`; порядок и индекс backlog выровнены, включая последние записи `BACK-000028`...`BACK-000031`; правило по шаблонам не нарушено; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -57,6 +64,7 @@
 ---
 
 ## QL-000028
+ID: QL-000028
 Дата: 2026-03-29
 Статус: пройдено
 Проверка: `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Docs/Technical/README.md` согласованно описывают назначение, статус `0.1.0`, участие в lifecycle, признак источника истины и границы подмены для `Runtime/`, `Pipeline/`, `Adapters/`, `Memory/` и `MCP/`; `Pipeline/README.md`, `Runtime/README.md`, `Adapters/README.md`, `Memory/README.md` и `MCP/README.md` приведены к тому же краткому participation contract; `README.md` не требовал обновления; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -65,6 +73,7 @@
 ---
 
 ## QL-000027
+ID: QL-000027
 Дата: 2026-03-29
 Статус: пройдено
 Проверка: существует `Docs/Technical/Artifact_Lifecycle.md`; документ кратко фиксирует источники истины, производные артефакты, порядок обязательной синхронизации и минимальный task-close checklist без дублирования полного `Pipeline.md`; `Docs/Technical/Pipeline.md` сокращён и ссылается на `Artifact_Lifecycle.md` как на точку детализации; `Docs/Technical/README.md` и `Docs/README.md` отражают новый technical artifact; `Tools/bp_lint.py` требует `Docs/Technical/Artifact_Lifecycle.md`; `Model.md` и `System_Invariants.md` не менялись, потому что новый lifecycle contract не создаёт противоречия в их текущем содержании; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -73,6 +82,7 @@
 ---
 
 ## QL-000026
+ID: QL-000026
 Дата: 2026-03-28
 Статус: пройдено
 Проверка: `BACK-000027` и `PLAN-000019` переведены в финальный статус; `AGENTS.md`, `Setup_Guide.md` и `Docs/Technical/Platform_Contracts.md` согласованно описывают `develop -> task branch -> серия локальных коммитов -> self-check после каждого коммита -> final push -> проверка существующего PR -> создание PR`; зафиксированы правило не использовать `--dry-run`, если установленный `gh` его не поддерживает, и fallback без автоматической переавторизации; `Plans/README.md` больше не содержит устаревшей конкретики о диапазоне plan-files; `Roles/Developer.md`, `Roles/QA.md` и `Roles/Release.md` больше не используют `Plans/PLAN-*.md`; follow-up в `Skills/*` не потребовался; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -81,6 +91,7 @@
 ---
 
 ## QL-000025
+ID: QL-000025
 Дата: 2026-03-28
 Статус: пройдено
 Проверка: выполнен repo-wide аудит активного слоя после product/discovery/sync-contract проходов; `README.md`, `AGENTS.md` и `Tools/README.md` отражают `Docs/Discovery/`, roadmap уровня крупных этапов и текущий lint contract; `Docs/Technical/Product_Bootstrap_Validation.md` согласован с фактическим минимальным product-layer canon; `Roles/Business_Analyst.md`, `Roles/System_Analyst.md`, `Roles/Architect.md`, `Skills/Interview.md` и `Skills/Planning.md` больше не используют устаревшие ссылки `Plans/PLAN-*.md` и учитывают `Docs/Discovery/Interview.md` как current-truth артефакт там, где это нужно; `Plans/Archive/PLAN-000017-discovery-and-sync-contract.md` очищен от дублирующегося артефакта; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; `bp_lint contract unaffected`.
@@ -89,6 +100,7 @@
 ---
 
 ## QL-000024
+ID: QL-000024
 Дата: 2026-03-28
 Статус: пройдено
 Проверка: существуют `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md`; `Docs/README.md` отражает новый слой `Discovery/`; `Plans/Roadmap.md` хранит только крупные этапы уровня системы и не перечисляет отдельные документные проходы; `Docs/Technical/Pipeline.md` содержит минимальную sync-matrix по проверке связанных артефактов после изменения `Interview`, `Docs/Product/*`, `Templates/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и `Plans/Roadmap.md`; `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/README.md` и `Plans/README.md` синхронизированы с новой моделью только в необходимой степени; `bp_lint.py` требует `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md`; `ADR-000017` зафиксировал discovery-domain, current-truth интервью и sync-contract как устойчивое архитектурное решение; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -97,6 +109,7 @@
 ---
 
 ## QL-000023
+ID: QL-000023
 Дата: 2026-03-28
 Статус: пройдено
 Проверка: `Templates/Delivery.md` существует, `Templates/README.md` перечисляет `JTBD.md`, `PRD.md`, `Delivery.md`, а `Docs/Product/Delivery.md` приведён к тем же разделам `Назначение`, `Модель передачи`, `Обязательные элементы поставки`, `Ограничения поставки`; `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md` отражают канонический минимальный набор `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`; `bp_bootstrap.py` материализует этот набор, а `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет полный минимальный `Docs/Product/*` слой в product repo; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне; bootstrap smoke-check выполнен через `python3 Tools/bp_bootstrap.py --name "Smoke Product" --product-code SP --brand-profile Default --target /tmp/bytepress-delivery-bJeblG`, затем `python3 Tools/bp_lint.py --repo /tmp/bytepress-delivery-bJeblG` прошёл, а файлы `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md` реально присутствуют в сгенерированном продукте.
@@ -105,6 +118,7 @@
 ---
 
 ## QL-000022
+ID: QL-000022
 Дата: 2026-03-27
 Статус: пройдено
 Проверка: `Docs/Product/` содержит только `README.md`, `JTBD.md`, `PRD.md`, `Delivery.md`; `Docs/Product/PRD.md` и `Docs/Product/JTBD.md` выровнены по `Templates/PRD.md` и `Templates/JTBD.md` без смешения с внутренними системными сущностями; `Docs/Product/Implementation_Plan.md` и `Docs/Product/Profiles.md` удалены как дубль и внепродуктовый документ; `Docs/Product/Bootstrap_Contract.md` и `Docs/Product/Bootstrap_Validation.md` перенесены в `Docs/Technical/Product_Bootstrap_Contract.md` и `Docs/Technical/Product_Bootstrap_Validation.md`; прямые ссылки в `Plans/Archive/PLAN-000005-adapters-memory-mcp-and-bootstrap.md`, `Plans/Archive/PLAN-000010-tools-contract-sync.md`, `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`, `Plans/Archive/PLAN-000012-migrate-historical-logs.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` синхронизированы; `python3 Tools/bp_lint.py --repo .` проходит после каждого коммита и на финальном прогоне.
@@ -113,6 +127,7 @@
 ---
 
 ## QL-000021
+ID: QL-000021
 Дата: 2026-03-19
 Статус: пройдено
 Проверка: `Setup_Guide.md` использует канонический пример release-ветки `release/000019-0.1.0-rc2`, а команды создания, PR в `main` и удаления ветки больше не показывают неканонический пример `release/0.1.0`; scope ограничен `Setup_Guide.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md`.
@@ -121,6 +136,7 @@
 ---
 
 ## QL-000020
+ID: QL-000020
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: `README.md` коротко фиксирует ценность `BytePress` как устойчивого контекста вокруг продукта, управляемого agent contour и снижения недетерминированности в SDLC; `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Release.md` согласованно описывают `release/*` как временную stabilizing branch только от `develop`, без feature-work, с PR только в `main`, удалением ветки после merge и возвратом release-only fixes в `develop` при необходимости.
@@ -129,6 +145,7 @@
 ---
 
 ## QL-000019
+ID: QL-000019
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: `BACK-000017` и `BACK-000018` в `Plans/Backlog.md` переведены в `Завершено`, а их статус теперь согласован с `PLAN-000006`, `CHG-000012` и `QL-000007`; scope ограничен только `Plans/Backlog.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` без изменения ADR, semver, tools, schemas, templates, terms, profiles и historical logs.
@@ -137,6 +154,7 @@
 ---
 
 ## QL-000018
+ID: QL-000018
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: orphan ID `BP-REQ-0001` удалён из `Plans/Archive/PLAN-000001-foundation.md` и `Plans/Archive/PLAN-000002-seed-docs-and-standards.md` без введения нового requirement ID; orphan ID `PIPE-0001` удалён из `Rules/Approval_Strictness.md` без введения нового pipeline ID namespace; смысл планов и правила сохранён через существующие `Основание`, `Связанные_backlog`, `Связанные_ADR`, описание и проверку; `Plans/Archive/PLAN-000014-cleanup-orphan-ids.md` и факт-записи текущего прохода добавлены без изменения historical logs, semver, `Schemas/*`, `Templates/*` и `Tools/*.py`.
@@ -145,6 +163,7 @@
 ---
 
 ## QL-000017
+ID: QL-000017
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: `Standards/Naming.md` и `Docs/Technical/Platform_Contracts.md` фиксируют current operational baseline `BytePress` как `0.1.0`, а активные non-log документы в `Docs/Technical/*`, `Docs/Product/*`, `Adapters/*`, `Memory/*`, `MCP/*`, `Pipeline/*`, `Plans/Backlog.md`, `Plans/Roadmap.md`, релевантных `Plans/BP-*`, `Tools/README.md`, `Rules/README.md`, `Standards/README.md` и `Skills/README.md` используют semver-метку `0.1.0` вместо `v1` там, где `v1` обозначал текущий baseline. `Logs/*`, `BP-REQ-0001`, `PIPE-0001`, `Schemas/*`, `Templates/*` и `Tools/*.py` не изменялись.
@@ -153,6 +172,7 @@
 ---
 
 ## QL-000016
+ID: QL-000016
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: `Logs/ADRlog.md`, `Logs/ChangeLog.md` и `Logs/QualityLog.md` переведены на 6-значный формат исторических `ADR/CHG/QL ID`; прямые ссылки на historical log IDs в `Plans/*`, `Docs/Technical/*`, `Docs/Product/*`, `Rules/*`, `Standards/*`, `Adapters/*`, `Tools/README.md` и `Plans/Backlog.md` синхронизированы; однозначные ссылки на старые `BACK/ROAD/PLAN` внутри historical logs приведены к уже действующему 6-значному формату; смысл записей, порядок, даты и текст истории не переписаны; `BP-REQ-0001` и `PIPE-0001` оставлены без изменений.
@@ -161,6 +181,7 @@
 ---
 
 ## QL-000015
+ID: QL-000015
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: активные non-log internal ID в `Plans/Backlog.md`, `Plans/Roadmap.md`, `Profiles/*`, `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Adapters/*`, `Memory/Registry.md`, `MCP/Registry.md`, `Docs/Technical/*` и `Docs/Technical/Product_Bootstrap_Contract.md` приведены к 6-значному формату; прямые ссылки на старые 4-значные `BACK/ROAD/PROF/RULE/STD/ROLE/SKILL/ADP/MEM/MCP ID` в активных non-log файлах синхронизированы; создан `Plans/Archive/PLAN-000011-migrate-active-nonlog-ids.md`; historical logs не переписывались; `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*` filenames и `Tools/*.py` оставлены вне scope.
@@ -169,6 +190,7 @@
 ---
 
 ## QL-000014
+ID: QL-000014
 Дата: 2026-03-18
 Статус: пройдено
 Проверка: `bp_bootstrap.py` требует `--name`, `--product-code`, `--brand-profile`, `--target`, валидирует существование brand profile в `BytePress`, не генерирует `product-code` автоматически, использует текущую дату выполнения, создаёт `Profiles/Product.md`, `Plans/<PRODUCT_CODE>-000001-product-initialization.md` и 6-значные `ROAD/BACK/PLAN/PROF ID`; `bp_lint.py` минимально синхронизирован с новым product bootstrap output contract; `Tools/README.md` и `Docs/Product/*` отражают фактический контракт; `Plans/Backlog.md` и `Plans/Archive/PLAN-000010-tools-contract-sync.md` фиксируют завершение прохода без изменения `Schemas/*`, `Templates/*`, `Docs/Terms/*`, `Profiles/*`, semver и historical logs migration.
@@ -177,6 +199,7 @@
 ---
 
 ## QL-000013
+ID: QL-000013
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: `Docs/Terms/*` приведены к filenames `TERM-<NNNNNN>-<slug>.md`, внутренние `TERM ID` выровнены до `TERM-000001`...`TERM-000016`, `Base_Terms.md` и прямые term-ссылки в `Docs/Technical/Model.md`, `Plans/Archive/PLAN-000003-fill-technical-and-rules.md`, `Plans/Archive/PLAN-000004-fill-skills-and-tools.md`, `Standards/*`, `Rules/Terms_Governance.md` и `Logs/ADRlog.md` синхронизированы; `bp_normalize_terms.py` принимает новый 6-значный filename pattern и продолжает пересобирать `Base_Terms.md`; `Plans/Backlog.md` и `Plans/Archive/PLAN-000009-migrate-terms-layer.md` отражают фактическое завершение migration-pass без изменения `Schemas/*`, `Templates/*`, `Profiles/*`, `bp_bootstrap.py`, `bp_lint.py`, semver и historical logs.
@@ -185,6 +208,7 @@
 ---
 
 ## QL-000012
+ID: QL-000012
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: `Schemas/*` и `Templates/*` приведены к 6-значной числовой части `ID`, `Schemas/README.md` и `Templates/README.md` синхронизированы с новым контрактом; `profile.schema.json`, `Templates/Profile.md`, `Profiles/README.md`, `Profiles/Default.md` и `Profiles/Speculorg.md` согласованно отражают `Тип_профиля`, `Код_продукта`, `Язык_взаимодействия`, semantic filename для brand profiles и хранение product profiles только в product repo; в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Standards/Documentation.md` зафиксирован английский язык для commit/PR artifacts и `branch slug`; `Plans/Backlog.md` и `Plans/Archive/PLAN-000008-schemas-templates-profiles-and-language-sync.md` обновлены только в пределах текущего migration-pass; журналы отражают только факты этого прохода.
@@ -193,6 +217,7 @@
 ---
 
 ## QL-000011
+ID: QL-000011
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: в `Standards/Naming.md` зафиксирована repo-wide policy фазной миграции ID, категории serial/hybrid/singleton-доменов, hybrid-правило для `Terms/` и `Profiles/`, а также поздняя отдельная фаза для historical logs; в `Docs/Technical/Model.md`, `Docs/Terms/README.md` и `Profiles/README.md` policy отражена согласованно; в `Plans/Backlog.md` уточнены scope `BACK-000021` и `BACK-000022`, добавлены `BACK-000023` и `BACK-000024`; создан `Plans/Archive/PLAN-000007-id-migration-policy-and-phase-plan.md`; журналы обновлены только фактами policy-прохода без запуска rewrite-pass.
@@ -201,6 +226,7 @@
 ---
 
 ## QL-000010
+ID: QL-000010
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: remaining plan layer переведён в канонические файлы `BP-000002`...`BP-000006`, внутренние `ID` планов выровнены до `PLAN-000002`...`PLAN-000006`, прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md`, `Docs/Technical/Product_Bootstrap_Validation.md` и `Tools/bp_lint.py` обновлены под новый канон. `PLAN-000006` переведён в `Завершено`, так как его DoD уже фактически закрыт артефактами branch lifecycle, Auto-PR process и подготовкой входа в большой аудит, отражёнными в `AGENTS.md`, `Setup_Guide.md`, `Docs/Technical/Platform_Contracts.md`, `Plans/Backlog.md`, `Logs/ADRlog.md`, `Logs/ChangeLog.md` и предыдущем `QL-000007`.
@@ -209,6 +235,7 @@
 ---
 
 ## QL-000009
+ID: QL-000009
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: foundation-план BytePress приведён к каноническому файлу `Plans/Archive/PLAN-000001-foundation.md`, legacy-дубль `Plans/Plan_BP-0001_BytePress_V1.md` удалён, `ID` плана выровнен до `PLAN-000001`, статус выровнен до `Завершено`, продуктовый слой больше не хранит отдельный дубль foundation-плана, а прямые ссылки в `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ADRlog.md` и `Logs/ChangeLog.md` обновлены на новый `ID`. Журналы обновлены только как исполнение уже принятого naming contract без нового архитектурного решения.
@@ -217,6 +244,7 @@
 ---
 
 ## QL-000008
+ID: QL-000008
 Дата: 2026-03-17
 Статус: пройдено
 Проверка: в `Standards/Naming.md` зафиксированы 6-значная числовая часть ID, `kebab-case` для `slug`, запрет дублирования родительского каталога и каноническое имя plan-file `Plans/<PRODUCT_CODE>-<NNNNNN>-<slug>.md`; в `Docs/Technical/Model.md` и `Profiles/README.md` зафиксирована модель `brand profile` / `product profile`; в `Plans/README.md` текущий слой `Plans/*` явно помечен как legacy; в `Plans/Backlog.md` добавлены отдельные задачи на нормализацию `Plans/*`, а также на приведение `Schemas/*`, `Templates/*` и `Tools/*` к новому контракту; журналы обновлены только фактическими контрактными решениями этого прохода.
@@ -225,6 +253,7 @@
 ---
 
 ## QL-000007
+ID: QL-000007
 Дата: 2026-03-14
 Статус: пройдено
 Проверка: branch lifecycle и целевой Auto-PR process зафиксированы в `AGENTS.md`, `Docs/Technical/Platform_Contracts.md` и `Setup_Guide.md`; добавлены `BACK-000017`, `BACK-000018`, `BACK-000019` и `PLAN-000006`; журналы обновлены только фактами этого прохода.
@@ -233,6 +262,7 @@
 ---
 
 ## QL-000006
+ID: QL-000006
 Дата: 2026-03-14
 Статус: пройдено_частично
 Проверка: подтверждён рабочий агентный Git-контур (`task branch -> push -> PR -> human approve -> human merge`), добавлены карты `README.md` и `AGENTS.md`, зафиксированы минимальные обновления в платформенных контрактах и naming.
@@ -241,6 +271,7 @@
 ---
 
 ## QL-000005
+ID: QL-000005
 Дата: 2026-03-10
 Статус: пройдено
 Проверка: `Adapters/`, `Memory/` и `MCP/` приведены к согласованному каркасу, `bp_bootstrap.py` усилен, выполнена тестовая генерация продуктового каркаса, `bp_lint.py` проходит.
@@ -249,6 +280,7 @@
 ---
 
 ## QL-000004
+ID: QL-000004
 Дата: 2026-03-10
 Статус: пройдено
 Проверка: библиотека навыков приведена к единому формату, инструменты `bp_bootstrap.py`, `bp_normalize_terms.py` и `bp_lint.py` усилены, роли и профили согласованы с новым исполнительным контуром, `bp_lint.py` проходит.
@@ -257,6 +289,7 @@
 ---
 
 ## QL-000003
+ID: QL-000003
 Дата: 2026-03-10
 Статус: пройдено
 Проверка: `Docs/Technical/*` и `Rules/*` усилены, новые backlog-элементы, ADR и ChangeLog-записи добавлены, `bp_lint.py` проходит.
@@ -265,6 +298,7 @@
 ---
 
 ## QL-000002
+ID: QL-000002
 Дата: 2026-03-10
 Статус: пройдено
 Проверка: базовые термины вынесены в отдельные файлы, стандарты усилены, журналы дополнены записями, `bp_lint.py` проходит.
@@ -273,6 +307,7 @@
 ---
 
 ## QL-000001
+ID: QL-000001
 Дата: 2026-03-09
 Статус: предварительная фиксация
 Проверка: каркас BytePress v1 собран согласно финальным ответам интервью.
