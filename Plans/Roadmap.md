@@ -200,16 +200,16 @@ ID: ROAD-000010
 ID: ROAD-000011
 Этап: Контур проверок и верификации (Verification and Validation Contour)
 Статус: В_работе
-Связи: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053, PLAN-000054
-Источник: PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053, PLAN-000054
+Связи: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067, PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053, PLAN-000054, PLAN-000055
+Источник: PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053, PLAN-000054, PLAN-000055
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Собрать контур проверок и верификации поверх обновлённой operating model и технической карты системы без смешения verification-work с самой нормализацией техслоя.
 Зависимости: ROAD-000010
-Связанные_backlog: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066
+Связанные_backlog: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067
 
 ### Описание
-Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Затем `Docs/Technical/Verification.md` был пересобран в contract map verification-layer с классами checks, inputs, outputs, evidence и ownership результата. Следующий завершённый pass ввёл `Verification_Levels.md`, чтобы зафиксировать уровни verification и target split будущих `bp_check / bp_verify`. Затем был зафиксирован tooling boundary verification-контура в `Tools/README.md`. Текущий завершённый pass ввёл `Verification_Evidence.md`, чтобы зафиксировать contract verification evidence: виды evidence, обязательность по классам checks, storage и linkage к pass-close contour без реализации нового toolchain и без открытия `ROAD-000012`.
+Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Затем `Docs/Technical/Verification.md` был пересобран в contract map verification-layer с классами checks, inputs, outputs, evidence и ownership результата. Следующий завершённый pass ввёл `Verification_Levels.md`, чтобы зафиксировать уровни verification и target split будущих `bp_check / bp_verify`. Затем был зафиксирован tooling boundary verification-контура в `Tools/README.md`. Следующий завершённый pass ввёл `Verification_Evidence.md`, чтобы зафиксировать contract verification evidence: виды evidence, обязательность по классам checks, storage и linkage к pass-close contour без реализации нового toolchain. Текущий pass выделяет общий `Validation.md`, чтобы развести validation и verification, связать validation с evidence, pass-close contour и phase gates без открытия `ROAD-000012`.
 
 ---
 

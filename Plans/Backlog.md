@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000067 | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,7 +38,19 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-- нет
+#### BACK-000067 — Зафиксировать границы validation-layer
+ID: BACK-000067
+Название: Зафиксировать границы validation-layer
+Тип: Документация
+Приоритет: Критический
+Статус: В_работе
+Связи: ROAD-000011, PLAN-000055
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-08
+Дата_изменения: 2026-04-08
+
+##### Описание
+Создать `Docs/Technical/Validation.md` и зафиксировать место validation-layer в системе: развести validation и verification, определить inputs/outputs, связь с evidence, phase gates и pass-close contour без реализации нового toolchain.
 
 ### Завершённые
 

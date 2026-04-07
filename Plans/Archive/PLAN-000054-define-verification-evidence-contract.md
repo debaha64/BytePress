@@ -46,7 +46,7 @@ ID: PLAN-000054
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000054-define-verification-evidence-contract.md`
+- `Plans/Archive/PLAN-000054-define-verification-evidence-contract.md`
 - `Plans/Archive/PLAN-000053-define-verification-tooling-boundary.md`
 - `Docs/Technical/Verification.md`
 - `Docs/Technical/Verification_Levels.md`
