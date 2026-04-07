@@ -47,7 +47,7 @@ ID: PLAN-000046
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000046-clarify-technical-platform-contracts.md`
+- `Plans/Archive/PLAN-000046-clarify-technical-platform-contracts.md`
 - `Plans/Archive/PLAN-000045-clarify-technical-system-invariants.md`
 - `Docs/Technical/Platform_Contracts.md`
 - `Docs/Technical/README.md`

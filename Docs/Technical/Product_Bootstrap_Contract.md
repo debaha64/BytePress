@@ -1,53 +1,241 @@
 # Product Bootstrap Contract
 
 ## Назначение
-Этот документ фиксирует, какой минимальный продуктовый каркас обязан уметь материализовать `bp_bootstrap.py` в `BytePress 0.1.0`.
+`Docs/Technical/Product_Bootstrap_Contract.md` является каноническим bootstrap-contract текущего `BytePress`.
 
-## CLI contract
-Обязательные параметры:
+Этот document отвечает на вопросы:
+- какой минимальный product repo обязан materialize `Tools/bp_bootstrap.py`;
+- какие артефакты bootstrap обязан создать сразу;
+- какие слои bootstrap инициализирует только как каркас;
+- где проходит граница bootstrap-ответственности;
+- какие bootstrap-пропуски и упрощения считаются допустимыми или недопустимыми.
+
+## Место документа в technical-layer
+`Product_Bootstrap_Contract.md` является supporting technical-document, а не частью required core.
+
+Его роль:
+- фиксировать expected outcome bootstrap materialization;
+- удерживать один канонический contract минимального product skeleton;
+- не дублировать `README.md` как карту technical-layer;
+- не дублировать `Platform_Contracts.md` как contract среды и tool perimeter;
+- не дублировать `Artifact_Lifecycle.md` как lifecycle и sync-loop matrix;
+- не дублировать `Interfaces.md` как карту touchpoints;
+- не дублировать `Product_Bootstrap_Validation.md` как документ фактической проверки результата.
+
+## Чем bootstrap-contract отличается от соседних документов
+- `README.md` отвечает за карту technical-layer и его required/supporting split.
+- `Platform_Contracts.md` отвечает за рабочую платформу, execution assumptions и supported tool perimeter.
+- `Artifact_Lifecycle.md` отвечает за источники истины и обязательные sync-loop.
+- `Interfaces.md` отвечает за допустимые точки стыка и service interfaces.
+- `Product_Bootstrap_Contract.md` отвечает за то, что именно должен создать bootstrap и где заканчивается его ответственность.
+- `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за подтверждённый результат проверки bootstrap behavior.
+
+## Связь с `Tools/bp_bootstrap.py`
+`Tools/bp_bootstrap.py` является materializer этого контракта.
+
+Это означает:
+- contract первичен как человеко-читаемое описание ожидаемого bootstrap outcome;
+- `bp_bootstrap.py` обязан оставаться согласованным с этим document;
+- расширение bootstrap behavior без документной синхронизации считается contract drift;
+- validation проходит против materialized result, а не заменяет сам contract.
+
+## CLI contract bootstrap
+### Обязательные параметры
 - `--name`
 - `--product-code`
 - `--brand-profile`
 - `--target`
 
-Правила:
-- `--product-code` обязателен, содержит 2-3 символа верхнего регистра и не генерируется автоматически;
-- без `--product-code` bootstrap не запускается;
-- `--brand-profile` обязателен и должен указывать на существующий `brand profile` в репозитории `BytePress`;
-- при отсутствии указанного brand profile bootstrap завершается понятной ошибкой.
+### Обязательные правила параметров
+- `--name` не должен быть пустым;
+- `--product-code` обязателен и содержит 2-3 символа верхнего регистра;
+- `--product-code` не генерируется автоматически;
+- `--brand-profile` обязателен и должен ссылаться на существующий brand profile в `BytePress`;
+- указанный profile должен иметь `Тип_профиля: brand`;
+- brand profile обязан содержать `Язык_взаимодействия`;
+- при нарушении этих условий bootstrap завершается явной ошибкой, а не создаёт частично догаданный outcome.
 
-## Минимальный состав продукта
+## Минимальный outcome bootstrap
+Bootstrap materialize отдельный product repo с минимальным initialized state, пригодным для первого предметного pass.
+
+Минимальный outcome включает:
+- отдельный target-репозиторий продукта вне дерева самого `BytePress`;
+- базовую структуру каталогов `Docs/`, `Runtime/`, `Plans/`, `Logs/`, `Profiles/`, `Adapters/`, `scripts/`;
+- минимальный product-layer с базовыми content placeholders;
+- минимальный technical-layer продукта только в объёме стартовых singleton docs;
+- initial planning contour продукта;
+- базовые logs и project entry scripts.
+
+Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его минимально инициализированным и пригодным к следующему управляемому pass.
+
+## Обязательные создаваемые артефакты и слои
+### Репозиторный каркас
+Bootstrap обязан создать:
+- `.gitignore`
 - `README.md`
 - `Setup_Guide.md`
+
+### Product knowledge layer
+Bootstrap обязан создать:
 - `Docs/User/README.md`
 - `Docs/Product/README.md`
 - `Docs/Product/JTBD.md`
 - `Docs/Product/PRD.md`
 - `Docs/Product/Delivery.md`
+
+Эти документы создаются как минимальный стартовый content skeleton, а не как полностью предметно заполненный product package.
+
+### Technical layer продукта
+Bootstrap обязан создать:
 - `Docs/Technical/README.md`
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/Interfaces.md`
 - `Docs/Technical/System_Invariants.md`
+
+Bootstrap не обязан создавать для product repo полный `BytePress` technical core. В текущем contract он materialize только минимальный стартовый technical subset, достаточный для первого product initialization pass.
+
+### Terminology layer
+Bootstrap обязан создать:
 - `Docs/Terms/README.md`
 - `Docs/Terms/Base_Terms.md`
-- `Profiles/Product.md`
-- `Runtime/*`
-- `Plans/README.md`, `Plans/Roadmap.md`, `Plans/Backlog.md`, initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md`
-- `Logs/README.md`, `ChangeLog.md`, `ADRlog.md`, `QualityLog.md`, `ReleaseLog.md`, `SupportLog.md`
-- `Adapters/README.md` и базовые каталоги адаптеров
-- `scripts/` с управляемыми точками входа проекта
 
-## Инварианты
-- продукт создаётся как отдельный репозиторий;
-- продукт не содержит копию системных доменов `BytePress`, не относящихся к продукту;
-- продукт не зависит на выполнение от исходного репозитория `BytePress`;
-- продукт получает только минимальный пригодный каркас и может далее развиваться отдельно;
-- продуктовый слой bootstrap ограничен каноническим набором `README`, `JTBD`, `PRD`, `Delivery`;
-- bootstrap использует 6-значные ID: `ROAD-000001`, `BACK-000001`, `PLAN-000001`, `PROF-000001` и аналогичные;
-- bootstrap использует текущую дату выполнения, а не жёстко зашитые даты;
-- из brand profile наследуются только `Брендовый_профиль` и `Язык_взаимодействия`.
+### Runtime layer
+Bootstrap обязан создать:
+- `Runtime/README.md`
+- `Runtime/Context.md`
+- `Runtime/Task.md`
+- `Runtime/Session_Log.md`
+- `Runtime/Handover.md`
+
+Эти артефакты инициализируют runtime-carrier, но не заполняют его фактическим состоянием beyond bootstrap baseline.
+
+### Planning layer
+Bootstrap обязан создать:
+- `Plans/README.md`
+- `Plans/Roadmap.md`
+- `Plans/Backlog.md`
+- initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md`
+
+Planning outcome должен удовлетворять текущему bootstrap contract:
+- roadmap использует `ROAD-000001`;
+- backlog использует `BACK-000001`;
+- initial plan имеет внутренний `ID: PLAN-000001`;
+- filename initial plan использует product code prefix, а не filename вида `PLAN-000001-*`.
+
+### Fact layer
+Bootstrap обязан создать:
+- `Logs/README.md`
+- `Logs/ChangeLog.md`
+- `Logs/ADRlog.md`
+- `Logs/QualityLog.md`
+- `Logs/ReleaseLog.md`
+- `Logs/SupportLog.md`
+
+### Governance and integration skeleton
+Bootstrap обязан создать:
+- `Profiles/Product.md`
+- `Adapters/README.md`
+- `Adapters/Codex/README.md`
+- `Adapters/Claude/README.md`
+- `Adapters/Gemini/README.md`
+- `Adapters/Local/README.md`
+
+### Project entry scripts
+Bootstrap обязан создать:
+- `scripts/README.md`
+- `scripts/dev-up.sh`
+- `scripts/dev-down.sh`
+- `scripts/dev-test.sh`
+
+## Что bootstrap materialize только как каркас
+Bootstrap создаёт каркас, но не завершённое содержательное состояние, для:
+- `Docs/Product/*` — только стартовый first-version content skeleton;
+- `Docs/Technical/*` продукта — только minimal startup subset, а не полный system contract map;
+- `Runtime/*` — только carrier для дальнейшего execution context;
+- `Plans/*` — только начальный stage/task/pass baseline, а не готовый предметный backlog;
+- `Logs/*` — только empty or near-empty fact containers;
+- `Adapters/*` и `scripts/*` — только managed entry skeleton без полноценной интеграционной логики.
+
+## Что bootstrap сознательно не обязан делать
+Bootstrap не обязан:
+- копировать в product repo полный доменный состав самого `BytePress`;
+- создавать `Pipeline/`, `Rules/`, `Standards/`, `Schemas/`, `Templates/`, `Skills/`, `Memory/` или `MCP/` внутри product repo;
+- materialize `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Platform_Contracts.md` или другие advanced technical contracts продукта;
+- создавать предметно завершённые product requirements, delivery model или terminology base;
+- открывать несколько roadmap stages, backlog items или plans;
+- автоматически генерировать `product-code`, brand inheritance beyond allowed fields или скрытые external integrations;
+- превращать product repo в копию operational/governance contour самого `BytePress`.
+
+## Bootstrap boundaries
+### Граница ответственности
+Bootstrap отвечает за:
+- создание минимально согласованного product repo;
+- соблюдение naming/profile/date baseline текущего контракта;
+- materialization только того skeleton, который нужен для первого управляемого product pass.
+
+Bootstrap не отвечает за:
+- предметное наполнение продукта;
+- полный technical normalization product repo;
+- release readiness продукта;
+- продуктовую verification-model beyond base structural check;
+- последующие passes после initial product initialization.
+
+### Допущения
+Bootstrap предполагает, что:
+- target path доступен для записи;
+- `BytePress` выступает source repo для bootstrap;
+- выбранный brand profile уже существует и валиден;
+- дальнейшее предметное наполнение выполнит следующий pass, а не сам bootstrap.
+
+## Допустимые и недопустимые упрощения
+### Допустимые упрощения
+- создавать product docs как короткие стартовые placeholders;
+- ограничивать technical layer продукта минимальным subset;
+- ограничивать planning layer одной стартовой stage/task/pass цепочкой;
+- ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
+- создавать logs как пустые или почти пустые singleton containers.
+
+### Недопустимые упрощения и пропуски
+- не создавать один из обязательных singleton artifacts минимального outcome;
+- создавать initial plan без внутреннего `ID: PLAN-000001`;
+- пропускать `Profiles/Product.md` или нарушать `Тип_профиля: product`;
+- silently подставлять отсутствующий `brand profile` или auto-generate `product-code`;
+- считать bootstrap завершённым, если product repo не проходит базовый structural check;
+- переносить в bootstrap contract обязанности validation-layer или последующих предметных passes.
+
+## Связь с validation-layer
+`Product_Bootstrap_Contract.md` задаёт expected bootstrap obligations.
+
+`Product_Bootstrap_Validation.md`:
+- фиксирует, что уже было фактически проверено;
+- подтверждает sync между contract и реализованным bootstrap behavior;
+- не заменяет сам contract и не задаёт новые bootstrap obligations.
+
+Если validation document и `bp_bootstrap.py` расходятся, каноническое исправление должно сначала синхронизировать contract или bootstrap behavior, а не подменять contract одним validation result.
+
+## Отношение bootstrap-contract к соседним контурам
+### К `Plans/*`
+Bootstrap обязан materialize только initial planning contour продукта. Дальнейший planning-state создаётся уже внутри product repo и не принадлежит bootstrap contract `BytePress`.
+
+### К `Platform_Contracts.md`
+Platform contract задаёт execution perimeter и tool assumptions. Bootstrap contract задаёт expected product repo outcome внутри этого периметра.
+
+### К `Artifact_Lifecycle.md`
+Lifecycle contract задаёт sync-loop и source-of-truth matrix. Bootstrap contract задаёт только initial materialized product state до дальнейших lifecycle-переходов.
+
+### К `Interfaces.md`
+Interface contract задаёт touchpoints между доменами. Bootstrap contract задаёт, какие минимальные domain entrypoints и skeleton files должны появиться после bootstrap.
+
+## Граница документа
+`Product_Bootstrap_Contract.md` не является:
+- картой technical-layer как каталога;
+- platform-contract document;
+- lifecycle-checklist;
+- validation report;
+- process-canon document.
+
+Он остаётся каноническим contract того, какой минимальный product repo обязан materialize `BytePress` bootstrap.
 
 ## Связи
 - `ADR-000009`
-- `BACK-000016`
 - `CHG-000009`
