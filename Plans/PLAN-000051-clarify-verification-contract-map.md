@@ -2,7 +2,7 @@
 
 ID: PLAN-000051
 Название: Пересобрать contract map verification-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000063
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-07
@@ -62,4 +62,7 @@ ID: PLAN-000051
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- В работе.
+- `Docs/Technical/Verification.md` пересобран из boundary-document в contract map verification-layer с явными классами checks, inputs, outputs, evidence forms и ownership интерпретации результата.
+- Automatic checks, procedural checks и process gates разведены без переноса gate policy в `Pipeline/*` или tooling implementation в `Docs/Technical/*`.
+- `Artifact_Lifecycle.md`, `Pipeline/Phase_Gates.md`, `Docs/Technical/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`

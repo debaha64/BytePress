@@ -209,7 +209,7 @@ ID: ROAD-000011
 Связанные_backlog: BACK-000062, BACK-000063
 
 ### Описание
-Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Текущий pass углубляет `Docs/Technical/Verification.md` до contract map verification-layer без запуска нового toolchain и без открытия `ROAD-000012`.
+Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Следующий завершённый pass пересобрал `Docs/Technical/Verification.md` в contract map verification-layer с классами checks, inputs, outputs, evidence и ownership результата без запуска нового toolchain и без открытия `ROAD-000012`.
 
 ---
 
