@@ -65,7 +65,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Pipeline.md`
   Роль: supporting technical view на участие `Pipeline/` в системе; не является каноническим phase registry и не заменяет `Pipeline/*`.
 - `Platform_Contracts.md`
-  Роль: контекстный contract среды выполнения и рабочего периметра.
+  Роль: канонический supporting contract рабочей платформы, среды исполнения и tool perimeter.
 - `Product_Bootstrap_Contract.md`
   Роль: специализированный technical contract минимального product bootstrap.
 - `Product_Bootstrap_Validation.md`
@@ -103,7 +103,7 @@ Technical-layer нужен для ответа на вопросы:
 - `System_Invariants.md` — недопустимые нарушения системного контракта.
 - `Artifact_Lifecycle.md` — порядок обязательной синхронизации и lifecycle технических артефактов.
 - `Pipeline.md` — supporting technical view на роль `Pipeline/` в общей системе.
-- `Platform_Contracts.md` — контракт среды выполнения и рабочего периметра.
+- `Platform_Contracts.md` — канонический supporting contract среды выполнения, platform assumptions и tool perimeter.
 - `Product_Bootstrap_Contract.md` — минимальный bootstrap contract продукта.
 - `Product_Bootstrap_Validation.md` — зафиксированный результат проверки bootstrap-контракта.
 

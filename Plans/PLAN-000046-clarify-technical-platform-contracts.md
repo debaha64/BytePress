@@ -2,7 +2,7 @@
 
 ID: PLAN-000046
 Название: Пересобрать Platform_Contracts.md как platform-contract
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000058
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -70,4 +70,8 @@ ID: PLAN-000046
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- в работе
+- `Docs/Technical/Platform_Contracts.md` пересобран как канонический platform-contract текущего `BytePress`: теперь он явно фиксирует supported execution environment, platform assumptions, supported tool perimeter, роли ключевых инструментов, допустимые режимы platform usage и недопустимые anti-patterns без смешения с architecture, model, lifecycle, interfaces, invariants или process-canon.
+- `Docs/Technical/README.md` синхронизирован минимально: supporting role `Platform_Contracts.md` теперь описана как канонический platform/tool contract, а не как расплывчатый контекстный document.
+- `bp_bootstrap.py` не менялся, потому что `Platform_Contracts.md` остаётся supporting technical-document и текущий bootstrap contract не требует materialize его как обязательный active artifact.
+- `bp_lint.py` не менялся, потому что audit не подтвердил необходимости переводить `Platform_Contracts.md` в required core или делать его обязательным structural check.
+- `bp_lint contract unaffected`
