@@ -2,7 +2,7 @@
 
 ID: PLAN-000045
 Название: Пересобрать System_Invariants.md как invariant-contract
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000057
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -65,3 +65,10 @@ ID: PLAN-000045
 - `Docs/Technical/System_Invariants.md` является ясным invariant-contract текущей системы.
 - разведение `System_Invariants.md`, `README.md`, `Architecture.md`, `Model.md`, `Artifact_Lifecycle.md`, `Interfaces.md` и `Pipeline/*` описано ясно и без новой двусмысленности.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Docs/Technical/System_Invariants.md` пересобран как канонический invariant-contract текущего `BytePress`: в одном document теперь явно собраны repository/source-of-truth, planning, ownership, active/archive, traceability, process и tooling invariants, а также нарушения и их последствия.
+- для pass не потребовался отдельный шаблон: existing `Templates/Document.md` достаточен как общий singleton-document template, поэтому новый special template не вводился.
+- `bp_bootstrap.py` не менялся, потому что bootstrap уже materialize `Docs/Technical/System_Invariants.md` в product skeleton и новый pass не меняет сам bootstrap path-contract.
+- `bp_lint.py` минимально синхронизирован: required core `System_Invariants.md` теперь обязателен и для active `BytePress`, а не только для product bootstrap contract.
+- `bp_lint contract affected`
