@@ -182,17 +182,17 @@ ID: ROAD-000009
 ## ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
 ID: ROAD-000010
 Этап: Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
-Статус: В_работе
-Связи: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059, BACK-000060, PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044, PLAN-000045, PLAN-000046, PLAN-000047, PLAN-000048
-Источник: PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044, PLAN-000045, PLAN-000046, PLAN-000047, PLAN-000048
+Статус: Завершено
+Связи: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059, BACK-000060, BACK-000061, PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044, PLAN-000045, PLAN-000046, PLAN-000047, PLAN-000048, PLAN-000049
+Источник: PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044, PLAN-000045, PLAN-000046, PLAN-000047, PLAN-000048, PLAN-000049
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Определить границы `Docs/Technical/*`, минимальный состав technical-layer и карту системных контрактов без смешения technical knowledge-layer с `Pipeline/*` и planning/governance контуром.
 Зависимости: ROAD-000009
-Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059, BACK-000060
+Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059, BACK-000060, BACK-000061
 
 ### Описание
-Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, model-core pass пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы, artifact-lifecycle pass пересобрал `Artifact_Lifecycle.md` как lifecycle-contract источников истины, обязательных sync-loop и допустимых переходов между active, archive, runtime и log слоями, interfaces-core pass пересобрал `Interfaces.md` как канонический contract внутренних и внешних интерфейсов, stable/service/derived touchpoints и недопустимых обходов системных границ, invariants-core pass пересобрал `System_Invariants.md` как канонический contract ненарушаемых системных свойств и минимально синхронизировал lint с required core technical-layer, platform-contract pass пересобрал `Platform_Contracts.md` как канонический contract рабочей платформы, execution environment и supported tool perimeter без перевода этого документа в required core, bootstrap-contract pass пересобрал `Product_Bootstrap_Contract.md` как канонический contract minimal product bootstrap outcome, bootstrap obligations и bootstrap boundaries вокруг `bp_bootstrap.py`, а bootstrap-validation pass пересобрал `Product_Bootstrap_Validation.md` как канонический validation-contract bootstrap-result, acceptance criteria, automatic/procedural check split и validation boundaries без расширения bootstrap behavior или lint perimeter beyond фактического active contract.
+Этап завершён: boundary-pass зафиксировал назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, после чего contract-map pass подтвердил required core и supporting technical-documents. Отдельные passes пересобрали `Architecture.md`, `Model.md`, `Artifact_Lifecycle.md`, `Interfaces.md`, `System_Invariants.md`, `Platform_Contracts.md`, `Product_Bootstrap_Contract.md` и `Product_Bootstrap_Validation.md` как согласованную карту системных контрактов; финальный audit-pass не подтвердил реального residual gap в active technical layer, bootstrap/lint perimeter или planning sync, поэтому `ROAD-000010` закрыт без candidate tail и без автоматической активации `ROAD-000011`.
 
 ---
 

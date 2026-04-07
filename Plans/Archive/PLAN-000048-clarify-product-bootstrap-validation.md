@@ -47,7 +47,7 @@ ID: PLAN-000048
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000048-clarify-product-bootstrap-validation.md`
+- `Plans/Archive/PLAN-000048-clarify-product-bootstrap-validation.md`
 - `Plans/Archive/PLAN-000047-clarify-product-bootstrap-contract.md`
 - `Docs/Technical/Product_Bootstrap_Validation.md`
 - `Docs/Technical/Product_Bootstrap_Contract.md`
