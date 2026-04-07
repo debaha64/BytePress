@@ -75,6 +75,8 @@ Technical-layer нужен для ответа на вопросы:
   Роль: boundary-document verification-layer, automatic/procedural checks и их границ относительно `Pipeline` и `Tools`.
 - `Verification_Levels.md`
   Роль: supporting document уровней verification-контура и target contract будущих `bp_check / bp_verify`.
+- `Validation.md`
+  Роль: boundary-document validation-layer, который разводит outcome confirmation, verification evidence и process gates.
 
 Вспомогательные документы не образуют required ядро сами по себе. Они уточняют специализированные части системы и могут меняться точечно, пока не ломают contracts обязательного ядра.
 
@@ -82,7 +84,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Architecture.md`, `Model.md`, `Interfaces.md` и `System_Invariants.md` находятся в `Docs/Technical/*`, потому что описывают устройство системы, а не процесс выполнения работы.
 - `Artifact_Lifecycle.md` находится в `Docs/Technical/*`, потому что закрепляет технический contract источников истины и обязательной синхронизации артефактов, а не текущее состояние backlog или runtime.
 - `Pipeline.md` находится в `Docs/Technical/*` только как supporting technical view на process-domain: он объясняет, как `Pipeline/*` участвует в технической системе, но не владеет самим process-canon.
-- `Platform_Contracts.md`, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Verification.md` и `Verification_Levels.md` находятся здесь, потому что описывают технический рабочий периметр, verification boundaries, уровни verification и проверяемые контракты, а не пользовательский, плановый или журнальный слой.
+- `Platform_Contracts.md`, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Verification.md`, `Verification_Levels.md` и `Validation.md` находятся здесь, потому что описывают технический рабочий периметр, verification/validation boundaries, уровни verification и проверяемые контракты, а не пользовательский, плановый или журнальный слой.
 
 ## Границы
 - этот каталог не хранит оперативное состояние исполнения;
@@ -113,6 +115,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Product_Bootstrap_Validation.md` — validation-contract bootstrap-result и acceptance criteria.
 - `Verification.md` — границы verification-layer, checks contour и его разведение с gates и tool implementation.
 - `Verification_Levels.md` — уровни verification-контура и target split будущих `bp_check / bp_verify`.
+- `Validation.md` — границы validation-layer и связь outcome confirmation с evidence, pass-close contour и gates.
 
 ## Связи
 - конвейер как process-domain раскрыт в `../../Pipeline/`;
