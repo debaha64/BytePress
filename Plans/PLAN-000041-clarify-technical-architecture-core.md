@@ -2,7 +2,7 @@
 
 ID: PLAN-000041
 Название: Пересобрать Architecture.md как карту доменов и слоёв
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000053
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -60,3 +60,9 @@ ID: PLAN-000041
 - `Docs/Technical/Architecture.md` является ясной картой доменов, слоёв и границ системы.
 - разведение `Docs/Technical/*` и `Pipeline/*` описано ясно и без новой двусмысленности.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Docs/Technical/Architecture.md` пересобран как каноническая архитектурная карта текущего `BytePress`: в одном document теперь явно разведены domain map, layer map, границы ответственности, допустимые направления связей и недопустимые подмены.
+- архитектурная граница между `Docs/Technical/*` и `Pipeline/*` зафиксирована без дублирования process-canon: `Architecture.md` описывает место process-layer в системе, но не повторяет фазы, gates и process IO.
+- дополнительные изменения в `Docs/Technical/README.md`, `Docs/Technical/Pipeline.md`, `Pipeline/*`, `Standards/*`, `Plans/README.md` и `bp_lint.py` не потребовались: audit не подтвердил реального active-layer contradiction за пределами самого `Architecture.md`.
+- `bp_lint contract unaffected`
