@@ -46,7 +46,7 @@ ID: PLAN-000044
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000044-clarify-technical-interfaces-core.md`
+- `Plans/Archive/PLAN-000044-clarify-technical-interfaces-core.md`
 - `Plans/Archive/PLAN-000043-clarify-technical-artifact-lifecycle.md`
 - `Docs/Technical/Interfaces.md`
 - `Docs/Technical/README.md`
