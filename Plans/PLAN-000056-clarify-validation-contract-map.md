@@ -2,7 +2,7 @@
 
 ID: PLAN-000056
 Название: Пересобрать contract map validation-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000068
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-08
@@ -64,4 +64,8 @@ ID: PLAN-000056
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- В работе.
+- `Docs/Technical/Validation.md` пересобран из boundary-doc в contract map validation-layer: document теперь явно фиксирует validation inputs, outputs, verdict classes, ownership интерпретации, отношение к evidence package и место в pass-close contour.
+- `Docs/Technical/Verification.md` минимально синхронизирован, чтобы развести verification contract map и validation contract map.
+- `Docs/Technical/README.md` минимально синхронизирован, чтобы описывать `Validation.md` уже как contract map, а не как boundary-only document.
+- `Verification_Evidence.md`, `Artifact_Lifecycle.md`, `Pipeline/Phase_Gates.md`, `Tools/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`
