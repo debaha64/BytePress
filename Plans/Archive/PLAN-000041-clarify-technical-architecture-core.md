@@ -46,7 +46,7 @@ ID: PLAN-000041
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000041-clarify-technical-architecture-core.md`
+- `Plans/Archive/PLAN-000041-clarify-technical-architecture-core.md`
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Pipeline.md`
