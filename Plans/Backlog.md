@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000065 | Завершённые: BACK-000062, BACK-000063, BACK-000064 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,7 +38,19 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-- нет
+#### BACK-000065 — Зафиксировать tooling boundary verification-контура
+ID: BACK-000065
+Название: Зафиксировать tooling boundary verification-контура
+Тип: Документация
+Приоритет: Критический
+Статус: В_работе
+Связи: ROAD-000011, PLAN-000053
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-07
+Дата_изменения: 2026-04-07
+
+##### Описание
+Пересобрать `Tools/README.md` как boundary-document tooling verification contour: развести роль `bp_lint`, target role будущего `bp_check`, target role будущего `bp_verify`, structural checks, contract/verification checks и procedural verification без реализации новых инструментов.
 
 ### Завершённые
 
