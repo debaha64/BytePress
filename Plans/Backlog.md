@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000064 | Завершённые: BACK-000062, BACK-000063 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,7 +38,19 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-- нет
+#### BACK-000064 — Зафиксировать verification levels и target automation split
+ID: BACK-000064
+Название: Зафиксировать verification levels и target automation split
+Тип: Документация
+Приоритет: Критический
+Статус: В_работе
+Связи: ROAD-000011, PLAN-000052
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-07
+Дата_изменения: 2026-04-07
+
+##### Описание
+Создать `Docs/Technical/Verification_Levels.md` и зафиксировать уровни verification-контура, evidence, ownership результата и target contract будущих `bp_check / bp_verify` без реализации нового toolchain.
 
 ### Завершённые
 
