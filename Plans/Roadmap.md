@@ -200,16 +200,16 @@ ID: ROAD-000010
 ID: ROAD-000011
 Этап: Контур проверок и верификации (Verification and Validation Contour)
 Статус: В_работе
-Связи: BACK-000062, PLAN-000050
-Источник: PLAN-000050
+Связи: BACK-000062, BACK-000063, PLAN-000050, PLAN-000051
+Источник: PLAN-000050, PLAN-000051
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Собрать контур проверок и верификации поверх обновлённой operating model и технической карты системы без смешения verification-work с самой нормализацией техслоя.
 Зависимости: ROAD-000010
-Связанные_backlog: BACK-000062
+Связанные_backlog: BACK-000062, BACK-000063
 
 ### Описание
-Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе, границы между automatic checks, procedural checks, process gates и tool implementation через `Docs/Technical/Verification.md`, без запуска нового toolchain и без открытия `ROAD-000012`.
+Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Текущий pass углубляет `Docs/Technical/Verification.md` до contract map verification-layer без запуска нового toolchain и без открытия `ROAD-000012`.
 
 ---
 
