@@ -2,7 +2,7 @@
 
 ID: PLAN-000055
 Название: Зафиксировать границы validation-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000067
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-08
@@ -64,4 +64,8 @@ ID: PLAN-000055
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- В работе.
+- `Docs/Technical/Validation.md` создан как singleton boundary-document validation-layer: назначение validation, отличия от verification, inputs/outputs, evidence usage, ownership результата и связь с pass-close contour и phase gates.
+- `Docs/Technical/Verification.md` минимально синхронизирован, чтобы явно развести verification contract и validation outcome confirmation.
+- `Docs/Technical/README.md` минимально синхронизирован, чтобы включить `Validation.md` в supporting technical-documents.
+- `Verification_Evidence.md`, `Artifact_Lifecycle.md`, `Pipeline/Phase_Gates.md`, `Tools/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`
