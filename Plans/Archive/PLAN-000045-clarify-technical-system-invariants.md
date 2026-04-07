@@ -47,7 +47,7 @@ ID: PLAN-000045
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000045-clarify-technical-system-invariants.md`
+- `Plans/Archive/PLAN-000045-clarify-technical-system-invariants.md`
 - `Plans/Archive/PLAN-000044-clarify-technical-interfaces-core.md`
 - `Docs/Technical/System_Invariants.md`
 - `Docs/Technical/README.md`
