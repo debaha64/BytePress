@@ -192,7 +192,7 @@ ID: ROAD-000010
 Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055
 
 ### Описание
-Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, model-core pass пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы, а текущий узкий pass углубляет required core через `Artifact_Lifecycle.md` как lifecycle-contract источников истины, обязательных sync-loop и допустимых переходов между active, archive, runtime и log слоями.
+Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, model-core pass пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы, а artifact-lifecycle pass теперь пересобрал `Artifact_Lifecycle.md` как lifecycle-contract источников истины, обязательных sync-loop и допустимых переходов между active, archive, runtime и log слоями.
 
 ---
 
