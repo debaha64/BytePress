@@ -43,7 +43,7 @@ ID: PLAN-000049
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000049-audit-and-close-road-000010.md`
+- `Plans/Archive/PLAN-000049-audit-and-close-road-000010.md`
 - `Plans/Archive/PLAN-000048-clarify-product-bootstrap-validation.md`
 - `Plans/README.md`
 - `Standards/Planning.md`
