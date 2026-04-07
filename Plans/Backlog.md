@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000068 | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,7 +38,19 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-- нет
+#### BACK-000068 — Пересобрать contract map validation-layer
+ID: BACK-000068
+Название: Пересобрать contract map validation-layer
+Тип: Документация
+Приоритет: Критический
+Статус: В_работе
+Связи: ROAD-000011, PLAN-000056
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-08
+Дата_изменения: 2026-04-08
+
+##### Описание
+Пересобрать `Docs/Technical/Validation.md` из boundary-doc в contract map validation-layer: явно зафиксировать validation inputs/outputs, classes validation result, ownership интерпретации результата, отношение к evidence package, место в pass-close contour и границу между validation result и gate decision без реализации нового toolchain.
 
 ### Завершённые
 

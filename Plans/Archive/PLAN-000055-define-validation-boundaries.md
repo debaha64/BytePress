@@ -46,7 +46,7 @@ ID: PLAN-000055
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000055-define-validation-boundaries.md`
+- `Plans/Archive/PLAN-000055-define-validation-boundaries.md`
 - `Plans/Archive/PLAN-000054-define-verification-evidence-contract.md`
 - `Docs/Technical/Validation.md`
 - `Docs/Technical/Verification.md`
