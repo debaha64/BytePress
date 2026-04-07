@@ -202,7 +202,7 @@ Lifecycle contract задаёт, какие sync-loop обязательны. Ve
 Gate policy остаётся в `Pipeline/*`. Verification levels только показывают, где verification result превращается в gate input.
 
 ### К `Tools/*`
-`Tools/*` не получают реализации в этом pass. Document фиксирует только target contract будущих `bp_check / bp_verify`.
+`Tools/*` не получают реализации в этом pass. Document фиксирует только target contract будущих `bp_check / bp_verify`, а tooling boundary отдельно раскрыт в `Tools/README.md`.
 
 ## Граница документа
 `Verification_Levels.md` не является:

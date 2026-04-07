@@ -200,16 +200,16 @@ ID: ROAD-000010
 ID: ROAD-000011
 Этап: Контур проверок и верификации (Verification and Validation Contour)
 Статус: В_работе
-Связи: BACK-000062, BACK-000063, BACK-000064, PLAN-000050, PLAN-000051, PLAN-000052
-Источник: PLAN-000050, PLAN-000051, PLAN-000052
+Связи: BACK-000062, BACK-000063, BACK-000064, BACK-000065, PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053
+Источник: PLAN-000050, PLAN-000051, PLAN-000052, PLAN-000053
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Собрать контур проверок и верификации поверх обновлённой operating model и технической карты системы без смешения verification-work с самой нормализацией техслоя.
 Зависимости: ROAD-000010
-Связанные_backlog: BACK-000062, BACK-000063, BACK-000064
+Связанные_backlog: BACK-000062, BACK-000063, BACK-000064, BACK-000065
 
 ### Описание
-Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Затем `Docs/Technical/Verification.md` был пересобран в contract map verification-layer с классами checks, inputs, outputs, evidence и ownership результата. Следующий завершённый pass ввёл `Verification_Levels.md`, чтобы зафиксировать уровни verification и target split будущих `bp_check / bp_verify` без запуска нового toolchain и без открытия `ROAD-000012`.
+Этап активирован boundary-pass для verification contour: первым шагом зафиксированы место verification-layer в системе и границы между automatic checks, procedural checks, process gates и tool implementation. Затем `Docs/Technical/Verification.md` был пересобран в contract map verification-layer с классами checks, inputs, outputs, evidence и ownership результата. Следующий завершённый pass ввёл `Verification_Levels.md`, чтобы зафиксировать уровни verification и target split будущих `bp_check / bp_verify`. Текущий завершённый pass зафиксировал tooling boundary verification-контура в `Tools/README.md`, разведя `bp_lint`, будущий `bp_check`, будущий `bp_verify` и procedural verification без реализации нового toolchain и без открытия `ROAD-000012`.
 
 ---
 
