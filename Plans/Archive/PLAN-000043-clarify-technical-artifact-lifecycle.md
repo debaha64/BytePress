@@ -46,7 +46,7 @@ ID: PLAN-000043
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000043-clarify-technical-artifact-lifecycle.md`
+- `Plans/Archive/PLAN-000043-clarify-technical-artifact-lifecycle.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Architecture.md`
