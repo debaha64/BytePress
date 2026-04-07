@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: BACK-000060 | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059 | Кандидаты задач этапа
+- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: нет | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058, BACK-000059, BACK-000060 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,12 +38,16 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
+- нет
+
+### Завершённые
+
 #### BACK-000060 — Пересобрать Product_Bootstrap_Validation.md как validation-contract
 ID: BACK-000060
 Название: Пересобрать Product_Bootstrap_Validation.md как validation-contract
 Тип: Документация
 Приоритет: Критический
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000010, PLAN-000048
 Источник: Следующий узкий pass этапа `ROAD-000010` после bootstrap-contract pass
 Дата_создания: 2026-04-07
@@ -51,8 +55,6 @@ ID: BACK-000060
 
 ##### Описание
 Провести audit `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и bootstrap-related active references, затем пересобрать `Product_Bootstrap_Validation.md` как канонический validation-contract bootstrap-result, acceptance criteria, validation boundaries и недопустимых validation-пропусков без широкого рефакторинга всего technical-layer.
-
-### Завершённые
 
 #### BACK-000059 — Пересобрать Product_Bootstrap_Contract.md как bootstrap-contract
 ID: BACK-000059

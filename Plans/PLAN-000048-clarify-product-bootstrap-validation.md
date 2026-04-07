@@ -2,7 +2,7 @@
 
 ID: PLAN-000048
 Название: Пересобрать Product_Bootstrap_Validation.md как validation-contract
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000060
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -64,4 +64,9 @@ ID: PLAN-000048
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- в работе
+- `Docs/Technical/Product_Bootstrap_Validation.md` пересобран как канонический validation-contract bootstrap-result текущего `BytePress`: документ теперь явно фиксирует validation-scope, acceptance criteria, automatic/procedural split и недопустимые validation-пропуски.
+- validation-layer теперь явно разведен с bootstrap-contract: `Product_Bootstrap_Contract.md` владеет bootstrap obligations, а `Product_Bootstrap_Validation.md` владеет критериями и режимом проверки результата.
+- `Docs/Technical/README.md` и `Docs/Technical/Product_Bootstrap_Contract.md` синхронизированы минимально, чтобы active technical-layer больше не описывал validation document как legacy evidence note.
+- `bp_bootstrap.py` не менялся, потому что audit не подтвердил расхождения между bootstrap-contract, validation-contract и фактическим bootstrap behavior.
+- `bp_lint.py` не менялся, потому что текущий automatic structural perimeter уже покрывает обязательный bootstrap minimum, а этот pass не доказал необходимость расширять lint до procedural validation.
+- `bp_lint contract unaffected`

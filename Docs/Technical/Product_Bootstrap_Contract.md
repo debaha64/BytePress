@@ -28,7 +28,7 @@
 - `Artifact_Lifecycle.md` отвечает за источники истины и обязательные sync-loop.
 - `Interfaces.md` отвечает за допустимые точки стыка и service interfaces.
 - `Product_Bootstrap_Contract.md` отвечает за то, что именно должен создать bootstrap и где заканчивается его ответственность.
-- `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за подтверждённый результат проверки bootstrap behavior.
+- `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за validation-scope, acceptance criteria и подтверждение корректности bootstrap-result.
 
 ## Связь с `Tools/bp_bootstrap.py`
 `Tools/bp_bootstrap.py` является materializer этого контракта.
@@ -207,7 +207,8 @@ Bootstrap предполагает, что:
 `Product_Bootstrap_Contract.md` задаёт expected bootstrap obligations.
 
 `Product_Bootstrap_Validation.md`:
-- фиксирует, что уже было фактически проверено;
+- фиксирует validation-scope и acceptance criteria bootstrap-result;
+- разделяет automatic и procedural checks вокруг bootstrap behavior;
 - подтверждает sync между contract и реализованным bootstrap behavior;
 - не заменяет сам contract и не задаёт новые bootstrap obligations.
 

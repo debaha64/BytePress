@@ -69,7 +69,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Product_Bootstrap_Contract.md`
   Роль: специализированный technical contract минимального product bootstrap.
 - `Product_Bootstrap_Validation.md`
-  Роль: специализированная фиксация результата проверки bootstrap-контракта.
+  Роль: специализированный validation-contract bootstrap-result и его acceptance perimeter.
 
 Вспомогательные документы не образуют required ядро сами по себе. Они уточняют специализированные части системы и могут меняться точечно, пока не ломают contracts обязательного ядра.
 
@@ -105,7 +105,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Pipeline.md` — supporting technical view на роль `Pipeline/` в общей системе.
 - `Platform_Contracts.md` — канонический supporting contract среды выполнения, platform assumptions и tool perimeter.
 - `Product_Bootstrap_Contract.md` — минимальный bootstrap contract продукта.
-- `Product_Bootstrap_Validation.md` — зафиксированный результат проверки bootstrap-контракта.
+- `Product_Bootstrap_Validation.md` — validation-contract bootstrap-result и acceptance criteria.
 
 ## Связи
 - конвейер как process-domain раскрыт в `../../Pipeline/`;
