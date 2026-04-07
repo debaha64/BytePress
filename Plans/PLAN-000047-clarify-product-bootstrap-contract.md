@@ -2,7 +2,7 @@
 
 ID: PLAN-000047
 Название: Пересобрать Product_Bootstrap_Contract.md как bootstrap-contract
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000059
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -65,4 +65,8 @@ ID: PLAN-000047
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- в работе
+- `Docs/Technical/Product_Bootstrap_Contract.md` пересобран как канонический bootstrap-contract текущего `BytePress`: теперь он явно фиксирует CLI contract, minimal product repo outcome, обязательные создаваемые артефакты, bootstrap boundaries, допустимые упрощения и недопустимые bootstrap-пропуски.
+- bootstrap-contract теперь прямо разводит contract obligations, platform assumptions, lifecycle rules и validation result: `Product_Bootstrap_Validation.md` остаётся evidence document, а не substitute для самого contract.
+- `bp_bootstrap.py` не менялся, потому что audit не подтвердил расхождения между документным contract и фактическим materialization behavior.
+- `bp_lint.py` не менялся, потому что bootstrap result contract и его structural checks уже согласованы и pass не меняет обязательный lint surface.
+- `bp_lint contract unaffected`
