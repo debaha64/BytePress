@@ -212,7 +212,7 @@ def main() -> int:
     missing.extend(collect_missing(root, REQUIRED_MEMORY, "Memory"))
     missing.extend(collect_missing(root, REQUIRED_MCP, "MCP"))
     missing.extend(collect_missing(root, ["README.md", "Interview.md", "Discussion.md", "Research.md", "Requirements.md"], "Docs/Discovery"))
-    missing.extend(collect_missing(root, ["Artifact_Lifecycle.md"], "Docs/Technical"))
+    missing.extend(collect_missing(root, ["Artifact_Lifecycle.md", "System_Invariants.md"], "Docs/Technical"))
 
     id_errors: list[str] = []
     for rel in [
