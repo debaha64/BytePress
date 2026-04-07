@@ -2,7 +2,7 @@
 
 ID: PLAN-000050
 Название: Зафиксировать границы verification-layer
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000062
 Источник: Первый узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-07
@@ -64,4 +64,8 @@ ID: PLAN-000050
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- в работе
+- `Docs/Technical/Verification.md` создан как канонический boundary-document verification-layer и фиксирует границы между automatic checks, procedural checks, process gates и tool implementation.
+- `Docs/Technical/README.md` минимально синхронизирован: `Verification.md` добавлен в supporting technical-documents и в карту слоя.
+- `Pipeline/Phase_Gates.md` минимально синхронизирован, чтобы gate был явно разведен с результатом verification.
+- `Artifact_Lifecycle.md`, `Standards/Planning.md` и `bp_lint.py` не менялись, потому что audit не подтвердил противоречия или contract impact, требующие правки.
+- `bp_lint contract unaffected`

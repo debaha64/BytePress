@@ -18,6 +18,7 @@ Technical-layer нужен для ответа на вопросы:
 - системные инварианты;
 - внутренние и внешние интерфейсы;
 - platform/bootstrap contracts;
+- verification contracts;
 - technical view на lifecycle и на участие `Pipeline/` в системе.
 
 ## Что не входит в слой
@@ -70,6 +71,8 @@ Technical-layer нужен для ответа на вопросы:
   Роль: специализированный technical contract минимального product bootstrap.
 - `Product_Bootstrap_Validation.md`
   Роль: специализированный validation-contract bootstrap-result и его acceptance perimeter.
+- `Verification.md`
+  Роль: boundary-document verification-layer, automatic/procedural checks и их границ относительно `Pipeline` и `Tools`.
 
 Вспомогательные документы не образуют required ядро сами по себе. Они уточняют специализированные части системы и могут меняться точечно, пока не ломают contracts обязательного ядра.
 
@@ -77,7 +80,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Architecture.md`, `Model.md`, `Interfaces.md` и `System_Invariants.md` находятся в `Docs/Technical/*`, потому что описывают устройство системы, а не процесс выполнения работы.
 - `Artifact_Lifecycle.md` находится в `Docs/Technical/*`, потому что закрепляет технический contract источников истины и обязательной синхронизации артефактов, а не текущее состояние backlog или runtime.
 - `Pipeline.md` находится в `Docs/Technical/*` только как supporting technical view на process-domain: он объясняет, как `Pipeline/*` участвует в технической системе, но не владеет самим process-canon.
-- `Platform_Contracts.md`, `Product_Bootstrap_Contract.md` и `Product_Bootstrap_Validation.md` находятся здесь, потому что описывают технический рабочий периметр и его проверяемые контракты, а не пользовательский, плановый или журнальный слой.
+- `Platform_Contracts.md`, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md` и `Verification.md` находятся здесь, потому что описывают технический рабочий периметр, verification boundaries и проверяемые контракты, а не пользовательский, плановый или журнальный слой.
 
 ## Границы
 - этот каталог не хранит оперативное состояние исполнения;
@@ -106,6 +109,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Platform_Contracts.md` — канонический supporting contract среды выполнения, platform assumptions и tool perimeter.
 - `Product_Bootstrap_Contract.md` — минимальный bootstrap contract продукта.
 - `Product_Bootstrap_Validation.md` — validation-contract bootstrap-result и acceptance criteria.
+- `Verification.md` — границы verification-layer, checks contour и его разведение с gates и tool implementation.
 
 ## Связи
 - конвейер как process-domain раскрыт в `../../Pipeline/`;

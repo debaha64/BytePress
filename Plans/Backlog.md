@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000062 | Завершённые: нет | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,12 +38,16 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
+- нет
+
+### Завершённые
+
 #### BACK-000062 — Зафиксировать границы verification-layer
 ID: BACK-000062
 Название: Зафиксировать границы verification-layer
 Тип: Документация
 Приоритет: Критический
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000011, PLAN-000050
 Источник: Первый узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-07
@@ -51,10 +55,6 @@ ID: BACK-000062
 
 ##### Описание
 Активировать `ROAD-000011`, определить место verification/checks contour в системе и пересобрать `Docs/Technical/Verification.md` как boundary-document, который явно разводит verification-layer, automatic checks, procedural checks, `Pipeline` gates и tool implementation без рефакторинга toolchain.
-
-### Завершённые
-
-- нет
 
 ### Кандидаты задач этапа
 - нет
