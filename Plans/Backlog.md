@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: BACK-000066 | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -38,7 +38,19 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-- нет
+#### BACK-000066 — Зафиксировать contract verification evidence
+ID: BACK-000066
+Название: Зафиксировать contract verification evidence
+Тип: Документация
+Приоритет: Критический
+Статус: В_работе
+Связи: ROAD-000011, PLAN-000054
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-08
+Дата_изменения: 2026-04-08
+
+##### Описание
+Создать `Docs/Technical/Verification_Evidence.md` и зафиксировать contract verification evidence: виды evidence, mandatory/optional по классам checks, место хранения evidence и связи с pass-close contour без реализации нового toolchain.
 
 ### Завершённые
 
