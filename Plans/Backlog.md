@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: нет | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057 | Кандидаты задач этапа
+- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: нет | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, BACK-000057, BACK-000058 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -41,6 +41,20 @@ Historical backlog завершённых этапов хранится в `Plan
 - нет
 
 ### Завершённые
+
+#### BACK-000058 — Пересобрать Platform_Contracts.md как platform-contract
+ID: BACK-000058
+Название: Пересобрать Platform_Contracts.md как platform-contract
+Тип: Документация
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000010, PLAN-000046
+Источник: Следующий узкий pass этапа `ROAD-000010` после system-invariants pass
+Дата_создания: 2026-04-07
+Дата_изменения: 2026-04-07
+
+##### Описание
+Провести audit `Docs/Technical/Platform_Contracts.md`, `Tools/*`, `Pipeline/*`, planning/runtime touchpoints и platform assumptions текущего `BytePress`, затем пересобрать `Platform_Contracts.md` как канонический contract рабочей платформы, среды исполнения, supported tool perimeter, допустимых режимов platform usage и недопустимых отклонений без широкого рефакторинга всего technical-layer.
 
 #### BACK-000057 — Пересобрать System_Invariants.md как invariant-contract
 ID: BACK-000057
