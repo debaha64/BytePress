@@ -2,7 +2,7 @@
 
 ID: PLAN-000044
 Название: Пересобрать Interfaces.md как interface-contract
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000056
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -64,3 +64,10 @@ ID: PLAN-000044
 - `Docs/Technical/Interfaces.md` является ясным contract интерфейсов текущей системы.
 - разведение `Interfaces.md`, `README.md`, `Architecture.md`, `Model.md`, `Artifact_Lifecycle.md` и `Pipeline/*` описано ясно и без новой двусмысленности.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Docs/Technical/Interfaces.md` пересобран как канонический interface-contract текущего `BytePress`: в одном document теперь явно разведены внутренние и внешние интерфейсы, stable/service/derived classes, допустимые touchpoints и недопустимые обходы границ.
+- `Interfaces.md` больше не выглядит как короткий legacy-list связей: отношение interface-layer к `Plans/*`, `Runtime/*`, `Logs/*` и `Pipeline/*` зафиксировано отдельно от архитектурной карты, ownership-модели и lifecycle-contract.
+- `Pipeline/README.md` минимально синхронизирован, чтобы process-domain оставался источником истины именно для process-canon и не спорил с уже зафиксированными technical contracts.
+- дополнительные изменения в `Docs/Technical/README.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Pipeline.md`, `Standards/*`, `Plans/README.md` и `bp_lint.py` не потребовались: audit не подтвердил другого active-layer contradiction за пределами `Interfaces.md` и одной прямой формулировки в `Pipeline/README.md`.
+- `bp_lint contract unaffected`
