@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: нет | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055 | Кандидаты задач этапа
+- ROAD-000010 — Технический слой и карта системных контрактов (Technical Layer and System Contract Map) | Активные: нет | Завершённые: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -41,6 +41,20 @@ Historical backlog завершённых этапов хранится в `Plan
 - нет
 
 ### Завершённые
+
+#### BACK-000056 — Пересобрать Interfaces.md как interface-contract
+ID: BACK-000056
+Название: Пересобрать Interfaces.md как interface-contract
+Тип: Документация
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000010, PLAN-000044
+Источник: Следующий узкий pass этапа `ROAD-000010` после artifact-lifecycle pass
+Дата_создания: 2026-04-07
+Дата_изменения: 2026-04-07
+
+##### Описание
+Провести audit `Docs/Technical/Interfaces.md` и его пересечений с `Docs/Technical/README.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Pipeline.md`, `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, затем пересобрать `Interfaces.md` как канонический contract внутренних и внешних интерфейсов, допустимых точек стыка и недопустимых обходов границ без широкого рефакторинга всего technical-layer.
 
 #### BACK-000051 — Зафиксировать границы и минимальный состав Docs/Technical
 ID: BACK-000051

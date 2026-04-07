@@ -183,16 +183,16 @@ ID: ROAD-000009
 ID: ROAD-000010
 Этап: Технический слой и карта системных контрактов (Technical Layer and System Contract Map)
 Статус: В_работе
-Связи: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043
-Источник: PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043
+Связи: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056, PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044
+Источник: PLAN-000039, PLAN-000040, PLAN-000041, PLAN-000042, PLAN-000043, PLAN-000044
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-07
 Цель: Определить границы `Docs/Technical/*`, минимальный состав technical-layer и карту системных контрактов без смешения technical knowledge-layer с `Pipeline/*` и planning/governance контуром.
 Зависимости: ROAD-000009
-Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055
+Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054, BACK-000055, BACK-000056
 
 ### Описание
-Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, model-core pass пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы, а artifact-lifecycle pass теперь пересобрал `Artifact_Lifecycle.md` как lifecycle-contract источников истины, обязательных sync-loop и допустимых переходов между active, archive, runtime и log слоями.
+Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, model-core pass пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы, artifact-lifecycle pass пересобрал `Artifact_Lifecycle.md` как lifecycle-contract источников истины, обязательных sync-loop и допустимых переходов между active, archive, runtime и log слоями, а interfaces-core pass пересобрал `Interfaces.md` как канонический contract внутренних и внешних интерфейсов, stable/service/derived touchpoints и недопустимых обходов системных границ.
 
 ---
 
