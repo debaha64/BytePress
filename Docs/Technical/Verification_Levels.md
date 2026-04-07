@@ -115,6 +115,8 @@ Evidence:
 - согласованное состояние `Roadmap`, `Backlog` и current `Plan`;
 - при необходимости запись в `Logs/QualityLog.md`.
 
+Evidence contract (классы, storage и sufficient/insufficient критерии) фиксируется в `Docs/Technical/Verification_Evidence.md`.
+
 Owner результата:
 - pass owner.
 
