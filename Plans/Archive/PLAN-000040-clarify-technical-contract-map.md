@@ -46,7 +46,7 @@ ID: PLAN-000040
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000040-clarify-technical-contract-map.md`
+- `Plans/Archive/PLAN-000040-clarify-technical-contract-map.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Pipeline.md`
 - `Pipeline/README.md`
