@@ -9,7 +9,7 @@ ID: DOC-000002
 Дата_изменения: 2026-04-08
 
 ## Назначение
-`Docs/Technical/Validation.md` является каноническим singleton document, который фиксирует границы validation-layer текущего `BytePress`.
+`Docs/Technical/Validation.md` является каноническим singleton document, который фиксирует contract map validation-layer текущего `BytePress`.
 
 Этот document отвечает на вопросы:
 - какое место validation занимает в системе;
@@ -25,8 +25,9 @@ ID: DOC-000002
 `Validation.md` является supporting technical-document verification and validation contour.
 
 Его роль:
-- фиксировать purpose и boundary validation-layer поверх уже выделенного verification-layer;
+- фиксировать contract map validation-layer поверх уже выделенного verification-layer;
 - разводить validation, verification, evidence package и gate approval;
+- фиксировать classes validation result, inputs, outputs и ownership интерпретации;
 - удерживать связь validation с pass-close contour без превращения validation в новый toolchain;
 - не дублировать `Verification.md` как contract map verification checks;
 - не дублировать `Verification_Levels.md` как operational levels verification;
@@ -40,9 +41,9 @@ ID: DOC-000002
 - `Verification_Evidence.md` отвечает за виды evidence, обязательность, storage и linkage к pass-close contour.
 - `Pipeline/Phase_Gates.md` отвечает за manual gate decision и phase approval.
 - `Tools/*` отвечают за implementation automatic checks.
-- `Validation.md` отвечает за то, когда уже собранные verification result и evidence package считаются достаточными для подтверждения корректности outcome относительно contract.
+- `Validation.md` отвечает за то, как validation-layer читает verification result и evidence package, какие verdict classes выдаёт и когда outcome считается подтверждённым относительно contract.
 
-## Назначение validation-layer в системе
+## Validation-layer в системе
 Validation-layer находится после выполнения verification checks и до process-layer gate decision.
 
 Его задача:
@@ -88,7 +89,7 @@ Validation читает только уже существующие active sour
 Validation-layer не создаёт новый source-of-truth домен. Он produce validation result.
 
 Основные outputs:
-- `validated` или `not validated` verdict относительно конкретного outcome;
+- verdict относительно конкретного outcome;
 - явное объяснение, какого evidence хватает или не хватает;
 - подтверждение, что pass-close claim может или не может быть сделан локально;
 - validation handoff note для process gate, если process-layer требует такого input.
@@ -97,6 +98,51 @@ Validation output не равен:
 - phase approval;
 - автоматическому закрытию backlog-задачи;
 - автоматическому обновлению `Roadmap`, `Backlog` или `Plan`.
+
+## Classes validation result
+Validation result должен читаться как ограниченный набор contract-level verdict classes.
+
+### `validated`
+Что означает:
+- outcome подтверждён относительно проверяемого contract;
+- evidence package достаточен для локального closure claim;
+- validation result может использоваться как gate input, если process-layer этого требует.
+
+Что не означает:
+- automatic phase approval;
+- автоматическое закрытие pass без planning sync.
+
+### `not_validated`
+Что означает:
+- outcome не подтверждён;
+- validation выявил contradiction, missing evidence или несоответствие contract outcome.
+
+Что требует:
+- pass не может считаться локально закрытым;
+- handoff в gate contour считается неполным или некорректным.
+
+### `validation_blocked`
+Что означает:
+- validation не может быть честно завершён, потому что verification basis или evidence package неполны;
+- отсутствует достаточный input для verdict class `validated` / `not_validated`.
+
+Типовые причины:
+- нет обязательной governance-сверки;
+- отсутствует связанный evidence package;
+- verification result не зафиксирован в active layer.
+
+### Почему classes ограничены
+Validation-layer не должен плодить тонкие status-taxonomy вместо ясного contract verdict.
+
+В текущем `BytePress` достаточно трёх классов:
+- `validated`
+- `not_validated`
+- `validation_blocked`
+
+Их хватает, чтобы развести:
+- подтверждённый outcome;
+- опровергнутый outcome;
+- ситуацию, где basis для честного verdict ещё не собран.
 
 ## Какие evidence использует validation
 Validation не определяет evidence classes заново. Он использует evidence package, уже определённый в `Verification_Evidence.md`.
@@ -121,7 +167,26 @@ Validation result интерпретирует pass owner:
 - verification evidence может быть собран автоматически, но sufficiency и outcome confirmation остаются procedural;
 - gate owner может принять или не принять handoff, но не подменяет локальную validation interpretation задним числом.
 
-## Связь validation с pass-close contour
+## Ownership интерпретации validation result
+### Local pass context
+В локальном pass context owner интерпретации validation result:
+- pass owner.
+
+Именно pass owner решает:
+- достаточно ли inputs для завершения validation;
+- какому result class соответствует текущий outcome;
+- можно ли переводить backlog-задачу и current `Plan` в финальные статусы.
+
+### Gate handoff context
+Если validation result передаётся в process-layer:
+- validation owner остаётся автором verdict;
+- phase owner остаётся owner gate decision.
+
+Это разделение обязательно:
+- validation owner не принимает gate decision;
+- phase owner не переписывает validation result задним числом, а либо принимает его как input, либо отклоняет handoff.
+
+## Место validation в pass-close contour
 Validation входит в pass-close contour после verification и до финального утверждения локального closure.
 
 Нормальная последовательность:
@@ -147,6 +212,16 @@ Validation не подменяет gate policy.
 - validated outcome может стать gate input, но не становится gate approval автоматически;
 - gate может требовать validation basis, но не обязан принимать его без отдельного process decision;
 - отсутствие validation делает gate input неполным, если process-layer ждёт подтверждённый outcome, а не только raw evidence.
+
+## Где validation заканчивается и начинается gate
+Граница проходит так:
+- validation отвечает за interpretation outcome относительно contract;
+- gate отвечает за process decision о дальнейшем переходе.
+
+Следствия:
+- validation result class `validated` не равен approved gate;
+- validation result class `not_validated` или `validation_blocked` делает gate input слабым или неполным, но сам process-layer всё равно владеет решением;
+- gate policy остаётся в `Pipeline/Phase_Gates.md`, а не переносится сюда.
 
 ## Что validation не должно подменять
 Validation-layer не должен:

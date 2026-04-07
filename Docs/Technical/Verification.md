@@ -33,7 +33,7 @@
 - `Verification.md` отвечает за сам contract checks contour: классы проверок, inputs, outputs, evidence и ownership результата.
 - `Verification_Levels.md` отвечает за уровни verification-контура и target split будущих `bp_check / bp_verify`.
 - `Verification_Evidence.md` отвечает за contract evidence: виды evidence, обязательность, storage и linkage к pass-close contour.
-- `Validation.md` отвечает за boundary validation-layer: когда verification result и evidence package достаточно для подтверждения outcome, но ещё не превращаются в process gate decision.
+- `Validation.md` отвечает за contract map validation-layer: как verification result и evidence package превращаются в validation verdict classes до process gate decision.
 
 ## Verification-layer в системе
 Verification-layer находится между system contracts, planning-contour, process-layer и tool perimeter.
