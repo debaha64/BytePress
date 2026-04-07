@@ -192,7 +192,7 @@ ID: ROAD-000010
 Связанные_backlog: BACK-000051, BACK-000052, BACK-000053, BACK-000054
 
 ### Описание
-Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, а текущий узкий pass углубляет required core через `Model.md` как каноническую модель сущностей, ownership состояния и связей системы без широкого рефакторинга всего technical-layer.
+Этап активирован через boundary-pass: назначение `Docs/Technical/*`, его минимальное ядро и границы относительно `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*` уже зафиксированы; затем отдельный contract-map pass подтвердил required core, supporting technical-documents и допустимые пересечения с process-layer. Архитектурный pass пересобрал `Architecture.md` как каноническую карту доменов, слоёв и границ системы, а model-core pass теперь пересобрал `Model.md` как каноническую модель сущностей, ownership состояния и связей системы без широкого рефакторинга всего technical-layer.
 
 ---
 

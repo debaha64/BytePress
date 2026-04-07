@@ -2,7 +2,7 @@
 
 ID: PLAN-000042
 Название: Пересобрать Model.md как каноническую модель системы
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000054
 Источник: Следующий узкий pass этапа `ROAD-000010`
 Дата_создания: 2026-04-07
@@ -61,3 +61,9 @@ ID: PLAN-000042
 - `Docs/Technical/Model.md` является ясной моделью сущностей, владельцев состояния и связей системы.
 - разведение `Model.md`, `Architecture.md`, `Artifact_Lifecycle.md` и `Pipeline/*` описано ясно и без новой двусмысленности.
 - `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Docs/Technical/Model.md` пересобран как каноническая модель текущего `BytePress`: в одном document теперь явно разведены ключевые сущности системы, ownership состояния, основные связи и недопустимые смешения ответственности.
+- `Model.md` больше не смешивает profile policy, naming migration и historical state с моделью сущностей; границы между model-layer, architecture-layer, lifecycle-layer и process-layer зафиксированы явно.
+- дополнительные изменения в `Docs/Technical/README.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Pipeline.md`, `Pipeline/*`, `Standards/*`, `Plans/README.md` и `bp_lint.py` не потребовались: audit не подтвердил реального active-layer contradiction за пределами самого `Model.md`.
+- `bp_lint contract unaffected`
