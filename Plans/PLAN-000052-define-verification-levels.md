@@ -2,7 +2,7 @@
 
 ID: PLAN-000052
 Название: Зафиксировать verification levels и target automation split
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000064
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-07
@@ -64,4 +64,7 @@ ID: PLAN-000052
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- В работе.
+- `Docs/Technical/Verification_Levels.md` создан как supporting technical document уровней verification-контура и target split будущих `bp_check / bp_verify`.
+- `Docs/Technical/Verification.md` минимально синхронизирован ссылкой на level-specific document, а `Docs/Technical/README.md` обновлён в карте supporting documents.
+- `Artifact_Lifecycle.md`, `Pipeline/Phase_Gates.md`, `Tools/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`

@@ -31,6 +31,7 @@
 - `Pipeline/Phase_Gates.md` отвечает за gates и manual phase approval.
 - `Tools/*` отвечают за materialization machine-executable checks.
 - `Verification.md` отвечает за сам contract checks contour: классы проверок, inputs, outputs, evidence и ownership результата.
+- `Verification_Levels.md` отвечает за уровни verification-контура и target split будущих `bp_check / bp_verify`.
 
 ## Verification-layer в системе
 Verification-layer находится между system contracts, planning-contour, process-layer и tool perimeter.
@@ -201,6 +202,8 @@ Verification-layer не должен:
 - procedural checks остаются отдельным классом и не маскируются под shell automation;
 - evidence формы и ownership результата читаются одинаково до и после возможного tooling expansion;
 - future `bp_check / bp_verify` остаётся implementation layer поверх уже утверждённого verification contract map.
+
+Детализация уровней verification и target split будущих commands вынесена в `Docs/Technical/Verification_Levels.md`.
 
 ## Отношение verification-layer к соседним контурам
 ### К `Plans/*`
