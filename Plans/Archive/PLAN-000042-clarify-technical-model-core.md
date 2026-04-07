@@ -46,7 +46,7 @@ ID: PLAN-000042
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000042-clarify-technical-model-core.md`
+- `Plans/Archive/PLAN-000042-clarify-technical-model-core.md`
 - `Docs/Technical/Model.md`
 - `Docs/Technical/README.md`
 - `Docs/Technical/Architecture.md`
