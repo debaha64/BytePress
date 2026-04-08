@@ -262,4 +262,4 @@ Validation-layer не должен:
 - replacement для `Validation_Levels.md`;
 - checklist каждого отдельного domain-specific validation case.
 
-Он остаётся каноническим boundary-document validation-layer текущего `BytePress`.
+Он остаётся каноническим contract map validation-layer текущего `BytePress`.
