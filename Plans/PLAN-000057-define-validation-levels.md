@@ -2,7 +2,7 @@
 
 ID: PLAN-000057
 Название: Зафиксировать уровни validation-контура
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000069
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-08
@@ -62,4 +62,8 @@ ID: PLAN-000057
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- В работе.
+- `Docs/Technical/Validation_Levels.md` создан как singleton contract уровней validation-контура: уровни, цели, required inputs, expected outputs и relation к evidence package и pass-close contour.
+- `Docs/Technical/Validation.md` минимально синхронизирован ссылкой на отдельный levels-document.
+- `Docs/Technical/README.md` минимально синхронизирован, чтобы включить `Validation_Levels.md` в карту supporting technical-documents.
+- `Verification_Evidence.md`, `Tools/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`
