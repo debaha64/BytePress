@@ -46,7 +46,7 @@ ID: PLAN-000056
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000056-clarify-validation-contract-map.md`
+- `Plans/Archive/PLAN-000056-clarify-validation-contract-map.md`
 - `Plans/Archive/PLAN-000055-define-validation-boundaries.md`
 - `Docs/Technical/Validation.md`
 - `Docs/Technical/Verification.md`
