@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067, BACK-000068 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067, BACK-000068, BACK-000069 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -139,6 +139,20 @@ ID: BACK-000068
 
 ##### Описание
 Пересобрать `Docs/Technical/Validation.md` из boundary-doc в contract map validation-layer: явно зафиксировать validation inputs/outputs, classes validation result, ownership интерпретации результата, отношение к evidence package, место в pass-close contour и границу между validation result и gate decision без реализации нового toolchain.
+
+#### BACK-000069 — Зафиксировать уровни validation-контура
+ID: BACK-000069
+Название: Зафиксировать уровни validation-контура
+Тип: Документация
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000011, PLAN-000057
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-08
+Дата_изменения: 2026-04-08
+
+##### Описание
+Создать `Docs/Technical/Validation_Levels.md` и зафиксировать уровни validation-контура: назначение каждого уровня, required inputs, expected outputs, relation к `Validation.md`, relation к `Verification_Evidence.md`, relation к pass-close contour и границы того, что не должно автоматизироваться и смешиваться с verification levels.
 
 ### Кандидаты задач этапа
 - нет

@@ -30,6 +30,7 @@ ID: DOC-000002
 - фиксировать classes validation result, inputs, outputs и ownership интерпретации;
 - удерживать связь validation с pass-close contour без превращения validation в новый toolchain;
 - не дублировать `Verification.md` как contract map verification checks;
+- не дублировать `Validation_Levels.md` как operational levels validation;
 - не дублировать `Verification_Levels.md` как operational levels verification;
 - не дублировать `Verification_Evidence.md` как contract evidence classes, storage и sufficiency;
 - не дублировать `Pipeline/Phase_Gates.md` как gate policy;
@@ -39,6 +40,7 @@ ID: DOC-000002
 - `Verification.md` отвечает за contract map verification-layer: checks, inputs, outputs, evidence forms и ownership verification result.
 - `Verification_Levels.md` отвечает за operational levels verification и target split future `bp_check / bp_verify`.
 - `Verification_Evidence.md` отвечает за виды evidence, обязательность, storage и linkage к pass-close contour.
+- `Validation_Levels.md` отвечает за operational levels validation и relation этих уровней к evidence package и pass-close contour.
 - `Pipeline/Phase_Gates.md` отвечает за manual gate decision и phase approval.
 - `Tools/*` отвечают за implementation automatic checks.
 - `Validation.md` отвечает за то, как validation-layer читает verification result и evidence package, какие verdict classes выдаёт и когда outcome считается подтверждённым относительно contract.
@@ -240,6 +242,9 @@ Validation-layer не должен:
 ### К `Verification_Evidence.md`
 `Verification_Evidence.md` задаёт classes, storage и sufficiency rules evidence. `Validation.md` использует этот package как basis для outcome confirmation.
 
+### К `Validation_Levels.md`
+`Validation_Levels.md` раскладывает общую contract map validation-layer по уровням: sufficiency, outcome confirmation, pass-close readiness и gate handoff readiness.
+
 ### К `Plans/*`
 `Plans/*` владеет stage/task/pass state. Validation использует planning-state как часть closure basis, но не владеет им.
 
@@ -254,6 +259,7 @@ Validation-layer не должен:
 - tool implementation spec;
 - gate policy;
 - replacement для `Verification.md`, `Verification_Levels.md` или `Verification_Evidence.md`;
+- replacement для `Validation_Levels.md`;
 - checklist каждого отдельного domain-specific validation case.
 
-Он остаётся каноническим boundary-document validation-layer текущего `BytePress`.
+Он остаётся каноническим contract map validation-layer текущего `BytePress`.
