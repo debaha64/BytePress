@@ -3,10 +3,10 @@
 ID: DOC-000003
 Название: Validation Levels
 Статус: Действует
-Связи: `ROAD-000011`, `BACK-000069`, `PLAN-000057`, `Docs/Technical/Validation.md`, `Docs/Technical/Verification_Evidence.md`
+Связи: `ROAD-000011`, `BACK-000069`, `PLAN-000057`, `Docs/Technical/Validation.md`, `Docs/Technical/Validation_Evidence.md`, `Docs/Technical/Verification_Evidence.md`
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-08
-Дата_изменения: 2026-04-08
+Дата_изменения: 2026-04-11
 
 ## Назначение
 `Docs/Technical/Validation_Levels.md` является каноническим singleton document, который фиксирует уровни validation-контура текущего `BytePress`.
@@ -30,6 +30,7 @@ ID: DOC-000003
 - раскладывать validation по operational levels, не превращая это в validation toolchain;
 - фиксировать relation уровней к evidence package и pass-close contour;
 - не дублировать `Validation.md` как общую карту inputs/outputs/ownership;
+- не дублировать `Validation_Evidence.md` как classes, storage и sufficient/insufficient criteria validation evidence;
 - не дублировать `Verification_Evidence.md` как contract evidence classes и storage;
 - не дублировать `Artifact_Lifecycle.md` как closure-loop и sync matrix;
 - не дублировать `Pipeline/Phase_Gates.md` как gate policy;
@@ -38,7 +39,8 @@ ID: DOC-000003
 ## Чем document отличается от соседних contracts
 - `Validation.md` задаёт общую contract map validation-layer.
 - `Validation_Levels.md` раскладывает validation contour по уровням и по relation к pass-close contour.
-- `Verification_Evidence.md` задаёт classes, storage и sufficiency rules evidence package.
+- `Validation_Evidence.md` задаёт classes, storage и sufficient/insufficient criteria validation evidence package.
+- `Verification_Evidence.md` задаёт upstream classes, storage и sufficiency rules evidence package.
 - `Verification_Levels.md` задаёт уровни verification, а не уровни outcome confirmation.
 - `Artifact_Lifecycle.md` задаёт closure-loop и обязательные sync relations, но не делит validation на levels.
 - `Pipeline/Phase_Gates.md` задаёт gate policy, но не описывает validation ladder.
@@ -50,6 +52,7 @@ ID: DOC-000003
 
 Required inputs:
 - verification evidence package из `Docs/Technical/Verification_Evidence.md`;
+- validation evidence expectations из `Docs/Technical/Validation_Evidence.md`;
 - outputs relevant verification checks и planning-state evidence;
 - current `Plan` как носитель evidence summary текущего pass.
 
@@ -64,6 +67,10 @@ Relation к `Verification_Evidence.md`:
 - опирается на EVC-001..EVC-006 как на уже утверждённые evidence classes;
 - не создаёт новых evidence classes.
 
+Relation к `Validation_Evidence.md`:
+- получает criteria sufficient / insufficient evidence для validation interpretation;
+- использует `Validation_Evidence.md` как contract того, как upstream evidence bundle должен быть связан с validation scope.
+
 Relation к pass-close contour:
 - если уровень не пройден, pass-close contour не может перейти к локальному closure claim;
 - недостаточный evidence package блокирует дальнейшую validation interpretation.
@@ -74,6 +81,7 @@ Relation к pass-close contour:
 
 Required inputs:
 - result level 1;
+- evidence sufficiency criteria из `Docs/Technical/Validation_Evidence.md`;
 - active contracts и реально затронутые documents текущего pass;
 - verification result из `Validation.md` / `Verification.md`.
 
@@ -87,6 +95,10 @@ Relation к `Validation.md`:
 Relation к `Verification_Evidence.md`:
 - использует evidence package как basis, но не подменяет semantic interpretation самим presence evidence.
 
+Relation к `Validation_Evidence.md`:
+- использует VAE-002 как contract outcome interpretation evidence;
+- не сводит outcome confirmation к наличию upstream checks outputs.
+
 Relation к pass-close contour:
 - это последний validation уровень, после которого pass owner может делать local closure claim;
 - без него pass нельзя переводить в финальные planning-statuses.
@@ -99,10 +111,15 @@ Required inputs:
 - result levels 1-2;
 - current planning-state из `Roadmap.md`, `Backlog.md` и current `Plan`;
 - обязательная governance-сверка pass.
+- closure readiness evidence из `Docs/Technical/Validation_Evidence.md`.
 
 Expected outputs:
 - readiness verdict для local pass-close;
 - подтверждение, что validation result достаточно отражён в current `Plan` и user-facing отчёте.
+
+Relation к `Validation_Evidence.md`:
+- использует VAE-003 как closure-readiness evidence;
+- требует sufficient evidence package для связи validation outcome с planning-state.
 
 Relation к `Validation.md`:
 - реализует ту часть contract map, где validation входит в pass-close contour.
@@ -123,6 +140,7 @@ Required inputs:
 - result levels 1-3;
 - handoff-ready evidence package;
 - process context из `Pipeline/Phase_Gates.md`, если gate input действительно нужен.
+- optional gate handoff evidence expectations из `Docs/Technical/Validation_Evidence.md`.
 
 Expected outputs:
 - handoff-ready validation note;
@@ -133,6 +151,10 @@ Relation к `Validation.md`:
 
 Relation к `Verification_Evidence.md`:
 - использует gate-handoff evidence как готовый пакет, но не считает gate approval evidence substitute.
+
+Relation к `Validation_Evidence.md`:
+- использует VAE-004 как optional gate handoff evidence;
+- не смешивает gate-ready validation package с самим gate decision.
 
 Relation к pass-close contour:
 - не нужен для каждого pass как условие локального close;
@@ -156,6 +178,9 @@ Relation к pass-close contour:
 ### К `Validation.md`
 `Validation.md` удерживает общую contract map validation-layer. `Validation_Levels.md` раскладывает её по operational levels.
 
+### К `Validation_Evidence.md`
+`Validation_Evidence.md` задаёт, какой evidence bundle обязателен и достаточен на каждом validation level.
+
 ### К `Verification_Evidence.md`
 `Verification_Evidence.md` задаёт, что считается evidence и как оно хранится. `Validation_Levels.md` показывает, на каких уровнях этот evidence bundle читается и интерпретируется.
 
@@ -171,7 +196,7 @@ Lifecycle contract задаёт closure-loop. Validation levels определя
 ## Граница документа
 `Validation_Levels.md` не является:
 - implementation spec validation tooling;
-- заменой `Validation.md` или `Verification_Evidence.md`;
+- заменой `Validation.md`, `Validation_Evidence.md` или `Verification_Evidence.md`;
 - gate policy;
 - checklist каждого конкретного domain-specific validation case.
 

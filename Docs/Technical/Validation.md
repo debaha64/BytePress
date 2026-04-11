@@ -3,10 +3,10 @@
 ID: DOC-000002
 Название: Validation
 Статус: Действует
-Связи: `ROAD-000011`, `BACK-000067`, `PLAN-000055`, `Docs/Technical/Verification.md`, `Docs/Technical/Verification_Evidence.md`
+Связи: `ROAD-000011`, `BACK-000067`, `PLAN-000055`, `Docs/Technical/Verification.md`, `Docs/Technical/Verification_Evidence.md`, `Docs/Technical/Validation_Evidence.md`
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-08
-Дата_изменения: 2026-04-08
+Дата_изменения: 2026-04-11
 
 ## Назначение
 `Docs/Technical/Validation.md` является каноническим singleton document, который фиксирует contract map validation-layer текущего `BytePress`.
@@ -31,6 +31,7 @@ ID: DOC-000002
 - удерживать связь validation с pass-close contour без превращения validation в новый toolchain;
 - не дублировать `Verification.md` как contract map verification checks;
 - не дублировать `Validation_Levels.md` как operational levels validation;
+- не дублировать `Validation_Evidence.md` как classes validation evidence, storage и sufficiency criteria;
 - не дублировать `Verification_Levels.md` как operational levels verification;
 - не дублировать `Verification_Evidence.md` как contract evidence classes, storage и sufficiency;
 - не дублировать `Pipeline/Phase_Gates.md` как gate policy;
@@ -39,7 +40,8 @@ ID: DOC-000002
 ## Чем validation отличается от соседних contracts
 - `Verification.md` отвечает за contract map verification-layer: checks, inputs, outputs, evidence forms и ownership verification result.
 - `Verification_Levels.md` отвечает за operational levels verification и target split future `bp_check / bp_verify`.
-- `Verification_Evidence.md` отвечает за виды evidence, обязательность, storage и linkage к pass-close contour.
+- `Verification_Evidence.md` отвечает за upstream виды evidence, обязательность, storage и linkage к pass-close contour.
+- `Validation_Evidence.md` отвечает за classes validation evidence, mandatory / optional status, sufficient / insufficient criteria и relation к validation levels.
 - `Validation_Levels.md` отвечает за operational levels validation и relation этих уровней к evidence package и pass-close contour.
 - `Pipeline/Phase_Gates.md` отвечает за manual gate decision и phase approval.
 - `Tools/*` отвечают за implementation automatic checks.
@@ -242,6 +244,9 @@ Validation-layer не должен:
 ### К `Verification_Evidence.md`
 `Verification_Evidence.md` задаёт classes, storage и sufficiency rules evidence. `Validation.md` использует этот package как basis для outcome confirmation.
 
+### К `Validation_Evidence.md`
+`Validation_Evidence.md` задаёт, какой evidence package validation считает достаточным на разных уровнях interpretation, closure readiness и gate handoff readiness.
+
 ### К `Validation_Levels.md`
 `Validation_Levels.md` раскладывает общую contract map validation-layer по уровням: sufficiency, outcome confirmation, pass-close readiness и gate handoff readiness.
 
@@ -259,7 +264,7 @@ Validation-layer не должен:
 - tool implementation spec;
 - gate policy;
 - replacement для `Verification.md`, `Verification_Levels.md` или `Verification_Evidence.md`;
-- replacement для `Validation_Levels.md`;
+- replacement для `Validation_Levels.md` или `Validation_Evidence.md`;
 - checklist каждого отдельного domain-specific validation case.
 
 Он остаётся каноническим contract map validation-layer текущего `BytePress`.

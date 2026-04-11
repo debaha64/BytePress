@@ -46,7 +46,7 @@ ID: PLAN-000057
 ## Артефакты
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
-- `Plans/PLAN-000057-define-validation-levels.md`
+- `Plans/Archive/PLAN-000057-define-validation-levels.md`
 - `Plans/Archive/PLAN-000056-clarify-validation-contract-map.md`
 - `Docs/Technical/Validation_Levels.md`
 - `Docs/Technical/Validation.md`
