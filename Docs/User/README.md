@@ -13,6 +13,7 @@
 - `README.md` — entrypoint user-layer и карта маршрутов.
 - `Operating_Mode.md` — human operating mode: роль человека, отношение к агенту и общий режим работы с системой.
 - `First_Start.md` — первый маршрут входа в `BytePress` после клонирования или получения репозитория.
+- `Pass_Request.md` — как человеку формулировать pass для агента через repo contracts.
 - `Usage_Scenarios.md` — базовые сценарии использования `BytePress` как системы.
 
 ## Что входит в user-layer
@@ -37,6 +38,7 @@
 ## Базовые user-documents
 - human operating mode раскрыт в `Operating_Mode.md`;
 - порядок первого старта раскрыт в `First_Start.md`;
+- как формулировать pass для агента раскрыто в `Pass_Request.md`;
 - базовые сценарии использования раскрыты в `Usage_Scenarios.md`.
 
 ## Связи

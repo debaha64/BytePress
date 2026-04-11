@@ -9,11 +9,11 @@
 - Прочитать `../../README.md` как карту системы.
 - Проверить human operating mode через `Operating_Mode.md`.
 - Если среда не готова, пройти `../../Setup_Guide.md`.
-- Запустить `python3 ../../Tools/bp_lint.py --repo .` из корня репозитория, чтобы убедиться, что базовая структура валидна.
+- Из корня репозитория запустить `python3 Tools/bp_lint.py --repo .`, чтобы убедиться, что базовая структура валидна.
 
 ## Сценарий 2. Запустить новый pass с агентом
 - Найти текущий stage/task/pass в `../../Plans/Roadmap.md`, `../../Plans/Backlog.md` и current `Plan`.
-- Сформулировать узкий scope и ограничения для pass.
+- Сформулировать pass через `Pass_Request.md` и repo contracts.
 - Направить агента на задачу, опираясь на repo contracts, а не на ручной пересказ всего operating loop.
 - Проверить результат по checks, governance-сверке и PR-flow, которые агент обязан пройти по `../../AGENTS.md`.
 
