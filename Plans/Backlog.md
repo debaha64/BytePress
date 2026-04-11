@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- нет активного этапа; backlog `ROAD-000011` выведен в `Plans/Archive/Backlog/ROAD-000011.md`
+- ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 
 ## Легенда типов
 - Система
@@ -29,13 +29,28 @@
 
 ---
 
-## Архив
-Historical backlog завершённых этапов хранится в `Plans/Archive/Backlog/ROAD-<NNNNNN>.md`.
+## ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
+
+### Активные
+- отсутствуют
+
+### Завершённые
+
+#### BACK-000073 — Активировать ROAD-000012 и зафиксировать AGENTS.md как canonical agent entry point
+ID: BACK-000073
+Название: Активировать ROAD-000012 и зафиксировать AGENTS.md как canonical agent entry point
+Тип: Документация
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000012, PLAN-000061
+Источник: Новый узкий pass этапа `ROAD-000012`
+Дата_создания: 2026-04-11
+Дата_изменения: 2026-04-11
+
+##### Описание
+Активировать `ROAD-000012`, пересобрать `AGENTS.md` как каноническую entry point карту агента в `BytePress`, зафиксировать source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*` без открытия широкого user-layer и без автоматической активации `ROAD-000013`.
+
+### Кандидаты задач этапа
+- нет
 
 ---
-
-Активный этап отсутствует.
-
-`ROAD-000011` завершён и выведен в `Plans/Archive/Backlog/ROAD-000011.md`.
-
-`ROAD-000012` не активирован автоматически и остаётся следующим черновым горизонтом в `Plans/Roadmap.md`.
