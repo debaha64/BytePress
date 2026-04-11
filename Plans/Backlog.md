@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067, BACK-000068, BACK-000069, BACK-000070 | Кандидаты задач этапа
+- ROAD-000011 — Контур проверок и верификации (Verification and Validation Contour) | Активные: нет | Завершённые: BACK-000062, BACK-000063, BACK-000064, BACK-000065, BACK-000066, BACK-000067, BACK-000068, BACK-000069, BACK-000070, BACK-000071 | Кандидаты задач этапа
 
 ## Легенда типов
 - Система
@@ -41,6 +41,20 @@ Historical backlog завершённых этапов хранится в `Plan
 - нет
 
 ### Завершённые
+
+#### BACK-000071 — Зафиксировать tooling boundary validation-контура
+ID: BACK-000071
+Название: Зафиксировать tooling boundary validation-контура
+Тип: Документация
+Приоритет: Критический
+Статус: Завершено
+Связи: ROAD-000011, PLAN-000059
+Источник: Следующий узкий pass этапа `ROAD-000011`
+Дата_создания: 2026-04-11
+Дата_изменения: 2026-04-11
+
+##### Описание
+Пересобрать `Tools/README.md` так, чтобы tooling boundary явно покрывал не только verification contour, но и validation contour: развести validation tooling support, verification tooling, procedural validation, границу между validation result и gate decision, а также не вводить новый validation toolchain.
 
 #### BACK-000070 — Зафиксировать contract validation evidence
 ID: BACK-000070
