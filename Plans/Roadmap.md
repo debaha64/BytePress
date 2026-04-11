@@ -216,17 +216,17 @@ ID: ROAD-000011
 ## ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 ID: ROAD-000012
 Этап: Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
-Статус: В_работе
-Связи: BACK-000073, BACK-000074
-Источник: PLAN-000061, PLAN-000062
+Статус: Завершено
+Связи: BACK-000073, BACK-000074, BACK-000075
+Источник: PLAN-000061, PLAN-000062, PLAN-000063
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-11
 Цель: Проявить устойчивую точку входа агента и согласованный пользовательский слой после того, как planning и verification-контуры перестанут противоречить друг другу.
 Зависимости: ROAD-000011
-Связанные_backlog: BACK-000073, BACK-000074
+Связанные_backlog: BACK-000073, BACK-000074, BACK-000075
 
 ### Описание
-Этап активирован узким boundary-pass: сначала фиксируется `AGENTS.md` как каноническая agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Следующий узкий pass проявляет минимальный `Docs/User/*` как human-facing layer: human operating mode, порядок первого старта и базовые сценарии использования без широкого user-layer и без автоматической активации `ROAD-000013`.
+Этап завершён: первый pass зафиксировал `AGENTS.md` как каноническую agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Следующий pass проявил минимальный human-facing `Docs/User/*` с human operating mode, порядком первого старта и базовыми сценариями использования без широкого user-layer. Финальный closure-pass добавил последний обязательный user-facing contract для формулирования pass человеком, исправил доказанный direct contradiction вокруг запуска `bp_lint.py` из корня репозитория и не подтвердил residual gap в active agent-entry/user-layer contour, поэтому `ROAD-000012` закрыт и не активирует `ROAD-000013` автоматически.
 
 ---
 
