@@ -216,7 +216,7 @@ ID: ROAD-000011
 ## ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 ID: ROAD-000012
 Этап: Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000073, BACK-000074, BACK-000075
 Источник: PLAN-000061, PLAN-000062, PLAN-000063
 Дата_создания: 2026-03-31
@@ -226,7 +226,7 @@ ID: ROAD-000012
 Связанные_backlog: BACK-000073, BACK-000074, BACK-000075
 
 ### Описание
-Этап активирован узкими passes: сначала фиксируется `AGENTS.md` как каноническая agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Затем минимальный user-layer проявляет human operating mode, порядок первого старта и базовые сценарии использования без широкого user-layer. Текущий closure-pass добирает последний обязательный user-facing contract для формулирования pass человеком, исправляет direct contradiction вокруг запуска `bp_lint.py` из корня репозитория и проводит финальный audit contour без автоматической активации `ROAD-000013`.
+Этап завершён: первый pass зафиксировал `AGENTS.md` как каноническую agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Следующий pass проявил минимальный human-facing `Docs/User/*` с human operating mode, порядком первого старта и базовыми сценариями использования без широкого user-layer. Финальный closure-pass добавил последний обязательный user-facing contract для формулирования pass человеком, исправил доказанный direct contradiction вокруг запуска `bp_lint.py` из корня репозитория и не подтвердил residual gap в active agent-entry/user-layer contour, поэтому `ROAD-000012` закрыт и не активирует `ROAD-000013` автоматически.
 
 ---
 

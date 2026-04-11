@@ -2,7 +2,7 @@
 
 ID: PLAN-000063
 Название: Провести closure-pass и закрыть `ROAD-000012`
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000075
 Источник: Новый завершающий pass этапа `ROAD-000012`
 Дата_создания: 2026-04-11
@@ -50,9 +50,28 @@ ID: PLAN-000063
 - `Plans/Backlog.md`
 - `Plans/PLAN-000063-close-road-000012-user-entry.md`
 - `Plans/Archive/PLAN-000062-minimal-user-boundary.md`
+- `Plans/Archive/Backlog/ROAD-000012.md`
 - `Docs/User/*`
 - `README.md`
 - `Setup_Guide.md`
 - `Plans/README.md`
 - `Standards/Planning.md`
 - `Tools/bp_lint.py`
+
+## DoD
+- создана одна новая backlog-задача и один новый current `Plan` для closure-pass.
+- исправлен direct contradiction в `Docs/User/*` вокруг команды запуска `bp_lint.py` из корня репозитория.
+- добавлен один минимальный user-facing document о том, как человеку формулировать pass для агента через repo contracts.
+- выполнен явный audit `ROAD-000012`.
+- residual gap в active agent-entry/user-layer contour не подтверждён, поэтому `ROAD-000012` закрыт, а stage backlog выведен в archive-layer.
+- `ROAD-000013` не активирован автоматически.
+- `python3 Tools/bp_lint.py --repo .` проходит.
+
+## Результат
+- `Pass_Request.md` добавлен как минимальный user-facing contract для формулирования pass человеком через repo contracts без дублирования agent operating loop.
+- direct contradiction в `Docs/User/*` вокруг запуска `bp_lint.py` из корня репозитория исправлен: user-layer теперь ссылается на `python3 Tools/bp_lint.py --repo .` именно как на команду из корня репозитория.
+- Финальный audit `AGENTS.md`, `Docs/User/*`, `README.md`, `Setup_Guide.md`, `Plans/*` и `Standards/Planning.md` не подтвердил residual gap в active contour `ROAD-000012`.
+- `ROAD-000012` переведён в `Завершено`, active `Backlog.md` очищен, а backlog этапа выведен в `Plans/Archive/Backlog/ROAD-000012.md`.
+- `ROAD-000013` не активирован автоматически.
+- `README.md`, `Setup_Guide.md`, `Plans/README.md`, `Standards/Planning.md` и `Tools/bp_lint.py` не менялись, потому что audit не подтвердил реального direct contradiction или tooling gap.
+- `bp_lint contract unaffected`
