@@ -217,16 +217,16 @@ ID: ROAD-000011
 ID: ROAD-000012
 Этап: Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 Статус: В_работе
-Связи: BACK-000073
-Источник: PLAN-000061
+Связи: BACK-000073, BACK-000074
+Источник: PLAN-000061, PLAN-000062
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-11
 Цель: Проявить устойчивую точку входа агента и согласованный пользовательский слой после того, как planning и verification-контуры перестанут противоречить друг другу.
 Зависимости: ROAD-000011
-Связанные_backlog: BACK-000073
+Связанные_backlog: BACK-000073, BACK-000074
 
 ### Описание
-Этап активирован узким boundary-pass: сначала фиксируется `AGENTS.md` как каноническая agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Широкий user-layer этим pass не открывается, а `ROAD-000013` не активируется автоматически.
+Этап активирован узким boundary-pass: сначала фиксируется `AGENTS.md` как каноническая agent entry point и routing-document для Codex внутри `BytePress`, source-of-truth hierarchy, operating loop и границы между `AGENTS.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*`, `Logs/*` и `Tools/*`. Следующий узкий pass проявляет минимальный `Docs/User/*` как human-facing layer: human operating mode, порядок первого старта и базовые сценарии использования без широкого user-layer и без автоматической активации `ROAD-000013`.
 
 ---
 
