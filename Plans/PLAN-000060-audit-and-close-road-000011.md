@@ -72,5 +72,6 @@ ID: PLAN-000060
 - Audit active verification/validation contour не подтвердил реального residual gap: verification, validation, evidence, tooling support и gates разведены без доказанного active-layer contradiction.
 - `ROAD-000011` переведён в `Завершено` без candidate tail и без автоматической активации `ROAD-000012`.
 - `Plans/Backlog.md` очищен от закрытого этапа, а backlog `ROAD-000011` выведен в `Plans/Archive/Backlog/ROAD-000011.md`; `Plans/README.md` и `Standards/Planning.md` минимально синхронизированы, чтобы явно допустить пустой active backlog между этапами.
+- governance-sync подтверждён: `BACK-000072` находится в archived backlog `ROAD-000011` со статусом `Завершено`, active `Backlog.md` явно фиксирует отсутствие текущего этапа, `ROAD-000011` имеет статус `Завершено`, current `Plan` оформлен как `PLAN-000060`.
 - `Docs/Technical/*`, `Tools/README.md`, `Pipeline/Phase_Gates.md` и `Tools/bp_lint.py` не менялись, потому что audit не доказал contract defect в самом verification/validation contour.
 - `bp_lint contract unaffected`
