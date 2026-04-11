@@ -65,6 +65,7 @@ ID: PLAN-000059
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
+- planning-contour согласован: `BACK-000071` находится в завершённой секции и индексе `Backlog.md`, `ROAD-000011` остаётся в `В_работе`, current `Plan` оформлен как `PLAN-000059`.
 - `Tools/README.md` пересобран как boundary-document verification + validation tooling contour с явным разделением роли `bp_lint`, target role будущих `bp_check / bp_verify`, допустимого future validation tooling и procedural validation.
 - `Docs/Technical/Validation.md`, `Validation_Levels.md`, `Validation_Evidence.md`, `Verification_Levels.md`, `Docs/Technical/README.md`, `Pipeline/Phase_Gates.md` и `Tools/bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
 - `bp_lint contract unaffected`
