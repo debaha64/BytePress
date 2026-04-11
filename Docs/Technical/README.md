@@ -119,6 +119,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Verification_Levels.md` — уровни verification-контура и target split будущих `bp_check / bp_verify`.
 - `Validation.md` — contract map validation-layer: inputs, outputs, verdict classes, ownership и связь outcome confirmation с evidence, pass-close contour и gates.
 - `Validation_Levels.md` — уровни validation-контура, required inputs, expected outputs и relation к evidence package и pass-close contour.
+- `Validation_Evidence.md` — contract validation evidence: classes, mandatory / optional expectations, storage и sufficient / insufficient criteria.
 
 ## Связи
 - конвейер как process-domain раскрыт в `../../Pipeline/`;
