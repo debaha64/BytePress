@@ -2,7 +2,7 @@
 
 ID: PLAN-000058
 Название: Зафиксировать contract validation evidence
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000070
 Источник: Следующий узкий pass этапа `ROAD-000011`
 Дата_создания: 2026-04-11
@@ -64,4 +64,9 @@ ID: PLAN-000058
 - `python3 Tools/bp_lint.py --repo .` проходит.
 
 ## Результат
-- в работе
+- `Docs/Technical/Validation_Evidence.md` создан как singleton contract validation evidence: classes, mandatory / optional expectations, storage, sufficient / insufficient criteria и relation к validation levels и pass-close contour.
+- `Docs/Technical/Validation.md` минимально синхронизирован, чтобы явно ссылаться на `Validation_Evidence.md` как отдельный evidence-contract validation-layer.
+- `Docs/Technical/Validation_Levels.md` минимально синхронизирован, чтобы развести levels-document и evidence-document без повторного открытия verification-evidence scope.
+- `Docs/Technical/README.md` минимально синхронизирован, чтобы включить `Validation_Evidence.md` в карту technical-layer.
+- `Pipeline/Phase_Gates.md`, `Tools/README.md` и `bp_lint.py` не менялись, потому что audit не подтвердил реального противоречия или contract impact.
+- `bp_lint contract unaffected`
