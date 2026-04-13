@@ -2,7 +2,7 @@
 
 ID: PLAN-000065
 Название: Активировать `ROAD-000014` и собрать controlled integration contour
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000077
 Источник: Новый крупный activation pass этапа `ROAD-000014`
 Дата_создания: 2026-04-13
@@ -64,4 +64,7 @@ ID: PLAN-000065
 - `ROAD-000014` остаётся `В_работе` после pass с узко сформулированным residual front.
 
 ## Результат
-- В работе.
+- `ROAD-000014` активирован и оставлен в статусе `В_работе` как текущий stage.
+- `Docs/Technical/*`, `MCP/*`, `Adapters/*` и `Tools/README.md` теперь согласованно фиксируют controlled integration contour, границы `Adapters/*` и `MCP/*`, product-side handoff через `scripts/*` и отсутствие реальных внешних подключений в active scope.
+- `Tools/bp_bootstrap.py` materialize `scripts/integration-smoke.sh`, а `Tools/bp_integration_smoke.py` и `Tools/bp_lint.py` подтверждают minimal integration smoke contour generated product repo.
+- Реальный smoke bootstrap на отдельном target path подтвердил, что generated repo проходит и structural lint, и integration smoke route.

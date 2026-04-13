@@ -260,4 +260,4 @@ ID: ROAD-000014
 Связанные_backlog: BACK-000077
 
 ### Описание
-Activation pass переводит stage из черновика в рабочее состояние и фиксирует controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. По итогам этого pass stage остаётся `В_работе`: реальных внешних подключений, секретов, network-dependent runtime и vendor-specific execution logic по-прежнему нет, а следующий остаточный фронт сужен до repo-native integration evidence/handoff без открытия нового широкого слоя.
+Activation pass перевёл stage из черновика в рабочее состояние и зафиксировал controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. Generated product repo теперь materialize отдельный minimal integration smoke route и проходит его без открытия реальных внешних подключений, секретов, network-dependent runtime и vendor-specific execution logic. По итогам pass `ROAD-000014` остаётся `В_работе`, а следующий остаточный фронт сужен до repo-native integration evidence/handoff без открытия нового широкого слоя.

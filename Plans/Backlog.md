@@ -35,23 +35,23 @@ Historical backlog завершённых этапов хранится в `Plan
 ## ROAD-000014 — Интеграционный контур и будущие расширения
 
 ### Активные
+- отсутствуют
+
+### Завершённые
 
 #### BACK-000077 — Активировать controlled integration contour
 ID: BACK-000077
 Название: Активировать controlled integration contour
 Тип: Инфраструктура
 Приоритет: Высокий
-Статус: В_работе
+Статус: Завершено
 Связи: ROAD-000014, PLAN-000065
 Источник: Activation pass этапа `ROAD-000014`
 Дата_создания: 2026-04-13
 Дата_изменения: 2026-04-13
 
 ##### Описание
-Зафиксировать канонический integration contour `BytePress`, controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`, materialize minimal integration smoke route без открытия реальных внешних подключений и оставить stage в управляемом активном состоянии.
-
-### Завершённые
-- отсутствуют
+Зафиксирован канонический integration contour `BytePress`, controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`; generated repo materialize отдельный minimal integration smoke route без открытия реальных внешних подключений, а stage остаётся активным для следующего узкого integration pass.
 
 ### Кандидаты задач этапа
 - Следующий узкий фронт: оформить repo-native integration evidence handoff для generated product repo без открытия реальных connector runtimes и без расширения bootstrap-stage.
