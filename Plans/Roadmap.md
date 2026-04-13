@@ -233,7 +233,7 @@ ID: ROAD-000012
 ## ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 ID: ROAD-000013
 Этап: Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000076
 Источник: PLAN-000064
 Дата_создания: 2026-03-31
@@ -243,7 +243,7 @@ ID: ROAD-000013
 Связанные_backlog: BACK-000076
 
 ### Описание
-Этап активирован как один stage-closing pass: bootstrap/replication contract доводится от minimal skeleton до first-usable replicated product repo, materialized outcome синхронизируется с current agent/user entry contracts, active non-log baseline `BytePress` переводится на `0.2.0` только в реально operational contracts, а доказанные workflow defects закрываются по результатам audit без автоматической активации `ROAD-000014`.
+Этап завершён одним stage-closing pass: bootstrap/replication contract доведён от minimal skeleton до first-usable replicated product repo, materialized outcome синхронизирован с current agent/user entry contracts, active non-log baseline `BytePress` переведён на `0.2.0` только в реально operational contracts, а `.codex` workflow noise закрыт как доказанный `.gitignore` gap. Финальный audit не подтвердил residual gap в bootstrap/replication contour, поэтому `ROAD-000013` закрыт и не активирует `ROAD-000014` автоматически.
 
 ---
 
