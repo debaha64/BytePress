@@ -66,7 +66,8 @@ Outcome включает:
 - минимальный product-layer с базовыми content placeholders;
 - минимальный technical-layer продукта только в объёме стартовых singleton docs;
 - initial planning contour продукта в состоянии first current stage/task/pass;
-- базовые logs, adapter registry/policy и project entry scripts.
+- базовые logs, adapter registry/policy и project entry scripts;
+- minimal integration smoke route, который возвращает generated repo в controlled integration contour `BytePress` без materialization `MCP/*` внутри продукта.
 
 Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его first-usable, согласованным и пригодным к следующему управляемому pass без ручной пересборки entry contour.
 
@@ -150,14 +151,17 @@ Bootstrap обязан создать:
 - `Adapters/Gemini/README.md`
 - `Adapters/Local/README.md`
 
+Этот skeleton фиксирует product-side adapter contour, но не materialize `MCP/*` внутрь generated product repo. `MCP/*` остаётся owner-domain самого `BytePress`, а product repo получает только controlled handoff route к нему через `scripts/*` и repo-native tools.
+
 ### Project entry scripts
 Bootstrap обязан создать:
 - `scripts/README.md`
 - `scripts/dev-up.sh`
 - `scripts/dev-down.sh`
 - `scripts/dev-test.sh`
+- `scripts/integration-smoke.sh`
 
-Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, а не оставаться немым placeholder.
+Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, а `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic.
 
 ## Что bootstrap materialize только как каркас
 Bootstrap создаёт каркас, но не завершённое содержательное состояние, для:
@@ -169,6 +173,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 - `Plans/*` — только начальный stage/task/pass baseline, а не готовый предметный backlog;
 - `Logs/*` — только empty or near-empty fact containers;
 - `Adapters/*` и `scripts/*` — только managed entry skeleton без полноценной интеграционной логики.
+- `MCP/*` — не materialize в product repo bootstrap'ом; этот слой остаётся в `BytePress` и участвует только через controlled handoff.
 
 ## Что bootstrap сознательно не обязан делать
 Bootstrap не обязан:
@@ -207,12 +212,14 @@ Bootstrap предполагает, что:
 - ограничивать technical layer продукта минимальным subset;
 - ограничивать planning layer одной стартовой stage/task/pass цепочкой;
 - materialize product repo с minimal human/agent entry contour вместо полного governance copy;
+- materialize product repo с minimal integration smoke route вместо реальных внешних connectors;
 - ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
 - создавать logs как пустые или почти пустые singleton containers.
 
 ### Недопустимые упрощения и пропуски
 - не создавать один из обязательных singleton artifacts минимального outcome;
 - не создавать `AGENTS.md` или обязательный `Docs/User/*` contour replicated repo;
+- не создавать `scripts/integration-smoke.sh`, если bootstrap заявляет controlled integration contour;
 - создавать initial plan без внутреннего `ID: PLAN-000001`;
 - оставлять initial stage/task/pass в пассивном или двусмысленном состоянии, если репозиторий заявлен как first-usable;
 - пропускать `Profiles/Product.md` или нарушать `Тип_профиля: product`;

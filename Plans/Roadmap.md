@@ -250,14 +250,14 @@ ID: ROAD-000013
 ## ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 ID: ROAD-000014
 Этап: Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
-Статус: Черновик
-Связи: отсутствуют
-Источник: Дальний стратегический этап
+Статус: В_работе
+Связи: BACK-000077, PLAN-000065
+Источник: PLAN-000065
 Дата_создания: 2026-03-31
-Дата_изменения: 2026-04-06
-Цель: Развить интеграционный контур, будущие расширения и дальний growth-horizon `BytePress` после replication-stage и baseline `0.2.0`.
+Дата_изменения: 2026-04-13
+Цель: Собрать управляемый integration contour `BytePress` после replication-stage и baseline `0.2.0`, не открывая реальные внешние интеграции и не смешивая integration-layer с source-of-truth моделью репозитория.
 Зависимости: ROAD-000013
-Связанные_backlog: отсутствуют
+Связанные_backlog: BACK-000077
 
 ### Описание
-Дальний этап, в котором интеграции, расширения и последующее масштабирование сходятся в следующий горизонт развития без дополнительной детализации текущим corrective pass.
+Activation pass переводит stage из черновика в рабочее состояние и фиксирует controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. По итогам этого pass stage остаётся `В_работе`: реальных внешних подключений, секретов, network-dependent runtime и vendor-specific execution logic по-прежнему нет, а следующий остаточный фронт сужен до repo-native integration evidence/handoff без открытия нового широкого слоя.

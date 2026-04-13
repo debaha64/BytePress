@@ -186,11 +186,26 @@ Supporting contract layer поставляет form/validation interfaces для
 - merge завершает pass на уровне репозитория, но не меняет ownership доменных source-of-truth.
 
 ### Model adapter contour
-`Adapters/*`, `MCP/*` и смежные integration domains описывают будущий внешний контур подключения моделей и инструментов.
+`Adapters/*`, `MCP/*`, `Tools/*` и generated product repo образуют controlled integration contour без открытия реальных внешних подключений.
 
 Служебный contract:
-- внешние модели и интеграции подключаются только через управляемые adapters/interfaces;
-- внешняя интеграция не меняет архитектурные и planning contracts напрямую.
+- `Adapters/*` задаёт, какой исполнитель и какие режимы применения допустимы внутри системы;
+- `MCP/*` задаёт registry, policy и interface envelope допустимых connector classes, но не становится источником истины и не materialize runtime;
+- `Tools/*` materialize deterministic checks и handoff routes поверх утверждённых adapter/MCP contracts;
+- generated product repo использует только controlled handoff через собственные `scripts/*`, которые обращаются к repo-native tools `BytePress`, а не к внешним сервисам напрямую;
+- внешняя интеграция не меняет архитектурные, planning и knowledge contracts напрямую.
+
+### Controlled connector handoff
+Допустимый minimal handoff проходит так:
+- generated product repo запускает локальный `scripts/integration-smoke.sh`;
+- script вызывает repo-native integration smoke tooling `BytePress` через `BYTEPRESS_ROOT`;
+- tooling читает `Adapters/*`, `MCP/*` и product-side contour как contracts;
+- результатом считается только deterministic local smoke без сетевых вызовов, секретов и vendor runtime.
+
+Недопустимо:
+- вызывать внешние connectors прямо из `Adapters/*` или product `scripts/*`;
+- читать `MCP/*` как source of truth вместо `Docs/Technical/*`, `Plans/*` и product repo contracts;
+- materialize `MCP/*` внутрь generated product repo как часть bootstrap-baseline без отдельного contract.
 
 ### Product contour
 Продукт и его deliverables остаются внешними по отношению к самой файловой фабрике `BytePress`.
