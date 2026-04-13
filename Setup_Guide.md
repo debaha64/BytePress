@@ -143,19 +143,19 @@ python3 Tools/bp_lint.py --repo .
 git checkout develop
 git fetch --prune origin
 git pull --ff-only origin develop
-git checkout -b release/000019-0.1.0-rc2
-git push -u origin release/000019-0.1.0-rc2
+git checkout -b release/000020-0.2.0-rc1
+git push -u origin release/000020-0.2.0-rc1
 ```
 
 Открыть PR из `release/*` только в `main`:
 
 ```bash
-gh pr create --base main --head release/000019-0.1.0-rc2
+gh pr create --base main --head release/000020-0.2.0-rc1
 ```
 
 После merge удалить release-ветку:
 
 ```bash
-git branch -d release/000019-0.1.0-rc2
-git push origin --delete release/000019-0.1.0-rc2
+git branch -d release/000020-0.2.0-rc1
+git push origin --delete release/000020-0.2.0-rc1
 ```

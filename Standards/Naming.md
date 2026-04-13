@@ -11,7 +11,7 @@ ID: STD-000006
 ## Версии
 Версии оформляются в формате `MAJOR.MINOR.PATCH`.
 
-Текущая baseline-version `BytePress`: `0.1.0`.
+Текущая baseline-version `BytePress`: `0.2.0`.
 
 Активные документы используют semver, а не метки вида `vN`, когда речь идёт о текущем operational contract системы.
 
