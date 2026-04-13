@@ -156,7 +156,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Проверка\n"
         "- для structural и integration smoke checks replicated repo установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
         "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`;\n"
-        "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`.\n",
+        "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`;\n"
+        "- report artifact integration smoke будет записан в `Runtime/Integration_Smoke_Report.json`.\n",
     )
 
     write(
@@ -533,7 +534,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `dev-up.sh` — placeholder старта локального product contour.\n"
         "- `dev-down.sh` — placeholder остановки локального contour.\n"
         "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT`.\n"
-        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT`.\n",
+        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с report artifact в `Runtime/Integration_Smoke_Report.json`.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",
@@ -569,11 +570,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "  exit 1\n"
         "fi\n\n"
         "SMOKE_SCRIPT=\"$BYTEPRESS_ROOT/Tools/bp_integration_smoke.py\"\n"
+        "REPORT_PATH=\"$ROOT_DIR/Runtime/Integration_Smoke_Report.json\"\n"
         "if [[ ! -f \"$SMOKE_SCRIPT\" ]]; then\n"
         "  echo \"BytePress integration smoke script not found at: $SMOKE_SCRIPT\"\n"
         "  exit 1\n"
         "fi\n\n"
-        "python3 \"$SMOKE_SCRIPT\" --repo \"$ROOT_DIR\"\n",
+        "python3 \"$SMOKE_SCRIPT\" --repo \"$ROOT_DIR\" --report \"$REPORT_PATH\"\n"
+        "echo \"Integration smoke report written to: $REPORT_PATH\"\n",
     )
 
 

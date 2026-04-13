@@ -35,7 +35,20 @@ Historical backlog завершённых этапов хранится в `Plan
 ## ROAD-000014 — Интеграционный контур и будущие расширения
 
 ### Активные
-- отсутствуют
+
+#### BACK-000078 — Закрыть integration evidence handoff ROAD-000014
+ID: BACK-000078
+Название: Закрыть integration evidence handoff ROAD-000014
+Тип: Инфраструктура
+Приоритет: Высокий
+Статус: В_работе
+Связи: ROAD-000014, PLAN-000066
+Источник: Stage-closing pass этапа `ROAD-000014`
+Дата_создания: 2026-04-13
+Дата_изменения: 2026-04-13
+
+##### Описание
+Оформить repo-native integration evidence handoff для generated product repo поверх уже существующего controlled integration smoke contour, не открывая реальные внешние connectors, network runtime, secrets и vendor-specific execution.
 
 ### Завершённые
 
@@ -54,4 +67,4 @@ ID: BACK-000077
 Зафиксирован канонический integration contour `BytePress`, controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`; generated repo materialize отдельный minimal integration smoke route без открытия реальных внешних подключений, а stage остаётся активным для следующего узкого integration pass.
 
 ### Кандидаты задач этапа
-- Следующий узкий фронт: оформить repo-native integration evidence handoff для generated product repo без открытия реальных connector runtimes и без расширения bootstrap-stage.
+- отсутствуют
