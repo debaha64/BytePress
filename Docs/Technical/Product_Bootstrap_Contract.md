@@ -163,6 +163,8 @@ Bootstrap обязан создать:
 
 Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, а `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic.
 
+В stage-closing baseline `ROAD-000014` этот route также обязан выпускать deterministic evidence/report artifact по фиксированному пути `Runtime/Integration_Smoke_Report.json`, не materialize отдельный новый evidence-layer и не подменяя `Plans/*` или `Logs/*` как source-of-truth.
+
 ## Что bootstrap materialize только как каркас
 Bootstrap создаёт каркас, но не завершённое содержательное состояние, для:
 - `AGENTS.md` продукта — только minimal agent entry point replicated repo, а не копию `AGENTS.md` самого `BytePress`;
@@ -174,6 +176,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 - `Logs/*` — только empty or near-empty fact containers;
 - `Adapters/*` и `scripts/*` — только managed entry skeleton без полноценной интеграционной логики.
 - `MCP/*` — не materialize в product repo bootstrap'ом; этот слой остаётся в `BytePress` и участвует только через controlled handoff.
+- integration evidence artifact — только repo-native handoff carrier внутри `Runtime/*`, а не новый canonical knowledge/fact layer продукта.
 
 ## Что bootstrap сознательно не обязан делать
 Bootstrap не обязан:
@@ -220,6 +223,7 @@ Bootstrap предполагает, что:
 - не создавать один из обязательных singleton artifacts минимального outcome;
 - не создавать `AGENTS.md` или обязательный `Docs/User/*` contour replicated repo;
 - не создавать `scripts/integration-smoke.sh`, если bootstrap заявляет controlled integration contour;
+- не выпускать deterministic integration evidence/report artifact, если bootstrap заявляет stage-closing integration contour с evidence handoff;
 - создавать initial plan без внутреннего `ID: PLAN-000001`;
 - оставлять initial stage/task/pass в пассивном или двусмысленном состоянии, если репозиторий заявлен как first-usable;
 - пропускать `Profiles/Product.md` или нарушать `Тип_профиля: product`;

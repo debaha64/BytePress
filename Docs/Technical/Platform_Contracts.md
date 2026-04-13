@@ -135,7 +135,8 @@
 
 ### `Tools/bp_integration_smoke.py`
 Роль:
-- проверяет minimal controlled connector handoff generated product repo против active integration contracts `BytePress`.
+- проверяет minimal controlled connector handoff generated product repo против active integration contracts `BytePress`;
+- при repo-native report route materialize deterministic integration evidence artifact без обращения к внешней сети.
 
 Не роль:
 - не открывает реальные внешние подключения;

@@ -250,14 +250,14 @@ ID: ROAD-000013
 ## ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 ID: ROAD-000014
 Этап: Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
-Статус: В_работе
-Связи: BACK-000077, PLAN-000065
-Источник: PLAN-000065
+Статус: Завершено
+Связи: BACK-000077, BACK-000078, PLAN-000065, PLAN-000066
+Источник: PLAN-000065, PLAN-000066
 Дата_создания: 2026-03-31
 Дата_изменения: 2026-04-13
 Цель: Собрать управляемый integration contour `BytePress` после replication-stage и baseline `0.2.0`, не открывая реальные внешние интеграции и не смешивая integration-layer с source-of-truth моделью репозитория.
 Зависимости: ROAD-000013
-Связанные_backlog: BACK-000077
+Связанные_backlog: BACK-000077, BACK-000078
 
 ### Описание
-Activation pass перевёл stage из черновика в рабочее состояние и зафиксировал controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. Generated product repo теперь materialize отдельный minimal integration smoke route и проходит его без открытия реальных внешних подключений, секретов, network-dependent runtime и vendor-specific execution logic. По итогам pass `ROAD-000014` остаётся `В_работе`, а следующий остаточный фронт сужен до repo-native integration evidence/handoff без открытия нового широкого слоя.
+Activation pass перевёл stage из черновика в рабочее состояние и зафиксировал controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. Stage-closing pass усилил существующий `integration-smoke` route до deterministic repo-native evidence handoff: generated product repo теперь materialize report artifact `Runtime/Integration_Smoke_Report.json`, а verdict этого artifact согласован со smoke result без открытия реальных внешних подключений, network runtime, secrets или vendor-specific execution. Финальный audit не подтвердил residual gap в active integration contour, bootstrap/validation sync или evidence handoff boundary, поэтому `ROAD-000014` закрыт и backlog этапа выведен в archive-layer без автоматической активации нового `ROAD-*`.

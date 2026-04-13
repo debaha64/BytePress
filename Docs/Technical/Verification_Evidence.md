@@ -34,10 +34,12 @@
 
 Примеры:
 - результат `python3 Tools/bp_lint.py --repo .`.
+- deterministic report artifact `Runtime/Integration_Smoke_Report.json`, выпущенный существующим `integration-smoke` route generated product repo.
 
 Где хранится:
 - как summary в current `Plan` (и/или в user-facing отчёте);
 - при необходимости как факт проверки в `Logs/QualityLog.md`.
+- для generated product repo допускается repo-native carrier в `Runtime/Integration_Smoke_Report.json`, если он затем явно связан с current `Plan` и итоговым отчётом.
 
 ### EVC-002 — Repo state evidence
 Что это:
@@ -155,6 +157,7 @@ Insufficient evidence считается:
 - ссылка на память исполнителя без воспроизводимого check;
 - “скриншот результата” вместо machine-executable output;
 - raw output без связи с тем, какой contract он подтверждает;
+- integration report artifact без linkage к current `Plan`, scope и smoke verdict;
 - gate approval без предъявленного evidence package.
 
 ## Что не является evidence

@@ -58,6 +58,7 @@ ID: DOC-000004
 - ссылка на current `Plan`;
 - ссылка на соответствующую backlog-задачу;
 - ссылка на релевантный verification evidence package;
+- ссылка на deterministic `Runtime/Integration_Smoke_Report.json`, если validation scope включает controlled integration smoke contour;
 - перечень реально затронутых active artifacts.
 
 Где хранится:
@@ -74,6 +75,7 @@ ID: DOC-000004
 Примеры:
 - явная outcome note в current `Plan`;
 - краткая contract-oriented формулировка в итоговом отчёте;
+- согласование verdict integration smoke report artifact с результатом route;
 - зафиксированное указание, какой contract подтверждён или почему он не подтверждён.
 
 Где хранится:
@@ -200,6 +202,7 @@ Validation evidence считается sufficient, когда одновреме
 ## Insufficient evidence
 Validation evidence считается insufficient, если:
 - есть только upstream verification evidence без validation interpretation;
+- deterministic integration report artifact существует, но его verdict не связан с validation outcome;
 - verdict заявлен, но не связан с конкретным validation level;
 - pass-close claim сделан без VAE-003;
 - gate readiness утверждена без VAE-004 в случаях, где gate handoff реально нужен;

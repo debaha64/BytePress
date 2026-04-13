@@ -200,7 +200,8 @@ Supporting contract layer поставляет form/validation interfaces для
 - generated product repo запускает локальный `scripts/integration-smoke.sh`;
 - script вызывает repo-native integration smoke tooling `BytePress` через `BYTEPRESS_ROOT`;
 - tooling читает `Adapters/*`, `MCP/*` и product-side contour как contracts;
-- результатом считается только deterministic local smoke без сетевых вызовов, секретов и vendor runtime.
+- tooling при необходимости materialize deterministic report artifact `Runtime/Integration_Smoke_Report.json` внутри generated product repo;
+- результатом считается только deterministic local smoke и связанный report artifact без сетевых вызовов, секретов и vendor runtime.
 
 Недопустимо:
 - вызывать внешние connectors прямо из `Adapters/*` или product `scripts/*`;
