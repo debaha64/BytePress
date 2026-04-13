@@ -233,17 +233,17 @@ ID: ROAD-000012
 ## ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 ID: ROAD-000013
 Этап: Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
-Статус: Черновик
-Связи: отсутствуют
-Источник: Следующий этап после agent entry and user layer
+Статус: В_работе
+Связи: BACK-000076
+Источник: PLAN-000064
 Дата_создания: 2026-03-31
-Дата_изменения: 2026-04-06
+Дата_изменения: 2026-04-13
 Цель: Подготовить повторяемое тиражирование product repo и следующий baseline `0.2.0` как отдельный управляемый этап после проявления точки входа агента и пользовательского слоя.
 Зависимости: ROAD-000012
-Связанные_backlog: отсутствуют
+Связанные_backlog: BACK-000076
 
 ### Описание
-Этап связывает replication-path и подготовку к `0.2.0`, не смешивая это с последующим интеграционным контуром и будущими расширениями.
+Этап активирован как один stage-closing pass: bootstrap/replication contract доводится от minimal skeleton до first-usable replicated product repo, materialized outcome синхронизируется с current agent/user entry contracts, active non-log baseline `BytePress` переводится на `0.2.0` только в реально operational contracts, а доказанные workflow defects закрываются по результатам audit без автоматической активации `ROAD-000014`.
 
 ---
 

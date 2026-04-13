@@ -4,7 +4,7 @@
 `Docs/Technical/Product_Bootstrap_Contract.md` является каноническим bootstrap-contract текущего `BytePress`.
 
 Этот document отвечает на вопросы:
-- какой минимальный product repo обязан materialize `Tools/bp_bootstrap.py`;
+- какой first-usable replicated product repo обязан materialize `Tools/bp_bootstrap.py`;
 - какие артефакты bootstrap обязан создать сразу;
 - какие слои bootstrap инициализирует только как каркас;
 - где проходит граница bootstrap-ответственности;
@@ -14,8 +14,8 @@
 `Product_Bootstrap_Contract.md` является supporting technical-document, а не частью required core.
 
 Его роль:
-- фиксировать expected outcome bootstrap materialization;
-- удерживать один канонический contract минимального product skeleton;
+- фиксировать expected outcome bootstrap replication;
+- удерживать один канонический contract first-usable replicated product repo;
 - не дублировать `README.md` как карту technical-layer;
 - не дублировать `Platform_Contracts.md` как contract среды и tool perimeter;
 - не дублировать `Artifact_Lifecycle.md` как lifecycle и sync-loop matrix;
@@ -55,35 +55,42 @@
 - brand profile обязан содержать `Язык_взаимодействия`;
 - при нарушении этих условий bootstrap завершается явной ошибкой, а не создаёт частично догаданный outcome.
 
-## Минимальный outcome bootstrap
-Bootstrap materialize отдельный product repo с минимальным initialized state, пригодным для первого предметного pass.
+## First-usable replicated outcome bootstrap
+Bootstrap materialize отдельный product repo с first-usable initialized state, пригодным для первого предметного pass и согласованным с current human/agent entry contour `BytePress`.
 
-Минимальный outcome включает:
+Outcome включает:
 - отдельный target-репозиторий продукта вне дерева самого `BytePress`;
+- top-level human/agent entry files `README.md`, `AGENTS.md`, `Setup_Guide.md`, `.gitignore`;
 - базовую структуру каталогов `Docs/`, `Runtime/`, `Plans/`, `Logs/`, `Profiles/`, `Adapters/`, `scripts/`;
+- минимальный, но first-usable `Docs/User/*` contour;
 - минимальный product-layer с базовыми content placeholders;
 - минимальный technical-layer продукта только в объёме стартовых singleton docs;
-- initial planning contour продукта;
-- базовые logs и project entry scripts.
+- initial planning contour продукта в состоянии first current stage/task/pass;
+- базовые logs, adapter registry/policy и project entry scripts.
 
-Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его минимально инициализированным и пригодным к следующему управляемому pass.
+Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его first-usable, согласованным и пригодным к следующему управляемому pass без ручной пересборки entry contour.
 
 ## Обязательные создаваемые артефакты и слои
 ### Репозиторный каркас
 Bootstrap обязан создать:
 - `.gitignore`
 - `README.md`
+- `AGENTS.md`
 - `Setup_Guide.md`
 
 ### Product knowledge layer
 Bootstrap обязан создать:
 - `Docs/User/README.md`
+- `Docs/User/Operating_Mode.md`
+- `Docs/User/First_Start.md`
+- `Docs/User/Pass_Request.md`
+- `Docs/User/Usage_Scenarios.md`
 - `Docs/Product/README.md`
 - `Docs/Product/JTBD.md`
 - `Docs/Product/PRD.md`
 - `Docs/Product/Delivery.md`
 
-Эти документы создаются как минимальный стартовый content skeleton, а не как полностью предметно заполненный product package.
+Эти документы создаются как first-usable startup contour и content skeleton, а не как полностью предметно заполненный product package.
 
 ### Technical layer продукта
 Bootstrap обязан создать:
@@ -121,6 +128,7 @@ Planning outcome должен удовлетворять текущему bootst
 - backlog использует `BACK-000001`;
 - initial plan имеет внутренний `ID: PLAN-000001`;
 - filename initial plan использует product code prefix, а не filename вида `PLAN-000001-*`.
+- initial `Roadmap`, `Backlog` и `Plan` находятся в статусе `В_работе`.
 
 ### Fact layer
 Bootstrap обязан создать:
@@ -135,6 +143,8 @@ Bootstrap обязан создать:
 Bootstrap обязан создать:
 - `Profiles/Product.md`
 - `Adapters/README.md`
+- `Adapters/Policy.md`
+- `Adapters/Registry.md`
 - `Adapters/Codex/README.md`
 - `Adapters/Claude/README.md`
 - `Adapters/Gemini/README.md`
@@ -147,8 +157,12 @@ Bootstrap обязан создать:
 - `scripts/dev-down.sh`
 - `scripts/dev-test.sh`
 
+Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, а не оставаться немым placeholder.
+
 ## Что bootstrap materialize только как каркас
 Bootstrap создаёт каркас, но не завершённое содержательное состояние, для:
+- `AGENTS.md` продукта — только minimal agent entry point replicated repo, а не копию `AGENTS.md` самого `BytePress`;
+- `Docs/User/*` продукта — только minimal human-facing contour, а не полный manual;
 - `Docs/Product/*` — только стартовый first-version content skeleton;
 - `Docs/Technical/*` продукта — только minimal startup subset, а не полный system contract map;
 - `Runtime/*` — только carrier для дальнейшего execution context;
@@ -169,7 +183,7 @@ Bootstrap не обязан:
 ## Bootstrap boundaries
 ### Граница ответственности
 Bootstrap отвечает за:
-- создание минимально согласованного product repo;
+- создание first-usable согласованного product repo;
 - соблюдение naming/profile/date baseline текущего контракта;
 - materialization только того skeleton, который нужен для первого управляемого product pass.
 
@@ -192,15 +206,18 @@ Bootstrap предполагает, что:
 - создавать product docs как короткие стартовые placeholders;
 - ограничивать technical layer продукта минимальным subset;
 - ограничивать planning layer одной стартовой stage/task/pass цепочкой;
+- materialize product repo с minimal human/agent entry contour вместо полного governance copy;
 - ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
 - создавать logs как пустые или почти пустые singleton containers.
 
 ### Недопустимые упрощения и пропуски
 - не создавать один из обязательных singleton artifacts минимального outcome;
+- не создавать `AGENTS.md` или обязательный `Docs/User/*` contour replicated repo;
 - создавать initial plan без внутреннего `ID: PLAN-000001`;
+- оставлять initial stage/task/pass в пассивном или двусмысленном состоянии, если репозиторий заявлен как first-usable;
 - пропускать `Profiles/Product.md` или нарушать `Тип_профиля: product`;
 - silently подставлять отсутствующий `brand profile` или auto-generate `product-code`;
-- считать bootstrap завершённым, если product repo не проходит базовый structural check;
+- считать bootstrap завершённым, если product repo не проходит базовый structural check или если human/agent entry contour не materialized;
 - переносить в bootstrap contract обязанности validation-layer или последующих предметных passes.
 
 ## Связь с validation-layer
@@ -235,7 +252,7 @@ Interface contract задаёт touchpoints между доменами. Bootstr
 - validation report;
 - process-canon document.
 
-Он остаётся каноническим contract того, какой минимальный product repo обязан materialize `BytePress` bootstrap.
+Он остаётся каноническим contract того, какой first-usable replicated product repo обязан materialize `BytePress` bootstrap.
 
 ## Связи
 - `ADR-000009`

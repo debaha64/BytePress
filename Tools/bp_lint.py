@@ -35,6 +35,10 @@ SCHEMA_ARTIFACT_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
 PRODUCT_PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULTILINE)
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
+PRODUCT_GITIGNORE_CODEX = re.compile(r"^\.codex/?$", re.MULTILINE)
+PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s+В_работе")
+PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
+PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
 PROFILE_LIST_PATTERNS = {
     "Активные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
     "Резервные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
@@ -88,6 +92,12 @@ def contains_pattern(path: Path, pattern: re.Pattern[str]) -> bool:
     return bool(pattern.search(text))
 
 
+def is_executable(path: Path) -> bool:
+    if not path.exists():
+        return False
+    return bool(path.stat().st_mode & 0o111)
+
+
 def check_profile_reference_lists(path: Path) -> list[str]:
     if not path.exists():
         return []
@@ -119,11 +129,15 @@ def is_bytepress_repo(root: Path) -> bool:
 
 def check_product_repo(root: Path) -> int:
     required = [
-        "README.md", "Setup_Guide.md", "Docs", "Runtime", "Plans", "Logs",
+        "README.md", "AGENTS.md", "Setup_Guide.md", "Docs", "Runtime", "Plans", "Logs",
         "Profiles", "Adapters", "scripts"
     ]
     required_paths = [
         "Docs/User/README.md",
+        "Docs/User/Operating_Mode.md",
+        "Docs/User/First_Start.md",
+        "Docs/User/Pass_Request.md",
+        "Docs/User/Usage_Scenarios.md",
         "Docs/Product/README.md",
         "Docs/Product/JTBD.md",
         "Docs/Product/PRD.md",
@@ -145,6 +159,8 @@ def check_product_repo(root: Path) -> int:
         "Logs/SupportLog.md",
         "Profiles/Product.md",
         "Adapters/README.md",
+        "Adapters/Policy.md",
+        "Adapters/Registry.md",
         "Adapters/Codex/README.md",
         "Adapters/Claude/README.md",
         "Adapters/Gemini/README.md",
@@ -172,10 +188,25 @@ def check_product_repo(root: Path) -> int:
             errors.append("Profiles/Product.md: missing `Тип_профиля: product`")
         if not contains_pattern(profile_path, PRODUCT_PROFILE_ID):
             errors.append("Profiles/Product.md: missing `ID: PROF-000001`")
+    gitignore_path = root / ".gitignore"
+    if gitignore_path.exists() and not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_CODEX):
+        errors.append(".gitignore: missing `.codex/` ignore")
+    roadmap_path = root / "Plans" / "Roadmap.md"
+    if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
+        errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
+    backlog_path = root / "Plans" / "Backlog.md"
+    if backlog_path.exists() and not contains_pattern(backlog_path, PRODUCT_BACKLOG_IN_PROGRESS):
+        errors.append("Plans/Backlog.md: initial backlog task is not active `В_работе`")
     if plan_matches:
         plan_path = plan_matches[0]
         if check_has_id(plan_path):
             errors.append(f"{plan_path}: missing ID line")
+        if not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
+            errors.append(f"{plan_path}: missing `Статус: В_работе`")
+    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh"]:
+        path = root / rel
+        if path.exists() and not is_executable(path):
+            errors.append(f"{rel}: script is not executable")
 
     if missing or errors:
         if missing:
