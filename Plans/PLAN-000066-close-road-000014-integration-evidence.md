@@ -2,7 +2,7 @@
 
 ID: PLAN-000066
 Название: Закрыть `ROAD-000014` через repo-native integration evidence handoff
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000078
 Источник: Новый stage-closing pass этапа `ROAD-000014`
 Дата_создания: 2026-04-13
@@ -61,4 +61,7 @@ ID: PLAN-000066
 - при clean audit `ROAD-000014` переведён в `Завершено` и backlog этапа выведен в archive-layer.
 
 ## Результат
-- В работе.
+- Существующий `integration-smoke` route усилен до deterministic repo-native evidence handoff: `bp_integration_smoke.py` может materialize report artifact, а bootstrap-generated `scripts/integration-smoke.sh` пишет его в `Runtime/Integration_Smoke_Report.json`.
+- `Interfaces.md`, `Platform_Contracts.md`, bootstrap/validation contracts, `Verification_Evidence.md`, `Validation_Evidence.md` и `Pipeline/Phase_Gates.md` согласованы с этим handoff без redesign evidence storage model и без открытия нового tool family.
+- Реальный smoke bootstrap на отдельном target path подтвердил, что generated repo проходит `bp_lint`, integration smoke и выпускает report artifact с verdict, согласованным со smoke result.
+- Финальный audit не подтвердил residual gap в scope `ROAD-000014`, поэтому `BACK-000078` и `ROAD-000014` закрыты, а backlog этапа выведен в `Plans/Archive/Backlog/ROAD-000014.md`.
