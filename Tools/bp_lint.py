@@ -25,7 +25,7 @@ REQUIRED_SKILLS = [
     "Implementation.md", "Quality.md", "Review.md", "Release.md", "Support.md"
 ]
 REQUIRED_STANDARDS = ["Coding.md", "Documentation.md", "Naming.md", "Planning.md", "Quality.md", "Release.md", "Terminology.md", "Traceability.md"]
-REQUIRED_TOOLS = ["bp_lint.py", "bp_bootstrap.py", "bp_normalize_terms.py"]
+REQUIRED_TOOLS = ["bp_lint.py", "bp_bootstrap.py", "bp_integration_smoke.py", "bp_normalize_terms.py"]
 REQUIRED_ADAPTERS = ["README.md", "Policy.md", "Registry.md", "Codex/README.md", "Claude/README.md", "Gemini/README.md", "Local/README.md"]
 REQUIRED_MEMORY = ["README.md", "Model.md", "Boundaries.md", "Interfaces.md", "Registry.md"]
 REQUIRED_MCP = ["README.md", "Policy.md", "Interfaces.md", "Registry.md"]
@@ -168,6 +168,7 @@ def check_product_repo(root: Path) -> int:
         "scripts/dev-up.sh",
         "scripts/dev-down.sh",
         "scripts/dev-test.sh",
+        "scripts/integration-smoke.sh",
     ]
     missing: list[str] = []
     for item in required:
@@ -203,7 +204,7 @@ def check_product_repo(root: Path) -> int:
             errors.append(f"{plan_path}: missing ID line")
         if not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
             errors.append(f"{plan_path}: missing `Статус: В_работе`")
-    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh"]:
+    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh"]:
         path = root / rel
         if path.exists() and not is_executable(path):
             errors.append(f"{rel}: script is not executable")

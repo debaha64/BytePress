@@ -110,6 +110,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. Подготовить среду по `Setup_Guide.md`.\n"
         "3. Проверить current stage/task/pass в `Plans/*`.\n"
         "4. Использовать `scripts/dev-test.sh`, если нужен structural check через `BytePress`.\n\n"
+        "5. Использовать `scripts/integration-smoke.sh`, если нужен minimal integration handoff check.\n\n"
         "## Доменная карта\n"
         "- `Docs/User/*` — human-facing layer продукта.\n"
         "- `Docs/Product/*` — прикладная рамка продукта.\n"
@@ -137,6 +138,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Для human-facing route использовать `Docs/User/*`.\n"
         "- Для structural check использовать `scripts/dev-test.sh` с `BYTEPRESS_ROOT`.\n"
+        "- Для minimal integration handoff использовать `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n"
         "- Не дублировать repo contracts длинным ручным промптом, если они уже определены продуктом.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/User/*`, `Docs/Technical/*` и `Plans/*`;\n"
@@ -152,8 +154,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Рабочий каталог\n"
         "- Репозиторий продукта располагается отдельно от BytePress.\n\n"
         "## Проверка\n"
-        "- для structural check replicated repo установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
-        "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`.\n",
+        "- для structural и integration smoke checks replicated repo установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
+        "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`;\n"
+        "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`.\n",
     )
 
     write(
@@ -356,7 +359,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- human entry: `README.md`, `Docs/User/*`, `Setup_Guide.md`;\n"
         "- agent entry: `AGENTS.md`;\n"
         "- planning entry: `Plans/*`;\n"
-        "- structural check route: `scripts/dev-test.sh` с `BYTEPRESS_ROOT`.\n",
+        "- structural check route: `scripts/dev-test.sh` с `BYTEPRESS_ROOT`;\n"
+        "- integration smoke route: `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n",
     )
     write(
         target / "Docs/Technical/System_Invariants.md",
@@ -528,7 +532,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`scripts/*` — project entry scripts replicated product repo.\n\n"
         "- `dev-up.sh` — placeholder старта локального product contour.\n"
         "- `dev-down.sh` — placeholder остановки локального contour.\n"
-        "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT`.\n",
+        "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT`.\n"
+        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT`.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",
@@ -553,6 +558,22 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "  exit 1\n"
         "fi\n\n"
         "python3 \"$LINT_SCRIPT\" --repo \"$ROOT_DIR\"\n",
+    )
+    write_executable(
+        target / "scripts/integration-smoke.sh",
+        "#!/usr/bin/env bash\n"
+        "set -euo pipefail\n\n"
+        "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
+        "if [[ -z \"${BYTEPRESS_ROOT:-}\" ]]; then\n"
+        "  echo \"Set BYTEPRESS_ROOT to the BytePress repository path before running integration-smoke.sh.\"\n"
+        "  exit 1\n"
+        "fi\n\n"
+        "SMOKE_SCRIPT=\"$BYTEPRESS_ROOT/Tools/bp_integration_smoke.py\"\n"
+        "if [[ ! -f \"$SMOKE_SCRIPT\" ]]; then\n"
+        "  echo \"BytePress integration smoke script not found at: $SMOKE_SCRIPT\"\n"
+        "  exit 1\n"
+        "fi\n\n"
+        "python3 \"$SMOKE_SCRIPT\" --repo \"$ROOT_DIR\"\n",
     )
 
 

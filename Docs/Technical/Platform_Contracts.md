@@ -83,6 +83,7 @@
 
 ### Поддерживаемые repo-native инструменты
 - `Tools/bp_bootstrap.py` — materialization минимального product skeleton по contract `BytePress`;
+- `Tools/bp_integration_smoke.py` — deterministic integration smoke handoff для generated product repo без реальных внешних подключений;
 - `Tools/bp_normalize_terms.py` — нормализация карточек терминов и пересборка индекса терминов.
 
 ### Поддерживаемые служебные инструменты
@@ -120,7 +121,7 @@
 
 ### `Tools/bp_bootstrap.py`
 Роль:
-- materialize минимальный product skeleton по уже утверждённому bootstrap contract.
+- materialize first-usable replicated product repo и его controlled integration smoke route по уже утверждённому bootstrap contract.
 
 Не роль:
 - не определяет product governance или technical contracts без синхронизации документов.
@@ -131,6 +132,15 @@
 
 Не роль:
 - не является owner'ом терминологического слоя.
+
+### `Tools/bp_integration_smoke.py`
+Роль:
+- проверяет minimal controlled connector handoff generated product repo против active integration contracts `BytePress`.
+
+Не роль:
+- не открывает реальные внешние подключения;
+- не становится vendor runtime engine;
+- не подменяет `bp_lint.py`, `MCP/*` или procedural audit integration-layer.
 
 ### `gh`
 Роль:
@@ -144,6 +154,7 @@
 - работать внутри Git-репозитория `BytePress` или product repo, созданного по bootstrap contract;
 - синхронизироваться от `origin/develop` перед началом task pass;
 - выполнять project tooling через `python3 Tools/...`;
+- выполнять integration smoke только через repo-native tool route, а не через прямые внешние connector calls;
 - использовать shell utilities для чтения, diff и навигации по active layer;
 - использовать `gh` только после final push и после проверки отсутствия existing PR для head-ветки;
 - хранить runtime context только как временный execution helper, не превращая его в source of truth.

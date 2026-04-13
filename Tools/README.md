@@ -228,6 +228,7 @@ Gate decision:
 ### Обязательные repo-native tools
 - `bp_lint.py` — текущий structural check `BytePress` и product bootstrap contract.
 - `bp_bootstrap.py` — materialization first-usable replicated product repo по contract `BytePress`.
+- `bp_integration_smoke.py` — deterministic integration smoke route для generated product repo без реальных внешних подключений.
 - `bp_normalize_terms.py` — нормализация карточек терминов и пересборка индекса `Base_Terms.md`.
 
 ### Future tooling horizon
@@ -252,10 +253,12 @@ Future validation-support tooling:
 - bootstrap создаёт `README.md`, `AGENTS.md`, `Setup_Guide.md` и обязательный `Docs/User/*` contour replicated repo;
 - bootstrap создаёт канонический минимальный продуктовый слой `Docs/Product/README.md`, `Docs/Product/JTBD.md`, `Docs/Product/PRD.md`, `Docs/Product/Delivery.md`;
 - bootstrap создаёт `Profiles/Product.md`, adapter policy/registry и initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md`;
+- bootstrap создаёт `scripts/integration-smoke.sh` как отдельный controlled handoff route к integration smoke tooling `BytePress`;
 - bootstrap materialize initial `Roadmap`, `Backlog` и `Plan` продукта в состоянии `В_работе`;
 - `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет наличие полного минимального `Docs/Product/*` набора в product repo;
-- `bp_lint.py` проверяет наличие `AGENTS.md`, обязательного `Docs/User/*`, adapter policy/registry, `.gitignore` c `.codex/` и first-usable replicated planning contour;
+- `bp_lint.py` проверяет наличие `AGENTS.md`, обязательного `Docs/User/*`, adapter policy/registry, `scripts/integration-smoke.sh`, `.gitignore` c `.codex/` и first-usable replicated planning contour;
 - `bp_lint.py` требует `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` и `Templates/Interview.md` в `BytePress`;
+- `bp_integration_smoke.py` проверяет, что generated product repo использует только local integration handoff и не materialize `MCP/*` или реальные внешние подключения;
 - bootstrap использует 6-значные ID и текущую дату выполнения, без жёстко прошитых дат;
 - из brand profile наследуются только `Брендовый_профиль` и `Язык_взаимодействия`.
 
