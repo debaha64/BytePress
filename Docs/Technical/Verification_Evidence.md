@@ -74,6 +74,7 @@
 Примеры:
 - запись о выполненной проверке в `Logs/QualityLog.md`;
 - запись о содержательном изменении в `Logs/ChangeLog.md`.
+- запись о подтверждённом release event в `Logs/ReleaseLog.md`, если verification scope закрывает factual release sync.
 
 Где хранится:
 - в `Logs/*` как каноническом fact-layer.
@@ -132,8 +133,9 @@ Not evidence:
   - current `Plan` хранит summary evidence package текущего pass;
   - `Backlog` и `Roadmap` хранят planning-state evidence.
 - `Logs/*`:
-  - `Logs/QualityLog.md` хранит факты проверки;
-  - `Logs/ChangeLog.md` хранит факты изменения.
+- `Logs/QualityLog.md` хранит факты проверки;
+- `Logs/ChangeLog.md` хранит факты изменения.
+- `Logs/ReleaseLog.md` хранит factual release events, если verification scope подтверждает уже состоявшийся release fact.
 - `Tools/*`:
   - владеет только implementation checks, но не evidence storage как source of truth.
 - внешняя delivery поверхность (PR):
@@ -146,6 +148,7 @@ Evidence package для pass-close должен быть связан миним
 - фиксированный список выполненных automatic checks и их verdict;
 - явная governance-сверка planning-state;
 - если применимо, ссылка на log-entry о проверке.
+- если scope реально release-related, ссылка на factual `ReleaseLog` entry или явное объяснение, почему release fact ещё не подтверждён tag/history.
 
 Нормальная точка фиксации этого linkage:
 - раздел `## Результат` current `Plan`;

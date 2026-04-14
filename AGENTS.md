@@ -64,6 +64,8 @@
 - scope остаётся узким и не открывает соседний этап без явного решения;
 - owner-documents и прямые references не спорят после правок;
 - завершённый historical `Plan` архивирован, если новый pass уже стартовал и старый current `Plan` ещё лежал в active `Plans/`;
+- если pass дал содержательное изменение, closure `ChangeLog.md` и `QualityLog.md` проверен как обязательный history-fact;
+- если pass подтверждает состоявшийся release event по tag/history, closure `ReleaseLog.md` тоже проверен как factual log, а не как прогноз;
 - выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`;
 - если затронут planning-layer, `Roadmap`, `Backlog`, текущий `Plan` и их индексы согласованы по ID и статусам.
 
@@ -86,6 +88,7 @@
 - список изменённых файлов и краткую причину изменений;
 - какие checks и governance-сверки выполнены и чем закончились;
 - статус `push` / PR-flow;
+- какие log-entries добавлены или почему очередной log closure не требовался по contract;
 - найденные дефекты, несоответствия или residual risks, даже если они мелкие;
 - одну узкую recommendation по улучшению, связанную с темой pass;
 - явную пометку `bp_lint contract unaffected`, если `Tools/bp_lint.py` не пришлось менять по реальному audit.

@@ -1,5 +1,356 @@
 # QualityLog
 
+## QL-000074
+ID: QL-000074
+Дата: 2026-04-15
+Статус: пройдено
+Проверка: release workflow теперь явно покрывает release branch creation, final validation, PR в `main`, tag creation/push, cleanup release branch, sync `develop` и factual `ReleaseLog` path; `ChangeLog.md` и `QualityLog.md` дозаполнены начиная с первого реально незалогированного pass после `CHG-000040` / `QL-000035`; `ReleaseLog.md` содержит factual запись `RL-000006`, подтверждённую annotated tag `0.1.0` на commit `92891482e9bc88940069700ba93890fb317b5cab`; governance-сверка planning-state, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: corrective pass `ROAD-000015` закрыт как согласованный release/journaling history-fact без доказанного residual blocker для подготовки `0.2.0`.
+
+---
+
+## QL-000073
+ID: QL-000073
+Дата: 2026-04-13
+Статус: пройдено
+Проверка: существующий `integration-smoke` route усилен до deterministic repo-native evidence handoff: `bp_integration_smoke.py` materialize report artifact, а bootstrap-generated `scripts/integration-smoke.sh` пишет его в `Runtime/Integration_Smoke_Report.json`; `Interfaces.md`, `Platform_Contracts.md`, bootstrap/validation contracts, `Verification_Evidence.md`, `Validation_Evidence.md` и `Pipeline/Phase_Gates.md` согласованы с этим handoff; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Close ROAD-000014 integration evidence` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000072
+ID: QL-000072
+Дата: 2026-04-13
+Статус: пройдено
+Проверка: `ROAD-000014` активирован и оставлен в статусе `В_работе`; `Docs/Technical/*`, `MCP/*`, `Adapters/*` и `Tools/README.md` согласованно фиксируют controlled integration contour, границы `Adapters/*` и `MCP/*`, product-side handoff через `scripts/*` и отсутствие реальных внешних подключений; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Activate ROAD-000014 integration contour` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000071
+ID: QL-000071
+Дата: 2026-04-13
+Статус: пройдено
+Проверка: `bp_bootstrap.py` больше не materialize лишь minimal skeleton: generated repo получает `README.md`, `AGENTS.md`, `Setup_Guide.md`, полный минимальный `Docs/User/*` contour, adapter policy/registry, executable scripts и initial current stage/task/pass; `bp_lint.py` расширен до structural contract first-usable replicated repo и подтверждает human/agent entry contour, `.gitignore` для `.codex`, executable scripts и initial planning state; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Close ROAD-000013 product replication` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000070
+ID: QL-000070
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: `Pass_Request.md` добавлен как минимальный user-facing contract для формулирования pass человеком через repo contracts без дублирования agent operating loop; direct contradiction в `Docs/User/*` вокруг запуска `bp_lint.py` из корня репозитория исправлен и user-layer теперь ссылается на `python3 Tools/bp_lint.py --repo .`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Close ROAD-000012 user entry` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000069
+ID: QL-000069
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: `ROAD-000012` остался активным, `ROAD-000013` не активирован, `PLAN-000061` выведен в archive-layer, а `PLAN-000062` оформлен как новый current `Plan`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Minimal user boundary` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000068
+ID: QL-000068
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: `ROAD-000012` активирован без автоматической активации `ROAD-000013`; `Plans/Backlog.md` переведён на `ROAD-000012` и содержит одну завершённую задачу `BACK-000073`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Activate ROAD-000012 agent entry boundaries` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000067
+ID: QL-000067
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: audit active verification/validation contour не подтвердил реального residual gap; verification, validation, evidence, tooling support и gates разведены без доказанного active-layer contradiction; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Audit and close ROAD-000011` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000066
+ID: QL-000066
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: planning-contour согласован: `BACK-000071` находится в завершённой секции и индексе `Backlog.md`, `ROAD-000011` остаётся в `В_работе`, current `Plan` оформлен как `PLAN-000059`; `Tools/README.md` пересобран как boundary-document verification + validation tooling contour; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define validation tooling boundary` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000065
+ID: QL-000065
+Дата: 2026-04-11
+Статус: пройдено
+Проверка: `Docs/Technical/Validation_Evidence.md` создан как singleton contract validation evidence с classes, mandatory / optional expectations, storage и relation к validation levels и pass-close contour; `Docs/Technical/Validation.md` синхронизирован ссылкой на evidence-contract; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define validation evidence contract` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000064
+ID: QL-000064
+Дата: 2026-04-08
+Статус: пройдено
+Проверка: `Docs/Technical/Validation_Levels.md` создан как singleton contract уровней validation-контура с required inputs, expected outputs и relation к evidence package и pass-close contour; `Docs/Technical/Validation.md` минимально синхронизирован; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define validation levels` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000063
+ID: QL-000063
+Дата: 2026-04-08
+Статус: пройдено
+Проверка: `Docs/Technical/Validation.md` пересобран из boundary-doc в contract map validation-layer с явными inputs, outputs, verdict classes, ownership интерпретации и местом в pass-close contour; `Docs/Technical/Verification.md` синхронизирован для разведения verification и validation maps; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify validation contract map` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000062
+ID: QL-000062
+Дата: 2026-04-08
+Статус: пройдено
+Проверка: `Docs/Technical/Validation.md` создан как singleton boundary-document validation-layer с назначением, отличиями от verification, inputs/outputs, evidence usage, ownership результата и связью с phase gates; `Docs/Technical/Verification.md` минимально синхронизирован; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define validation boundaries` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000061
+ID: QL-000061
+Дата: 2026-04-08
+Статус: пройдено
+Проверка: `Docs/Technical/Verification_Evidence.md` создан как singleton contract verification evidence с evidence classes, обязательностью, storage и linkage к pass-close contour; `Docs/Technical/Verification.md` и `Docs/Technical/Verification_Levels.md` синхронизированы ссылками на evidence contract; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define verification evidence contract` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000060
+ID: QL-000060
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Tools/README.md` пересобран как boundary-document tooling verification contour с явным разделением ролей `bp_lint`, будущего `bp_check`, будущего `bp_verify` и procedural verification; `Docs/Technical/Verification_Levels.md` минимально синхронизирован ссылкой на tooling boundary; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define verification tooling boundary` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000059
+ID: QL-000059
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Verification_Levels.md` создан как supporting technical document уровней verification-контура и target split будущих `bp_check / bp_verify`; `Docs/Technical/Verification.md` и `Docs/Technical/README.md` синхронизированы минимально; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define verification levels` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000058
+ID: QL-000058
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Verification.md` пересобран из boundary-document в contract map verification-layer с явными классами checks, inputs, outputs, evidence forms и ownership интерпретации результата; automatic checks, procedural checks и process gates разведены без переноса gate policy в `Pipeline/*`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify verification contract map` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000057
+ID: QL-000057
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Verification.md` создан как канонический boundary-document verification-layer и фиксирует границы между automatic checks, procedural checks, process gates и tool implementation; `Docs/Technical/README.md` минимально синхронизирован; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Activate ROAD-000011 verification boundaries` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000056
+ID: QL-000056
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: финальный audit active technical layer не подтвердил реального residual gap: required core и supporting technical contracts согласованы между собой и с planning/process/bootstrap perimeter; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Audit and close ROAD-000010` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000055
+ID: QL-000055
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Product_Bootstrap_Validation.md` пересобран как канонический validation-contract bootstrap-result с validation-scope, acceptance criteria, automatic/procedural split и недопустимыми validation-пропусками; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify product bootstrap validation` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000054
+ID: QL-000054
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Product_Bootstrap_Contract.md` пересобран как канонический bootstrap-contract с CLI contract, minimal product repo outcome, обязательными артефактами, bootstrap boundaries и недопустимыми bootstrap-пропусками; `Product_Bootstrap_Validation.md` оставлен validation evidence document, а не substitute для contract; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify product bootstrap contract` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000053
+ID: QL-000053
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Platform_Contracts.md` пересобран как канонический platform-contract с supported execution environment, platform assumptions, supported tool perimeter и anti-patterns без смешения с architecture/model/lifecycle/interfaces/invariants/process-canon; `Docs/Technical/README.md` минимально синхронизирован; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical platform contracts` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000052
+ID: QL-000052
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/System_Invariants.md` пересобран как канонический invariant-contract с repository/source-of-truth, planning, ownership, active/archive, traceability, process и tooling invariants; отдельный special template не потребовался; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Clarify technical system invariants` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000051
+ID: QL-000051
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Interfaces.md` пересобран как канонический interface-contract с внутренними и внешними интерфейсами, stable/service/derived classes, допустимыми touchpoints и недопустимыми обходами границ; отношение interface-layer к `Plans/*`, `Runtime/*`, `Logs/*` и `Pipeline/*` зафиксировано отдельно; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical interfaces core` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000050
+ID: QL-000050
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Artifact_Lifecycle.md` пересобран как канонический lifecycle-contract с артефактными группами, источниками истины, обязательными sync-loop, допустимыми layer transitions и closure-loop перед завершением pass; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical artifact lifecycle` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000049
+ID: QL-000049
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Model.md` пересобран как каноническая модель текущего `BytePress` с явным разделением сущностей, ownership состояния, основных связей и недопустимых смешений ответственности; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical model core` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000048
+ID: QL-000048
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/Architecture.md` пересобран как каноническая архитектурная карта с domain map, layer map, границами ответственности и недопустимыми подменами; граница между `Docs/Technical/*` и `Pipeline/*` зафиксирована без дублирования process-canon; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical architecture core` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000047
+ID: QL-000047
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Docs/Technical/README.md` теперь явно делит current technical-documents на required core и supporting layer, а `Docs/Technical/Pipeline.md` возвращён к supporting technical view без дублирования process-canon; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Clarify technical contract map` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000046
+ID: QL-000046
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `ROAD-000010` активирован как текущий этап без переоткрытия `ROAD-000009`; `Docs/Technical/README.md` фиксирует назначение technical-layer, включения, исключения, отношение к `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, а также minimal required core; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Activate ROAD-000010 technical boundaries` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000045
+ID: QL-000045
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: audit активного governance-layer и planning-contour не подтвердил реального residual gap; `ROAD-000009` переведён в `Завершено`, `ROAD-000010` не активирован автоматически и остаётся следующим черновым горизонтом без новой backlog-задачи; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Audit and close ROAD-000009` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000044
+ID: QL-000044
+Дата: 2026-04-07
+Статус: пройдено
+Проверка: `Profiles/*` доведены до implemented hybrid contract без migration semantic filenames, внутренние `PROF-*` сохранены, а ссылочные списки нормализованы на canonical `ID`; `Docs/Terms/*` не потребовал file migration; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Migrate remaining governance ID layer` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000043
+ID: QL-000043
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `BACK-000048` и `PLAN-000036` ограничены активными governance/supporting domains; `Rules/*` подтвердили singleton contract без filename-migration, а `Standards/Naming.md`, `Standards/Quality.md` и `Standards/Traceability.md` доведены до явных `STD-*`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Migrate governance ID layer` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000042
+ID: QL-000042
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `Logs/QualityLog.md` получил явные `ID:` для всех serial quality entries, а `Logs/ReleaseLog.md` переведён на шестизначный `RL-<NNNNNN>` contract с явными внутренними `ID`; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Migrate log ID layer` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000041
+ID: QL-000041
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `Runtime/Plan.md` удалён из рабочего дерева, а `Tools/bp_bootstrap.py` больше не материализует legacy runtime plan artifact; planning-contour удерживает `Plan` как единственный канонический pass-source; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Remove runtime plan legacy tail` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000040
+ID: QL-000040
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: historical backlog `ROAD-000001`–`ROAD-000008` выведен в `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` с сохранением `BACK-ID`, порядка и связи с соответствующим `ROAD-*`; active `Backlog.md` перестал держать historical stage backlog; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Archive backlog history layer` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000039
+ID: QL-000039
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: historical `BP-*` и завершённые `PLAN-*` перемещены в `Plans/Archive/` и приведены к `PLAN-*` filename-contract; active `Plans/` оставил только singleton files и current plan; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract affected`.
+Результат: pass `Migrate plan history to archive` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000038
+ID: QL-000038
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `Standards/Naming.md` зафиксировал target `ID scheme` для serial / hybrid / singleton domains, правила filename и внутренних ссылок, а также future migration-order по доменам; pass не запускал саму migration; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Define unified ID scheme` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000037
+ID: QL-000037
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `Roadmap` доведён до утверждённого горизонта с новыми смыслами `ROAD-000011`…`ROAD-000014`, а corrective pass ограничен planning-transition без migration historical layer; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Align roadmap and planning transition` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
+## QL-000036
+ID: QL-000036
+Дата: 2026-04-06
+Статус: пройдено
+Проверка: `ROAD-000009` активирован как первый governance-pass новой operating model, `ROAD-000010` переопределён как следующий technical-layer stage, а `BACK-000041` ограничен терминологией, ownership состояния, lifecycle `Plan`, неканоничностью `Runtime/Plan.md` и hard-close contour; governance-сверка, `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: pass `Activate ROAD-000009 operating model pass` закрыт как согласованный history-fact без доказанного пропуска verification contour.
+
+---
+
 ## QL-000035
 ID: QL-000035
 Дата: 2026-04-02

@@ -41,3 +41,5 @@ Planning-contour в рабочем дереве больше не использ
 `Backlog.md` хранит только задачи текущего этапа; если текущий этап отсутствует, `Backlog.md` не удерживает закрытый backlog в active layer и явно отражает это состояние. Historical backlog хранится в `Plans/Archive/Backlog/`, а дальний горизонт и статусы этапов принадлежат `Roadmap.md`.
 
 `Roadmap.md` не дублирует backlog и не перечисляет каждый документный или контрактный проход.
+
+Planning-layer не заменяет обязательный log closure: содержательный завершённый pass должен проверить factual sync `ChangeLog.md` и `QualityLog.md`, а factual release event после merge/tag — `ReleaseLog.md`.
