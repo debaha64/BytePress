@@ -15,6 +15,7 @@
 - ROAD-000012 — Точка входа агента и пользовательский слой (Agent Entry Point and User Layer)
 - ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 - ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
+- ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
 
 ## Легенда статусов
 - Черновик
@@ -261,3 +262,20 @@ ID: ROAD-000014
 
 ### Описание
 Activation pass перевёл stage из черновика в рабочее состояние и зафиксировал controlled connector handoff между `Adapters/*`, `MCP/*`, `Tools/*`, bootstrap-generated product repo и `scripts/*`. Stage-closing pass усилил существующий `integration-smoke` route до deterministic repo-native evidence handoff: generated product repo теперь materialize report artifact `Runtime/Integration_Smoke_Report.json`, а verdict этого artifact согласован со smoke result без открытия реальных внешних подключений, network runtime, secrets или vendor-specific execution. Финальный audit не подтвердил residual gap в active integration contour, bootstrap/validation sync или evidence handoff boundary, поэтому `ROAD-000014` закрыт и backlog этапа выведен в archive-layer без автоматической активации нового `ROAD-*`.
+
+---
+
+## ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
+ID: ROAD-000015
+Этап: Release readiness и factual log closure (Release Readiness and Factual Log Closure)
+Статус: Завершено
+Связи: BACK-000079, PLAN-000067, CHG-000079
+Источник: PLAN-000067
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+Цель: Закрыть release-readiness и journaling gaps после завершения `ROAD-000014`, довести канонический workflow выпуска `0.2.0` до `main` и восстановить factual history-fact closure в журналах без открытия нового roadmap-stage.
+Зависимости: ROAD-000014
+Связанные_backlog: BACK-000079
+
+### Описание
+Этап закрыт одним corrective pass: `Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.

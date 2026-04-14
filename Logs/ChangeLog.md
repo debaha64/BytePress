@@ -1,6 +1,45 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
+- CHG-000078 — Close ROAD-000014 integration evidence
+- CHG-000077 — Activate ROAD-000014 integration contour
+- CHG-000076 — Close ROAD-000013 product replication
+- CHG-000075 — Close ROAD-000012 user entry
+- CHG-000074 — Minimal user boundary
+- CHG-000073 — Activate ROAD-000012 agent entry boundaries
+- CHG-000072 — Audit and close ROAD-000011
+- CHG-000071 — Define validation tooling boundary
+- CHG-000070 — Define validation evidence contract
+- CHG-000069 — Define validation levels
+- CHG-000068 — Clarify validation contract map
+- CHG-000067 — Define validation boundaries
+- CHG-000066 — Define verification evidence contract
+- CHG-000065 — Define verification tooling boundary
+- CHG-000064 — Define verification levels
+- CHG-000063 — Clarify verification contract map
+- CHG-000062 — Activate ROAD-000011 verification boundaries
+- CHG-000061 — Audit and close ROAD-000010
+- CHG-000060 — Clarify product bootstrap validation
+- CHG-000059 — Clarify product bootstrap contract
+- CHG-000058 — Clarify technical platform contracts
+- CHG-000057 — Clarify technical system invariants
+- CHG-000056 — Clarify technical interfaces core
+- CHG-000055 — Clarify technical artifact lifecycle
+- CHG-000054 — Clarify technical model core
+- CHG-000053 — Clarify technical architecture core
+- CHG-000052 — Clarify technical contract map
+- CHG-000051 — Activate ROAD-000010 technical boundaries
+- CHG-000050 — Audit and close ROAD-000009
+- CHG-000049 — Migrate remaining governance ID layer
+- CHG-000048 — Migrate governance ID layer
+- CHG-000047 — Migrate log ID layer
+- CHG-000046 — Remove runtime plan legacy tail
+- CHG-000045 — Archive backlog history layer
+- CHG-000044 — Migrate plan history to archive
+- CHG-000043 — Define unified ID scheme
+- CHG-000042 — Align roadmap and planning transition
+- CHG-000041 — Activate ROAD-000009 operating model pass
 - CHG-000040 — ROAD-000008 governance state repaired and the stage closed consistently
 - CHG-000039 — Requirements introduced as the next canonical artifact of ROAD-000008
 - CHG-000038 — Research introduced as the next canonical artifact of ROAD-000008
@@ -41,6 +80,669 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
+ID: CHG-000079
+Дата: 2026-04-15
+Тип_изменения: Документация
+Источник: Corrective closure pass for `ROAD-000015`
+Связи: PLAN-000067, BACK-000079, QL-000074
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Pipeline/Phase_Gates.md` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены начиная с первого реально незалогированного pass после `CHG-000040` / `QL-000035`, а `ReleaseLog.md` получил factual запись `RL-000006` о release event `0.1.0`, подтверждённом annotated tag `0.1.0` на commit `92891482e9bc88940069700ba93890fb317b5cab`.
+
+### Эффект
+Release-readiness и journaling contour больше не имеют доказанного active-layer gap для подготовки `0.2.0`, а `ROAD-000015` закрыт без открытия нового roadmap-stage.
+
+---
+
+## CHG-000078 — Close ROAD-000014 integration evidence
+ID: CHG-000078
+Дата: 2026-04-13
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000066
+Связи: PLAN-000066, BACK-000078, QL-000073
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+Существующий `integration-smoke` route усилен до deterministic repo-native evidence handoff: `bp_integration_smoke.py` может materialize report artifact, а bootstrap-generated `scripts/integration-smoke.sh` пишет его в `Runtime/Integration_Smoke_Report.json`. `Interfaces.md`, `Platform_Contracts.md`, bootstrap/validation contracts, `Verification_Evidence.md`, `Validation_Evidence.md` и `Pipeline/Phase_Gates.md` согласованы с этим handoff без redesign evidence storage model и без открытия нового tool family.
+
+### Эффект
+History-fact stage-closing pass `ROAD-000014` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000077 — Activate ROAD-000014 integration contour
+ID: CHG-000077
+Дата: 2026-04-13
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000065
+Связи: PLAN-000065, BACK-000077, QL-000072
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`ROAD-000014` активирован и оставлен в статусе `В_работе` как текущий stage. `Docs/Technical/*`, `MCP/*`, `Adapters/*` и `Tools/README.md` теперь согласованно фиксируют controlled integration contour, границы `Adapters/*` и `MCP/*`, product-side handoff через `scripts/*` и отсутствие реальных внешних подключений в active scope.
+
+### Эффект
+History-fact activation pass `ROAD-000014` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000076 — Close ROAD-000013 product replication
+ID: CHG-000076
+Дата: 2026-04-13
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000064
+Связи: PLAN-000064, BACK-000076, QL-000071
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`bp_bootstrap.py` больше не materialize лишь minimal skeleton: generated repo получает `README.md`, `AGENTS.md`, `Setup_Guide.md`, полный минимальный `Docs/User/*` contour, adapter policy/registry, executable scripts и initial current stage/task/pass. `bp_lint.py` расширен до structural contract first-usable replicated repo и подтверждает не только product skeleton, но и human/agent entry contour, `.gitignore` для `.codex`, executable scripts и initial planning state.
+
+### Эффект
+History-fact stage-closing pass `ROAD-000013` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000075 — Close ROAD-000012 user entry
+ID: CHG-000075
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000063
+Связи: PLAN-000063, BACK-000075, QL-000070
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Pass_Request.md` добавлен как минимальный user-facing contract для формулирования pass человеком через repo contracts без дублирования agent operating loop. Direct contradiction в `Docs/User/*` вокруг запуска `bp_lint.py` из корня репозитория исправлен: user-layer теперь ссылается на `python3 Tools/bp_lint.py --repo .` именно как на команду из корня репозитория.
+
+### Эффект
+History-fact closure-pass `ROAD-000012` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000074 — Minimal user boundary
+ID: CHG-000074
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000062
+Связи: PLAN-000062, BACK-000074, QL-000069
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`ROAD-000012` остался активным, а `ROAD-000013` не активирован. `PLAN-000061` выведен в archive-layer, `PLAN-000062` оформлен как новый current `Plan`.
+
+### Эффект
+History-fact pass минимального user-layer добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000073 — Activate ROAD-000012 agent entry boundaries
+ID: CHG-000073
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000061
+Связи: PLAN-000061, BACK-000073, QL-000068
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`ROAD-000012` активирован без автоматической активации `ROAD-000013`. `Plans/Backlog.md` переведён на `ROAD-000012` и содержит одну завершённую задачу `BACK-000073` этого узкого pass.
+
+### Эффект
+History-fact activation pass `ROAD-000012` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000072 — Audit and close ROAD-000011
+ID: CHG-000072
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000060
+Связи: PLAN-000060, BACK-000072, QL-000067
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+Audit active verification/validation contour не подтвердил реального residual gap: verification, validation, evidence, tooling support и gates разведены без доказанного active-layer contradiction. `ROAD-000011` переведён в `Завершено` без candidate tail и без автоматической активации `ROAD-000012`.
+
+### Эффект
+History-fact audit-pass `ROAD-000011` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000071 — Define validation tooling boundary
+ID: CHG-000071
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000059
+Связи: PLAN-000059, BACK-000071, QL-000066
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+Planning-contour согласован: `BACK-000071` находится в завершённой секции и индексе `Backlog.md`, `ROAD-000011` остаётся в `В_работе`, current `Plan` оформлен как `PLAN-000059`. `Tools/README.md` пересобран как boundary-document verification + validation tooling contour с явным разделением роли `bp_lint`, target role будущих `bp_check / bp_verify`, допустимого future validation tooling и procedural validation.
+
+### Эффект
+History-fact pass validation tooling boundary добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000070 — Define validation evidence contract
+ID: CHG-000070
+Дата: 2026-04-11
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000058
+Связи: PLAN-000058, BACK-000070, QL-000065
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Validation_Evidence.md` создан как singleton contract validation evidence: classes, mandatory / optional expectations, storage, sufficient / insufficient criteria и relation к validation levels и pass-close contour. `Docs/Technical/Validation.md` минимально синхронизирован, чтобы явно ссылаться на `Validation_Evidence.md` как отдельный evidence-contract validation-layer.
+
+### Эффект
+History-fact pass validation evidence добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000069 — Define validation levels
+ID: CHG-000069
+Дата: 2026-04-08
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000057
+Связи: PLAN-000057, BACK-000069, QL-000064
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Validation_Levels.md` создан как singleton contract уровней validation-контура: уровни, цели, required inputs, expected outputs и relation к evidence package и pass-close contour. `Docs/Technical/Validation.md` минимально синхронизирован ссылкой на отдельный levels-document.
+
+### Эффект
+History-fact pass validation levels добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000068 — Clarify validation contract map
+ID: CHG-000068
+Дата: 2026-04-08
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000056
+Связи: PLAN-000056, BACK-000068, QL-000063
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Validation.md` пересобран из boundary-doc в contract map validation-layer: document теперь явно фиксирует validation inputs, outputs, verdict classes, ownership интерпретации, отношение к evidence package и место в pass-close contour. `Docs/Technical/Verification.md` минимально синхронизирован, чтобы развести verification contract map и validation contract map.
+
+### Эффект
+History-fact pass validation contract map добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000067 — Define validation boundaries
+ID: CHG-000067
+Дата: 2026-04-08
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000055
+Связи: PLAN-000055, BACK-000067, QL-000062
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Validation.md` создан как singleton boundary-document validation-layer: назначение validation, отличия от verification, inputs/outputs, evidence usage, ownership результата и связь с pass-close contour и phase gates. `Docs/Technical/Verification.md` минимально синхронизирован, чтобы явно развести verification contract и validation outcome confirmation.
+
+### Эффект
+History-fact pass validation boundaries добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000066 — Define verification evidence contract
+ID: CHG-000066
+Дата: 2026-04-08
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000054
+Связи: PLAN-000054, BACK-000066, QL-000061
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Verification_Evidence.md` создан как singleton contract verification evidence: evidence classes, обязательность, storage и linkage к pass-close contour. `Docs/Technical/Verification.md` и `Docs/Technical/Verification_Levels.md` минимально синхронизированы ссылками на evidence contract.
+
+### Эффект
+History-fact pass verification evidence добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000065 — Define verification tooling boundary
+ID: CHG-000065
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000053
+Связи: PLAN-000053, BACK-000065, QL-000060
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Tools/README.md` пересобран как boundary-document tooling verification contour с явным разделением ролей `bp_lint`, будущего `bp_check`, будущего `bp_verify` и procedural verification. `Docs/Technical/Verification_Levels.md` минимально синхронизирован ссылкой на tooling boundary.
+
+### Эффект
+History-fact pass verification tooling boundary добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000064 — Define verification levels
+ID: CHG-000064
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000052
+Связи: PLAN-000052, BACK-000064, QL-000059
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Verification_Levels.md` создан как supporting technical document уровней verification-контура и target split будущих `bp_check / bp_verify`. `Docs/Technical/Verification.md` минимально синхронизирован ссылкой на level-specific document, а `Docs/Technical/README.md` обновлён в карте supporting documents.
+
+### Эффект
+History-fact pass verification levels добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000063 — Clarify verification contract map
+ID: CHG-000063
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000051
+Связи: PLAN-000051, BACK-000063, QL-000058
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Verification.md` пересобран из boundary-document в contract map verification-layer с явными классами checks, inputs, outputs, evidence forms и ownership интерпретации результата. Automatic checks, procedural checks и process gates разведены без переноса gate policy в `Pipeline/*` или tooling implementation в `Docs/Technical/*`.
+
+### Эффект
+History-fact pass verification contract map добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000062 — Activate ROAD-000011 verification boundaries
+ID: CHG-000062
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000050
+Связи: PLAN-000050, BACK-000062, QL-000057
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Verification.md` создан как канонический boundary-document verification-layer и фиксирует границы между automatic checks, procedural checks, process gates и tool implementation. `Docs/Technical/README.md` минимально синхронизирован: `Verification.md` добавлен в supporting technical-documents и в карту слоя.
+
+### Эффект
+History-fact activation pass `ROAD-000011` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000061 — Audit and close ROAD-000010
+ID: CHG-000061
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000049
+Связи: PLAN-000049, BACK-000061, QL-000056
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+Финальный audit active technical layer не подтвердил реального residual gap: required core и supporting technical contracts согласованы между собой и с planning/process/bootstrap perimeter. `ROAD-000010` переведён в `Завершено` без candidate tail и без автоматической активации `ROAD-000011`.
+
+### Эффект
+History-fact audit-pass `ROAD-000010` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000060 — Clarify product bootstrap validation
+ID: CHG-000060
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000048
+Связи: PLAN-000048, BACK-000060, QL-000055
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Validation.md` пересобран как канонический validation-contract bootstrap-result текущего `BytePress`: document теперь явно фиксирует validation-scope, acceptance criteria, automatic/procedural split и недопустимые validation-пропуски. Validation-layer явно разведен с bootstrap-contract: `Product_Bootstrap_Contract.md` владеет bootstrap obligations, а `Product_Bootstrap_Validation.md` владеет критериями и режимом проверки результата.
+
+### Эффект
+History-fact pass product bootstrap validation добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000059 — Clarify product bootstrap contract
+ID: CHG-000059
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000047
+Связи: PLAN-000047, BACK-000059, QL-000054
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Contract.md` пересобран как канонический bootstrap-contract текущего `BytePress`: теперь он явно фиксирует CLI contract, minimal product repo outcome, обязательные создаваемые артефакты, bootstrap boundaries, допустимые упрощения и недопустимые bootstrap-пропуски. Bootstrap-contract теперь прямо разводит contract obligations, platform assumptions, lifecycle rules и validation result: `Product_Bootstrap_Validation.md` остаётся evidence document, а не substitute для самого contract.
+
+### Эффект
+History-fact pass product bootstrap contract добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000058 — Clarify technical platform contracts
+ID: CHG-000058
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000046
+Связи: PLAN-000046, BACK-000058, QL-000053
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Platform_Contracts.md` пересобран как канонический platform-contract текущего `BytePress`: теперь он явно фиксирует supported execution environment, platform assumptions, supported tool perimeter, роли ключевых инструментов, допустимые режимы platform usage и недопустимые anti-patterns без смешения с architecture, model, lifecycle, interfaces, invariants или process-canon. `Docs/Technical/README.md` синхронизирован минимально: supporting role `Platform_Contracts.md` теперь описана как канонический platform/tool contract, а не как расплывчатый контекстный document.
+
+### Эффект
+History-fact pass technical platform contracts добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000057 — Clarify technical system invariants
+ID: CHG-000057
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000045
+Связи: PLAN-000045, BACK-000057, QL-000052
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/System_Invariants.md` пересобран как канонический invariant-contract текущего `BytePress`: в одном document теперь явно собраны repository/source-of-truth, planning, ownership, active/archive, traceability, process и tooling invariants, а также нарушения и их последствия. Для pass не потребовался отдельный шаблон: existing `Templates/Document.md` достаточен как общий singleton-document template, поэтому новый special template не вводился.
+
+### Эффект
+History-fact pass system invariants добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000056 — Clarify technical interfaces core
+ID: CHG-000056
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000044
+Связи: PLAN-000044, BACK-000056, QL-000051
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Interfaces.md` пересобран как канонический interface-contract текущего `BytePress`: в одном document теперь явно разведены внутренние и внешние интерфейсы, stable/service/derived classes, допустимые touchpoints и недопустимые обходы границ. `Interfaces.md` больше не выглядит как короткий legacy-list связей: отношение interface-layer к `Plans/*`, `Runtime/*`, `Logs/*` и `Pipeline/*` зафиксировано отдельно от архитектурной карты, ownership-модели и lifecycle-contract.
+
+### Эффект
+History-fact pass technical interfaces добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000055 — Clarify technical artifact lifecycle
+ID: CHG-000055
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000043
+Связи: PLAN-000043, BACK-000055, QL-000050
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Artifact_Lifecycle.md` пересобран как канонический lifecycle-contract текущего `BytePress`: в одном document теперь явно разведены артефактные группы, источники истины, обязательные sync-loop, допустимые переходы между active, archive, runtime и log слоями и недопустимые lifecycle-пропуски. `Artifact_Lifecycle.md` больше не выглядит как короткий sync-note: closure-loop перед завершением pass, допустимые layer transitions и границы между lifecycle-layer, architecture-layer, model-layer и process-layer зафиксированы явно.
+
+### Эффект
+History-fact pass artifact lifecycle добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000054 — Clarify technical model core
+ID: CHG-000054
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000042
+Связи: PLAN-000042, BACK-000054, QL-000049
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Model.md` пересобран как каноническая модель текущего `BytePress`: в одном document теперь явно разведены ключевые сущности системы, ownership состояния, основные связи и недопустимые смешения ответственности. `Model.md` больше не смешивает profile policy, naming migration и historical state с моделью сущностей; границы между model-layer, architecture-layer, lifecycle-layer и process-layer зафиксированы явно.
+
+### Эффект
+History-fact pass technical model добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000053 — Clarify technical architecture core
+ID: CHG-000053
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000041
+Связи: PLAN-000041, BACK-000053, QL-000048
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/Architecture.md` пересобран как каноническая архитектурная карта текущего `BytePress`: в одном document теперь явно разведены domain map, layer map, границы ответственности, допустимые направления связей и недопустимые подмены. Архитектурная граница между `Docs/Technical/*` и `Pipeline/*` зафиксирована без дублирования process-canon: `Architecture.md` описывает место process-layer в системе, но не повторяет фазы, gates и process IO.
+
+### Эффект
+History-fact pass technical architecture добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000052 — Clarify technical contract map
+ID: CHG-000052
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000040
+Связи: PLAN-000040, BACK-000052, QL-000047
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Docs/Technical/README.md` теперь явно делит current technical-documents на required core и supporting layer и фиксирует роль каждого документа в слое. `Docs/Technical/Pipeline.md` возвращён к supporting technical view: из active layer убран дублирующий process-canon, а приоритет `Pipeline/*` как process-domain закреплён явно.
+
+### Эффект
+History-fact pass technical contract map добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000051 — Activate ROAD-000010 technical boundaries
+ID: CHG-000051
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000039
+Связи: PLAN-000039, BACK-000051, QL-000046
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`ROAD-000010` активирован как текущий этап без переоткрытия `ROAD-000009`. `Docs/Technical/README.md` зафиксировал назначение technical-layer, его включения, исключения, отношение к `Pipeline/*`, `Plans/*`, `Runtime/*` и `Logs/*`, а также минимальный required состав слоя.
+
+### Эффект
+History-fact activation pass `ROAD-000010` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000050 — Audit and close ROAD-000009
+ID: CHG-000050
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000038
+Связи: PLAN-000038, BACK-000050, QL-000045
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+Audit активного governance-layer и planning-contour не подтвердил реального residual gap: candidate про hard-close contour не опирался на активное рассогласование и снят как неподтверждённый. `ROAD-000009` переведён в `Завершено`; `ROAD-000010` не активирован автоматически и остаётся следующим черновым горизонтом без новой backlog-задачи.
+
+### Эффект
+History-fact audit-pass `ROAD-000009` добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000049 — Migrate remaining governance ID layer
+ID: CHG-000049
+Дата: 2026-04-07
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000037
+Связи: PLAN-000037, BACK-000049, QL-000044
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Profiles/*` доведены до implemented hybrid contract без migration semantic filenames: внутренние `PROF-*` сохранены, а ссылочные списки `Активные_*` и `Резервные_*` нормализованы на canonical `ID`. `Docs/Terms/*` не потребовал file migration: `TERM-*` уже соответствовали serial contract, а singleton support-files внутри домена явно разведены с term-card layer.
+
+### Эффект
+History-fact pass remaining governance IDs добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000048 — Migrate governance ID layer
+ID: CHG-000048
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000036
+Связи: PLAN-000036, BACK-000048, QL-000043
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000048` и `PLAN-000036` зафиксировали только узкий pass по active governance/supporting domains без открытия других доменов. `Rules/*` подтвердили singleton contract без filename-migration; `Standards/Naming.md`, `Standards/Quality.md` и `Standards/Traceability.md` доведены до явных `STD-*`.
+
+### Эффект
+History-fact pass governance ID layer добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000047 — Migrate log ID layer
+ID: CHG-000047
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000035
+Связи: PLAN-000035, BACK-000047, QL-000042
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000047` и `PLAN-000035` зафиксировали только узкий pass по migration log-layer без открытия других доменов. `Logs/QualityLog.md` получил явные `ID:` для всех serial quality entries, а `Logs/ReleaseLog.md` переведён на шестизначный `RL-<NNNNNN>` contract с явными внутренними `ID`.
+
+### Эффект
+History-fact pass log ID layer добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000046 — Remove runtime plan legacy tail
+ID: CHG-000046
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000034
+Связи: PLAN-000034, BACK-000046, QL-000041
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000046` и `PLAN-000034` зафиксировали только cleanup-pass по legacy runtime tail planning-контура. `Runtime/Plan.md` удалён из рабочего дерева, а `Tools/bp_bootstrap.py` больше не материализует этот legacy artifact.
+
+### Эффект
+History-fact pass runtime plan cleanup добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000045 — Archive backlog history layer
+ID: CHG-000045
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000033
+Связи: PLAN-000033, BACK-000045, QL-000040
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000045` и `PLAN-000033` зафиксировали только pass на archive migration historical backlog прошлых этапов. Historical backlog `ROAD-000001`–`ROAD-000008` выведен в `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` с сохранением `BACK-ID`, порядка и связи с соответствующим `ROAD-*`.
+
+### Эффект
+History-fact pass backlog archive migration добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000044 — Migrate plan history to archive
+ID: CHG-000044
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000032
+Связи: PLAN-000032, BACK-000044, QL-000039
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000044` и `PLAN-000032` зафиксировали только pass на migration plan-files и archive policy. Historical `BP-*` и завершённые `PLAN-*` перемещены в `Plans/Archive/` и приведены к `PLAN-*` filename-contract.
+
+### Эффект
+History-fact pass plan archive migration добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000043 — Define unified ID scheme
+ID: CHG-000043
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000031
+Связи: PLAN-000031, BACK-000043, QL-000038
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`BACK-000043` и `PLAN-000031` зафиксировали только pass на unified `ID scheme` без запуска migration. `Standards/Naming.md` зафиксировал target `ID scheme` для serial / hybrid / singleton domains, правила filename и внутренних ссылок, а также future migration-order по доменам.
+
+### Эффект
+History-fact pass unified ID scheme добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000042 — Align roadmap and planning transition
+ID: CHG-000042
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000030
+Связи: PLAN-000030, BACK-000042, QL-000037
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`Roadmap` доведён до утверждённого горизонта: `ROAD-000011` теперь означает verification contour, `ROAD-000012` — agent entry point and user layer, `ROAD-000013` — product repo replication and baseline `0.2.0`, `ROAD-000014` — integration layer and future extensions. `BACK-000042` и `PLAN-000030` зафиксировали только corrective pass на выравнивание planning-transition без migration historical layer.
+
+### Эффект
+History-fact corrective pass planning transition добавлен в `ChangeLog` без подмены planning-layer журналом.
+
+---
+
+## CHG-000041 — Activate ROAD-000009 operating model pass
+ID: CHG-000041
+Дата: 2026-04-06
+Тип_изменения: Документация
+Источник: Archive backfill from PLAN-000029
+Связи: PLAN-000029, BACK-000041, QL-000036
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+`ROAD-000009` активирован как первый governance-pass новой operating model `BytePress`, а `ROAD-000010` переопределён как следующий technical-layer stage. `BACK-000041` зафиксировал узкий pass только на терминологию, ownership состояния, lifecycle `Plan`, неканоничность `Runtime/Plan.md` и hard-close contour задачи.
+
+### Эффект
+History-fact activation pass `ROAD-000009` добавлен в `ChangeLog` без подмены planning-layer журналом.
 
 ---
 

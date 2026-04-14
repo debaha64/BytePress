@@ -23,6 +23,7 @@
 - какой `ROAD-*` должен остаться активным или быть закрыт;
 - нужно ли архивировать previous current `Plan` или stage backlog;
 - какие direct-reference sync допустимы, если обнаружится реальное противоречие;
+- если pass release- или journaling-related, какие factual log closures ожидаются и что уже подтверждено tag/history;
 - какой итоговый report-format нужен человеку.
 
 ## Чего не нужно делать
