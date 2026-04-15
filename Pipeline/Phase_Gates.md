@@ -7,5 +7,13 @@
 ## Политика по умолчанию
 Профиль `Default` требует ручного утверждения на каждой фазе.
 
+## Граница с verification
+Gate остаётся решением process-layer о переходе между фазами.
+
+Успешный automatic check или завершённый procedural review могут быть входом для gate, но не заменяют само ручное утверждение перехода.
+
+Deterministic evidence artifact, выпущенный repo-native smoke route, допускается как verification/validation handoff input, но не считается gate approval сам по себе.
+Release-readiness gate тоже не заменяет фактические merge/tag/logging steps: approval не подменяет release event и не создаёт запись в `ReleaseLog.md` сам по себе.
+
 ## Параметризуемость
 Политика строгости должна задаваться профилем, а не вшиваться в конвейер как неизменяемое правило.

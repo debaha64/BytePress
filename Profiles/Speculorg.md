@@ -13,47 +13,50 @@ ID: PROF-000002
 Строгость: Максимальная
 Активный_путь: Pipeline/Golden_Path.md
 Активные_роли:
-- Research
-- Business_Analyst
-- System_Analyst
-- Architect
-- Developer
-- QA
-- Release
-- Support
+- ROLE-000003
+- ROLE-000001
+- ROLE-000002
+- ROLE-000004
+- ROLE-000005
+- ROLE-000006
+- ROLE-000007
+- ROLE-000008
 Резервные_роли:
-- Documentation
-- Security
-- DevOps
+- ROLE-000009
+- ROLE-000010
+- ROLE-000011
 Активные_правила:
-- Approval_Strictness
-- Repository_As_Source_Of_Truth
-- Runtime_Is_Temporary
-- Terms_Governance
-- Plans_Require_Approved_Backlog
+- RULE-000001
+- RULE-000003
+- RULE-000004
+- RULE-000006
+- RULE-000008
 Активные_стандарты:
-- Coding
-- Documentation
-- Planning
-- Release
-- Terminology
+- STD-000001
+- STD-000002
+- STD-000003
+- STD-000004
+- STD-000005
+- STD-000006
+- STD-000007
+- STD-000008
 Активные_навыки:
-- Discussion
-- Interview
-- Research
-- Requirements
-- Planning
-- Implementation
-- Quality
-- Review
-- Release
-- Support
+- SKILL-000001
+- SKILL-000002
+- SKILL-000003
+- SKILL-000004
+- SKILL-000005
+- SKILL-000006
+- SKILL-000007
+- SKILL-000008
+- SKILL-000009
+- SKILL-000010
 Активные_адаптеры:
-- Codex
+- ADP-000001
 Резервные_адаптеры:
-- Gemini
-- Local
-- Claude
+- ADP-000003
+- ADP-000004
+- ADP-000002
 
 ## Назначение
 Брендовый профиль для систем и продуктов Speculorg поверх базового режима BytePress.

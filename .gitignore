@@ -3,6 +3,8 @@ __pycache__/
 .env
 .env.*
 !.env.example
+.codex
+.codex/
 .vscode/
 .idea/
 .DS_Store

@@ -4,7 +4,7 @@
 - пакет основания документации;
 - `Roadmap.md`;
 - `Backlog.md`;
-- `Plan_<ID>.md`;
+- `PLAN-<NNNNNN>-<slug>.md`;
 - записи в `ADRlog.md` при необходимости;
 - записи в `QualityLog.md`;
 - записи в `ChangeLog.md`;
