@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
 - CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
 - CHG-000078 — Close ROAD-000014 integration evidence
 - CHG-000077 — Activate ROAD-000014 integration contour
@@ -80,6 +81,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
+ID: CHG-000080
+Дата: 2026-04-15
+Тип_изменения: Документация
+Источник: Post-release sync pass after merged `0.2.0`
+Связи: PLAN-000068, BACK-000080, QL-000075, RL-000007
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+После подтверждённого merge `PR #77` и annotated tag `0.2.0` выполнен минимальный post-release sync-pass в `develop`: local/remote release-ветка снята из operational contour, `ReleaseLog.md` получил factual запись `RL-000007`, а planning-layer зафиксировал отдельный operational stage `ROAD-000016` только для этого closure. Сравнение `origin/main` и `origin/develop` не подтвердило release-only tree fixes для back-sync, поэтому sync-pass не вносил новых product-development changes beyond factual release logging и minimal planning/log closure.
+
+### Эффект
+Post-release contour `0.2.0` закрыт в `develop` как history-fact без открытия нового широкого roadmap-stage.
 
 ---
 

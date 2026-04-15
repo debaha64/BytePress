@@ -16,6 +16,7 @@
 - ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 - ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 - ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
+- ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
 
 ## Легенда статусов
 - Черновик
@@ -279,3 +280,20 @@ ID: ROAD-000015
 
 ### Описание
 Этап закрыт одним corrective pass: `Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
+
+---
+
+## ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+ID: ROAD-000016
+Этап: Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+Статус: Завершено
+Связи: BACK-000080, PLAN-000068, CHG-000080
+Источник: PLAN-000068
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+Цель: Завершить post-release closure после merge/tag `0.2.0`: зафиксировать factual release event в `ReleaseLog.md`, подтвердить отсутствие release-only back-sync fixes и закрыть минимальный planning/log contour в `develop`.
+Зависимости: ROAD-000015
+Связанные_backlog: BACK-000080
+
+### Описание
+Этап закрыт одним узким operational sync-pass после подтверждённого merge `PR #77` и annotated tag `0.2.0` на commit `68824d0646fc3e68992bbd1d6a3e6b7f5dcf3b83` в `main`. Remote release-ветка уже отсутствовала, local release-ветка удалена, factual запись о выпуске `0.2.0` добавлена в `ReleaseLog.md`, а сравнение `origin/main` и `origin/develop` не подтвердило release-only tree fixes для back-sync. Минимальный planning/log closure завершён без открытия нового product-development scope.
