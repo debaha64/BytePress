@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000075
+ID: QL-000075
+Дата: 2026-04-15
+Статус: пройдено
+Проверка: подтверждены merged state `PR #77`, постановка annotated tag `0.2.0` на commit `68824d0646fc3e68992bbd1d6a3e6b7f5dcf3b83` в `main`, отсутствие remote release-ветки и удаление local release-ветки; сравнение `origin/main` и `origin/develop` не выявило release-only tree fixes для back-sync; в `develop` добавлены только factual `ReleaseLog` entry `RL-000007` и minimal planning/log closure `ROAD-000016` / `BACK-000080` / `PLAN-000068`; `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: post-release sync после `0.2.0` закрыт как согласованный factual/log/planning completion без нового product-development scope.
+
+---
+
 ## QL-000074
 ID: QL-000074
 Дата: 2026-04-15
