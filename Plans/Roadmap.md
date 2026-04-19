@@ -17,6 +17,7 @@
 - ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 - ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
 - ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+- ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
 
 ## Легенда статусов
 - Черновик
@@ -297,3 +298,18 @@ ID: ROAD-000016
 
 ### Описание
 Этап закрыт одним узким operational sync-pass после подтверждённого merge `PR #77` и annotated tag `0.2.0` на commit `68824d0646fc3e68992bbd1d6a3e6b7f5dcf3b83` в `main`. Remote release-ветка уже отсутствовала, local release-ветка удалена, factual запись о выпуске `0.2.0` добавлена в `ReleaseLog.md`, а сравнение `origin/main` и `origin/develop` не подтвердило release-only tree fixes для back-sync. Минимальный planning/log closure завершён без открытия нового product-development scope.
+
+## ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+ID: ROAD-000017
+Этап: Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+Статус: Завершено
+Связи: BACK-000081, PLAN-000069, CHG-000081
+Источник: PLAN-000069
+Дата_создания: 2026-04-19
+Дата_изменения: 2026-04-19
+Цель: Закрыть ранние control gaps после первого полевого запуска generated product repo: materialize minimal discovery-layer, сделать startup mode агента наблюдаемым и закрепить канонический interview format без открытия нового широкого stage.
+Зависимости: ROAD-000016
+Связанные_backlog: BACK-000081
+
+### Описание
+Этап закрыт одним corrective pass: generated product repo теперь materialize `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, product `AGENTS.md` явно включает discovery-layer в source-of-truth hierarchy и routing, а `AGENTS.md` самого `BytePress` фиксирует observable startup-handshake первого ответа. Одновременно `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer, bootstrap/validation contracts и `bp_lint.py` синхронизированы вокруг канонического interview format и нового bootstrap minimum. Smoke bootstrap и lint generated repo подтвердили отсутствие residual contradiction в этом scope.

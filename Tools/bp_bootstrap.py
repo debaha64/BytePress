@@ -79,6 +79,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     plan_filename = f"{ctx.product_code}-000001-product-initialization.md"
 
     for path in [
+        "Docs/Discovery",
         "Docs/User",
         "Docs/Product",
         "Docs/Technical",
@@ -112,6 +113,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "4. Использовать `scripts/dev-test.sh`, если нужен structural check через `BytePress`.\n\n"
         "5. Использовать `scripts/integration-smoke.sh`, если нужен minimal integration handoff check.\n\n"
         "## Доменная карта\n"
+        "- `Docs/Discovery/*` — current-truth и интервью продукта.\n"
         "- `Docs/User/*` — human-facing layer продукта.\n"
         "- `Docs/Product/*` — прикладная рамка продукта.\n"
         "- `Docs/Technical/*` — стартовый technical contour продукта.\n"
@@ -130,12 +132,14 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Агент ведёт работу через task-ветку, local checks и PR-flow.\n\n"
         "## Source-of-truth hierarchy\n"
         "1. Текущий task-source пользователя.\n"
-        "2. `Plans/*` как stage/task/pass owner.\n"
-        "3. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*` как knowledge/contract layers продукта.\n"
-        "4. `Logs/*` как фактологический слой.\n"
-        "5. `Adapters/*`, `Setup_Guide.md` и `scripts/*` как execution support.\n\n"
+        "2. `Docs/Discovery/*` как current-truth route продукта.\n"
+        "3. `Plans/*` как stage/task/pass owner.\n"
+        "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*` как knowledge/contract layers продукта.\n"
+        "5. `Logs/*` как фактологический слой.\n"
+        "6. `Adapters/*`, `Setup_Guide.md` и `scripts/*` как execution support.\n\n"
         "## Как входить в задачу\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
+        "- Если scope касается текущей истины продукта, сначала прочитать `Docs/Discovery/Interview.md`.\n"
         "- Для human-facing route использовать `Docs/User/*`.\n"
         "- Для structural check использовать `scripts/dev-test.sh` с `BYTEPRESS_ROOT`.\n"
         "- Для minimal integration handoff использовать `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n"
@@ -160,6 +164,40 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- report artifact integration smoke будет записан в `Runtime/Integration_Smoke_Report.json`.\n",
     )
 
+    write(
+        target / "Docs/Discovery/README.md",
+        "# Discovery\n\n"
+        "`Docs/Discovery/*` хранит current-truth продукта до перевода в требования и planning contour.\n\n"
+        "## Минимальный состав\n"
+        "- `README.md` — карта discovery-layer.\n"
+        "- `Interview.md` — текущее интервью продукта.\n\n"
+        "## Границы\n"
+        "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
+        "- history-fact изменений discovery-layer закрывается через planning/log contour.\n",
+    )
+    write(
+        target / "Docs/Discovery/Interview.md",
+        "# Interview\n\n"
+        "## Назначение интервью\n\n"
+        "Этот документ фиксирует текущую аналитическую истину о продукте до её перевода в требования и planning contour.\n\n"
+        "---\n\n"
+        "## Правило актуальности\n\n"
+        "Интервью хранит только актуальные вопросы и ответы. История изменений фиксируется через `Plans/*` и `Logs/*`.\n\n"
+        "---\n\n"
+        "## Вопросы и ответы\n\n"
+        "### 1. Какую текущую истину о продукте нужно зафиксировать первой?\n"
+        "Ответ: ...\n\n"
+        "Варианты ответа:\n"
+        "- A. Основной пользователь и его задача.\n"
+        "- B. Граница первой версии продукта.\n"
+        "- C. Ключевое ограничение реализации.\n\n"
+        "Рекомендуемый вариант: A — он быстрее всего даёт опорную current truth для следующего предметного pass.\n\n"
+        "### 2. Какой факт о продукте пока остаётся самым неопределённым?\n"
+        "Ответ: ...\n\n"
+        "### 3. Какие артефакты нужно проверить после обновления этого интервью?\n"
+        "Ответ: `Plans/Roadmap.md`, `Plans/Backlog.md`, active `Plans/*`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`.\n\n"
+        "---\n",
+    )
     write(
         target / "Docs/User/README.md",
         "# User\n\n"

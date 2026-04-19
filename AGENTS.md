@@ -34,6 +34,17 @@
 - Читает только те домены и контракты, которые действительно владеют истиной по текущему scope.
 - Если task уже определён репозиторием, агент не ждёт, что ручной промпт повторно опишет branch policy, checks, reporting contract или source-of-truth hierarchy.
 
+## Startup-handshake первого ответа
+- Первый содержательный ответ агента до исследования или правок обязан явно показать startup mode.
+- В startup-handshake агент коротко фиксирует:
+  1. как он понял scope текущего pass;
+  2. какой branch/start route он использует;
+  3. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;
+  4. какие owner-domains он читает первыми;
+  5. какой первый конкретный шаг выполняет дальше.
+- Startup-handshake должен быть коротким, наблюдаемым и проверяемым человеком по репозиторию.
+- Если первый ответ не позволяет понять startup mode агента, это считается defect контракта исполнения.
+
 ## Как агент выбирает домены и контракты
 - `Plans/*` — когда нужно определить этап, backlog-задачу, pass, статусы, activation/closure или archive action.
 - `Rules/*` и `Standards/*` — когда нужен hard boundary, quality contract, naming или presentation rule.

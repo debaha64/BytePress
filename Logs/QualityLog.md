@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000076
+ID: QL-000076
+Дата: 2026-04-19
+Статус: пройдено
+Проверка: `Tools/bp_bootstrap.py` materialize minimal `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, generated product `AGENTS.md` включает discovery-layer в source-of-truth hierarchy и task entry route, `AGENTS.md` самого `BytePress` содержит observable startup-handshake contract, а `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer, bootstrap/validation contracts и `Tools/bp_lint.py` согласованы по interview format; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, smoke bootstrap и `python3 Tools/bp_lint.py --repo <generated-product-repo>` пройдены; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000017` закрыт как согласованный history-fact без доказанного residual contradiction в bootstrap discovery и startup-handshake contour.
+
+---
+
 ## QL-000075
 ID: QL-000075
 Дата: 2026-04-15
