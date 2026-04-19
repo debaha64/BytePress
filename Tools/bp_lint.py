@@ -39,6 +39,15 @@ PRODUCT_GITIGNORE_CODEX = re.compile(r"^\.codex/?$", re.MULTILINE)
 PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
+PRODUCT_DISCOVERY_ROUTE = re.compile(r"Docs/Discovery/\*", re.MULTILINE)
+PRODUCT_INTERVIEW_FORMAT = re.compile(r"###\s+1\.")
+STARTUP_HANDSHAKE_SECTION = re.compile(r"^## Startup-handshake первого ответа$", re.MULTILINE)
+INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
+INTERVIEW_SKILL_OPTIONS = re.compile(r"буквен", re.IGNORECASE)
+INTERVIEW_SKILL_RECOMMENDED = re.compile(r"рекомендуем", re.IGNORECASE)
+INTERVIEW_TEMPLATE_NUMBERED = re.compile(r"###\s+1\.")
+INTERVIEW_TEMPLATE_OPTIONS = re.compile(r"Варианты ответа:")
+INTERVIEW_TEMPLATE_RECOMMENDED = re.compile(r"Рекомендуемый вариант:")
 PROFILE_LIST_PATTERNS = {
     "Активные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
     "Резервные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
@@ -133,6 +142,8 @@ def check_product_repo(root: Path) -> int:
         "Profiles", "Adapters", "scripts"
     ]
     required_paths = [
+        "Docs/Discovery/README.md",
+        "Docs/Discovery/Interview.md",
         "Docs/User/README.md",
         "Docs/User/Operating_Mode.md",
         "Docs/User/First_Start.md",
@@ -192,6 +203,11 @@ def check_product_repo(root: Path) -> int:
     gitignore_path = root / ".gitignore"
     if gitignore_path.exists() and not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_CODEX):
         errors.append(".gitignore: missing `.codex/` ignore")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_DISCOVERY_ROUTE):
+        errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
+    interview_path = root / "Docs" / "Discovery" / "Interview.md"
+    if interview_path.exists() and not contains_pattern(interview_path, PRODUCT_INTERVIEW_FORMAT):
+        errors.append("Docs/Discovery/Interview.md: missing numbered interview format")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
@@ -307,7 +323,27 @@ def main() -> int:
             continue
         profile_reference_errors.extend(check_profile_reference_lists(path))
 
-    if missing or id_errors or template_id_errors or schema_id_errors or profile_reference_errors:
+    contract_errors: list[str] = []
+    if not contains_pattern(root / "AGENTS.md", STARTUP_HANDSHAKE_SECTION):
+        contract_errors.append("AGENTS.md: missing observable startup-handshake contract")
+    interview_skill = root / "Skills" / "Interview.md"
+    if interview_skill.exists():
+        if not contains_pattern(interview_skill, INTERVIEW_SKILL_NUMBERED):
+            contract_errors.append("Skills/Interview.md: missing numbered-question contract")
+        if not contains_pattern(interview_skill, INTERVIEW_SKILL_OPTIONS):
+            contract_errors.append("Skills/Interview.md: missing lettered-options contract")
+        if not contains_pattern(interview_skill, INTERVIEW_SKILL_RECOMMENDED):
+            contract_errors.append("Skills/Interview.md: missing recommended-option contract")
+    interview_template = root / "Templates" / "Interview.md"
+    if interview_template.exists():
+        if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_NUMBERED):
+            contract_errors.append("Templates/Interview.md: missing numbered interview format")
+        if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_OPTIONS):
+            contract_errors.append("Templates/Interview.md: missing options block")
+        if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_RECOMMENDED):
+            contract_errors.append("Templates/Interview.md: missing recommended option block")
+
+    if missing or id_errors or template_id_errors or schema_id_errors or profile_reference_errors or contract_errors:
         if missing:
             print("Отсутствуют обязательные пути:")
             for item in missing:
@@ -327,6 +363,10 @@ def main() -> int:
         if profile_reference_errors:
             print("Профили с неканоничными ссылочными списками:")
             for item in profile_reference_errors:
+                print(f"- {item}")
+        if contract_errors:
+            print("Ошибки контрактов активного слоя:")
+            for item in contract_errors:
                 print(f"- {item}")
         return 1
     print("Структура BytePress, интеграционный и исполнительный контуры выглядят полными.")

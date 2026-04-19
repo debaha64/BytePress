@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
 - CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
 - CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
 - CHG-000078 — Close ROAD-000014 integration evidence
@@ -81,6 +82,24 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+
+## CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
+ID: CHG-000081
+Дата: 2026-04-19
+Тип_изменения: Документация
+Источник: Corrective pass after first field test of generated product repo
+Связи: PLAN-000069, BACK-000081, QL-000076
+Дата_создания: 2026-04-19
+Дата_изменения: 2026-04-19
+
+### Описание
+`AGENTS.md`, bootstrap/validation contracts, `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer и tooling синхронизированы после первого полевого запуска generated product repo. Bootstrap теперь materialize minimal `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, generated product `AGENTS.md` маршрутизирует discovery-layer явно, а startup mode агента в `BytePress` фиксируется через observable startup-handshake первого ответа.
+
+### Эффект
+Ранние control gaps первого bootstrap-run закрыты без изменения release contour, integration contour или открытия нового широкого roadmap-stage.
 
 ---
 
