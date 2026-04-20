@@ -19,6 +19,7 @@
 - ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
 - ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
 - ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+- ROAD-000019 — Enforce first product-pass gating after field-test regression
 
 ## Легенда статусов
 - Черновик
@@ -331,3 +332,20 @@ ID: ROAD-000018
 
 ### Описание
 Этап закрыт одним corrective pass после фактического smoke bootstrap во временный target path вне дерева `BytePress`. Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково требуют observable startup-handshake первого ответа, исполнимый first interview из 8–10 ключевых вопросов и явный current-truth ownership `Docs/Discovery/Interview.md`. Одновременно принят канон runtime artifact hygiene: `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit, materialize только после фактического smoke run и остаётся runtime-local artifact по умолчанию. Smoke bootstrap, generated repo lint и smoke report hygiene не подтвердили residual contradiction в этом scope.
+
+---
+
+## ROAD-000019 — Enforce first product-pass gating after field-test regression
+ID: ROAD-000019
+Этап: Enforce first product-pass gating after field-test regression
+Статус: Завершено
+Связи: BACK-000083, PLAN-000071, CHG-000083
+Источник: PLAN-000071
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+Цель: Полностью закрыть defects gating первого product pass после нового полевого теста `Minesweeper`: запретить self-answering interview, любые write-изменения до ответов пользователя и direct writes в `main` / `develop`, а также перестроить initial planning contour generated product repo в discovery-only / write-later route без раннего implementation.
+Зависимости: ROAD-000018
+Связанные_backlog: BACK-000083
+
+### Описание
+Этап закрыт одним corrective pass после реального bootstrap smoke во временный target path `/tmp/bytepress-first-pass-gating-Fd6CMn/repo`. Core `AGENTS.md`, active discovery-layer, bootstrap/validation contracts, `Templates/Interview.md`, `Skills/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково фиксируют hard-gates первого product-start pass: обязательный startup-handshake, discovery-only interview, явный запрет self-answering, запрет write-изменений до ответов пользователя и прямых writes в `main` / `develop`, а также route первого write-pass только через отдельную task-ветку после подтверждённого discovery. Generated repo materialize эти ограничения в `AGENTS.md`, `Docs/Discovery/*` и initial `Plans/*`, а `python3 Tools/bp_lint.py --repo /tmp/bytepress-first-pass-gating-Fd6CMn/repo` подтверждает отсутствие residual contradiction между contracts, bootstrap и generated product contour.

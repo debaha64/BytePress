@@ -34,6 +34,7 @@
 
 Роль:
 - хранить текущую аналитическую истину о системе и продукте.
+- для bootstrap-created product repo early product-start contour удерживать unanswered discovery-state до ответа пользователя, а не заменять его догадками агента.
 
 Источник истины:
 - `Docs/Discovery/Interview.md`.
@@ -230,6 +231,7 @@
 
 ## Недопустимые пропуски и смешения
 - менять канонический source-of-truth и не проверять связанные active artifacts;
+- в generated product repo закрывать unanswered discovery gaps предположениями агента или переводить discovery-first contour в write-state до ответов пользователя;
 - закрывать pass без фиксации результата проверки в `QualityLog`;
 - записывать в `ReleaseLog` release candidate, прогноз или намерение вместо factual release event;
 - считать runtime контур завершённым результатом без фиксации факта в `Logs/*`;

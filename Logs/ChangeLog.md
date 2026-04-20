@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000083 — First product-pass gating enforced after repeated field-test defects
 - CHG-000082 — Product-start corrective contour synchronized after first field test
 - CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
 - CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
@@ -83,6 +84,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000083 — First product-pass gating enforced after repeated field-test defects
+ID: CHG-000083
+Дата: 2026-04-20
+Тип_изменения: Инструмент
+Источник: Corrective pass after repeated `Minesweeper` field-test defects
+Связи: PLAN-000071, BACK-000083, QL-000078
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+
+### Описание
+`AGENTS.md`, active discovery-layer, bootstrap/validation contracts, `Templates/Interview.md`, `Skills/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг hard-gates первого product-start pass. Generated product repo теперь materialize explicit discovery-only startup contour: обязательный startup-handshake, запрет self-answering interview, запрет write-изменений до ответов пользователя, запрет direct writes в `main` / `develop` и initial `ROAD/BACK/PLAN`, который готовит отдельный первый write-pass вместо раннего implementation.
+
+### Эффект
+Первый запуск нового product repo больше не подталкивает агента к самозаполнению discovery или раннему write-pass: bootstrap, generated repo, planning contour и lint проверяются одним и тем же gating contract.
 
 ---
 

@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000078
+ID: QL-000078
+Дата: 2026-04-20
+Статус: пройдено
+Проверка: corrective stage `ROAD-000019` / `BACK-000083` / `PLAN-000071` оформлен и закрыт archive-consistently; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Templates/Interview.md`, `Skills/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг hard-gating первого product-start pass; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-first-pass-gating-Fd6CMn/repo` и `python3 Tools/bp_lint.py --repo /tmp/bytepress-first-pass-gating-Fd6CMn/repo` пройдены; generated repo содержит observable startup-handshake, запрет self-answering, запрет write-изменений до ответов пользователя, запрет direct writes в `main` / `develop` и discovery-only initial `ROAD/BACK/PLAN`; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000019` закрыт как согласованный history-fact без подтверждённого residual contradiction между core contracts, bootstrap tool, generated repo и lint.
+
+---
+
 ## QL-000077
 ID: QL-000077
 Дата: 2026-04-20

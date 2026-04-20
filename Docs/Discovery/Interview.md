@@ -10,6 +10,8 @@
 
 Интервью хранит только текущие вопросы и актуальные ответы. Устаревшие ответы переписываются, а история изменений и решений фиксируется через `Plans/Roadmap.md`, `Plans/Backlog.md`, активные `Plans/*`, `Logs/*` и при необходимости `Logs/ADRlog.md`.
 
+Если интервью используется как первый product-start route generated product repo, unanswered вопросы остаются unanswered до ответа пользователя: агент не самозаполняет интервью, не подменяет пропуски предположениями и не открывает write-pass до подтверждённого discovery.
+
 ---
 
 ## Вопросы и ответы
@@ -79,5 +81,7 @@
 - `Logs/ChangeLog.md`
 - `Logs/QualityLog.md`
 - при необходимости `Logs/ADRlog.md`
+
+До ответов пользователя на first-pass discovery interview недопустимо менять product truth, planning, logs или code.
 
 ---

@@ -41,6 +41,11 @@ PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s
 PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
 PRODUCT_DISCOVERY_ROUTE = re.compile(r"Docs/Discovery/\*", re.MULTILINE)
+PRODUCT_NO_SELF_ANSWERING = re.compile(r"не\s+самозаполня|self-answering", re.IGNORECASE)
+PRODUCT_NO_WRITES_BEFORE_ANSWERS = re.compile(r"до\s+ответов\s+пользователя[\s\S]{0,120}(не\s+(имеет\s+права\s+менять|меняет)|нельзя\s+менять)|no writes before user answers", re.IGNORECASE)
+PRODUCT_NO_MAIN_DEVELOP_WRITES = re.compile(r"(main|develop)[\s\S]{0,80}(запрещ|не\s+пиш|never write)", re.IGNORECASE)
+PRODUCT_FIRST_WRITE_PASS = re.compile(r"(write-pass[\s\S]{0,160}(task-ветк|task branch|подтвержд[её]нного\s+discovery))|((task-ветк|task branch)[\s\S]{0,160}write-pass)", re.IGNORECASE)
+PRODUCT_DISCOVERY_ONLY = re.compile(r"discovery-only|discovery/planning|только\s+discovery", re.IGNORECASE)
 QUESTION_HEADING = re.compile(r"^###\s+\d+\.", re.MULTILINE)
 INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
 INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
@@ -62,6 +67,13 @@ INTERVIEW_TEMPLATE_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
 INTERVIEW_TEMPLATE_OWNER = re.compile(r"owner-document|owner", re.IGNORECASE)
 INTERVIEW_TEMPLATE_OPTIONS = re.compile(r"Варианты ответа:")
 INTERVIEW_TEMPLATE_RECOMMENDED = re.compile(r"Рекомендуемый вариант:")
+INTERVIEW_GATING_SELF_ANSWERING = re.compile(r"не\s+самозаполня|self-answering", re.IGNORECASE)
+INTERVIEW_GATING_NO_WRITES = re.compile(r"до\s+ответов\s+пользователя[\s\S]{0,120}(нельзя|не\s+менять)|write-state", re.IGNORECASE)
+INTERVIEW_GATING_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
+BOOTSTRAP_CONTRACT_SELF_ANSWERING = re.compile(r"self-answering|не\s+самозаполня", re.IGNORECASE)
+BOOTSTRAP_CONTRACT_NO_WRITES = re.compile(r"до\s+ответов\s+пользователя[\s\S]{0,120}(не\s+меняет|не\s+делает|не\s+имеет\s+права\s+менять)", re.IGNORECASE)
+BOOTSTRAP_CONTRACT_NO_MAIN_DEVELOP = re.compile(r"(main|develop)[\s\S]{0,120}(запрещ|не\s+пиш)", re.IGNORECASE)
+BOOTSTRAP_CONTRACT_DISCOVERY_ONLY = re.compile(r"discovery-only|discovery/planning|write-pass", re.IGNORECASE)
 PROFILE_LIST_PATTERNS = {
     "Активные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
     "Резервные_роли": re.compile(r"^ROLE-[0-9]{6}$"),
@@ -263,21 +275,52 @@ def check_product_repo(root: Path) -> int:
         errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
     if not has_startup_handshake_contract(root / "AGENTS.md"):
         errors.append("AGENTS.md: missing observable startup-handshake contract for generated product repo")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_NO_SELF_ANSWERING):
+        errors.append("AGENTS.md: missing self-answering prohibition for first discovery pass")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_NO_WRITES_BEFORE_ANSWERS):
+        errors.append("AGENTS.md: missing no-write-before-user-answers gate")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_NO_MAIN_DEVELOP_WRITES):
+        errors.append("AGENTS.md: missing direct-write prohibition for `main` / `develop`")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_FIRST_WRITE_PASS):
+        errors.append("AGENTS.md: missing first write-pass route after confirmed discovery")
+    discovery_readme_path = root / "Docs" / "Discovery" / "README.md"
+    if discovery_readme_path.exists():
+        if not contains_pattern(discovery_readme_path, PRODUCT_NO_SELF_ANSWERING):
+            errors.append("Docs/Discovery/README.md: missing self-answering prohibition")
+        if not contains_pattern(discovery_readme_path, PRODUCT_NO_WRITES_BEFORE_ANSWERS):
+            errors.append("Docs/Discovery/README.md: missing no-write-before-user-answers gate")
+        if not contains_pattern(discovery_readme_path, PRODUCT_FIRST_WRITE_PASS):
+            errors.append("Docs/Discovery/README.md: missing first write-pass route")
     interview_path = root / "Docs" / "Discovery" / "Interview.md"
     for item in has_interview_contract(interview_path):
         errors.append(f"Docs/Discovery/Interview.md: {item}")
+    if interview_path.exists():
+        if not contains_pattern(interview_path, PRODUCT_NO_SELF_ANSWERING):
+            errors.append("Docs/Discovery/Interview.md: missing self-answering prohibition")
+        if not contains_pattern(interview_path, PRODUCT_NO_WRITES_BEFORE_ANSWERS):
+            errors.append("Docs/Discovery/Interview.md: missing no-write-before-user-answers gate")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
+    if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_DISCOVERY_ONLY):
+        errors.append("Plans/Roadmap.md: initial stage does not keep the first pass discovery-only")
     backlog_path = root / "Plans" / "Backlog.md"
     if backlog_path.exists() and not contains_pattern(backlog_path, PRODUCT_BACKLOG_IN_PROGRESS):
         errors.append("Plans/Backlog.md: initial backlog task is not active `В_работе`")
+    if backlog_path.exists() and not contains_pattern(backlog_path, PRODUCT_DISCOVERY_ONLY):
+        errors.append("Plans/Backlog.md: initial backlog task does not keep the first pass discovery-only")
     if plan_matches:
         plan_path = plan_matches[0]
         if check_has_id(plan_path):
             errors.append(f"{plan_path}: missing ID line")
         if not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
             errors.append(f"{plan_path}: missing `Статус: В_работе`")
+        if not contains_pattern(plan_path, PRODUCT_DISCOVERY_ONLY):
+            errors.append(f"{plan_path}: missing discovery-only first-pass contour")
+        if not contains_pattern(plan_path, PRODUCT_NO_WRITES_BEFORE_ANSWERS):
+            errors.append(f"{plan_path}: missing no-write-before-user-answers gate")
+        if not contains_pattern(plan_path, PRODUCT_FIRST_WRITE_PASS):
+            errors.append(f"{plan_path}: missing route to the first write-pass after discovery")
     for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh"]:
         path = root / rel
         if path.exists() and not is_executable(path):
@@ -398,6 +441,12 @@ def main() -> int:
             contract_errors.append("Skills/Interview.md: missing lettered-options contract")
         if not contains_pattern(interview_skill, INTERVIEW_SKILL_RECOMMENDED):
             contract_errors.append("Skills/Interview.md: missing recommended-option contract")
+        if not contains_pattern(interview_skill, INTERVIEW_GATING_SELF_ANSWERING):
+            contract_errors.append("Skills/Interview.md: missing self-answering prohibition")
+        if not contains_pattern(interview_skill, INTERVIEW_GATING_NO_WRITES):
+            contract_errors.append("Skills/Interview.md: missing no-write-before-user-answers gate")
+        if not contains_pattern(interview_skill, INTERVIEW_GATING_TASK_BRANCH):
+            contract_errors.append("Skills/Interview.md: missing task-branch route for the first write-pass")
     interview_template = root / "Templates" / "Interview.md"
     if interview_template.exists():
         if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_OWNER):
@@ -410,6 +459,32 @@ def main() -> int:
             contract_errors.append("Templates/Interview.md: missing options block")
         if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_RECOMMENDED):
             contract_errors.append("Templates/Interview.md: missing recommended option block")
+        if not contains_pattern(interview_template, INTERVIEW_GATING_SELF_ANSWERING):
+            contract_errors.append("Templates/Interview.md: missing self-answering prohibition")
+        if not contains_pattern(interview_template, INTERVIEW_GATING_NO_WRITES):
+            contract_errors.append("Templates/Interview.md: missing no-write-before-user-answers gate")
+        if not contains_pattern(interview_template, INTERVIEW_GATING_TASK_BRANCH):
+            contract_errors.append("Templates/Interview.md: missing task-branch route for the first write-pass")
+    bootstrap_contract = root / "Docs" / "Technical" / "Product_Bootstrap_Contract.md"
+    if bootstrap_contract.exists():
+        if not contains_pattern(bootstrap_contract, BOOTSTRAP_CONTRACT_SELF_ANSWERING):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Contract.md: missing self-answering prohibition")
+        if not contains_pattern(bootstrap_contract, BOOTSTRAP_CONTRACT_NO_WRITES):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Contract.md: missing no-write-before-user-answers gate")
+        if not contains_pattern(bootstrap_contract, BOOTSTRAP_CONTRACT_NO_MAIN_DEVELOP):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Contract.md: missing `main` / `develop` write prohibition")
+        if not contains_pattern(bootstrap_contract, BOOTSTRAP_CONTRACT_DISCOVERY_ONLY):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Contract.md: missing discovery-only initial planning contour")
+    bootstrap_validation = root / "Docs" / "Technical" / "Product_Bootstrap_Validation.md"
+    if bootstrap_validation.exists():
+        if not contains_pattern(bootstrap_validation, BOOTSTRAP_CONTRACT_SELF_ANSWERING):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Validation.md: missing self-answering prohibition")
+        if not contains_pattern(bootstrap_validation, BOOTSTRAP_CONTRACT_NO_WRITES):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Validation.md: missing no-write-before-user-answers gate")
+        if not contains_pattern(bootstrap_validation, BOOTSTRAP_CONTRACT_NO_MAIN_DEVELOP):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Validation.md: missing `main` / `develop` write prohibition")
+        if not contains_pattern(bootstrap_validation, BOOTSTRAP_CONTRACT_DISCOVERY_ONLY):
+            contract_errors.append("Docs/Technical/Product_Bootstrap_Validation.md: missing discovery-only initial planning contour")
 
     if missing or id_errors or template_id_errors or schema_id_errors or profile_reference_errors or contract_errors:
         if missing:
