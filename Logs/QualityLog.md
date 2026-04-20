@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000077
+ID: QL-000077
+Дата: 2026-04-20
+Статус: пройдено
+Проверка: `PLAN-000069` выведен в archive-layer, corrective stage `ROAD-000018` / `BACK-000082` / `PLAN-000070` оформлен и затем закрыт в одном pass; `AGENTS.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг observable startup-handshake, first interview из 8–10 вопросов и runtime hygiene `Runtime/Integration_Smoke_Report.json`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-product-start-1okrN3/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-product-start-1okrN3/repo` и `BYTEPRESS_ROOT=/home/dmin/code/BytePress /tmp/bytepress-product-start-1okrN3/repo/scripts/integration-smoke.sh` пройдены; baseline smoke report отсутствовал до запуска и после запуска был ignored-by-default как `!! Runtime/Integration_Smoke_Report.json`; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000018` закрыт как согласованный end-to-end history-fact без доказанного residual contradiction между core contracts, bootstrap tool, generated repo и validation.
+
+---
+
 ## QL-000076
 ID: QL-000076
 Дата: 2026-04-19

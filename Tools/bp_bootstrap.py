@@ -98,7 +98,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
 
     write(
         target / ".gitignore",
-        "__pycache__/\n*.pyc\n.env\n.env.*\n.venv/\n.codex\n.codex/\n",
+        "__pycache__/\n*.pyc\n.env\n.env.*\n.venv/\n.codex\n.codex/\nRuntime/Integration_Smoke_Report.json\n",
     )
     write(
         target / "README.md",
@@ -137,6 +137,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*` как knowledge/contract layers продукта.\n"
         "5. `Logs/*` как фактологический слой.\n"
         "6. `Adapters/*`, `Setup_Guide.md` и `scripts/*` как execution support.\n\n"
+        "## Startup-handshake первого ответа\n"
+        "- Первый содержательный ответ агента до исследования или правок обязан явно показать startup mode продукта.\n"
+        "- В startup-handshake агент коротко фиксирует:\n"
+        "  1. какой startup mode он использует для текущего product-start pass;\n"
+        "  2. как он понял scope текущего pass;\n"
+        "  3. какой branch/start route он использует;\n"
+        "  4. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;\n"
+        "  5. какие owner-domains он читает первыми;\n"
+        "  6. какой первый конкретный шаг выполняет дальше.\n"
+        "- Startup-handshake должен быть коротким, наблюдаемым и проверяемым по generated product repo.\n\n"
         "## Как входить в задачу\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Если scope касается текущей истины продукта, сначала прочитать `Docs/Discovery/Interview.md`.\n"
@@ -161,25 +171,29 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- для structural и integration smoke checks replicated repo установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
         "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`;\n"
         "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`;\n"
-        "- report artifact integration smoke будет записан в `Runtime/Integration_Smoke_Report.json`.\n",
+        "- report artifact integration smoke будет записан в `Runtime/Integration_Smoke_Report.json` как runtime-local файл;\n"
+        "- baseline commit generated repo не должен содержать этот artifact по умолчанию; если текущий pass явно сохраняет smoke evidence в Git, это решение должно быть зафиксировано в current `Plan` и итоговом отчёте.\n",
     )
 
     write(
         target / "Docs/Discovery/README.md",
         "# Discovery\n\n"
         "`Docs/Discovery/*` хранит current-truth продукта до перевода в требования и planning contour.\n\n"
-        "## Минимальный состав\n"
+        "## Current-truth owner\n"
+        "- `Interview.md` — owner текущей аналитической истины generated product repo.\n\n"
+        "## Bootstrap minimum раннего product-start contour\n"
         "- `README.md` — карта discovery-layer.\n"
         "- `Interview.md` — текущее интервью продукта.\n\n"
         "## Границы\n"
         "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
-        "- history-fact изменений discovery-layer закрывается через planning/log contour.\n",
+        "- history-fact изменений discovery-layer закрывается через planning/log contour;\n"
+        "- `Discussion`, `Research` и `Requirements` не materialize до отдельного pass, который явно открывает расширенный discovery contour.\n",
     )
     write(
         target / "Docs/Discovery/Interview.md",
         "# Interview\n\n"
         "## Назначение интервью\n\n"
-        "Этот документ фиксирует текущую аналитическую истину о продукте до её перевода в требования и planning contour.\n\n"
+        "`Docs/Discovery/Interview.md` является owner-document текущей аналитической истины о продукте до её перевода в требования и planning contour.\n\n"
         "---\n\n"
         "## Правило актуальности\n\n"
         "Интервью хранит только актуальные вопросы и ответы. История изменений фиксируется через `Plans/*` и `Logs/*`.\n\n"
@@ -192,10 +206,39 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- B. Граница первой версии продукта.\n"
         "- C. Ключевое ограничение реализации.\n\n"
         "Рекомендуемый вариант: A — он быстрее всего даёт опорную current truth для следующего предметного pass.\n\n"
-        "### 2. Какой факт о продукте пока остаётся самым неопределённым?\n"
+        "### 2. Какая граница первой версии сейчас выглядит самой вероятной?\n"
         "Ответ: ...\n\n"
-        "### 3. Какие артефакты нужно проверить после обновления этого интервью?\n"
+        "Варианты ответа:\n"
+        "- A. Один пользовательский сценарий и один основной результат.\n"
+        "- B. Полный release-ready продукт сразу.\n"
+        "- C. Только технический эксперимент без user value.\n\n"
+        "Рекомендуемый вариант: A — он удерживает первую версию в узком и проверяемом scope.\n\n"
+        "### 3. Какой факт о продукте пока остаётся самым неопределённым?\n"
+        "Ответ: ...\n\n"
+        "### 4. Какое ограничение сильнее всего влияет на первый pass продукта?\n"
+        "Ответ: ...\n\n"
+        "Варианты ответа:\n"
+        "- A. Ограничение времени и узкого scope.\n"
+        "- B. Обязательная полная автоматизация с первого дня.\n"
+        "- C. Требование открыть сразу все будущие домены.\n\n"
+        "Рекомендуемый вариант: A — ранний product-start contour должен оставаться узким и управляемым.\n\n"
+        "### 5. Какой основной пользовательский результат должен стать наблюдаемым после первого pass?\n"
+        "Ответ: ...\n\n"
+        "### 6. Какие артефакты являются первыми owner-documents продукта для этого scope?\n"
+        "Ответ: `Docs/Discovery/Interview.md`, `Docs/Product/*`, `Plans/*` и при необходимости `Docs/Technical/*`.\n\n"
+        "### 7. Какой route дальнейшего уточнения discovery сейчас нужен после интервью?\n"
+        "Ответ: ...\n\n"
+        "Варианты ответа:\n"
+        "- A. Открыть отдельный pass на `Discussion` / `Research` / `Requirements`, если minimum уже недостаточен.\n"
+        "- B. Сразу переписать планы без фиксации новой current truth.\n"
+        "- C. Оставить discovery только в устном виде.\n\n"
+        "Рекомендуемый вариант: A — он открывает расширенный discovery contour только по явному решению.\n\n"
+        "### 8. Какие артефакты нужно проверить после обновления этого интервью?\n"
         "Ответ: `Plans/Roadmap.md`, `Plans/Backlog.md`, active `Plans/*`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`.\n\n"
+        "### 9. Что сейчас остаётся вне scope первого product-start pass?\n"
+        "Ответ: ...\n\n"
+        "### 10. Какой следующий конкретный шаг должен последовать сразу после согласования интервью?\n"
+        "Ответ: ...\n\n"
         "---\n",
     )
     write(
@@ -412,7 +455,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(target / "Docs/Terms/README.md", "# Terms\n\nТермины предметной области продукта.\n")
     write(target / "Docs/Terms/Base_Terms.md", "# Base_Terms\n\n## Индекс\n")
 
-    write(target / "Runtime/README.md", "# Runtime\n\nОперативная среда текущего исполнения.\n")
+    write(
+        target / "Runtime/README.md",
+        "# Runtime\n\n"
+        "Оперативная среда текущего исполнения.\n\n"
+        "- `Runtime/Integration_Smoke_Report.json` materialize только после фактического smoke run;\n"
+        "- baseline commit generated repo не должен содержать этот artifact по умолчанию.\n",
+    )
     write(target / "Runtime/Context.md", "# Context\n\nТекущий контекст исполнения.\n")
     write(target / "Runtime/Task.md", "# Task\n\nТекущая задача.\n")
     write(target / "Runtime/Session_Log.md", "# Session_Log\n\nЖурнал текущей сессии.\n")
@@ -572,7 +621,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `dev-up.sh` — placeholder старта локального product contour.\n"
         "- `dev-down.sh` — placeholder остановки локального contour.\n"
         "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT`.\n"
-        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с report artifact в `Runtime/Integration_Smoke_Report.json`.\n",
+        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с runtime-local report artifact в `Runtime/Integration_Smoke_Report.json`.\n"
+        "- report artifact по умолчанию остаётся вне baseline commit и force-add допускается только при явном evidence-preservation решении текущего pass.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",

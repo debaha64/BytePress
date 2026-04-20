@@ -36,16 +36,30 @@ PRODUCT_PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$"
 PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULTILINE)
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
 PRODUCT_GITIGNORE_CODEX = re.compile(r"^\.codex/?$", re.MULTILINE)
+PRODUCT_GITIGNORE_SMOKE_REPORT = re.compile(r"^Runtime/Integration_Smoke_Report\.json$", re.MULTILINE)
 PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
 PRODUCT_DISCOVERY_ROUTE = re.compile(r"Docs/Discovery/\*", re.MULTILINE)
-PRODUCT_INTERVIEW_FORMAT = re.compile(r"###\s+1\.")
+QUESTION_HEADING = re.compile(r"^###\s+\d+\.", re.MULTILINE)
+INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
+INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
+INTERVIEW_OWNER_CURRENT_TRUTH = re.compile(r"Docs/Discovery/Interview\.md[\s\S]{0,120}(owner|current truth|текущ)", re.IGNORECASE)
 STARTUP_HANDSHAKE_SECTION = re.compile(r"^## Startup-handshake первого ответа$", re.MULTILINE)
+STARTUP_HANDSHAKE_MODE = re.compile(r"startup mode|режим", re.IGNORECASE)
+STARTUP_HANDSHAKE_SCOPE = re.compile(r"scope", re.IGNORECASE)
+STARTUP_HANDSHAKE_ROUTE = re.compile(r"route", re.IGNORECASE)
+STARTUP_HANDSHAKE_PLANNING = re.compile(r"ROAD/BACK/PLAN|активного этапа", re.IGNORECASE)
+STARTUP_HANDSHAKE_OWNERS = re.compile(r"owner-domains", re.IGNORECASE)
+STARTUP_HANDSHAKE_FIRST_STEP = re.compile(r"перв(ый|ого)\s+конкретн(ый|ого)\s+шаг", re.IGNORECASE)
 INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
+INTERVIEW_SKILL_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
+INTERVIEW_SKILL_OWNER = re.compile(r"owner", re.IGNORECASE)
 INTERVIEW_SKILL_OPTIONS = re.compile(r"буквен", re.IGNORECASE)
 INTERVIEW_SKILL_RECOMMENDED = re.compile(r"рекомендуем", re.IGNORECASE)
 INTERVIEW_TEMPLATE_NUMBERED = re.compile(r"###\s+1\.")
+INTERVIEW_TEMPLATE_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
+INTERVIEW_TEMPLATE_OWNER = re.compile(r"owner-document|owner", re.IGNORECASE)
 INTERVIEW_TEMPLATE_OPTIONS = re.compile(r"Варианты ответа:")
 INTERVIEW_TEMPLATE_RECOMMENDED = re.compile(r"Рекомендуемый вариант:")
 PROFILE_LIST_PATTERNS = {
@@ -99,6 +113,45 @@ def contains_pattern(path: Path, pattern: re.Pattern[str]) -> bool:
         return False
     text = path.read_text(encoding="utf-8")
     return bool(pattern.search(text))
+
+
+def count_matches(path: Path, pattern: re.Pattern[str]) -> int:
+    if not path.exists():
+        return 0
+    text = path.read_text(encoding="utf-8")
+    return len(pattern.findall(text))
+
+
+def has_startup_handshake_contract(path: Path) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    required = [
+        STARTUP_HANDSHAKE_SECTION,
+        STARTUP_HANDSHAKE_MODE,
+        STARTUP_HANDSHAKE_SCOPE,
+        STARTUP_HANDSHAKE_ROUTE,
+        STARTUP_HANDSHAKE_PLANNING,
+        STARTUP_HANDSHAKE_OWNERS,
+        STARTUP_HANDSHAKE_FIRST_STEP,
+    ]
+    return all(pattern.search(text) for pattern in required)
+
+
+def has_interview_contract(path: Path) -> list[str]:
+    if not path.exists():
+        return ["missing interview file"]
+    errors: list[str] = []
+    question_count = count_matches(path, QUESTION_HEADING)
+    if not 8 <= question_count <= 10:
+        errors.append("must contain 8-10 numbered questions")
+    if not contains_pattern(path, INTERVIEW_OPTIONS_BLOCK):
+        errors.append("missing lettered options block")
+    if not contains_pattern(path, INTERVIEW_RECOMMENDED_BLOCK):
+        errors.append("missing recommended option block")
+    if not contains_pattern(path, INTERVIEW_OWNER_CURRENT_TRUTH):
+        errors.append("missing current-truth owner statement")
+    return errors
 
 
 def is_executable(path: Path) -> bool:
@@ -201,13 +254,18 @@ def check_product_repo(root: Path) -> int:
         if not contains_pattern(profile_path, PRODUCT_PROFILE_ID):
             errors.append("Profiles/Product.md: missing `ID: PROF-000001`")
     gitignore_path = root / ".gitignore"
-    if gitignore_path.exists() and not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_CODEX):
-        errors.append(".gitignore: missing `.codex/` ignore")
+    if gitignore_path.exists():
+        if not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_CODEX):
+            errors.append(".gitignore: missing `.codex/` ignore")
+        if not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_SMOKE_REPORT):
+            errors.append(".gitignore: missing `Runtime/Integration_Smoke_Report.json` runtime ignore")
     if not contains_pattern(root / "AGENTS.md", PRODUCT_DISCOVERY_ROUTE):
         errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
+    if not has_startup_handshake_contract(root / "AGENTS.md"):
+        errors.append("AGENTS.md: missing observable startup-handshake contract for generated product repo")
     interview_path = root / "Docs" / "Discovery" / "Interview.md"
-    if interview_path.exists() and not contains_pattern(interview_path, PRODUCT_INTERVIEW_FORMAT):
-        errors.append("Docs/Discovery/Interview.md: missing numbered interview format")
+    for item in has_interview_contract(interview_path):
+        errors.append(f"Docs/Discovery/Interview.md: {item}")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
@@ -324,10 +382,16 @@ def main() -> int:
         profile_reference_errors.extend(check_profile_reference_lists(path))
 
     contract_errors: list[str] = []
-    if not contains_pattern(root / "AGENTS.md", STARTUP_HANDSHAKE_SECTION):
+    if not has_startup_handshake_contract(root / "AGENTS.md"):
         contract_errors.append("AGENTS.md: missing observable startup-handshake contract")
+    for item in has_interview_contract(root / "Docs" / "Discovery" / "Interview.md"):
+        contract_errors.append(f"Docs/Discovery/Interview.md: {item}")
     interview_skill = root / "Skills" / "Interview.md"
     if interview_skill.exists():
+        if not contains_pattern(interview_skill, INTERVIEW_SKILL_OWNER):
+            contract_errors.append("Skills/Interview.md: missing current-truth owner contract")
+        if not contains_pattern(interview_skill, INTERVIEW_SKILL_QUESTION_COUNT):
+            contract_errors.append("Skills/Interview.md: missing 8-10 question contract")
         if not contains_pattern(interview_skill, INTERVIEW_SKILL_NUMBERED):
             contract_errors.append("Skills/Interview.md: missing numbered-question contract")
         if not contains_pattern(interview_skill, INTERVIEW_SKILL_OPTIONS):
@@ -336,6 +400,10 @@ def main() -> int:
             contract_errors.append("Skills/Interview.md: missing recommended-option contract")
     interview_template = root / "Templates" / "Interview.md"
     if interview_template.exists():
+        if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_OWNER):
+            contract_errors.append("Templates/Interview.md: missing current-truth owner note")
+        if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_QUESTION_COUNT):
+            contract_errors.append("Templates/Interview.md: missing 8-10 question template note")
         if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_NUMBERED):
             contract_errors.append("Templates/Interview.md: missing numbered interview format")
         if not contains_pattern(interview_template, INTERVIEW_TEMPLATE_OPTIONS):

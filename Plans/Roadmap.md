@@ -18,6 +18,7 @@
 - ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
 - ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
 - ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+- ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
 
 ## Легенда статусов
 - Черновик
@@ -313,3 +314,20 @@ ID: ROAD-000017
 
 ### Описание
 Этап закрыт одним corrective pass: generated product repo теперь materialize `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, product `AGENTS.md` явно включает discovery-layer в source-of-truth hierarchy и routing, а `AGENTS.md` самого `BytePress` фиксирует observable startup-handshake первого ответа. Одновременно `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer, bootstrap/validation contracts и `bp_lint.py` синхронизированы вокруг канонического interview format и нового bootstrap minimum. Smoke bootstrap и lint generated repo подтвердили отсутствие residual contradiction в этом scope.
+
+---
+
+## ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+ID: ROAD-000018
+Этап: Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+Статус: Завершено
+Связи: BACK-000082, PLAN-000070, CHG-000082
+Источник: PLAN-000070
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+Цель: Полностью закрыть end-to-end gaps раннего product-start contour после теста `Minesweeper`: довести startup-handshake, interview current-truth, discovery minimum и runtime artifact hygiene до согласованного поведения между core contracts, bootstrap, generated product repo и lint без открытия release contour.
+Зависимости: ROAD-000017
+Связанные_backlog: BACK-000082
+
+### Описание
+Этап закрыт одним corrective pass после фактического smoke bootstrap во временный target path вне дерева `BytePress`. Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково требуют observable startup-handshake первого ответа, исполнимый first interview из 8–10 ключевых вопросов и явный current-truth ownership `Docs/Discovery/Interview.md`. Одновременно принят канон runtime artifact hygiene: `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit, materialize только после фактического smoke run и остаётся runtime-local artifact по умолчанию. Smoke bootstrap, generated repo lint и smoke report hygiene не подтвердили residual contradiction в этом scope.
