@@ -2,13 +2,21 @@
 
 `Docs/Discovery/` хранит аналитическое долговременное знание о продукте и системе до перехода в плановый и исполнительный контур.
 
-## Минимальный состав
+## Current-truth owner
+- `Interview.md` — owner текущей аналитической истины.
+
+## Активный состав BytePress
 - `Discussion.md` — канонический документ входной аналитической фазы до `Interview`, `Research` и `Requirements`.
 - `Interview.md` — канонический текущий документ с вопросами и актуальными ответами.
 - `Research.md` — канонический документ фазы проверки фактов, ограничений, вариантов и зависимостей после `Discussion`.
 - `Requirements.md` — канонический документ перевода результатов `Discussion` и `Research` в обязательные требования и границы следующего этапа.
 
+## Bootstrap minimum для generated product repo
+- В раннем product-start contour bootstrap materialize только `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`.
+- Это не противоречит active discovery-layer самого `BytePress`: generated product repo получает только minimum current-truth route до отдельного открытия `Discussion`, `Research` и `Requirements`.
+
 ## Формат интервью
+- `Interview.md` удерживает 8–10 ключевых вопросов первого discovery pass без мелких подпунктов;
 - вопросы в `Interview.md` фиксируются нумерованно;
 - если вопрос допускает ограниченный выбор, использовать буквенные варианты ответа;
 - если у вариантов есть предпочтительный, помечать рекомендуемый вариант прямо в интервью;

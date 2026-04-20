@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000082 — Product-start corrective contour synchronized after first field test
 - CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
 - CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
 - CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
@@ -82,6 +83,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000082 — Product-start corrective contour synchronized after first field test
+ID: CHG-000082
+Дата: 2026-04-20
+Тип_изменения: Документация
+Источник: Corrective pass after `Minesweeper` field test
+Связи: PLAN-000070, BACK-000082, QL-000077
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+
+### Описание
+Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после полевого теста `Minesweeper`. Generated product repo теперь materialize observable startup-handshake contract первого ответа, 10-вопросный `Docs/Discovery/Interview.md` как owner current truth и `.gitignore`, который удерживает `Runtime/Integration_Smoke_Report.json` вне baseline commit по умолчанию.
+
+### Эффект
+Ранний product-start contour первого запуска generated repo стал наблюдаемым, проверяемым и согласованным end-to-end без открытия нового release contour или предметной разработки `Minesweeper`.
 
 ---
 

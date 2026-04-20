@@ -77,9 +77,11 @@
 
 Роль:
 - держать только временный рабочий контекст во время активного pass.
+- для generated product repo early product-start contour сюда же относится runtime-local artifact `Runtime/Integration_Smoke_Report.json`, если он выпускается integration smoke route.
 
 Источник истины:
 - runtime не является source-of-truth слоем; это временный execution context.
+- `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit по умолчанию и не становится canonical evidence сам по себе; если отдельный pass явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
 
 ### Fact records
 - `Logs/ADRlog.md`
@@ -200,9 +202,11 @@
 ### Runtime -> Logs
 Допустимо:
 - подтверждённый результат исполнения переносится из runtime-context в `Logs/*` как факт.
+- runtime-local `Runtime/Integration_Smoke_Report.json` может использоваться как локальный carrier smoke verdict до его явной фиксации в pass report или `Logs/*`.
 
 Недопустимо:
 - runtime считается самодостаточным фактом без log fixation.
+- baseline generated product repo коммитится с уже materialized `Runtime/Integration_Smoke_Report.json` без отдельного evidence-preservation решения.
 
 ### Archive -> Active
 Допустимо:
