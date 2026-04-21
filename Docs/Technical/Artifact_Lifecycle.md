@@ -38,6 +38,10 @@
 Источник истины:
 - `Docs/Discovery/Interview.md`.
 
+Bootstrap note:
+- для generated product repo раннего product-start contour `Docs/Discovery/Interview.md` может начинаться в состоянии `Статус_текущей_истины: Не_подтверждена`;
+- пока этот статус не заменён явными ответами пользователя, допустимый active contour ограничен `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start.
+
 ### Technical contracts
 - `Docs/Technical/*`
 
@@ -78,6 +82,7 @@
 Роль:
 - держать только временный рабочий контекст во время активного pass.
 - для generated product repo early product-start contour сюда же относится runtime-local artifact `Runtime/Integration_Smoke_Report.json`, если он выпускается integration smoke route.
+- для generated product repo failed-start cleanup route может удалять runtime-local artifacts, но не превращается в silent restore tracked baseline.
 
 Источник истины:
 - runtime не является source-of-truth слоем; это временный execution context.
@@ -176,6 +181,7 @@
 ### Active -> Runtime
 Допустимо:
 - active `Plan` порождает временный runtime context во время исполнения.
+- generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить runtime-local smoke artifact и зафиксировать drift report после failed early product-start.
 
 Недопустимо:
 - runtime становится каноническим планом;
@@ -207,6 +213,7 @@
 Недопустимо:
 - runtime считается самодостаточным фактом без log fixation.
 - baseline generated product repo коммитится с уже materialized `Runtime/Integration_Smoke_Report.json` без отдельного evidence-preservation решения.
+- failed early product-start silently salvage'ится как новый baseline при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`.
 
 ### Archive -> Active
 Допустимо:

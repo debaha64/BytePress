@@ -69,6 +69,8 @@ Technical-layer нужен для ответа на вопросы:
   Роль: канонический supporting contract рабочей платформы, среды исполнения и tool perimeter.
 - `Product_Bootstrap_Contract.md`
   Роль: специализированный technical contract минимального product bootstrap.
+- `Product_Bootstrap_Domain_Matrix.md`
+  Роль: supporting matrix top-level domain replication canon для generated product repo.
 - `Product_Bootstrap_Validation.md`
   Роль: специализированный validation-contract bootstrap-result и его acceptance perimeter.
 - `Verification.md`
@@ -87,6 +89,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Artifact_Lifecycle.md` находится в `Docs/Technical/*`, потому что закрепляет технический contract источников истины и обязательной синхронизации артефактов, а не текущее состояние backlog или runtime.
 - `Pipeline.md` находится в `Docs/Technical/*` только как supporting technical view на process-domain: он объясняет, как `Pipeline/*` участвует в технической системе, но не владеет самим process-canon.
 - `Platform_Contracts.md`, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Verification.md`, `Verification_Levels.md`, `Validation.md` и `Validation_Levels.md` находятся здесь, потому что описывают технический рабочий периметр, verification/validation boundaries, уровни verification/validation и проверяемые контракты, а не пользовательский, плановый или журнальный слой.
+- `Product_Bootstrap_Domain_Matrix.md` находится здесь, потому что фиксирует канон top-level domain replication для generated product repo и не принадлежит `Plans/*` или `Tools/*`.
 
 ## Границы
 - этот каталог не хранит оперативное состояние исполнения;
@@ -114,6 +117,7 @@ Technical-layer нужен для ответа на вопросы:
 - `Pipeline.md` — supporting technical view на роль `Pipeline/` в общей системе.
 - `Platform_Contracts.md` — канонический supporting contract среды выполнения, platform assumptions и tool perimeter.
 - `Product_Bootstrap_Contract.md` — минимальный bootstrap contract продукта.
+- `Product_Bootstrap_Domain_Matrix.md` — каноническая matrix top-level domain replication и раннего bootstrap perimeter.
 - `Product_Bootstrap_Validation.md` — validation-contract bootstrap-result и acceptance criteria.
 - `Verification.md` — границы verification-layer, checks contour и его разведение с gates и tool implementation.
 - `Verification_Levels.md` — уровни verification-контура и target split будущих `bp_check / bp_verify`.

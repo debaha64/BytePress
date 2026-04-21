@@ -5,6 +5,7 @@
 
 Этот document отвечает на вопросы:
 - какой first-usable replicated product repo обязан materialize `Tools/bp_bootstrap.py`;
+- как классифицирован каждый top-level domain `BytePress` для product bootstrap;
 - какие артефакты bootstrap обязан создать сразу;
 - какие слои bootstrap инициализирует только как каркас;
 - где проходит граница bootstrap-ответственности;
@@ -28,6 +29,7 @@
 - `Artifact_Lifecycle.md` отвечает за источники истины и обязательные sync-loop.
 - `Interfaces.md` отвечает за допустимые точки стыка и service interfaces.
 - `Product_Bootstrap_Contract.md` отвечает за то, что именно должен создать bootstrap и где заканчивается его ответственность.
+- `Product_Bootstrap_Domain_Matrix.md` отвечает за top-level replication canon и не подменяет bootstrap obligations по конкретным артефактам.
 - `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за validation-scope, acceptance criteria и подтверждение корректности bootstrap-result.
 
 ## Связь с `Tools/bp_bootstrap.py`
@@ -56,18 +58,24 @@
 - при нарушении этих условий bootstrap завершается явной ошибкой, а не создаёт частично догаданный outcome.
 
 ## First-usable replicated outcome bootstrap
-Bootstrap materialize отдельный product repo с first-usable initialized state, пригодным для первого предметного pass и согласованным с current human/agent entry contour `BytePress`.
+Bootstrap materialize отдельный product repo с first-usable initialized state, пригодным для первого управляемого product-start pass и согласованным с current human/agent entry contour `BytePress`.
+
+Каноническая классификация всех top-level доменов `BytePress` для этого outcome живёт в `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`.
+
+Current bootstrap default materialize только тот domain subset, который нужен для controlled раннего product-start contour. Наличие startup placeholders не означает, что generated repo сразу разрешает предметную реализацию.
 
 Outcome включает:
 - отдельный target-репозиторий продукта вне дерева самого `BytePress`;
 - top-level human/agent entry files `README.md`, `AGENTS.md`, `Setup_Guide.md`, `.gitignore`;
 - базовую структуру каталогов `Docs/`, `Runtime/`, `Plans/`, `Logs/`, `Profiles/`, `Adapters/`, `scripts/`;
 - минимальный `Docs/Discovery/*` contour для first current-truth route;
+- hard first product-start gate, который удерживает initial pass в discovery-only contour до ответов пользователя;
 - минимальный, но first-usable `Docs/User/*` contour;
 - минимальный product-layer с базовыми content placeholders;
 - минимальный technical-layer продукта только в объёме стартовых singleton docs;
 - initial planning contour продукта в состоянии first current stage/task/pass;
 - базовые logs, adapter registry/policy и project entry scripts;
+- canonical failed-start reset/cleanup route;
 - minimal integration smoke route, который возвращает generated repo в controlled integration contour `BytePress` без materialization `MCP/*` внутри продукта.
 
 Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его first-usable, согласованным и пригодным к следующему управляемому pass без ручной пересборки entry contour.
@@ -89,6 +97,9 @@ Bootstrap обязан создать:
 
 Discovery minimum раннего product-start contour обязан явно фиксировать:
 - что `Docs/Discovery/Interview.md` остаётся owner текущей аналитической истины generated product repo;
+- что bootstrap-created interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;
+- что placeholders bootstrap'а не считаются подтверждённой current truth;
+- что до ответов пользователя generated repo остаётся в discovery-only contour и не открывает product docs/code/runtime implementation;
 - что bootstrap-created interview содержит 8–10 ключевых вопросов первого pass;
 - что буквенные варианты ответа используются там, где выбор ограничен;
 - что рекомендуемый вариант помечается там, где есть предпочтительный route.
@@ -174,14 +185,16 @@ Bootstrap обязан создать:
 - `scripts/dev-down.sh`
 - `scripts/dev-test.sh`
 - `scripts/integration-smoke.sh`
+- `scripts/reset-product-start.sh`
 
-Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, а `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic.
+Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic, а `reset-product-start.sh` обязан давать канонический cleanup route failed early product-start без молчаливого salvage behavior.
 
 В stage-closing baseline `ROAD-000014` этот route также обязан выпускать deterministic evidence/report artifact по фиксированному пути `Runtime/Integration_Smoke_Report.json`, не materialize отдельный новый evidence-layer и не подменяя `Plans/*` или `Logs/*` как source-of-truth.
 
 ## Что bootstrap materialize только как каркас
 Bootstrap создаёт каркас, но не завершённое содержательное состояние, для:
 - `AGENTS.md` продукта — только minimal agent entry point replicated repo, а не копию `AGENTS.md` самого `BytePress`; при этом product `AGENTS.md` обязан требовать наблюдаемый startup-handshake первого ответа с mode, scope, route, planning-state, owner-domains первого чтения и первым конкретным шагом;
+- product `AGENTS.md` обязан явно удерживать hard first product-start gate: пока `Docs/Discovery/Interview.md` находится в состоянии `Статус_текущей_истины: Не_подтверждена`, допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start;
 - `Docs/Discovery/*` продукта — только minimal current-truth route, а не полный discovery-program;
 - `Docs/User/*` продукта — только minimal human-facing contour, а не полный manual;
 - `Docs/Product/*` — только стартовый first-version content skeleton;
@@ -196,6 +209,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 ## Что bootstrap сознательно не обязан делать
 Bootstrap не обязан:
 - копировать в product repo полный доменный состав самого `BytePress`;
+- materialize optional top-level domains, потому что current matrix не вводит optional bootstrap profile;
 - создавать `Pipeline/`, `Rules/`, `Standards/`, `Schemas/`, `Templates/`, `Skills/`, `Memory/` или `MCP/` внутри product repo;
 - materialize `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Platform_Contracts.md` или другие advanced technical contracts продукта;
 - создавать предметно завершённые product requirements, delivery model или terminology base;
@@ -222,7 +236,14 @@ Bootstrap предполагает, что:
 - target path доступен для записи;
 - `BytePress` выступает source repo для bootstrap;
 - выбранный brand profile уже существует и валиден;
+- первый предметный product pass начинается только после подтверждённой current truth, а не сразу после bootstrap;
 - дальнейшее предметное наполнение выполнит следующий pass, а не сам bootstrap.
+
+## Failed first-start reset/cleanup route
+Bootstrap outcome обязан иметь канонический cleanup route для failed early product-start:
+1. generated repo удаляет runtime-local smoke artifact через `scripts/reset-product-start.sh`;
+2. script явно показывает, есть ли tracked drift вне разрешённого раннего contour `Docs/Discovery/*`, `Plans/*`, `Logs/*`;
+3. если out-of-gate drift подтверждён, canonical reset route — fresh bootstrap в новый target, а не salvage текущего baseline.
 
 ## Допустимые и недопустимые упрощения
 ### Допустимые упрощения
@@ -230,6 +251,7 @@ Bootstrap предполагает, что:
 - ограничивать technical layer продукта минимальным subset;
 - ограничивать planning layer одной стартовой stage/task/pass цепочкой;
 - materialize product repo с minimal human/agent entry contour вместо полного governance copy;
+- materialize startup placeholders для `Docs/Product/*` и `Docs/Technical/*` при условии, что hard first product-start gate не разрешает трактовать их как approval для немедленной реализации;
 - materialize product repo с minimal integration smoke route вместо реальных внешних connectors;
 - держать `Runtime/Integration_Smoke_Report.json` вне bootstrap baseline commit и materialize его только при фактическом smoke run;
 - ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
@@ -239,9 +261,12 @@ Bootstrap предполагает, что:
 - не создавать один из обязательных singleton artifacts минимального outcome;
 - не создавать minimal `Docs/Discovery/*`, если replicated repo заявлен как first-usable current-truth contour;
 - создавать generated product `AGENTS.md` без явного observable startup-handshake contract первого ответа;
+- создавать generated repo без hard first product-start gate, который держит initial pass в discovery-only contour до ответов пользователя;
 - создавать bootstrap interview с 1–3 общими вопросами вместо исполнимого first-pass current-truth minimum из 8–10 вопросов;
+- использовать bootstrap placeholders как скрытое разрешение на изменение `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметного кода до ответов пользователя;
 - не создавать `AGENTS.md` или обязательный `Docs/User/*` contour replicated repo;
 - не создавать `scripts/integration-smoke.sh`, если bootstrap заявляет controlled integration contour;
+- не создавать `scripts/reset-product-start.sh`, если bootstrap заявляет controlled failed-start cleanup route;
 - не выпускать deterministic integration evidence/report artifact, если bootstrap заявляет stage-closing integration contour с evidence handoff;
 - materialize `Runtime/Integration_Smoke_Report.json` уже в baseline generated repo без фактического smoke run или без явного hygiene-canon;
 - создавать initial plan без внутреннего `ID: PLAN-000001`;

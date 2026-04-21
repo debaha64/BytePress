@@ -12,6 +12,15 @@
 
 ---
 
+## Bootstrap gate для generated product repo
+
+- bootstrap-created product interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;
+- bootstrap placeholders и пустые ответы не считаются подтверждением current truth;
+- пока пользователь не дал явные ответы, generated product repo остаётся в discovery-only contour;
+- до подтверждения current truth интервью не разрешает изменения вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.
+
+---
+
 ## Вопросы и ответы
 
 ### 1. Каково назначение BytePress?
