@@ -41,6 +41,17 @@ PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s
 PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
 PRODUCT_DISCOVERY_ROUTE = re.compile(r"Docs/Discovery/\*", re.MULTILINE)
+PRODUCT_INTERVIEW_UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
+PRODUCT_INTERVIEW_PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено пользователем\.$", re.MULTILINE)
+PRODUCT_INTERVIEW_GATE = re.compile(r"не разрешает изменения вне `Docs/Discovery/\*`, `Plans/\*` и `Logs/\*`", re.IGNORECASE)
+PRODUCT_START_GATE_SECTION = re.compile(r"^## First product-start gate$", re.MULTILINE)
+PRODUCT_START_GATE_DISCOVERY_ONLY = re.compile(r"discovery-only", re.IGNORECASE)
+PRODUCT_START_GATE_RESET = re.compile(r"scripts/reset-product-start\.sh", re.IGNORECASE)
+PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена", re.IGNORECASE)
+PRODUCT_PLAN_DISCOVERY_ONLY = re.compile(r"discovery-only", re.IGNORECASE)
+PRODUCT_PLAN_CURRENT_TRUTH = re.compile(r"current truth", re.IGNORECASE)
+BYTEPRESS_PRODUCT_GATE = re.compile(r"первый product-start pass обязан оставаться discovery-only", re.IGNORECASE)
+BYTEPRESS_DISCOVERY_GATE = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена|generated repo остаётся в discovery-only contour", re.IGNORECASE)
 QUESTION_HEADING = re.compile(r"^###\s+\d+\.", re.MULTILINE)
 INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
 INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
@@ -154,6 +165,35 @@ def has_interview_contract(path: Path) -> list[str]:
     return errors
 
 
+def has_product_start_gate(path: Path) -> list[str]:
+    if not path.exists():
+        return ["missing AGENTS.md"]
+    text = path.read_text(encoding="utf-8")
+    required = [
+        PRODUCT_START_GATE_SECTION,
+        PRODUCT_START_GATE_DISCOVERY_ONLY,
+        PRODUCT_START_GATE_RESET,
+        PRODUCT_START_GATE_UNCONFIRMED,
+    ]
+    errors: list[str] = []
+    if not all(pattern.search(text) for pattern in required):
+        errors.append("missing hard first product-start gate")
+    return errors
+
+
+def has_product_interview_gate(path: Path) -> list[str]:
+    if not path.exists():
+        return ["missing interview file"]
+    errors: list[str] = []
+    if not contains_pattern(path, PRODUCT_INTERVIEW_UNCONFIRMED):
+        errors.append("missing `Статус_текущей_истины: Не_подтверждена`")
+    if not contains_pattern(path, PRODUCT_INTERVIEW_PLACEHOLDER):
+        errors.append("missing placeholder answers that require user confirmation")
+    if not contains_pattern(path, PRODUCT_INTERVIEW_GATE):
+        errors.append("missing discovery-only gate note")
+    return errors
+
+
 def is_executable(path: Path) -> bool:
     if not path.exists():
         return False
@@ -233,6 +273,7 @@ def check_product_repo(root: Path) -> int:
         "scripts/dev-down.sh",
         "scripts/dev-test.sh",
         "scripts/integration-smoke.sh",
+        "scripts/reset-product-start.sh",
     ]
     missing: list[str] = []
     for item in required:
@@ -263,8 +304,12 @@ def check_product_repo(root: Path) -> int:
         errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
     if not has_startup_handshake_contract(root / "AGENTS.md"):
         errors.append("AGENTS.md: missing observable startup-handshake contract for generated product repo")
+    for item in has_product_start_gate(root / "AGENTS.md"):
+        errors.append(f"AGENTS.md: {item}")
     interview_path = root / "Docs" / "Discovery" / "Interview.md"
     for item in has_interview_contract(interview_path):
+        errors.append(f"Docs/Discovery/Interview.md: {item}")
+    for item in has_product_interview_gate(interview_path):
         errors.append(f"Docs/Discovery/Interview.md: {item}")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
@@ -278,7 +323,11 @@ def check_product_repo(root: Path) -> int:
             errors.append(f"{plan_path}: missing ID line")
         if not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
             errors.append(f"{plan_path}: missing `Статус: В_работе`")
-    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh"]:
+        if not contains_pattern(plan_path, PRODUCT_PLAN_DISCOVERY_ONLY):
+            errors.append(f"{plan_path}: missing discovery-only gate wording")
+        if not contains_pattern(plan_path, PRODUCT_PLAN_CURRENT_TRUTH):
+            errors.append(f"{plan_path}: missing current-truth gating wording")
+    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh", "scripts/reset-product-start.sh"]:
         path = root / rel
         if path.exists() and not is_executable(path):
             errors.append(f"{rel}: script is not executable")
@@ -318,7 +367,7 @@ def main() -> int:
     missing.extend(collect_missing(root, REQUIRED_MEMORY, "Memory"))
     missing.extend(collect_missing(root, REQUIRED_MCP, "MCP"))
     missing.extend(collect_missing(root, ["README.md", "Interview.md", "Discussion.md", "Research.md", "Requirements.md"], "Docs/Discovery"))
-    missing.extend(collect_missing(root, ["Artifact_Lifecycle.md", "System_Invariants.md"], "Docs/Technical"))
+    missing.extend(collect_missing(root, ["Artifact_Lifecycle.md", "System_Invariants.md", "Product_Bootstrap_Domain_Matrix.md"], "Docs/Technical"))
 
     id_errors: list[str] = []
     for rel in [
@@ -384,8 +433,12 @@ def main() -> int:
     contract_errors: list[str] = []
     if not has_startup_handshake_contract(root / "AGENTS.md"):
         contract_errors.append("AGENTS.md: missing observable startup-handshake contract")
+    if not contains_pattern(root / "AGENTS.md", BYTEPRESS_PRODUCT_GATE):
+        contract_errors.append("AGENTS.md: missing bootstrap-created product discovery-only gate note")
     for item in has_interview_contract(root / "Docs" / "Discovery" / "Interview.md"):
         contract_errors.append(f"Docs/Discovery/Interview.md: {item}")
+    if not contains_pattern(root / "Docs" / "Discovery" / "README.md", BYTEPRESS_DISCOVERY_GATE):
+        contract_errors.append("Docs/Discovery/README.md: missing bootstrap-created product gate note")
     interview_skill = root / "Skills" / "Interview.md"
     if interview_skill.exists():
         if not contains_pattern(interview_skill, INTERVIEW_SKILL_OWNER):

@@ -45,6 +45,8 @@
   6. какой первый конкретный шаг выполняет дальше.
 - Startup-handshake должен быть коротким, наблюдаемым и проверяемым человеком по репозиторию.
 - Если `BytePress` materialize generated product repo, product-side `AGENTS.md` обязан сохранять этот observable contract первого ответа в терминах продуктового репозитория.
+- Для bootstrap-created product repo первый product-start pass обязан оставаться discovery-only, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя; placeholders bootstrap'а не считаются разрешением на product docs, code или runtime implementation.
+- Если ранний product-start сорвался и появились out-of-gate изменения, product-side contract обязан иметь явный reset/cleanup route вместо молчаливого salvage behavior.
 - Если первый ответ не позволяет понять startup mode агента, это считается defect контракта исполнения.
 
 ## Как агент выбирает домены и контракты

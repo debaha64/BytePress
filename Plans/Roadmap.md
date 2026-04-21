@@ -19,6 +19,7 @@
 - ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
 - ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
 - ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+- ROAD-000019 — Domain bootstrap strategy and early product-start gate
 
 ## Легенда статусов
 - Черновик
@@ -331,3 +332,20 @@ ID: ROAD-000018
 
 ### Описание
 Этап закрыт одним corrective pass после фактического smoke bootstrap во временный target path вне дерева `BytePress`. Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково требуют observable startup-handshake первого ответа, исполнимый first interview из 8–10 ключевых вопросов и явный current-truth ownership `Docs/Discovery/Interview.md`. Одновременно принят канон runtime artifact hygiene: `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit, materialize только после фактического smoke run и остаётся runtime-local artifact по умолчанию. Smoke bootstrap, generated repo lint и smoke report hygiene не подтвердили residual contradiction в этом scope.
+
+---
+
+## ROAD-000019 — Domain bootstrap strategy and early product-start gate
+ID: ROAD-000019
+Этап: Domain bootstrap strategy and early product-start gate
+Статус: Завершено
+Связи: BACK-000083, PLAN-000071
+Источник: PLAN-000071
+Дата_создания: 2026-04-21
+Дата_изменения: 2026-04-21
+Цель: Закрыть системный разрыв раннего product-start contour после повторного теста `Minesweeper`: классифицировать все top-level домены `BytePress` для product bootstrap, удержать generated repo в discovery-only режиме до ответов пользователя и оформить canonical reset/cleanup route для failed product-start.
+Зависимости: ROAD-000018
+Связанные_backlog: BACK-000083
+
+### Описание
+Этап закрыт одним corrective pass после повторного smoke bootstrap во временный target path вне дерева `BytePress`. Все top-level домены `BytePress` классифицированы в канонической replication matrix, bootstrap default ограничен управляемым startup subset без optional profile, а generated repo теперь одинаково с core contracts, planning-layer и lint удерживает discovery-only contour до явных ответов пользователя в `Docs/Discovery/Interview.md`. Дополнительно оформлен canonical reset/cleanup route `scripts/reset-product-start.sh`: он удаляет runtime-local smoke artifact, показывает drift и запрещает silent salvage при out-of-gate изменениях вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`. Финальный repo lint, generated repo lint, integration smoke и reset-route smoke не подтвердили residual contradiction в раннем product-start contour.
