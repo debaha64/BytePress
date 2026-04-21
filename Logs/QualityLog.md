@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000078
+ID: QL-000078
+Дата: 2026-04-21
+Статус: пройдено
+Проверка: `ROAD-000019` / `BACK-000083` / `PLAN-000071` активированы и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000019.md` и `Plans/Archive/PLAN-000071-domain-bootstrap-strategy-and-interview-gate.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `README.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг top-level domain matrix, hard discovery-only gate и failed-start reset route; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-domain-bootstrap-qTYUiZ/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-bootstrap-qTYUiZ/repo`, `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/integration-smoke.sh`, `scripts/reset-product-start.sh` на clean repo и `scripts/reset-product-start.sh` на out-of-gate drift `Docs/Product/PRD.md` пройдены с ожидаемым verdict; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000019` закрыт как согласованный history-fact без подтверждённого residual contradiction между matrix, bootstrap, generated repo, lint и cleanup route раннего product-start contour.
+
+---
+
 ## QL-000077
 ID: QL-000077
 Дата: 2026-04-20

@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
 - CHG-000082 — Product-start corrective contour synchronized after first field test
 - CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
 - CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
@@ -83,6 +84,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
+ID: CHG-000083
+Дата: 2026-04-21
+Тип_изменения: Документация
+Источник: Corrective pass after repeated `Minesweeper` field test
+Связи: PLAN-000071, BACK-000083, QL-000078
+Дата_создания: 2026-04-21
+Дата_изменения: 2026-04-21
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Domain_Matrix.md` добавлен как канонический supporting document для классификации всех top-level доменов `BytePress` по replication matrix `Default / Later product-pass / BytePress-only` без optional profile. Одновременно core `AGENTS.md`, active discovery-layer, bootstrap/validation contracts, `Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы так, чтобы generated product repo оставался в discovery-only contour до ответов пользователя и получал canonical failed-start reset route `scripts/reset-product-start.sh`.
+
+### Эффект
+Ранний product-start contour generated repo стал управляемым end-to-end: bootstrap materialize только утверждённый subset доменов, незаполненный discovery больше не трактуется как implicit approval для implementation, а failed start имеет проверяемый cleanup route вместо silent salvage.
 
 ---
 
