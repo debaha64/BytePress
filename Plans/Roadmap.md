@@ -339,13 +339,13 @@ ID: ROAD-000018
 ID: ROAD-000019
 Этап: Domain bootstrap strategy and early product-start gate
 Статус: Завершено
-Связи: BACK-000083, PLAN-000071
-Источник: PLAN-000071
+Связи: BACK-000083, BACK-000084, PLAN-000071, PLAN-000072, CHG-000083, CHG-000084
+Источник: PLAN-000071, PLAN-000072
 Дата_создания: 2026-04-21
-Дата_изменения: 2026-04-21
-Цель: Закрыть системный разрыв раннего product-start contour после повторного теста `Minesweeper`: классифицировать все top-level домены `BytePress` для product bootstrap, удержать generated repo в discovery-only режиме до ответов пользователя и оформить canonical reset/cleanup route для failed product-start.
+Дата_изменения: 2026-04-22
+Цель: Закрыть системные разрывы раннего product-start contour после полевых тестов `Minesweeper`: сначала классифицировать top-level домены `BytePress` для product bootstrap и ввести canonical reset/cleanup route, затем довести live execution discipline branch gate и structured interview format до согласованного поведения bootstrap, generated repo и lint.
 Зависимости: ROAD-000018
-Связанные_backlog: BACK-000083
+Связанные_backlog: BACK-000083, BACK-000084
 
 ### Описание
-Этап закрыт одним corrective pass после повторного smoke bootstrap во временный target path вне дерева `BytePress`. Все top-level домены `BytePress` классифицированы в канонической replication matrix, bootstrap default ограничен управляемым startup subset без optional profile, а generated repo теперь одинаково с core contracts, planning-layer и lint удерживает discovery-only contour до явных ответов пользователя в `Docs/Discovery/Interview.md`. Дополнительно оформлен canonical reset/cleanup route `scripts/reset-product-start.sh`: он удаляет runtime-local smoke artifact, показывает drift и запрещает silent salvage при out-of-gate изменениях вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`. Финальный repo lint, generated repo lint, integration smoke и reset-route smoke не подтвердили residual contradiction в раннем product-start contour.
+Этап закрыт двумя узкими corrective passes после повторных полевых тестов `Minesweeper`. Первый pass `PLAN-000071` зафиксировал каноническую replication matrix top-level доменов, удержал generated repo в discovery-only contour до ответов пользователя и оформил canonical reset/cleanup route `scripts/reset-product-start.sh`. Второй pass `PLAN-000072` довёл live execution discipline до наблюдаемого branch gate и жёсткого structured interview contract: generated repo теперь требует task-ветку до любого writable action, startup-handshake сообщает branch status и branch action, а full interview и допустимый delta-интервью одинаково удерживают numbered / lettered / recommended format. Финальный repo lint, smoke bootstrap, generated repo lint на `develop` и task-ветке, а также negative smoke свободноформатного delta-интервью не подтвердили residual contradiction между core contracts, bootstrap, generated repo и lint.
