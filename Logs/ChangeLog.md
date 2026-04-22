@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
 - CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
 - CHG-000082 — Product-start corrective contour synchronized after first field test
 - CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
@@ -84,6 +85,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
+ID: CHG-000084
+Дата: 2026-04-22
+Тип_изменения: Документация
+Источник: Corrective pass after blind field test of generated product repo
+Связи: PLAN-000072, BACK-000084, QL-000079
+Дата_создания: 2026-04-22
+Дата_изменения: 2026-04-22
+
+### Описание
+Core `AGENTS.md`, active discovery-layer, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг live execution discipline generated product-start. Generated repo теперь требует task-ветку до любого writable action, включая discovery/planning/log closure; startup-handshake сообщает branch status и branch action; full interview и допустимый delta-интервью одинаково удерживают numbered / lettered / recommended format.
+
+### Эффект
+Ранний product-start contour generated repo больше не оставляет свободы для первых правок в `develop` или для свободноформатного delta-интервью при ограниченном наборе вариантов. Bootstrap, generated repo, docs и lint ведут себя одинаково без открытия нового roadmap-stage или decorative telemetry.
 
 ---
 

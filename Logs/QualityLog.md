@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000079
+ID: QL-000079
+Дата: 2026-04-22
+Статус: пройдено
+Проверка: `ROAD-000019` / `BACK-000084` / `PLAN-000072` повторно активированы и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000019.md` и `Plans/Archive/PLAN-000072-enforce-branch-gate-and-live-interview.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг task-branch gate, startup-handshake branch status/action и structured delta-интервью; `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-branch-gate-dyeQlM/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-branch-gate-dyeQlM/repo`, `git init -b develop`, baseline commit, повторный `python3 Tools/bp_lint.py --repo /tmp/bytepress-branch-gate-dyeQlM/repo` с ожидаемым fail на `develop`, `git checkout -b feat/000001-confirm-current-truth` и повторный lint с pass-verdct, а также negative smoke свободноформатного delta-интервью с ожидаемым fail `missing delta-interview format contract` выполнены; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000072` закрыл подтверждённые live control gaps branch discipline и interview discipline без доказанного residual contradiction между bootstrap, generated repo, docs и lint.
+
+---
+
 ## QL-000078
 ID: QL-000078
 Дата: 2026-04-21

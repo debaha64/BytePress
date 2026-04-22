@@ -39,13 +39,15 @@
 - В startup-handshake агент коротко фиксирует:
   1. какой startup mode он использует для этого pass;
   2. как он понял scope текущего pass;
-  3. какой branch/start route он использует;
-  4. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;
-  5. какие owner-domains он читает первыми;
-  6. какой первый конкретный шаг выполняет дальше.
+  3. какой branch status он обнаружил;
+  4. какой branch action / start route он использует дальше;
+  5. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;
+  6. какие owner-domains он читает первыми;
+  7. какой первый конкретный шаг выполняет дальше.
 - Startup-handshake должен быть коротким, наблюдаемым и проверяемым человеком по репозиторию.
 - Если `BytePress` materialize generated product repo, product-side `AGENTS.md` обязан сохранять этот observable contract первого ответа в терминах продуктового репозитория.
 - Для bootstrap-created product repo первый product-start pass обязан оставаться discovery-only, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя; placeholders bootstrap'а не считаются разрешением на product docs, code или runtime implementation.
+- Для bootstrap-created product repo первый writable action любого вида допускается только после открытия task-ветки; это правило распространяется и на `Docs/Discovery/*`, `Plans/*`, `Logs/*`, а не только на implementation.
 - Если ранний product-start сорвался и появились out-of-gate изменения, product-side contract обязан иметь явный reset/cleanup route вместо молчаливого salvage behavior.
 - Если первый ответ не позволяет понять startup mode агента, это считается defect контракта исполнения.
 
