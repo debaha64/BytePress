@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 import argparse
 import re
+import subprocess
 
 REQUIRED = [
     "README.md", "Setup_Guide.md", "Docs", "Runtime", "Pipeline", "Plans", "Logs",
@@ -48,21 +49,28 @@ PRODUCT_START_GATE_SECTION = re.compile(r"^## First product-start gate$", re.MUL
 PRODUCT_START_GATE_DISCOVERY_ONLY = re.compile(r"discovery-only", re.IGNORECASE)
 PRODUCT_START_GATE_RESET = re.compile(r"scripts/reset-product-start\.sh", re.IGNORECASE)
 PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена", re.IGNORECASE)
+PRODUCT_START_GATE_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
+PRODUCT_START_GATE_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action", re.IGNORECASE)
 PRODUCT_PLAN_DISCOVERY_ONLY = re.compile(r"discovery-only", re.IGNORECASE)
 PRODUCT_PLAN_CURRENT_TRUTH = re.compile(r"current truth", re.IGNORECASE)
+PRODUCT_PLAN_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
+PRODUCT_PLAN_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action", re.IGNORECASE)
 BYTEPRESS_PRODUCT_GATE = re.compile(r"первый product-start pass обязан оставаться discovery-only", re.IGNORECASE)
 BYTEPRESS_DISCOVERY_GATE = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена|generated repo остаётся в discovery-only contour", re.IGNORECASE)
 QUESTION_HEADING = re.compile(r"^###\s+\d+\.", re.MULTILINE)
 INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
 INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
 INTERVIEW_OWNER_CURRENT_TRUTH = re.compile(r"Docs/Discovery/Interview\.md[\s\S]{0,120}(owner|current truth|текущ)", re.IGNORECASE)
+INTERVIEW_DELTA_BLOCK = re.compile(r"delta-интервью|delta interview", re.IGNORECASE)
 STARTUP_HANDSHAKE_SECTION = re.compile(r"^## Startup-handshake первого ответа$", re.MULTILINE)
 STARTUP_HANDSHAKE_MODE = re.compile(r"startup mode|режим", re.IGNORECASE)
 STARTUP_HANDSHAKE_SCOPE = re.compile(r"scope", re.IGNORECASE)
-STARTUP_HANDSHAKE_ROUTE = re.compile(r"route", re.IGNORECASE)
+STARTUP_HANDSHAKE_BRANCH_STATUS = re.compile(r"branch status|статус ветки", re.IGNORECASE)
+STARTUP_HANDSHAKE_BRANCH_ACTION = re.compile(r"branch action|действие с веткой|start route|route", re.IGNORECASE)
 STARTUP_HANDSHAKE_PLANNING = re.compile(r"ROAD/BACK/PLAN|активного этапа", re.IGNORECASE)
 STARTUP_HANDSHAKE_OWNERS = re.compile(r"owner-domains", re.IGNORECASE)
 STARTUP_HANDSHAKE_FIRST_STEP = re.compile(r"перв(ый|ого)\s+конкретн(ый|ого)\s+шаг", re.IGNORECASE)
+TASK_BRANCH_NAME = re.compile(r"^[a-z]+/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
 INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
 INTERVIEW_SKILL_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
 INTERVIEW_SKILL_OWNER = re.compile(r"owner", re.IGNORECASE)
@@ -141,7 +149,8 @@ def has_startup_handshake_contract(path: Path) -> bool:
         STARTUP_HANDSHAKE_SECTION,
         STARTUP_HANDSHAKE_MODE,
         STARTUP_HANDSHAKE_SCOPE,
-        STARTUP_HANDSHAKE_ROUTE,
+        STARTUP_HANDSHAKE_BRANCH_STATUS,
+        STARTUP_HANDSHAKE_BRANCH_ACTION,
         STARTUP_HANDSHAKE_PLANNING,
         STARTUP_HANDSHAKE_OWNERS,
         STARTUP_HANDSHAKE_FIRST_STEP,
@@ -162,6 +171,8 @@ def has_interview_contract(path: Path) -> list[str]:
         errors.append("missing recommended option block")
     if not contains_pattern(path, INTERVIEW_OWNER_CURRENT_TRUTH):
         errors.append("missing current-truth owner statement")
+    if not contains_pattern(path, INTERVIEW_DELTA_BLOCK):
+        errors.append("missing delta-interview format contract")
     return errors
 
 
@@ -174,6 +185,8 @@ def has_product_start_gate(path: Path) -> list[str]:
         PRODUCT_START_GATE_DISCOVERY_ONLY,
         PRODUCT_START_GATE_RESET,
         PRODUCT_START_GATE_UNCONFIRMED,
+        PRODUCT_START_GATE_TASK_BRANCH,
+        PRODUCT_START_GATE_WRITABLE,
     ]
     errors: list[str] = []
     if not all(pattern.search(text) for pattern in required):
@@ -227,6 +240,20 @@ def check_profile_reference_lists(path: Path) -> list[str]:
 
 def is_bytepress_repo(root: Path) -> bool:
     return (root / "Tools").exists() and (root / "Schemas").exists() and (root / "Templates").exists()
+
+
+def get_git_branch(root: Path) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "branch", "--show-current"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return None
+    branch = result.stdout.strip()
+    return branch or None
 
 
 def check_product_repo(root: Path) -> int:
@@ -327,6 +354,16 @@ def check_product_repo(root: Path) -> int:
             errors.append(f"{plan_path}: missing discovery-only gate wording")
         if not contains_pattern(plan_path, PRODUCT_PLAN_CURRENT_TRUTH):
             errors.append(f"{plan_path}: missing current-truth gating wording")
+        if not contains_pattern(plan_path, PRODUCT_PLAN_TASK_BRANCH):
+            errors.append(f"{plan_path}: missing task-branch gate wording")
+        if not contains_pattern(plan_path, PRODUCT_PLAN_WRITABLE):
+            errors.append(f"{plan_path}: missing writable-change gate wording")
+    current_branch = get_git_branch(root)
+    if current_branch and contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
+        if current_branch in {"develop", "main"} or not TASK_BRANCH_NAME.fullmatch(current_branch):
+            errors.append(
+                "git branch: generated product-start with unconfirmed current truth must run from a task branch before any writable changes"
+            )
     for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh", "scripts/reset-product-start.sh"]:
         path = root / rel
         if path.exists() and not is_executable(path):

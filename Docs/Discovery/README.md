@@ -16,6 +16,7 @@
 - Это не противоречит active discovery-layer самого `BytePress`: generated product repo получает только minimum current-truth route до отдельного открытия `Discussion`, `Research` и `Requirements`.
 - Bootstrap-created product interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`.
 - Пока пользователь не дал явные ответы и current truth не подтверждена, generated repo остаётся в discovery-only contour: это не разрешает переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.
+- Даже в discovery-only contour первый writable action generated product repo допускается только после открытия task-ветки; это относится и к `Docs/Discovery/*`, `Plans/*` и `Logs/*`.
 - Failed product-start закрывается через product-side reset/cleanup route, а не через молчаливую трактовку bootstrap placeholders как утверждённого scope.
 
 ## Формат интервью
@@ -23,6 +24,7 @@
 - вопросы в `Interview.md` фиксируются нумерованно;
 - если вопрос допускает ограниченный выбор, использовать буквенные варианты ответа;
 - если у вариантов есть предпочтительный, помечать рекомендуемый вариант прямо в интервью;
+- если достаточно узкого delta-интервью вместо полного повторного интервью, оно всё равно оформляется тем же форматом: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно;
 - history-fact изменения интервью закрываются через `Plans/*` и `Logs/*`, а не внутри самого интервью.
 
 ## Будущее расширение

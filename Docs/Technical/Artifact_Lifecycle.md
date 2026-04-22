@@ -40,6 +40,7 @@
 
 Bootstrap note:
 - для generated product repo раннего product-start contour `Docs/Discovery/Interview.md` может начинаться в состоянии `Статус_текущей_истины: Не_подтверждена`;
+- даже допустимые updates внутри раннего contour `Docs/Discovery/*`, `Plans/*`, `Logs/*` считаются writable pass и потому начинаются только после открытия task-ветки;
 - пока этот статус не заменён явными ответами пользователя, допустимый active contour ограничен `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start.
 
 ### Technical contracts

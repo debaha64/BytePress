@@ -139,6 +139,7 @@ python3 Tools/bp_lint.py --repo .
 ## Smoke bootstrap и failed-start cleanup
 - product bootstrap smoke выполняется только во временный target path вне дерева `BytePress`;
 - ранний generated product repo должен оставаться discovery-only, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;
+- для live product-start generated repo сначала переводится в baseline `develop`, а затем открывает task-ветку до первого writable action, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`;
 - если early product-start привёл к out-of-gate drift в generated repo, canonical cleanup route: `scripts/reset-product-start.sh`, а при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*` — fresh bootstrap в новый target вместо salvage текущего baseline.
 
 ## Release branch workflow
