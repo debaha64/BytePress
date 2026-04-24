@@ -1,150 +1,84 @@
 # AGENTS
 
-`AGENTS.md` — каноническая entry point карта агента Codex в репозитории `BytePress`.
+`AGENTS.md` — карта входа агента Codex в репозитории `BytePress`.
 
-`README.md` — карта для человека: см. `README.md`.
+`README.md` остаётся картой для человека.
 
-## Кто такой агент внутри BytePress
-- Агент — repo-operating исполнитель: он работает внутри контрактов репозитория, а не подменяет человека как owner стратегии.
-- Humans steer. Agents execute.
-- Агент обязан проводить изменения через planning-contour, task-ветку, локальные проверки и PR-flow.
-- Агент отвечает за точное чтение active contracts, минимальный scope правок, deterministic self-check и фактологичный отчёт.
+## Что делает агент
+- человек направляет, агент исполняет;
+- агент работает внутри контрактов репозитория и не подменяет owner стратегии;
+- каждое изменение проходит через task-ветку, planning-contour, локальные проверки и PR в `develop`.
 
-## Source-of-truth hierarchy
-При работе агент обязан исходить из иерархии источников истины:
-1. Текущий task-source: запрос пользователя, issue, PR-thread или другой явный scope текущего pass.
-2. Активные repo contracts по owner-domain:
-   - `Rules/*` — жёсткие запреты и обязательные ограничения.
-   - `Standards/*` — нормативы качества, формы и naming/presentation contracts.
-   - `Plans/*` — текущие stage/task/pass, их статусы и archive policy.
-   - `Docs/Technical/*` — системные контракты, lifecycle и границы доменов.
-   - `Docs/User/*` — human usage layer; это не operating canon агента.
-   - `Logs/*` — факты, решения, change/quality evidence.
-   - `Tools/*` — executable operations и deterministic checks; tool не владеет contract сам по себе.
-3. `AGENTS.md` — routing-document: он направляет агента к владельцу истины и фиксирует обязательный operating loop.
-4. Длинный ручной промпт допустим только как task-local clarification там, где репозиторий ещё ничего не определил; он не должен переопределять repo contracts.
+## Как читать истину
+Порядок чтения определяется владельцем смысла:
+1. текущий task-source;
+2. активные owner-домены по scope: `Rules/*`, `Standards/*`, `Plans/*`, `Docs/Technical/*`, `Docs/Discovery/*`, `Logs/*`, `Tools/*`;
+3. `AGENTS.md` как routing-document;
+4. ручной промпт только как локальное уточнение там, где репозиторий ещё ничего не определил.
 
-Если источники спорят, агент предпочитает active layer перед archive-layer, документ-владелец домена важнее пересказа, а более специфичный contract важнее общей сводки.
-
-## Как агент входит в задачу
-- Проверяет, что сигнатура дерева репозитория не выглядит неожиданно усечённой; если выглядит, останавливается без правок.
-- Определяет текущий branch-state и не работает напрямую в `main` или `develop`.
-- Перед новым pass синхронизируется только от `origin/develop`: `git fetch --prune origin` и `git pull --ff-only origin develop`.
-- Определяет текущие `ROAD-*`, `BACK-*`, `PLAN-*` или отсутствие активного этапа по `Plans/Roadmap.md`, `Plans/Backlog.md` и текущему `Plan`.
-- Читает только те домены и контракты, которые действительно владеют истиной по текущему scope.
-- Если task уже определён репозиторием, агент не ждёт, что ручной промпт повторно опишет branch policy, checks, reporting contract или source-of-truth hierarchy.
+Если источники спорят, приоритет у активного owner-document над пересказом и архивом.
 
 ## Startup-handshake первого ответа
-- Первый содержательный ответ агента до исследования или правок обязан явно показать startup mode.
-- В startup-handshake агент коротко фиксирует:
-  1. какой startup mode он использует для этого pass;
-  2. как он понял scope текущего pass;
-  3. какой branch status он обнаружил;
-  4. какой branch action / start route он использует дальше;
-  5. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;
-  6. какие owner-domains он читает первыми;
-  7. какой первый конкретный шаг выполняет дальше.
-- Startup-handshake должен быть коротким, наблюдаемым и проверяемым человеком по репозиторию.
-- Если `BytePress` materialize generated product repo, product-side `AGENTS.md` обязан сохранять этот observable contract первого ответа в терминах продуктового репозитория.
-- Для bootstrap-created product repo первый product-start pass обязан оставаться discovery-only, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя; placeholders bootstrap'а не считаются разрешением на product docs, code или runtime implementation.
-- Для bootstrap-created product repo первый writable action любого вида допускается только после открытия task-ветки; это правило распространяется и на `Docs/Discovery/*`, `Plans/*`, `Logs/*`, а не только на implementation.
-- Если ранний product-start сорвался и появились out-of-gate изменения, product-side contract обязан иметь явный reset/cleanup route вместо молчаливого salvage behavior.
-- Если первый ответ не позволяет понять startup mode агента, это считается defect контракта исполнения.
+Первый содержательный ответ до исследования или правок должен показать startup mode и короткий стартовый отчёт.
 
-## Как агент выбирает домены и контракты
-- `Plans/*` — когда нужно определить этап, backlog-задачу, pass, статусы, activation/closure или archive action.
-- `Rules/*` и `Standards/*` — когда нужен hard boundary, quality contract, naming или presentation rule.
-- `Docs/Technical/*` — когда нужен system contract, artifact lifecycle, interface/boundary decision или cross-domain ownership.
-- `Docs/User/*` — только когда scope реально касается human usage layer, а не operating-loop агента.
-- `Logs/*` — когда pass должен зафиксировать факт, решение, качество, change evidence или release/support след.
-- `Tools/*` — когда нужна machine-executable проверка или deterministic operation по уже утверждённому contract.
-- `README.md` и `*/README.md` используются как entrypoints и карты слоёв, но не подменяют документы-владельцы подробного контракта.
+Рекомендуемый вид стартового отчёта:
+`Приветствие:` короткая рабочая фраза без развёрнутого отчёта.
+`Режим запуска:` какой startup mode используется.
+`Scope:` как понят текущий проход.
+`Статус ветки:` что обнаружено в Git.
+`Действие с веткой:` какой start route используется дальше.
+`Состояние планирования:` текущие `ROAD/BACK/PLAN` или отсутствие активного этапа.
+`Первые owner-domains:` какие домены читаются первыми.
+`Первый конкретный шаг:` какое действие выполняется сразу.
 
-## Operating loop каждого pass
-1. Start: определить scope, branch, текущие `ROAD/BACK/PLAN`, owner-domains и ограничения pass.
-2. Audit: прочитать только релевантные contracts и найти реальные противоречия, а не расширять scope догадками.
-3. Route: выбрать минимальный набор доменов, которые обязаны измениться, и явно развести то, что остаётся вне pass.
-4. Implement: внести минимальные правки в owner-artifacts и синхронизировать только прямые references, где без этого остаётся реальное противоречие.
-5. Verify: выполнить обязательные checks и governance-сверки, достаточные для данного pass.
-6. Close: обновить статусы, archive-артефакты по policy, подготовить commit/push/PR-path.
-7. Report: вернуть факты о scope, изменениях, проверках, дефектах, рисках и одной improvement-рекомендации.
+Для bootstrap-created product repo первый product-start pass обязан оставаться discovery-only, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя.
 
-## Что агент обязан проверять
-### Перед start
-- work идёт из task-ветки формата `<type>/<NNNNNN>-<slug>`;
-- синхронизация от `origin/develop` выполнена;
-- tree signature выглядит полной;
-- текущий planning-state (`Roadmap`, `Backlog`, `Plan`) понятен;
-- выбранные owner-domains действительно покрывают scope pass.
+## Start route
+Перед новым pass агент обязан:
+- убедиться, что дерево репозитория выглядит полным;
+- не работать напрямую в `main` или `develop`;
+- синхронизироваться только от `origin/develop`: `git fetch --prune origin`, затем `git pull --ff-only origin develop`;
+- определить branch-state и открыть task-ветку формата `<type>/<NNNNNN>-<slug>`;
+- определить planning-state по `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`;
+- прочитать только те owner-domains, которые реально покрывают scope.
 
-### Before commit
-- scope остаётся узким и не открывает соседний этап без явного решения;
-- owner-documents и прямые references не спорят после правок;
-- завершённый historical `Plan` архивирован, если новый pass уже стартовал и старый current `Plan` ещё лежал в active `Plans/`;
-- если pass дал содержательное изменение, closure `ChangeLog.md` и `QualityLog.md` проверен как обязательный history-fact;
-- если pass подтверждает состоявшийся release event по tag/history, closure `ReleaseLog.md` тоже проверен как factual log, а не как прогноз;
-- выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`;
-- если затронут planning-layer, `Roadmap`, `Backlog`, текущий `Plan` и их индексы согласованы по ID и статусам.
+## Owner-domains
+- `Plans/*` — stage, task, pass и planning-history.
+- `Rules/*`, `Standards/*` — обязательные ограничения и нормативы.
+- `Docs/Technical/*` — системные контракты, границы, lifecycle и bootstrap.
+- `Docs/Discovery/*` — текущая аналитическая истина и интервью.
+- `Docs/User/*` — только human-facing слой, если он затронут scope.
+- `Logs/*` — подтверждённые факты изменений, проверок, выпуска и поддержки.
+- `Tools/*` — materialization и deterministic checks по уже утверждённым контрактам.
+- `Pipeline/*` — фазы, рабочие потоки и передачи процесса.
 
-### Before push
-- локальные commit уже содержат финальное состояние pass;
-- повторно выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`;
-- governance-сверка подтверждает статус текущей backlog-задачи, её секцию, индекс `Backlog.md`, статус и `Связанные_backlog` у текущего `ROAD-*`, а также статус текущего `Plan`.
+## Рабочий цикл
+1. Определить scope, branch-state, planning-state и owner-domains.
+2. Прочитать релевантные owner-documents и зафиксировать реальные противоречия.
+3. Выбрать минимальный набор артефактов для правки.
+4. Внести минимальные изменения и синхронизировать прямые references.
+5. Выполнить обязательные checks и governance-сверки.
+6. Закрыть planning/log contour, push и PR-path.
+7. Вернуть фактологичный отчёт с рисками и одной узкой рекомендацией.
 
-### Before PR
-- head-ветка уже pushed;
-- агент сначала проверил, нет ли открытого PR для head-ветки;
-- PR направляется в `develop`;
-- commit message, PR title и PR body оформлены на английском;
-- если `gh pr create --help` не содержит `--dry-run`, агент не использует этот флаг;
-- если `gh` недоступен, не авторизован или PR-команда падает, агент не переавторизовывает `gh` автоматически и выводит готовую команду создания PR.
+## Обязательный минимум перед commit, push и PR
+- `git diff --check`;
+- `python3 Tools/bp_lint.py --repo .`;
+- при затронутом planning-layer согласовать `Roadmap`, `Backlog`, current `Plan` и их индексы;
+- перед push повторить проверки и подтвердить статус текущих `ROAD/BACK/PLAN`;
+- перед PR сначала убедиться, что head-ветка уже pushed и для неё нет открытого PR;
+- commit message, PR title и PR body оформлять на английском.
 
-## Что агент обязан сообщать в каждом отчёте
+## Что вернуть в отчёте
 - имя ветки;
-- используемые `ROAD-*`, `BACK-*`, `PLAN-*` и следующий свободный ID, если pass его определял;
-- список изменённых файлов и краткую причину изменений;
-- какие checks и governance-сверки выполнены и чем закончились;
-- статус `push` / PR-flow;
-- какие log-entries добавлены или почему очередной log closure не требовался по contract;
-- найденные дефекты, несоответствия или residual risks, даже если они мелкие;
-- одну узкую recommendation по улучшению, связанную с темой pass;
-- явную пометку `bp_lint contract unaffected`, если `Tools/bp_lint.py` не пришлось менять по реальному audit.
+- использованные `ROAD`, `BACK`, `PLAN` и следующий свободный ID, если он определялся;
+- список изменённых файлов и краткую причину правок;
+- выполненные checks и governance-сверки;
+- статус push и PR-flow;
+- log closure или причину, почему он не требовался;
+- найденные дефекты и остаточные риски;
+- одну узкую рекомендацию;
+- явную пометку, затронут ли contract `bp_lint.py`.
 
-## Что считается дефектом или несоответствием
-- конфликт между owner-domains или расхождение active artifacts о статусе одной и той же сущности;
-- пропущенная обязательная синхронизация `Roadmap`, `Backlog`, `Plan` или direct references;
-- попытка использовать ручной промпт или tool output как замену repo contract;
-- работа в `main` / `develop`, пропуск task-ветки, sync, self-check, governance-check или PR-path;
-- неожиданно усечённое дерево репозитория или отсутствие канонического owner-artifact;
-- широкий refactor вне scope pass;
-- инструмент, документ или лог, который фактически заявляет ownership чужого домена.
-
-## Что агент обязан рекомендовать
-- В конце pass агент обязан предложить одну узкую improvement-рекомендацию, если видит способ снять двусмысленность, усилить contract, добавить проверку или убрать residual friction.
-- Рекомендация не должна автоматически открывать следующий широкий этап и не должна маскировать несделанный scope текущего pass.
-
-## Что агент не должен ждать от ручного промпта
-- branch-policy, PR-flow и правило работы только через task-ветку;
-- source-of-truth hierarchy и owner-domains;
-- обязанность читать repo contracts до правок;
-- обязательные self-check и governance-сверки;
-- правило архивирования завершённого historical `Plan` при старте нового pass;
-- requirement report defects even when they are minor;
-- commit/PR English и `branch slug` в английском `kebab-case`;
-- язык user-facing взаимодействия определяется профилем `Язык_взаимодействия`, а не случайной привычкой агента.
-
-## Канонические домены и routing
-- `Docs/` — долговременное знание.
-- `Docs/Discovery/` — аналитический слой и current-truth интервью.
-- `Docs/Technical/` — техническая карта системы и платформенные контракты.
-- `Plans/` — roadmap, backlog и утверждённые планы.
-- `Logs/` — ADR, изменения и проверки качества.
-- `Rules/` — обязательные ограничения.
-- `Standards/` — нормативы качества и представления.
-- `Tools/` — детерминированные проектные инструменты.
-
-## Дополнение по OpenAI-стеку
-Для вопросов по OpenAI API, ChatGPT Apps SDK, Codex и связанным темам использовать OpenAI developer docs MCP, если он доступен.
-
-## Границы документа
-`AGENTS.md` — entrypoint и routing-document. Он не дублирует полные правила из `Rules/*`, `Standards/*`, `Docs/Technical/*`, `Plans/*` или `Tools/*`, а направляет агента к их каноническим owner-documents.
+## Границы
+`AGENTS.md` не подменяет owner-documents из `Rules/*`, `Standards/*`, `Plans/*`, `Docs/Technical/*`, `Docs/Discovery/*`, `Logs/*`, `Pipeline/*` и `Tools/*`. Он только направляет к ним и удерживает минимальный operating loop агента.

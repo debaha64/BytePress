@@ -15,20 +15,28 @@
 - `Later product-pass` — не materialize bootstrap'ом; могут появиться в product repo только отдельным утверждённым product-pass.
 - `BytePress-only` — не materialize в product repo текущим каноном и не считаются частью раннего product-side replication contour.
 
-## Root entrypoint support
-К матрице top-level доменов дополнительно относятся root support artifacts bootstrap default:
+## Каркас репозитория по матрице
+Термин `Каркас репозитория` в bootstrap scope означает именно bootstrap-default из этой матрицы:
 - `README.md`
 - `AGENTS.md`
 - `Setup_Guide.md`
 - `.gitignore`
 - `scripts/*`
 
-Эти артефакты не являются top-level доменами `BytePress`, но входят в обязательный bootstrap outcome.
+и default-домены:
+- `Docs/*` только в минимальном startup subset;
+- `Plans/*`;
+- `Logs/*`;
+- `Runtime/*`;
+- `Profiles/Product.md`;
+- `Adapters/*`.
+
+Это не полная копия доменной структуры `BytePress`, а только обязательный bootstrap outcome раннего product-start.
 
 ## Каноническая матрица
 | Top-level domain `BytePress` | Канон | Product-side materialization | Причина |
 | --- | --- | --- | --- |
-| `Docs/` | `Default` | materialize только минимальный startup subset: `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, ограниченный `Docs/Technical/*`, базовый `Docs/Terms/*` | generated repo должен иметь current-truth route, human entry, product placeholders и минимальный technical contour, но не полную копию knowledge-layer `BytePress` |
+| `Docs/` | `Default` | materialize только минимальный startup subset: `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, ограниченный `Docs/Technical/*`, `Docs/Terms/Base_Terms.md` и `Docs/Terms/README.md` | generated repo должен иметь current-truth route, human entry, product placeholders, минимальный technical contour и стартовый пакет терминов, но не полную копию knowledge-layer `BytePress` |
 | `Plans/` | `Default` | materialize initial roadmap/backlog/current plan продукта | ранний product-start gate обязан иметь repo-native planning owner |
 | `Logs/` | `Default` | materialize singleton fact logs продукта | pass-close contour не должен зависеть только от памяти или runtime |
 | `Runtime/` | `Default` | materialize temporary execution carrier продукта | нужен controlled runtime-local contour и cleanup route, но не новый source-of-truth |
