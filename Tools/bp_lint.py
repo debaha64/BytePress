@@ -36,6 +36,7 @@ SCHEMA_ARTIFACT_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
 PRODUCT_PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULTILINE)
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
+PRODUCT_BASE_TERMS_SECTION = re.compile(r"^## Стартовый пакет терминов$", re.MULTILINE)
 PRODUCT_GITIGNORE_CODEX = re.compile(r"^\.codex/?$", re.MULTILINE)
 PRODUCT_GITIGNORE_SMOKE_REPORT = re.compile(r"^Runtime/Integration_Smoke_Report\.json$", re.MULTILINE)
 PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s+В_работе")
@@ -62,7 +63,14 @@ INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
 INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
 INTERVIEW_OWNER_CURRENT_TRUTH = re.compile(r"Docs/Discovery/Interview\.md[\s\S]{0,120}(owner|current truth|текущ)", re.IGNORECASE)
 INTERVIEW_DELTA_BLOCK = re.compile(r"delta-интервью|delta interview", re.IGNORECASE)
+INTERVIEW_CLASS_CONTEXT = re.compile(r"Класс вопроса:\s+Контекст", re.IGNORECASE)
+INTERVIEW_CLASS_BOUNDARY = re.compile(r"Класс вопроса:\s+Граница", re.IGNORECASE)
+INTERVIEW_CLASS_CONSTRAINT = re.compile(r"Класс вопроса:\s+Ограничение", re.IGNORECASE)
+INTERVIEW_CLASS_OWNERSHIP = re.compile(r"Класс вопроса:\s+Владение", re.IGNORECASE)
+INTERVIEW_CLASS_TRANSITION = re.compile(r"Класс вопроса:\s+Переход", re.IGNORECASE)
+INTERVIEW_TRANSFER_RULE = re.compile(r"блокирующ|неблокирующ", re.IGNORECASE)
 STARTUP_HANDSHAKE_SECTION = re.compile(r"^## Startup-handshake первого ответа$", re.MULTILINE)
+STARTUP_HANDSHAKE_GREETING = re.compile(r"приветств", re.IGNORECASE)
 STARTUP_HANDSHAKE_MODE = re.compile(r"startup mode|режим", re.IGNORECASE)
 STARTUP_HANDSHAKE_SCOPE = re.compile(r"scope", re.IGNORECASE)
 STARTUP_HANDSHAKE_BRANCH_STATUS = re.compile(r"branch status|статус ветки", re.IGNORECASE)
@@ -147,6 +155,7 @@ def has_startup_handshake_contract(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     required = [
         STARTUP_HANDSHAKE_SECTION,
+        STARTUP_HANDSHAKE_GREETING,
         STARTUP_HANDSHAKE_MODE,
         STARTUP_HANDSHAKE_SCOPE,
         STARTUP_HANDSHAKE_BRANCH_STATUS,
@@ -173,6 +182,36 @@ def has_interview_contract(path: Path) -> list[str]:
         errors.append("missing current-truth owner statement")
     if not contains_pattern(path, INTERVIEW_DELTA_BLOCK):
         errors.append("missing delta-interview format contract")
+    for pattern, label in [
+        (INTERVIEW_CLASS_CONTEXT, "Контекст"),
+        (INTERVIEW_CLASS_BOUNDARY, "Граница"),
+        (INTERVIEW_CLASS_CONSTRAINT, "Ограничение"),
+        (INTERVIEW_CLASS_OWNERSHIP, "Владение"),
+        (INTERVIEW_CLASS_TRANSITION, "Переход"),
+    ]:
+        if not contains_pattern(path, pattern):
+            errors.append(f"missing question class `{label}`")
+    if not contains_pattern(path, INTERVIEW_TRANSFER_RULE):
+        errors.append("missing blocking/nonblocking transfer rule")
+    return errors
+
+
+def has_product_base_terms(path: Path) -> list[str]:
+    if not path.exists():
+        return ["missing terms file"]
+    errors: list[str] = []
+    if not contains_pattern(path, PRODUCT_BASE_TERMS_SECTION):
+        errors.append("missing starter terms section")
+    for term_id, title in [
+        ("TERM-000019", "Каркас репозитория"),
+        ("TERM-000020", "Текущая истина"),
+        ("TERM-000021", "Рабочая ветка"),
+        ("TERM-000007", "Дорожная карта"),
+        ("TERM-000008", "Реестр работ"),
+        ("TERM-000009", "План"),
+    ]:
+        if f"{term_id} — {title}" not in path.read_text(encoding="utf-8"):
+            errors.append(f"missing starter term `{term_id} — {title}`")
     return errors
 
 
@@ -338,6 +377,8 @@ def check_product_repo(root: Path) -> int:
         errors.append(f"Docs/Discovery/Interview.md: {item}")
     for item in has_product_interview_gate(interview_path):
         errors.append(f"Docs/Discovery/Interview.md: {item}")
+    for item in has_product_base_terms(root / "Docs" / "Terms" / "Base_Terms.md"):
+        errors.append(f"Docs/Terms/Base_Terms.md: {item}")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
