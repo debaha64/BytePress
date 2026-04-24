@@ -2,7 +2,7 @@
 
 ID: PLAN-000073
 Название: Start contour semantic cleanup
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000085
 Источник: Corrective pass after repeated `Minesweeper` field test
 Дата_создания: 2026-04-24
@@ -55,3 +55,8 @@ ID: PLAN-000073
 - owner протокола интервью один, остальные места сведены к ссылкам или кратким выдержкам;
 - `Pipeline/*` содержит компактную карту жизненного цикла и передач без новой подсистемы;
 - bootstrap, generated repo, docs и lint ведут себя одинаково в раннем product-start contour.
+
+## Результат
+- `ROAD-000020`, `BACK-000085` и `PLAN-000073` открыты и затем закрыты в одном corrective pass; active `Backlog` очищен, а current `Plan` выведен в archive-layer без автоматической активации нового `ROAD-*`.
+- `AGENTS.md`, `Docs/Discovery/*`, `Docs/Terms/*`, `Docs/Technical/*`, `Pipeline/*`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково удерживают стартовый смысловой контур: короткий стартовый отчёт, один owner протокола интервью, пять смысловых классов вопросов, правило `блокирующее сразу / неблокирующее в следующую фазу`, минимальный стартовый пакет терминов и разведённый bootstrap-default.
+- Bootstrap smoke во временный repo `/tmp/bytepress-start-contour-LMin3q/repo` подтвердил, что generated product получает `Docs/Terms/Base_Terms.md` со стартовым пакетом терминов, отклоняется lint'ом на ветке `develop`, проходит lint на task-ветке `feat/000001-confirm-current-truth`, а product-side `scripts/dev-test.sh` и `scripts/integration-smoke.sh` работают через `BYTEPRESS_ROOT`.

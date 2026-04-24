@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000080
+ID: QL-000080
+Дата: 2026-04-24
+Статус: пройдено
+Проверка: `ROAD-000020` / `BACK-000085` / `PLAN-000073` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000020.md` и `Plans/Archive/PLAN-000073-start-contour-semantic-cleanup.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Terms/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Pipeline.md`, `Pipeline/Inputs_Outputs.md`, `Tools/README.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг bootstrap-default scaffold, стартового пакета терминов, короткого стартового отчёта агента, owner-протокола интервью и compact lifecycle/handoff map; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-start-contour-LMin3q/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-start-contour-LMin3q/repo`, `git init -b develop`, `git add .`, повторный `python3 /home/dmin/code/BytePress/Tools/bp_lint.py --repo /tmp/bytepress-start-contour-LMin3q/repo` с ожидаемым fail на `develop`, `git commit -m "Bootstrap baseline"`, `git checkout -b feat/000001-confirm-current-truth`, `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/dev-test.sh` и `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/integration-smoke.sh` выполнены; generated `Docs/Terms/Base_Terms.md` подтверждён как реальный стартовый пакет терминов; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000073` закрыл подтверждённые semantic gaps стартового контура без доказанного residual contradiction между term-layer, bootstrap matrix, generated repo, interview protocol, lifecycle handoff map и lint.
+
+---
+
 ## QL-000079
 ID: QL-000079
 Дата: 2026-04-22

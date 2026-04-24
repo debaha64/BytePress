@@ -35,8 +35,8 @@
 ## ROAD-000020 — Семантическая чистка стартового контура после повторного полевого теста
 ID: ROAD-000020
 Этап: Семантическая чистка стартового контура после повторного полевого теста
-Статус: В_работе
-Связи: BACK-000085, PLAN-000073
+Статус: Завершено
+Связи: BACK-000085, PLAN-000073, CHG-000085
 Источник: Corrective pass after repeated `Minesweeper` field test
 Дата_создания: 2026-04-24
 Дата_изменения: 2026-04-24
@@ -45,7 +45,7 @@ ID: ROAD-000020
 Связанные_backlog: BACK-000085
 
 ### Описание
-Узкий corrective stage переоткрыт после нового аудита стартового контура. В scope входят только владельцы смысла раннего product-start: `AGENTS.md`, `Docs/Discovery/*`, `Docs/Terms/*`, `Docs/Technical/*`, `Pipeline/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и прямые planning/log references, нужные для синхронизации результата без продолжения `Minesweeper`.
+Этап закрыт одним corrective pass `PLAN-000073`. Термин `Каркас репозитория`, матрица начального развёртывания и фактический `bp_bootstrap.py` теперь одинаково разводят bootstrap-default, будущие product-side расширения и BytePress-only domains. Generated product repo получает минимальный стартовый пакет терминов, `AGENTS.md` снова стал короткой картой входа, интервью сосредоточено в одном owner-document с пятью смысловыми классами вопросов, а compact lifecycle/handoff map закреплена в `Pipeline/Inputs_Outputs.md`. Финальный repo lint, bootstrap smoke, generated repo lint на `develop` и task-ветке, а также product-side script checks не подтвердили residual contradiction в scope этапа.
 
 ---
 

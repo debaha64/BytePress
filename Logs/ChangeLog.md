@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000085 — Start contour semantics synchronized before the next field test
 - CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
 - CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
 - CHG-000082 — Product-start corrective contour synchronized after first field test
@@ -85,6 +86,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000085 — Start contour semantics synchronized before the next field test
+ID: CHG-000085
+Дата: 2026-04-24
+Тип_изменения: Документация
+Источник: Corrective pass after repeated `Minesweeper` field test
+Связи: PLAN-000073, BACK-000085, QL-000080
+Дата_создания: 2026-04-24
+Дата_изменения: 2026-04-24
+
+### Описание
+`AGENTS.md`, active discovery-layer, term-layer, bootstrap/validation contracts, `Pipeline/Inputs_Outputs.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг одного стартового смыслового контура. Термин `Каркас репозитория` теперь совпадает с bootstrap-default matrix, generated product repo materialize реальный стартовый пакет терминов в `Docs/Terms/Base_Terms.md`, стартовый отчёт агента оформлен коротким блоком с приветствием и семью полями, а протокол интервью сосредоточен в одном owner-document с пятью смысловыми классами вопросов и правилом `блокирующее сразу / неблокирующее в следующую фазу`.
+
+### Эффект
+Перед следующим полевым тестом ранний product-start перестал расходиться между owner-documents, generated repo и checks. Bootstrap создаёт только согласованный каркас, не копирует весь `BytePress` в продукт и не оставляет смысловой двусмысленности вокруг branch gate, интервью, терминов и lifecycle handoff.
 
 ---
 
