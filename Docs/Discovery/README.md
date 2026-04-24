@@ -13,19 +13,18 @@
 
 ## Bootstrap minimum для generated product repo
 - В раннем product-start contour bootstrap materialize только `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`.
-- Это не противоречит active discovery-layer самого `BytePress`: generated product repo получает только minimum current-truth route до отдельного открытия `Discussion`, `Research` и `Requirements`.
+- Это не противоречит active discovery-layer самого `BytePress`: generated repo получает только minimum current-truth route до отдельного открытия `Discussion`, `Research` и `Requirements`.
 - Bootstrap-created product interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`.
 - Пока пользователь не дал явные ответы и current truth не подтверждена, generated repo остаётся в discovery-only contour: это не разрешает переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.
-- Даже в discovery-only contour первый writable action generated product repo допускается только после открытия task-ветки; это относится и к `Docs/Discovery/*`, `Plans/*` и `Logs/*`.
+- Даже в discovery-only contour первый writable action generated product repo допускается только после открытия рабочей ветки; это относится и к `Docs/Discovery/*`, `Plans/*` и `Logs/*`.
 - Failed product-start закрывается через product-side reset/cleanup route, а не через молчаливую трактовку bootstrap placeholders как утверждённого scope.
 
-## Формат интервью
-- `Interview.md` удерживает 8–10 ключевых вопросов первого discovery pass без мелких подпунктов;
-- вопросы в `Interview.md` фиксируются нумерованно;
-- если вопрос допускает ограниченный выбор, использовать буквенные варианты ответа;
-- если у вариантов есть предпочтительный, помечать рекомендуемый вариант прямо в интервью;
-- если достаточно узкого delta-интервью вместо полного повторного интервью, оно всё равно оформляется тем же форматом: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно;
-- history-fact изменения интервью закрываются через `Plans/*` и `Logs/*`, а не внутри самого интервью.
+## Interview protocol
+- owner протокола интервью один: `Docs/Discovery/Interview.md`;
+- `README.md`, `Skills/Interview.md` и `Templates/Interview.md` дают только короткие выдержки и ссылки, но не дублируют весь протокол;
+- вопросы первого прохода собираются в пять смысловых классов: `Контекст`, `Граница`, `Ограничение`, `Владение`, `Переход`;
+- если вопрос из соседнего рабочего потока блокирует следующий шаг, он задаётся сразу в интервью;
+- если вопрос не блокирует ранний проход, он накапливается для следующей фазы, а не раздувает стартовое интервью.
 
 ## Будущее расширение
 В следующих проходах сюда могут входить дополнительные discovery-артефакты, если они будут отдельно зафиксированы в системе, обеспечены шаблоном и введены отдельным pass.

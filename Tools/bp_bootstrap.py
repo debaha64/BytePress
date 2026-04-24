@@ -8,6 +8,22 @@ from pathlib import Path
 import re
 
 PRODUCT_CODE_RE = re.compile(r"^[A-Z]{2,3}$")
+STARTER_TERM_IDS = [
+    "TERM-000019",
+    "TERM-000020",
+    "TERM-000021",
+    "TERM-000007",
+    "TERM-000008",
+    "TERM-000009",
+]
+STARTER_TERM_PURPOSES = {
+    "TERM-000019": "Объясняет, какой минимальный каркас bootstrap создаёт по умолчанию.",
+    "TERM-000020": "Удерживает discovery-only gate до явных ответов пользователя.",
+    "TERM-000021": "Фиксирует, что writable pass начинается только из task-ветки.",
+    "TERM-000007": "Помогает читать stage-level planning продукта.",
+    "TERM-000008": "Помогает читать task-level planning текущего этапа.",
+    "TERM-000009": "Помогает читать и вести один текущий pass продукта.",
+}
 
 
 @dataclass(frozen=True)
@@ -17,11 +33,20 @@ class BrandProfile:
 
 
 @dataclass(frozen=True)
+class StarterTerm:
+    term_id: str
+    title: str
+    definition: str
+    purpose: str
+
+
+@dataclass(frozen=True)
 class ProductContext:
     name: str
     product_code: str
     brand_profile: BrandProfile
     current_date: str
+    starter_terms: tuple[StarterTerm, ...]
 
 
 def extract_value(text: str, key: str) -> str:
@@ -55,6 +80,58 @@ def load_brand_profile(repo_root: Path, profile_name: str) -> BrandProfile:
     return BrandProfile(name=profile_name, interaction_language=interaction_language)
 
 
+def load_starter_term(repo_root: Path, term_id: str) -> StarterTerm:
+    matches = sorted((repo_root / "Docs" / "Terms").glob(f"{term_id}-*.md"))
+    if len(matches) != 1:
+        raise ValueError(f"Starter term not found or ambiguous in BytePress: {term_id}")
+    text = matches[0].read_text(encoding="utf-8")
+    title = text.splitlines()[0].lstrip("#").strip()
+    definition = ""
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if line == "## Определение" and index + 1 < len(lines):
+            definition = lines[index + 1].strip()
+            break
+    if not definition:
+        raise ValueError(f"Starter term does not define `## Определение`: {term_id}")
+    return StarterTerm(
+        term_id=term_id,
+        title=title,
+        definition=definition,
+        purpose=STARTER_TERM_PURPOSES[term_id],
+    )
+
+
+def load_starter_terms(repo_root: Path) -> tuple[StarterTerm, ...]:
+    return tuple(load_starter_term(repo_root, term_id) for term_id in STARTER_TERM_IDS)
+
+
+def render_starter_terms(terms: tuple[StarterTerm, ...]) -> str:
+    lines = [
+        "# Base_Terms",
+        "",
+        "## Назначение",
+        "Этот файл содержит минимальный стартовый пакет терминов replicated product repo.",
+        "Полный словарь `BytePress` сюда не копируется.",
+        "",
+        "## Индекс",
+    ]
+    for term in terms:
+        lines.append(f"- {term.term_id} — {term.title}")
+    lines.extend(["", "## Стартовый пакет терминов"])
+    for term in terms:
+        lines.extend(
+            [
+                "",
+                f"### {term.term_id} — {term.title}",
+                f"Определение: {term.definition}",
+                f"Зачем нужен на старте: {term.purpose}",
+            ]
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def build_context(args: argparse.Namespace, repo_root: Path) -> ProductContext:
     name = args.name.strip()
     product_code = args.product_code.strip()
@@ -67,11 +144,13 @@ def build_context(args: argparse.Namespace, repo_root: Path) -> ProductContext:
         raise ValueError("--brand-profile must not be empty")
 
     brand_profile = load_brand_profile(repo_root, brand_profile_name)
+    starter_terms = load_starter_terms(repo_root)
     return ProductContext(
         name=name,
         product_code=product_code,
         brand_profile=brand_profile,
         current_date=date.today().isoformat(),
+        starter_terms=starter_terms,
     )
 
 
@@ -108,12 +187,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`AGENTS.md` — карта для агента.\n\n"
         "## Стартовый маршрут\n"
         "1. Прочитать `Docs/User/First_Start.md`.\n"
-        "2. Прочитать `Docs/Discovery/Interview.md` и подтвердить current truth ответами пользователя.\n"
-        "3. Подготовить среду по `Setup_Guide.md`.\n"
-        "4. Проверить current stage/task/pass в `Plans/*`.\n"
-        "5. Использовать `scripts/dev-test.sh`, если нужен structural check через `BytePress`.\n"
-        "6. Использовать `scripts/reset-product-start.sh`, если ранний product-start сорвался и нужен cleanup route.\n\n"
-        "7. Использовать `scripts/integration-smoke.sh`, если нужен minimal integration handoff check.\n\n"
+        "2. Прочитать `Docs/Terms/Base_Terms.md`.\n"
+        "3. Прочитать `Docs/Discovery/Interview.md` и подтвердить current truth ответами пользователя.\n"
+        "4. Подготовить среду по `Setup_Guide.md`.\n"
+        "5. Проверить current stage/task/pass в `Plans/*`.\n"
+        "6. Использовать `scripts/dev-test.sh`, если нужен structural check через `BytePress`.\n"
+        "7. Использовать `scripts/reset-product-start.sh`, если ранний product-start сорвался и нужен cleanup route.\n"
+        "8. Использовать `scripts/integration-smoke.sh`, если нужен minimal integration handoff check.\n\n"
         "## Доменная карта\n"
         "- `Docs/Discovery/*` — current-truth и интервью продукта.\n"
         "- `Docs/User/*` — human-facing layer продукта.\n"
@@ -127,29 +207,27 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "AGENTS.md",
         f"# AGENTS\n\n"
-        f"`AGENTS.md` — каноническая entry point карта агента в replicated product repo `{ctx.name}`.\n\n"
-        "## Кто такой агент внутри продукта\n"
-        "- Humans steer. Agents execute.\n"
-        "- Агент работает внутри contracts самого product repo, а не подменяет owner продукта.\n"
-        "- Агент ведёт работу через task-ветку, local checks и PR-flow.\n\n"
-        "## Source-of-truth hierarchy\n"
+        f"`AGENTS.md` — карта входа агента в replicated product repo `{ctx.name}`.\n\n"
+        "## Что делает агент\n"
+        "- человек направляет, агент исполняет;\n"
+        "- агент работает внутри контрактов product repo;\n"
+        "- каждое изменение проходит через task-ветку, локальные проверки и PR.\n\n"
+        "## Как читать истину\n"
         "1. Текущий task-source пользователя.\n"
         "2. `Docs/Discovery/*` как current-truth route продукта.\n"
         "3. `Plans/*` как stage/task/pass owner.\n"
-        "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*` как knowledge/contract layers продукта.\n"
-        "5. `Logs/*` как фактологический слой.\n"
-        "6. `Adapters/*`, `Setup_Guide.md` и `scripts/*` как execution support.\n\n"
+        "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как product knowledge layers.\n"
+        "5. `Logs/*`, `Setup_Guide.md`, `Adapters/*` и `scripts/*` как execution support.\n\n"
         "## Startup-handshake первого ответа\n"
-        "- Первый содержательный ответ агента до исследования или правок обязан явно показать startup mode продукта.\n"
-        "- В startup-handshake агент коротко фиксирует:\n"
-        "  1. какой startup mode он использует для текущего product-start pass;\n"
-        "  2. как он понял scope текущего pass;\n"
-        "  3. какой branch status он обнаружил;\n"
-        "  4. какой branch action / start route он использует;\n"
-        "  5. какой planning-state обнаружен: текущие `ROAD/BACK/PLAN` или отсутствие активного этапа;\n"
-        "  6. какие owner-domains он читает первыми;\n"
-        "  7. какой первый конкретный шаг выполняет дальше.\n"
-        "- Startup-handshake должен быть коротким, наблюдаемым и проверяемым по generated product repo.\n\n"
+        "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
+        "`Приветствие:` короткая рабочая фраза.\n"
+        "`Режим запуска:` какой startup mode используется.\n"
+        "`Scope:` как понят текущий проход.\n"
+        "`Статус ветки:` что обнаружено в Git.\n"
+        "`Действие с веткой:` какой start route используется дальше.\n"
+        "`Состояние планирования:` текущие `ROAD/BACK/PLAN` или отсутствие активного этапа.\n"
+        "`Первые owner-domains:` какие домены читаются первыми.\n"
+        "`Первый конкретный шаг:` какое действие выполняется сразу.\n\n"
         "## First product-start gate\n"
         "- Bootstrap-created repo стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
         "- Пока пользователь не дал явные ответы и current truth не подтверждена, агент работает только в discovery-only mode.\n"
@@ -157,17 +235,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- В этом gate допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и cleanup route failed pass, но сам writable pass начинается только после branch action в task-ветку.\n"
         "- В этом gate placeholders bootstrap'а не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.\n"
         "- Если failed start дал tracked drift вне разрешённого раннего contour, canonical reset route — fresh bootstrap в новый target.\n\n"
-        "## Как входить в задачу\n"
+        "## Start route\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
-        "- Для bootstrap-created repo сначала прочитать `Docs/Discovery/Interview.md` и проверить, подтверждена ли current truth ответами пользователя.\n"
-        "- Для human-facing route использовать `Docs/User/*`.\n"
+        "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
+        "- Первый writable pass начинать только после открытия task-ветки.\n"
         "- Для structural check использовать `scripts/dev-test.sh` с `BYTEPRESS_ROOT`.\n"
-        "- Для minimal integration handoff использовать `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n"
-        "- Для failed early product-start использовать `scripts/reset-product-start.sh`.\n"
-        "- Не дублировать repo contracts длинным ручным промптом, если они уже определены продуктом.\n\n"
+        "- Для integration handoff использовать `scripts/integration-smoke.sh`.\n"
+        "- Для failed start использовать `scripts/reset-product-start.sh`.\n\n"
         "## Границы\n"
-        "- этот файл не подменяет `Docs/User/*`, `Docs/Technical/*` и `Plans/*`;\n"
-        "- этот файл направляет агента к owner-documents replicated product repo.\n",
+        "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
+        "- этот файл только направляет агента к owner-documents replicated product repo.\n",
     )
     write(
         target / "Setup_Guide.md",
@@ -210,11 +287,12 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- пока пользователь не ответил явно, generated repo остаётся в discovery-only contour;\n"
         "- даже в discovery-only contour первый writable action допускается только после открытия task-ветки;\n"
         "- placeholders bootstrap'а не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и предметной реализации.\n\n"
-        "## Формат интервью\n"
-        "- вопросы фиксируются нумерованно;\n"
-        "- если выбор ограничен, использовать буквенные варианты ответа;\n"
-        "- если есть предпочтительный route, помечать рекомендуемый вариант;\n"
-        "- если достаточно узкого delta-интервью, оно всё равно использует тот же numbered / lettered / recommended format.\n\n"
+        "## Interview protocol\n"
+        "- owner протокола интервью один: `Interview.md`;\n"
+        "- вопросы первого прохода собираются по классам `Контекст`, `Граница`, `Ограничение`, `Владение`, `Переход`;\n"
+        "- блокирующие вопросы задаются сразу;\n"
+        "- неблокирующие вопросы накапливаются для следующей фазы;\n"
+        "- delta-интервью всё равно использует тот же numbered / lettered / recommended format.\n\n"
         "## Границы\n"
         "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
         "- history-fact изменений discovery-layer закрывается через planning/log contour;\n"
@@ -223,8 +301,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Docs/Discovery/Interview.md",
         "# Interview\n\n"
-        "## Назначение интервью\n\n"
-        "`Docs/Discovery/Interview.md` является owner-document текущей аналитической истины о продукте до её перевода в требования и planning contour.\n\n"
+        "## Назначение\n\n"
+        "`Docs/Discovery/Interview.md` — единственный owner-document протокола интервью и текущей аналитической истины продукта.\n\n"
         "---\n\n"
         "## Правило актуальности\n\n"
         "Интервью хранит только актуальные вопросы и ответы. История изменений фиксируется через `Plans/*` и `Logs/*`.\n\n"
@@ -235,50 +313,70 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Правило: первый writable action по этому интервью допускается только после открытия task-ветки.\n"
         "Правило: до явных ответов пользователя это интервью не разрешает изменения вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n\n"
         "---\n\n"
+        "## Смысловые классы вопросов\n\n"
+        "- `Контекст` — кто, для чего и в каком рабочем моменте ждёт результат.\n"
+        "- `Граница` — что входит в первый scope, а что остаётся вне него.\n"
+        "- `Ограничение` — какие лимиты и зависимости сдерживают первый pass.\n"
+        "- `Владение` — кто утверждает результат и поставляет обязательные входы.\n"
+        "- `Переход` — что блокирует следующий шаг, а что можно отложить до следующей фазы.\n\n"
+        "---\n\n"
+        "## Правило переноса вопросов\n\n"
+        "Блокирующий вопрос задаётся сразу. Неблокирующий вопрос не раздувает стартовое интервью и переносится в следующую фазу.\n\n"
+        "---\n\n"
         "## Правило delta-интервью\n\n"
         "Если для подтверждения current truth достаточно уточнить только часть вопросов, допускается узкое delta-интервью вместо полного повторного интервью. Оно всё равно обязано сохранять тот же format contract: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно.\n\n"
         "---\n\n"
         "## Вопросы и ответы\n\n"
-        "### 1. Какую текущую истину о продукте нужно зафиксировать первой?\n"
+        "### 1. Кто является первым целевым пользователем или заказчиком результата?\n"
+        "Класс вопроса: Контекст\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
-        "- A. Основной пользователь и его задача.\n"
-        "- B. Граница первой версии продукта.\n"
-        "- C. Ключевое ограничение реализации.\n\n"
+        "- A. Один основной пользователь или заказчик.\n"
+        "- B. Сразу несколько разнотипных аудиторий.\n"
+        "- C. Пользователь пока не определён.\n\n"
         "Рекомендуемый вариант: A — он быстрее всего даёт опорную current truth для следующего предметного pass.\n\n"
-        "### 2. Какая граница первой версии сейчас выглядит самой вероятной?\n"
+        "### 2. Какой наблюдаемый результат должен дать первый pass продукта?\n"
+        "Класс вопроса: Контекст\n"
+        "Ответ: Не подтверждено пользователем.\n\n"
+        "### 3. Что обязательно входит в границу первой версии?\n"
+        "Класс вопроса: Граница\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
         "- A. Один пользовательский сценарий и один основной результат.\n"
-        "- B. Полный release-ready продукт сразу.\n"
-        "- C. Только технический эксперимент без user value.\n\n"
+        "- B. Несколько несвязанных сценариев сразу.\n"
+        "- C. Полная release-ready система на первом pass.\n\n"
         "Рекомендуемый вариант: A — он удерживает первую версию в узком и проверяемом scope.\n\n"
-        "### 3. Какой факт о продукте пока остаётся самым неопределённым?\n"
+        "### 4. Что явно остаётся вне границы первой версии?\n"
+        "Класс вопроса: Граница\n"
         "Ответ: Не подтверждено пользователем.\n\n"
-        "### 4. Какое ограничение сильнее всего влияет на первый pass продукта?\n"
+        "### 5. Какое ограничение сильнее всего влияет на первый pass продукта?\n"
+        "Класс вопроса: Ограничение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
         "- A. Ограничение времени и узкого scope.\n"
         "- B. Обязательная полная автоматизация с первого дня.\n"
         "- C. Требование открыть сразу все будущие домены.\n\n"
         "Рекомендуемый вариант: A — ранний product-start contour должен оставаться узким и управляемым.\n\n"
-        "### 5. Какой основной пользовательский результат должен стать наблюдаемым после первого pass?\n"
+        "### 6. Кто утверждает границу первого результата и поставляет обязательные входы?\n"
+        "Класс вопроса: Владение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
-        "### 6. Какие артефакты являются первыми owner-documents продукта для этого scope?\n"
-        "Ответ: `Docs/Discovery/Interview.md`, `Docs/Product/*`, `Plans/*` и при необходимости `Docs/Technical/*`.\n\n"
-        "### 7. Какой route дальнейшего уточнения discovery сейчас нужен после интервью?\n"
+        "### 7. Какой вопрос нужно задать немедленно, если он блокирует следующий шаг?\n"
+        "Класс вопроса: Переход\n"
+        "Ответ: Не подтверждено пользователем.\n\n"
+        "### 8. Какие вопросы можно перенести в следующую фазу без блокировки старта?\n"
+        "Класс вопроса: Переход\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
-        "- A. Открыть отдельный pass на `Discussion` / `Research` / `Requirements`, если minimum уже недостаточен.\n"
-        "- B. Сразу переписать планы без фиксации новой current truth.\n"
-        "- C. Оставить discovery только в устном виде.\n\n"
-        "Рекомендуемый вариант: A — он открывает расширенный discovery contour только по явному решению.\n\n"
-        "### 8. Какие артефакты нужно проверить после обновления этого интервью?\n"
-        "Ответ: `Plans/Roadmap.md`, `Plans/Backlog.md`, active `Plans/*`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`.\n\n"
-        "### 9. Что сейчас остаётся вне scope первого product-start pass?\n"
-        "Ответ: Не подтверждено пользователем.\n\n"
-        "### 10. Какой следующий конкретный шаг должен последовать сразу после согласования интервью?\n"
-        "Ответ: Не подтверждено пользователем.\n\n"
+        "- A. Перенести их в следующую фазу `Discussion`, `Research` или `Requirements`.\n"
+        "- B. Немедленно включить всё в стартовое интервью.\n"
+        "- C. Оставить только в устной договорённости.\n\n"
+        "Рекомендуемый вариант: A — он удерживает интервью коротким и рабочим.\n\n"
+        "## Связанные артефакты для обязательной проверки\n\n"
+        "- `Plans/Roadmap.md`\n"
+        "- `Plans/Backlog.md`\n"
+        "- active `Plans/*`\n"
+        "- `Logs/ChangeLog.md`\n"
+        "- `Logs/QualityLog.md`\n\n"
         "---\n",
     )
     write(
@@ -496,8 +594,14 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- незаполненный discovery bootstrap не считается разрешением на изменение `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` или предметной реализации;\n"
         "- product repo не превращается в полную копию `BytePress`.\n",
     )
-    write(target / "Docs/Terms/README.md", "# Terms\n\nТермины предметной области продукта.\n")
-    write(target / "Docs/Terms/Base_Terms.md", "# Base_Terms\n\n## Индекс\n")
+    write(
+        target / "Docs/Terms/README.md",
+        "# Terms\n\n"
+        "`Docs/Terms/*` хранит минимальный стартовый пакет терминов продукта.\n\n"
+        "- `Base_Terms.md` — компактный glossary раннего product-start.\n"
+        "- полный словарь `BytePress` сюда не копируется автоматически.\n",
+    )
+    write(target / "Docs/Terms/Base_Terms.md", render_starter_terms(ctx.starter_terms))
 
     write(
         target / "Runtime/README.md",
