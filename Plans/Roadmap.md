@@ -36,7 +36,7 @@
 ## ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
 ID: ROAD-000021
 Этап: Разделить product lint для свежего bootstrap и развивающегося продукта
-Статус: В_работе
+Статус: Завершено
 Связи: BACK-000086, PLAN-000074
 Источник: Corrective pass after first evolving product repository check
 Дата_создания: 2026-04-26
@@ -46,7 +46,7 @@ ID: ROAD-000021
 Связанные_backlog: BACK-000086
 
 ### Описание
-Этап открыт для одного узкого corrective pass. Scope ограничен `Tools/bp_lint.py`, generated product scripts, bootstrap validation/contract documents, lifecycle references, planning/log closure и проверочными сценариями на временном generated product repo.
+Этап закрыт одним corrective pass `PLAN-000074`. `bp_lint.py` теперь различает fresh bootstrap product repo и developed product repo после подтверждения current truth; generated `scripts/dev-test.sh` запускает explicit `--mode auto`; technical contracts и tooling map синхронизированы с двумя structural gates. Проверки на временном generated product repo подтвердили fresh pass, developed pass и expected fail для contradiction scenario.
 
 ---
 

@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000081
+ID: QL-000081
+Дата: 2026-04-26
+Статус: пройдено
+Проверка: `ROAD-000021` / `BACK-000086` / `PLAN-000074` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000021.md` и `Plans/Archive/PLAN-000074-product-lint-lifecycle-modes.md` оформлены; `Tools/bp_lint.py`, `Tools/bp_bootstrap.py`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Tools/README.md` синхронизированы вокруг `product-fresh`, `product-developed` и `auto` modes; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-lint-lifecycle-q7DZ8V/product`, `python3 Tools/bp_lint.py --repo <product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <product> --mode auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed check и negative contradiction scenario выполнены; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000074` разделил fresh bootstrap и developed product structural checks без ослабления first product-start gate и без изменения `Minesweeper`.
+
+---
+
 ## QL-000080
 ID: QL-000080
 Дата: 2026-04-24

@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
+- нет активного этапа; backlog `ROAD-000021` выведен в `Plans/Archive/Backlog/ROAD-000021.md`
 
 ## Легенда типов
 - Система
@@ -32,28 +32,8 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ---
 
-## ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
+Активный этап отсутствует.
 
-### Активные
+`ROAD-000021` завершён и выведен в `Plans/Archive/Backlog/ROAD-000021.md`.
 
-#### BACK-000086 — Разделить fresh и developed проверки product repo
-ID: BACK-000086
-Название: Разделить fresh и developed проверки product repo
-Тип: Инструмент
-Приоритет: Критический
-Статус: В_работе
-Связи: ROAD-000021, PLAN-000074
-Источник: Corrective pass after first evolving product repository check
-Дата_создания: 2026-04-26
-Дата_изменения: 2026-04-26
-
-##### Описание
-`bp_lint.py` должен сохранить строгий fresh bootstrap gate и добавить отдельный developed product gate для состояния после подтверждения current truth и закрытия первого product-start pass. Generated `scripts/dev-test.sh`, validation docs и lifecycle references должны явно показывать выбранный режим проверки.
-
-### Завершённые
-- отсутствуют
-
-### Кандидаты задач этапа
-- нет
-
----
+Новый `ROAD-*` не активирован автоматически.
