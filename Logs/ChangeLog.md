@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000086 — Product lint lifecycle modes separated
 - CHG-000085 — Start contour semantics synchronized before the next field test
 - CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
 - CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
@@ -86,6 +87,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000086 — Product lint lifecycle modes separated
+ID: CHG-000086
+Дата: 2026-04-26
+Тип_изменения: Инструмент
+Источник: Corrective pass after first evolving product repository check
+Связи: PLAN-000074, BACK-000086, QL-000081
+Дата_создания: 2026-04-26
+Дата_изменения: 2026-04-26
+
+### Описание
+`Tools/bp_lint.py` разделён на fresh bootstrap check и developed product check для generated product repo. Fresh mode сохраняет строгие expectations исходного bootstrap state, а developed mode принимает confirmed current truth только при согласованном closure `Docs/Discovery/Interview.md`, `Plans/*` и `Logs/*`. `Tools/bp_bootstrap.py` теперь materialize generated `scripts/dev-test.sh`, который запускает `bp_lint.py --mode auto`.
+
+### Эффект
+`scripts/dev-test.sh` больше не падает на нормальном lifecycle transition после первого product-start pass, но продолжает падать на реальном contradiction: например, confirmed current truth при незакрытом `PLAN-000001` или без следующего active/completed plan.
 
 ---
 

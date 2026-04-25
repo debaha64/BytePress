@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- нет активного этапа; backlog `ROAD-000020` выведен в `Plans/Archive/Backlog/ROAD-000020.md`
+- нет активного этапа; backlog `ROAD-000021` выведен в `Plans/Archive/Backlog/ROAD-000021.md`
 
 ## Легенда типов
 - Система
@@ -34,6 +34,6 @@ Historical backlog завершённых этапов хранится в `Plan
 
 Активный этап отсутствует.
 
-`ROAD-000020` завершён и выведен в `Plans/Archive/Backlog/ROAD-000020.md`.
+`ROAD-000021` завершён и выведен в `Plans/Archive/Backlog/ROAD-000021.md`.
 
 Новый `ROAD-*` не активирован автоматически.

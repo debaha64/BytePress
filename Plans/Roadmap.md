@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
 - ROAD-000020 — Семантическая чистка стартового контура после повторного полевого теста
 - ROAD-000001 — Каркас репозитория и доменная структура (Repository Scaffold and Domain Structure)
 - ROAD-000002 — Термины, идентификаторы и шаблоны (Terms, IDs, and Templates)
@@ -29,6 +30,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
+ID: ROAD-000021
+Этап: Разделить product lint для свежего bootstrap и развивающегося продукта
+Статус: Завершено
+Связи: BACK-000086, PLAN-000074
+Источник: Corrective pass after first evolving product repository check
+Дата_создания: 2026-04-26
+Дата_изменения: 2026-04-26
+Цель: Развести automatic check свежего bootstrap-состояния и развивающегося product repo после подтверждения current truth, чтобы `bp_lint.py` выявлял реальные contradictions lifecycle, а не нормальный переход после первого прохода.
+Зависимости: ROAD-000020
+Связанные_backlog: BACK-000086
+
+### Описание
+Этап закрыт одним corrective pass `PLAN-000074`. `bp_lint.py` теперь различает fresh bootstrap product repo и developed product repo после подтверждения current truth; generated `scripts/dev-test.sh` запускает explicit `--mode auto`; technical contracts и tooling map синхронизированы с двумя structural gates. Проверки на временном generated product repo подтвердили fresh pass, developed pass и expected fail для contradiction scenario.
 
 ---
 
