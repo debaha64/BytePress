@@ -201,7 +201,7 @@ Bootstrap обязан создать:
 - `scripts/integration-smoke.sh`
 - `scripts/reset-product-start.sh`
 
-Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress`, `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic, а `reset-product-start.sh` обязан давать канонический cleanup route failed early product-start без молчаливого salvage behavior.
+Project scripts materialize first-usable project entry skeleton. `dev-test.sh` обязан давать явный route к structural check replicated repo через `BytePress` и запускать `bp_lint.py` в режиме `auto`, где fresh bootstrap state и developed product state различаются по current truth lifecycle. `integration-smoke.sh` обязан давать отдельный route к controlled integration smoke handoff без сетевых вызовов, секретов и vendor-specific runtime logic, а `reset-product-start.sh` обязан давать канонический cleanup route failed early product-start без молчаливого salvage behavior.
 
 В stage-closing baseline `ROAD-000014` этот route также обязан выпускать deterministic evidence/report artifact по фиксированному пути `Runtime/Integration_Smoke_Report.json`, не materialize отдельный новый evidence-layer и не подменяя `Plans/*` или `Logs/*` как source-of-truth.
 
@@ -216,7 +216,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 - `Docs/Technical/*` продукта — только minimal startup subset, а не полный system contract map;
 - `Docs/Terms/*` продукта — только `README.md` и `Base_Terms.md` со стартовым пакетом терминов, а не весь term-layer `BytePress`;
 - `Runtime/*` — только carrier для дальнейшего execution context;
-- `Plans/*` — только начальный stage/task/pass baseline, а не готовый предметный backlog;
+- `Plans/*` — только начальный stage/task/pass baseline, а не готовый предметный backlog; после подтверждения current truth developed product repo может закрыть `PLAN-000001` и вести следующий active или completed plan без нарушения bootstrap-contract;
 - `Logs/*` — только empty or near-empty fact containers;
 - `Adapters/*` и `scripts/*` — только managed entry skeleton без полноценной интеграционной логики.
 - `MCP/*` — не materialize в product repo bootstrap'ом; этот слой остаётся в `BytePress` и участвует только через controlled handoff.

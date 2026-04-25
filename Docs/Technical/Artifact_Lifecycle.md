@@ -42,6 +42,7 @@ Bootstrap note:
 - для generated product repo раннего product-start contour `Docs/Discovery/Interview.md` может начинаться в состоянии `Статус_текущей_истины: Не_подтверждена`;
 - даже допустимые updates внутри раннего contour `Docs/Discovery/*`, `Plans/*`, `Logs/*` считаются writable pass и потому начинаются только после открытия task-ветки;
 - пока этот статус не заменён явными ответами пользователя, допустимый active contour ограничен `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start.
+- после явного перехода к `Статус_текущей_истины: Подтверждена` generated product repo переходит из fresh bootstrap check в developed product check, где closed `PLAN-000001` является нормальным lifecycle state, если следующий active или completed plan и log closure согласованы.
 - блокирующие вопросы из соседних потоков входят в текущее интервью сразу, а неблокирующие передаются в следующую фазу по карте `Pipeline/Inputs_Outputs.md`.
 
 ### Technical contracts
@@ -185,6 +186,7 @@ Bootstrap note:
 Допустимо:
 - active `Plan` порождает временный runtime context во время исполнения.
 - generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить runtime-local smoke artifact и зафиксировать drift report после failed early product-start.
+- generated product repo может использовать generated `scripts/dev-test.sh` как automatic structural check route; script запускает `bp_lint.py --mode auto`, чтобы fresh bootstrap и developed product lifecycle проверялись разными gates.
 
 Недопустимо:
 - runtime становится каноническим планом;
