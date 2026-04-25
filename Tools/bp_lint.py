@@ -44,6 +44,7 @@ PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
 PRODUCT_DISCOVERY_ROUTE = re.compile(r"Docs/Discovery/\*", re.MULTILINE)
 PRODUCT_INTERVIEW_UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
+PRODUCT_INTERVIEW_CONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Подтверждена$", re.MULTILINE)
 PRODUCT_INTERVIEW_PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено пользователем\.$", re.MULTILINE)
 PRODUCT_INTERVIEW_GATE = re.compile(r"не разрешает изменения вне `Docs/Discovery/\*`, `Plans/\*` и `Logs/\*`", re.IGNORECASE)
 PRODUCT_START_GATE_SECTION = re.compile(r"^## First product-start gate$", re.MULTILINE)
@@ -79,6 +80,8 @@ STARTUP_HANDSHAKE_PLANNING = re.compile(r"ROAD/BACK/PLAN|активного эт
 STARTUP_HANDSHAKE_OWNERS = re.compile(r"owner-domains", re.IGNORECASE)
 STARTUP_HANDSHAKE_FIRST_STEP = re.compile(r"перв(ый|ого)\s+конкретн(ый|ого)\s+шаг", re.IGNORECASE)
 TASK_BRANCH_NAME = re.compile(r"^[a-z]+/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
+PRODUCT_PLAN_ID = re.compile(r"^ID:\s+PLAN-([0-9]{6})$", re.MULTILINE)
+PRODUCT_STATUS_LINE = re.compile(r"^Статус:\s+(\S+)$", re.MULTILINE)
 INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
 INTERVIEW_SKILL_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
 INTERVIEW_SKILL_OWNER = re.compile(r"owner", re.IGNORECASE)
@@ -140,6 +143,22 @@ def contains_pattern(path: Path, pattern: re.Pattern[str]) -> bool:
         return False
     text = path.read_text(encoding="utf-8")
     return bool(pattern.search(text))
+
+
+def read_text(path: Path) -> str:
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def extract_status(text: str) -> str | None:
+    match = PRODUCT_STATUS_LINE.search(text)
+    return match.group(1) if match else None
+
+
+def extract_plan_id(text: str) -> str | None:
+    match = PRODUCT_PLAN_ID.search(text)
+    return f"PLAN-{match.group(1)}" if match else None
 
 
 def count_matches(path: Path, pattern: re.Pattern[str]) -> int:
@@ -246,6 +265,83 @@ def has_product_interview_gate(path: Path) -> list[str]:
     return errors
 
 
+def detect_product_lint_mode(root: Path) -> str:
+    interview_path = root / "Docs" / "Discovery" / "Interview.md"
+    if contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
+        return "product-fresh"
+    if contains_pattern(interview_path, PRODUCT_INTERVIEW_CONFIRMED):
+        return "product-developed"
+    return "product-unknown"
+
+
+def find_initial_product_plan(root: Path) -> Path | None:
+    matches = [path for path in (root / "Plans").glob("*.md") if PRODUCT_PLAN_FILE.match(path.name)]
+    return matches[0] if matches else None
+
+
+def has_later_active_or_completed_plan(root: Path) -> bool:
+    for path in sorted((root / "Plans").glob("*.md")):
+        if path.name in {"README.md", "Roadmap.md", "Backlog.md"}:
+            continue
+        text = read_text(path)
+        plan_id = extract_plan_id(text)
+        if not plan_id:
+            continue
+        number = int(plan_id.removeprefix("PLAN-"))
+        status = extract_status(text)
+        if number > 1 and status in {"В_работе", "Завершено"}:
+            return True
+    return False
+
+
+def product_section_has_status(path: Path, artifact_id: str, status: str) -> bool:
+    text = read_text(path)
+    if not text:
+        return False
+    match = re.search(
+        rf"^.*{re.escape(artifact_id)}.*$[\s\S]*?^Статус:\s+{re.escape(status)}$",
+        text,
+        flags=re.MULTILINE,
+    )
+    return bool(match)
+
+
+def has_product_developed_consistency(root: Path, plan_path: Path | None) -> list[str]:
+    errors: list[str] = []
+    interview_path = root / "Docs" / "Discovery" / "Interview.md"
+    if not contains_pattern(interview_path, PRODUCT_INTERVIEW_CONFIRMED):
+        errors.append("Docs/Discovery/Interview.md: current truth is not `Подтверждена`")
+    if contains_pattern(interview_path, PRODUCT_INTERVIEW_PLACEHOLDER):
+        errors.append("Docs/Discovery/Interview.md: placeholder answers remain after current truth confirmation")
+
+    roadmap_path = root / "Plans" / "Roadmap.md"
+    backlog_path = root / "Plans" / "Backlog.md"
+    if not product_section_has_status(roadmap_path, "ROAD-000001", "Завершено"):
+        errors.append("Plans/Roadmap.md: ROAD-000001 must be `Завершено` after the first closed product-start pass")
+    if not product_section_has_status(backlog_path, "BACK-000001", "Завершено"):
+        errors.append("Plans/Backlog.md: BACK-000001 must be `Завершено` after the first closed product-start pass")
+
+    if plan_path is None:
+        errors.append("Plans/<PRODUCT_CODE>-000001-product-initialization.md: missing initial product plan")
+    else:
+        plan_text = read_text(plan_path)
+        if extract_plan_id(plan_text) != "PLAN-000001":
+            errors.append(f"{plan_path}: initial product plan ID must remain `PLAN-000001`")
+        if extract_status(plan_text) != "Завершено":
+            errors.append(f"{plan_path}: PLAN-000001 must be `Завершено` after the first closed product-start pass")
+
+    if not has_later_active_or_completed_plan(root):
+        errors.append("Plans/*: developing product repo must contain a later active or completed plan after PLAN-000001")
+
+    changelog_text = read_text(root / "Logs" / "ChangeLog.md")
+    quality_text = read_text(root / "Logs" / "QualityLog.md")
+    if "PLAN-000001" not in changelog_text or "BACK-000001" not in changelog_text:
+        errors.append("Logs/ChangeLog.md: missing first pass closure links to PLAN-000001 and BACK-000001")
+    if "PLAN-000001" not in quality_text:
+        errors.append("Logs/QualityLog.md: missing first pass check record linked to PLAN-000001")
+    return errors
+
+
 def is_executable(path: Path) -> bool:
     if not path.exists():
         return False
@@ -295,7 +391,7 @@ def get_git_branch(root: Path) -> str | None:
     return branch or None
 
 
-def check_product_repo(root: Path) -> int:
+def check_product_repo(root: Path, mode: str) -> int:
     required = [
         "README.md", "AGENTS.md", "Setup_Guide.md", "Docs", "Runtime", "Plans", "Logs",
         "Profiles", "Adapters", "scripts"
@@ -349,11 +445,21 @@ def check_product_repo(root: Path) -> int:
         if not (root / item).exists():
             missing.append(item)
 
-    plan_matches = [path for path in (root / "Plans").glob("*.md") if PRODUCT_PLAN_FILE.match(path.name)]
-    if not plan_matches:
+    plan_path = find_initial_product_plan(root)
+    if plan_path is None:
         missing.append("Plans/<PRODUCT_CODE>-000001-product-initialization.md")
 
     errors: list[str] = []
+    detected_mode = detect_product_lint_mode(root)
+    if mode == "auto":
+        mode = detected_mode
+    if mode == "product-unknown":
+        errors.append(
+            "Docs/Discovery/Interview.md: cannot determine product lint mode; expected `Не_подтверждена` or `Подтверждена` current truth"
+        )
+    elif mode not in {"product-fresh", "product-developed"}:
+        errors.append(f"lint mode: unsupported product mode `{mode}`")
+
     profile_path = root / "Profiles" / "Product.md"
     if profile_path.exists():
         if not contains_pattern(profile_path, PRODUCT_PROFILE_TYPE):
@@ -375,21 +481,24 @@ def check_product_repo(root: Path) -> int:
     interview_path = root / "Docs" / "Discovery" / "Interview.md"
     for item in has_interview_contract(interview_path):
         errors.append(f"Docs/Discovery/Interview.md: {item}")
-    for item in has_product_interview_gate(interview_path):
-        errors.append(f"Docs/Discovery/Interview.md: {item}")
+    if mode == "product-fresh":
+        for item in has_product_interview_gate(interview_path):
+            errors.append(f"Docs/Discovery/Interview.md: {item}")
+    elif mode == "product-developed":
+        if contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
+            errors.append("Docs/Discovery/Interview.md: developing product repo cannot keep unconfirmed current truth")
     for item in has_product_base_terms(root / "Docs" / "Terms" / "Base_Terms.md"):
         errors.append(f"Docs/Terms/Base_Terms.md: {item}")
     roadmap_path = root / "Plans" / "Roadmap.md"
-    if roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
+    if mode == "product-fresh" and roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
     backlog_path = root / "Plans" / "Backlog.md"
-    if backlog_path.exists() and not contains_pattern(backlog_path, PRODUCT_BACKLOG_IN_PROGRESS):
+    if mode == "product-fresh" and backlog_path.exists() and not contains_pattern(backlog_path, PRODUCT_BACKLOG_IN_PROGRESS):
         errors.append("Plans/Backlog.md: initial backlog task is not active `В_работе`")
-    if plan_matches:
-        plan_path = plan_matches[0]
+    if plan_path is not None:
         if check_has_id(plan_path):
             errors.append(f"{plan_path}: missing ID line")
-        if not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
+        if mode == "product-fresh" and not contains_pattern(plan_path, PRODUCT_PLAN_IN_PROGRESS):
             errors.append(f"{plan_path}: missing `Статус: В_работе`")
         if not contains_pattern(plan_path, PRODUCT_PLAN_DISCOVERY_ONLY):
             errors.append(f"{plan_path}: missing discovery-only gate wording")
@@ -399,8 +508,10 @@ def check_product_repo(root: Path) -> int:
             errors.append(f"{plan_path}: missing task-branch gate wording")
         if not contains_pattern(plan_path, PRODUCT_PLAN_WRITABLE):
             errors.append(f"{plan_path}: missing writable-change gate wording")
+    if mode == "product-developed":
+        errors.extend(has_product_developed_consistency(root, plan_path))
     current_branch = get_git_branch(root)
-    if current_branch and contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
+    if mode == "product-fresh" and current_branch and contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
         if current_branch in {"develop", "main"} or not TASK_BRANCH_NAME.fullmatch(current_branch):
             errors.append(
                 "git branch: generated product-start with unconfirmed current truth must run from a task branch before any writable changes"
@@ -420,17 +531,23 @@ def check_product_repo(root: Path) -> int:
             for item in errors:
                 print(f"- {item}")
         return 1
-    print("Структура продуктового bootstrap-контракта выглядит полной.")
+    print(f"Структура продуктового контракта выглядит полной. Режим: {mode}.")
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Проверка структуры BytePress и базовых контрактов.")
     parser.add_argument("--repo", default=".")
+    parser.add_argument(
+        "--mode",
+        choices=["auto", "product-fresh", "product-developed"],
+        default="auto",
+        help="Режим проверки product repo; BytePress repo всегда проверяется как BytePress.",
+    )
     args = parser.parse_args()
     root = Path(args.repo).resolve()
     if not is_bytepress_repo(root):
-        return check_product_repo(root)
+        return check_product_repo(root, args.mode)
 
     missing: list[str] = []
     for item in REQUIRED:

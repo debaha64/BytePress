@@ -770,7 +770,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`scripts/*` — project entry scripts replicated product repo.\n\n"
         "- `dev-up.sh` — placeholder старта локального product contour.\n"
         "- `dev-down.sh` — placeholder остановки локального contour.\n"
-        "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT`.\n"
+        "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT` с автоопределением режима fresh/developed product repo.\n"
         "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с runtime-local report artifact в `Runtime/Integration_Smoke_Report.json`.\n"
         "- `reset-product-start.sh` — cleanup route failed early product-start с drift report.\n"
         "- report artifact по умолчанию остаётся вне baseline commit и force-add допускается только при явном evidence-preservation решении текущего pass.\n",
@@ -797,7 +797,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "  echo \"BytePress lint script not found at: $LINT_SCRIPT\"\n"
         "  exit 1\n"
         "fi\n\n"
-        "python3 \"$LINT_SCRIPT\" --repo \"$ROOT_DIR\"\n",
+        "python3 \"$LINT_SCRIPT\" --repo \"$ROOT_DIR\" --mode auto\n",
     )
     write_executable(
         target / "scripts/integration-smoke.sh",
