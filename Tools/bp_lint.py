@@ -298,12 +298,14 @@ def product_section_has_status(path: Path, artifact_id: str, status: str) -> boo
     text = read_text(path)
     if not text:
         return False
-    match = re.search(
-        rf"^.*{re.escape(artifact_id)}.*$[\s\S]*?^Статус:\s+{re.escape(status)}$",
-        text,
-        flags=re.MULTILINE,
-    )
-    return bool(match)
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if line == f"ID: {artifact_id}":
+            for candidate in lines[index + 1:index + 12]:
+                if candidate.startswith("Статус: "):
+                    return candidate == f"Статус: {status}"
+            return False
+    return False
 
 
 def has_product_developed_consistency(root: Path, plan_path: Path | None) -> list[str]:
