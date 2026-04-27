@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000087 — Product service update path documented
 - CHG-000086 — Product lint lifecycle modes separated
 - CHG-000085 — Start contour semantics synchronized before the next field test
 - CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
@@ -87,6 +88,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000087 — Product service update path documented
+ID: CHG-000087
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: Corrective pass after developed product service-layer update need
+Связи: PLAN-000075, BACK-000087, QL-000082
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Verification.md`, `Tools/README.md` и generated `scripts/README.md` синхронизированы вокруг canonical update path для служебных файлов уже созданного product repo. На примере `scripts/dev-test.sh` и `scripts/README.md` зафиксирован product-side pass: взять delta из актуального `BytePress`, перенести только service files, не пересоздавать product repo и подтвердить developed state через `scripts/dev-test.sh` / `bp_lint.py --mode auto`.
+
+### Эффект
+Развивающийся product repo может получить обновление служебного слоя без fresh bootstrap reset, без потери confirmed current truth и без затрагивания предметных артефактов. Commit discipline уточнён: основание, документы, код или generated service files, checks/evidence и log closure лучше фиксировать отдельными смысловыми commits.
 
 ---
 
