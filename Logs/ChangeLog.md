@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000089 — Domain map and ADR decision contracts formalized
 - CHG-000088 — Language and domain maps cleaned up
 - CHG-000087 — Product service update path documented
 - CHG-000086 — Product lint lifecycle modes separated
@@ -89,6 +90,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000089 — Domain map and ADR decision contracts formalized
+ID: CHG-000089
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: PLAN-000077
+Связи: ROAD-000024, BACK-000089, ADR-000018, ADR-000019, ADR-000020, QL-000084
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+Добавлен шаблон `Templates/Domain_README.md`, `Standards/Documentation.md` закрепил `README.md` домена как краткую карту домена, а `Rules/Logs_Record_Facts_Only.md` и `Logs/README.md` уточнили обязательность `Logs/ADRlog.md` для значимых архитектурных, процессных и продуктово-договорных решений. В `Logs/ADRlog.md` добавлены ретро-ADR по стартовому product-start contour, fresh/developed product checks, картам доменов и service-layer update route already-created product repo.
+
+### Эффект
+README.md домена теперь имеет явную шаблонную форму и не должен подменять owner-documents. Журнал решений закрывает доказанный пропуск ADR по уже принятым договорам без изменения `Minesweeper`, без расширения bootstrap-доменов создаваемого продукта и без изменения `bp_lint.py`.
 
 ---
 

@@ -1,6 +1,9 @@
 # ADRlog
 
 ## Индекс
+- ADR-000020 — Domain maps and created product service-layer update route formalized
+- ADR-000019 — Fresh and developed product repository checks separated
+- ADR-000018 — Product-start contour, current truth and first gate formalized
 - ADR-000017 — Discovery layer, current-truth interview and artifact sync matrix formalized
 - ADR-000016 — Зафиксирован первый migration-pass для схем, шаблонов, профилей и языка Git/PR
 - ADR-000015 — Принята repo-wide policy фазной миграции ID и правил filename по доменам
@@ -18,6 +21,69 @@
 - ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-000002 — Развести знание, оперативную среду, планы и журналы
 - ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000020 — Domain maps and created product service-layer update route formalized
+ID: ADR-000020
+Дата: 2026-04-27
+Статус: Принято
+Связи: PLAN-000075, PLAN-000076, PLAN-000077, BACK-000087, BACK-000088, BACK-000089, CHG-000087, CHG-000088, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+После проходов `PLAN-000075` и `PLAN-000076` в active layer уже действовали два значимых договора: `README.md` домена используется как краткая карта домена, а уже созданный product repo обновляет служебный слой точечным product-side pass вместо повторного bootstrap. Эти договоры были отражены в технических документах, картах доменов и журналах изменений, но не имели отдельной ADR-записи.
+
+### Решение
+Зафиксировать `README.md` домена как краткую навигационную карту назначения, границ, артефактов, минимальных правил и дальнейших owner-documents, не заменяющую документы-владельцы. Для уже созданного product repo закрепить canonical service-layer update route: переносить только нужный служебный delta, не пересоздавать репозиторий, не переписывать confirmed current truth и предметные артефакты, проверять developed state через generated `scripts/dev-test.sh` или `bp_lint.py --mode auto` / `product-developed`.
+
+### Последствия
+Карты доменов получают явный шаблон и стандарт, а service-layer updates generated product repo отделены от fresh bootstrap. Это снижает риск случайного расширения bootstrap perimeter, потери предметного состояния продукта и превращения README.md в дубль owner-documents.
+
+---
+
+## ADR-000019 — Fresh and developed product repository checks separated
+ID: ADR-000019
+Дата: 2026-04-26
+Статус: Принято
+Связи: PLAN-000074, PLAN-000077, BACK-000086, BACK-000089, CHG-000086, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+Первый развивающийся generated product repo после подтверждения current truth перестал соответствовать fresh bootstrap markers, хотя это было нормальным lifecycle transition. Один автоматический product check смешивал исходное bootstrap-состояние и состояние продукта после первого управляемого прохода.
+
+### Решение
+Развести режимы проверки generated product repo: `product-fresh` проверяет состояние сразу после `bp_bootstrap.py`, `product-developed` проверяет состояние после подтверждения current truth и закрытия первого pass, а `auto` выбирает режим по lifecycle state `Docs/Discovery/Interview.md`. Fresh gate не должен требовать возврата развивающегося продукта к initial placeholders, а developed gate должен выявлять реальные противоречия между current truth, `Plans/*` и `Logs/*`.
+
+### Последствия
+Проверка generated product repo стала соответствовать жизненному циклу: fresh bootstrap остаётся строгим, developed product state становится допустимым после закрытия первого прохода, а `scripts/dev-test.sh` получает стабильный route через `--mode auto` без ослабления structural gate.
+
+---
+
+## ADR-000018 — Product-start contour, current truth and first gate formalized
+ID: ADR-000018
+Дата: 2026-04-21
+Статус: Принято
+Связи: PLAN-000069, PLAN-000070, PLAN-000071, PLAN-000072, PLAN-000073, PLAN-000077, BACK-000081, BACK-000082, BACK-000083, BACK-000084, BACK-000085, BACK-000089, CHG-000081, CHG-000082, CHG-000083, CHG-000084, CHG-000085, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+Серия первых полевых product-start проходов показала, что bootstrap-created product repo нуждается в явном стартовом контуре: discovery minimum, observable startup-handshake, current-truth owner, branch gate до любых writable changes, reset route failed start и запрет перехода к implementation до подтверждения пользовательских ответов.
+
+### Решение
+Закрепить, что bootstrap-created product repo стартует в discovery-only contour, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя. `Docs/Discovery/Interview.md` является owner текущей аналитической истины; bootstrap placeholders не являются подтверждённой current truth. Первый writable action требует task-ветку, включая изменения `Docs/Discovery/*`, `Plans/*` и `Logs/*`. Startup-handshake должен сообщать mode, scope, branch status, branch action/start route, planning-state, owner-domains первого чтения и первый конкретный шаг.
+
+### Последствия
+Ранний product-start стал управляемым end-to-end: generated repo не открывает предметную реализацию до подтверждения current truth, failed start имеет cleanup route, а agent entry contour становится наблюдаемым и проверяемым в документах, bootstrap result и lint checks.
 
 ---
 
