@@ -773,7 +773,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT` с автоопределением режима fresh/developed product repo.\n"
         "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с runtime-local report artifact в `Runtime/Integration_Smoke_Report.json`.\n"
         "- `reset-product-start.sh` — cleanup route failed early product-start с drift report.\n"
-        "- report artifact по умолчанию остаётся вне baseline commit и force-add допускается только при явном evidence-preservation решении текущего pass.\n",
+        "- report artifact по умолчанию остаётся вне baseline commit и force-add допускается только при явном evidence-preservation решении текущего pass.\n"
+        "\n"
+        "## Service-layer update\n"
+        "После первого product-start pass обновляйте `scripts/dev-test.sh` и этот `README.md` точечным product-side pass: возьмите delta из актуального `BytePress`, перенесите только service files, не пересоздавайте product repo и подтвердите результат через `scripts/dev-test.sh`.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",
