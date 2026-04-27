@@ -187,7 +187,7 @@ Bootstrap note:
 - active `Plan` порождает временный runtime context во время исполнения.
 - generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить runtime-local smoke artifact и зафиксировать drift report после failed early product-start.
 - generated product repo может использовать generated `scripts/dev-test.sh` как automatic structural check route; script запускает `bp_lint.py --mode auto`, чтобы fresh bootstrap и developed product lifecycle проверялись разными gates.
-- generated product repo после первого pass может обновлять служебные файлы `scripts/*` отдельным product-side pass без fresh bootstrap reset, если planning/log closure и product-developed check сохраняют confirmed current truth и предметные артефакты.
+- generated product repo после первого pass может обновлять служебные файлы `scripts/*` отдельным product-side pass без fresh bootstrap reset, если planning/log closure и product-developed check сохраняют подтверждённую текущую истину и предметные артефакты.
 
 Недопустимо:
 - runtime становится каноническим планом;

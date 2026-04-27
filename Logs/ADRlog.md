@@ -1,6 +1,7 @@
 # ADRlog
 
 ## Индекс
+- ADR-000021 — Russian lint markers accepted without weakening product gates
 - ADR-000020 — Domain maps and created product service-layer update route formalized
 - ADR-000019 — Fresh and developed product repository checks separated
 - ADR-000018 — Product-start contour, current truth and first gate formalized
@@ -21,6 +22,27 @@
 - ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-000002 — Развести знание, оперативную среду, планы и журналы
 - ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000021 — Russian lint markers accepted without weakening product gates
+ID: ADR-000021
+Дата: 2026-04-27
+Статус: Принято
+Связи: PLAN-000078, BACK-000090, CHG-000090
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-27
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+После языковой чистки active и generated layer часть проверочных формулировок оставалась на английском только потому, что `bp_lint.py` искал точные англоязычные маркеры: `discovery-only`, `current truth`, `startup-handshake`, `owner`, `writable action/changes` и близкие формы. Это удерживало смешанный язык в документах без технической необходимости.
+
+### Решение
+Сохранить прежние структурные проверки `bp_lint.py`, но разрешить для тех же смысловых условий русские эквиваленты: аналитический контур, текущая истина, стартовый отчёт первого ответа, документ-владелец, домены-владельцы и записываемые действия. CLI modes, имена файлов, ID, команды и branch naming остаются техническими маркерами и не переводятся.
+
+### Последствия
+Active и generated layer могут использовать русский проверочный текст без ослабления product-start, fresh/developed и startup-handshake gates. `bp_lint.py` остаётся structural check, а не языковым нормализатором всего архива.
 
 ---
 

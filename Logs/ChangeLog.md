@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000090 — Russian lint markers accepted in active and generated layers
 - CHG-000089 — Domain map and ADR decision contracts formalized
 - CHG-000088 — Language and domain maps cleaned up
 - CHG-000087 — Product service update path documented
@@ -90,6 +91,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000090 — Russian lint markers accepted in active and generated layers
+ID: CHG-000090
+Дата: 2026-04-27
+Тип_изменения: Инструмент
+Источник: PLAN-000078
+Связи: ROAD-000025, BACK-000090, ADR-000021, QL-000085
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`Tools/bp_lint.py` обновлён так, чтобы принимать русские эквиваленты проверочных маркеров для стартового отчёта первого ответа, аналитического контура, текущей истины, документов-владельцев, доменов-владельцев и записываемых действий. Active docs и generated strings в `Tools/bp_bootstrap.py` переведены на безопасные русские формулировки там, где это не затрагивает имена файлов, команды, ID, ветки и CLI modes.
+
+### Эффект
+Проверочный договор больше не требует англоязычные текстовые маркеры без технической необходимости, но сохраняет прежние structural gates fresh/developed product repo, first product-start gate и startup report.
 
 ---
 
