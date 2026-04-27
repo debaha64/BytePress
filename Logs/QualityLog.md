@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000085
+ID: QL-000085
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000025` / `BACK-000090` / `PLAN-000078` открыты и затем закрыты в одном pass; `Tools/bp_lint.py`, `Tools/bp_bootstrap.py`, `Tools/README.md`, `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Skills/Interview.md` и `Templates/Interview.md` синхронизированы вокруг русских проверочных маркеров; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, `product-fresh`, `auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed product, `product-developed`, repeated auto и repeated generated `scripts/dev-test.sh` пройдены; `bp_lint contract affected`.
+Результат: active и generated layer используют русские маркеры для аналитического гейта, текущей истины, стартового отчёта, документов-владельцев и записываемых действий без изменения `Minesweeper`, без новых доменов создаваемого продукта и без широкой языковой чистки архива.
+
+---
+
 ## QL-000084
 ID: QL-000084
 Дата: 2026-04-27

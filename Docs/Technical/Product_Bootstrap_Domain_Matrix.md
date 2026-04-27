@@ -36,7 +36,7 @@
 ## Каноническая матрица
 | Top-level domain `BytePress` | Канон | Product-side materialization | Причина |
 | --- | --- | --- | --- |
-| `Docs/` | `Default` | materialize только минимальный startup subset: `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, ограниченный `Docs/Technical/*`, `Docs/Terms/Base_Terms.md` и `Docs/Terms/README.md` | generated repo должен иметь current-truth route, human entry, product placeholders, минимальный technical contour и стартовый пакет терминов, но не полную копию knowledge-layer `BytePress` |
+| `Docs/` | `Default` | materialize только минимальный startup subset: `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, ограниченный `Docs/Technical/*`, `Docs/Terms/Base_Terms.md` и `Docs/Terms/README.md` | generated repo должен иметь маршрут текущей истины, human entry, product-заготовки, минимальный technical contour и стартовый пакет терминов, но не полную копию knowledge-layer `BytePress` |
 | `Plans/` | `Default` | materialize initial roadmap/backlog/current plan продукта | ранний product-start gate обязан иметь repo-native planning owner |
 | `Logs/` | `Default` | materialize singleton fact logs продукта | pass-close contour не должен зависеть только от памяти или runtime |
 | `Runtime/` | `Default` | materialize temporary execution carrier продукта | нужен controlled runtime-local contour и cleanup route, но не новый source-of-truth |
@@ -66,15 +66,15 @@ Default matrix materialize только тот subset, который нужен
 
 Это не даёт права считать generated repo готовым к предметной реализации сразу после bootstrap:
 - bootstrap-created `Docs/Discovery/Interview.md` стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;
-- пока пользователь не дал явные ответы и current truth не подтверждена, агент остаётся в discovery-only contour;
-- до подтверждения current truth допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start;
+- пока пользователь не дал явные ответы и текущая истина не подтверждена, агент остаётся только в аналитическом контуре;
+- до подтверждения текущей истины допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start;
 - наличие bootstrap-created `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и `scripts/*` не считается разрешением на их предметное изменение в первом pass.
 
 ## Failed product-start reset route
 Канонический reset/cleanup route после failed product-start:
 1. запустить `scripts/reset-product-start.sh` в generated repo, чтобы убрать runtime-local smoke artifact и получить явный drift report;
 2. если drift ограничен `Docs/Discovery/*`, `Plans/*` и `Logs/*`, решить отдельно, какие текущие current-truth/planning/log edits сохранить;
-3. если появились tracked changes вне раннего discovery-only contour, canonical cleanup route — отбросить damaged repo и materialize fresh target новым bootstrap run, а не чинить out-of-gate drift вручную как новый baseline.
+3. если появились tracked changes вне раннего аналитического контура, canonical cleanup route — отбросить damaged repo и materialize fresh target новым bootstrap run, а не чинить out-of-gate drift вручную как новый baseline.
 
 ## Граница документа
 `Product_Bootstrap_Domain_Matrix.md`:
