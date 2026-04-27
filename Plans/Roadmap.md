@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000022 — Канонический путь обновления service-layer created product repo
 - ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
 - ROAD-000020 — Семантическая чистка стартового контура после повторного полевого теста
 - ROAD-000001 — Каркас репозитория и доменная структура (Repository Scaffold and Domain Structure)
@@ -30,6 +31,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000022 — Канонический путь обновления service-layer created product repo
+ID: ROAD-000022
+Этап: Канонический путь обновления service-layer created product repo
+Статус: Завершено
+Связи: BACK-000087, PLAN-000075
+Источник: Corrective pass after developed product service-layer update need
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+Цель: Зафиксировать минимальный путь обновления служебных файлов уже созданного product repo без пересоздания продукта, потери предметных артефактов, расширения bootstrap-доменов или ослабления fresh/developed product checks.
+Зависимости: ROAD-000021
+Связанные_backlog: BACK-000087
+
+### Описание
+Этап закрыт одним узким pass `PLAN-000075`. Bootstrap contract, validation contract, lifecycle, verification и tooling map теперь фиксируют canonical product-side route обновления `scripts/dev-test.sh` и `scripts/README.md` в уже созданном product repo: точечный service-layer delta, без fresh bootstrap reset, без переписывания предметных артефактов и с подтверждением через `scripts/dev-test.sh` / `bp_lint.py --mode auto`. Временный product repo подтвердил fresh state, generated service guidance и modeled developed state.
 
 ---
 
