@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000083
+ID: QL-000083
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000023` / `BACK-000088` / `PLAN-000076` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000023.md` и `Plans/Archive/PLAN-000076-language-domain-map-cleanup.md` оформлены; активные карты доменов `README.md`, `AGENTS.md`, `Setup_Guide.md`, `Tools/README.md` и generated text в `Tools/bp_bootstrap.py` синхронизированы вокруг краткого русского инженерного формата; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-language-cleanup-SSAUbQ/product`, `python3 Tools/bp_lint.py --repo <product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <product> --mode auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed product, `python3 Tools/bp_lint.py --repo <product> --mode product-developed`, повторный auto и repeated generated scripts пройдены; `bp_lint contract unaffected`.
+Результат: языковая и картографическая чистка закрыта без изменения `Minesweeper`, без изменения предметного смысла `BytePress`, без изменения состава доменов создаваемого продукта и без ослабления branch/fresh/developed product gates.
+
+---
+
 ## QL-000082
 ID: QL-000082
 Дата: 2026-04-27

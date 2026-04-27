@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000088 — Language and domain maps cleaned up
 - CHG-000087 — Product service update path documented
 - CHG-000086 — Product lint lifecycle modes separated
 - CHG-000085 — Start contour semantics synchronized before the next field test
@@ -88,6 +89,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000088 — Language and domain maps cleaned up
+ID: CHG-000088
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: PLAN-000076
+Связи: ROAD-000023, BACK-000088, QL-000083
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`AGENTS.md`, корневой `README.md`, `Setup_Guide.md`, карты доменов `README.md`, `Tools/README.md` и текстовый слой `Tools/bp_bootstrap.py` приведены к краткому русскому инженерному формату. Карты доменов теперь описывают назначение, границы, карту артефактов и дальнейшую навигацию, не перенося внутрь README подробные правила владельцев доменов.
+
+### Эффект
+Активный слой и создаваемый product repo читаются через один навигационный формат. Случайная англо-русская смесь снижена без изменения предметного смысла `BytePress`, состава создаваемых доменов, branch gate, fresh/developed product checks и договора `bp_lint.py`.
 
 ---
 
