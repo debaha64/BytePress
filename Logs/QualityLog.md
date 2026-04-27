@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000084
+ID: QL-000084
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000024` / `BACK-000089` / `PLAN-000077` открыты и затем закрыты в одном pass; `Templates/Domain_README.md`, `Templates/README.md`, `Standards/Documentation.md`, `Rules/Logs_Record_Facts_Only.md`, `Logs/README.md` и `Logs/ADRlog.md` синхронизированы вокруг договора карт доменов и ADR; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-domain-adr-0fJZkG/product`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode product-fresh`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode auto`, generated `scripts/dev-test.sh`, modeled developed product, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode product-developed`, повторный auto и repeated generated `scripts/dev-test.sh` пройдены; `bp_lint contract unaffected`.
+Результат: договор README.md домена и обязательность ADR для значимых решений закреплены без изменения `Minesweeper`, без новых доменов создаваемого продукта, без широкой языковой чистки и без изменения `Tools/bp_lint.py`.
+
+---
+
 ## QL-000083
 ID: QL-000083
 Дата: 2026-04-27
