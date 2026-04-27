@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000082
+ID: QL-000082
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000022` / `BACK-000087` / `PLAN-000075` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000022.md` и `Plans/Archive/PLAN-000075-product-service-update-path.md` оформлены; `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Verification.md`, `Tools/README.md` и `Tools/bp_bootstrap.py` синхронизированы вокруг canonical service-layer update path для `scripts/dev-test.sh` и `scripts/README.md`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap fresh продукта `/tmp/bytepress-service-update-fresh-Q9Dh3o/product`, `python3 Tools/bp_lint.py --repo <fresh-product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <fresh-product> --mode auto`, generated fresh `scripts/dev-test.sh`, modeled developed product `/tmp/bytepress-service-update-YpTbG9/product`, `python3 Tools/bp_lint.py --repo <developed-product> --mode product-developed` и generated developed `scripts/dev-test.sh` выполнены; запуск `product-fresh` на уже смоделированном developed product дал ожидаемый fail fresh markers; `bp_lint contract unaffected`.
+Результат: corrective pass `PLAN-000075` зафиксировал служебный update route для already-created product repo без повторного bootstrap, без изменения `Minesweeper`, без новых bootstrap domains и без ослабления fresh/developed product gates.
+
+---
+
 ## QL-000081
 ID: QL-000081
 Дата: 2026-04-26
