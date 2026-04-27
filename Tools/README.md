@@ -70,6 +70,8 @@ Tooling-layer не должен:
 
 Эти режимы не меняют роль `bp_lint.py`: он остаётся structural check и подсвечивает contradictions lifecycle, но не оценивает предметное качество продукта.
 
+Для уже созданного product repo обновление служебных files `scripts/dev-test.sh` и `scripts/README.md` выполняется как product-side pass: взять delta из актуального `BytePress`, перенести только нужные service files, не пересоздавать product repo, не трогать предметные artifacts и подтвердить результат через generated `scripts/dev-test.sh` или `bp_lint.py --mode auto`.
+
 ## Target role будущего `bp_check`
 `bp_check` пока не реализован и в этом pass не вводится.
 
@@ -266,6 +268,7 @@ Future validation-support tooling:
 - bootstrap создаёт `Docs/Terms/README.md` и `Docs/Terms/Base_Terms.md` со стартовым пакетом терминов вместо полного term-layer `BytePress`;
 - bootstrap создаёт `Profiles/Product.md`, adapter policy/registry и initial plan file `Plans/<PRODUCT_CODE>-000001-product-initialization.md`;
 - bootstrap создаёт `scripts/integration-smoke.sh` как отдельный controlled handoff route к integration smoke tooling `BytePress`;
+- bootstrap создаёт `scripts/dev-test.sh` и `scripts/README.md` как service-layer entrypoints; их последующие updates в уже созданном product repo выполняются точечно, без повторного bootstrap и без переписывания product artifacts;
 - bootstrap materialize initial `Roadmap`, `Backlog` и `Plan` продукта в состоянии `В_работе`;
 - `bp_lint.py` требует `Templates/Delivery.md` в `BytePress` и проверяет наличие полного минимального `Docs/Product/*` набора в product repo;
 - `bp_lint.py` проверяет наличие `AGENTS.md`, короткого стартового отчёта с приветствием, обязательного `Docs/User/*`, starter terms в `Docs/Terms/Base_Terms.md`, adapter policy/registry, `scripts/integration-smoke.sh`, `.gitignore` c `.codex/`, смысловых классов интервью и first-usable replicated planning contour;
