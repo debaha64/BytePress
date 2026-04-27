@@ -1,4 +1,4 @@
-# Setup_Guide
+# Setup Guide
 
 ## Базовая среда
 Основная среда разработки для BytePress — Linux.
@@ -9,10 +9,10 @@
 - Python 3.11+
 - Git
 - Node.js 20+
-- pre-commit
+- `pre-commit`
 - Codex CLI
 
-Windows-native установка Codex не используется.
+Установка Codex напрямую в Windows не используется.
 
 ## Рабочий каталог
 Все проекты должны находиться в домашнем каталоге пользователя.
@@ -105,7 +105,7 @@ export CODEX_HOME="$PWD/.codex"
 ```
 
 ## GitHub CLI и PR-контур
-Для Auto-PR требуется минимально настроенный GitHub CLI:
+Для автоматической подготовки PR требуется минимально настроенный GitHub CLI:
 
 ```bash
 gh auth login
@@ -113,15 +113,15 @@ gh auth status
 ```
 
 На стороне GitHub для репозитория BytePress должны быть включены:
-- automatic deletion of head branches после merge;
+- автоматическое удаление head-веток после merge;
 - защита `develop` и `main` в режиме PR-only.
 
-Рабочий порядок для task-ветки:
+Рабочий порядок для рабочей ветки:
 1. перейти на `develop`, выполнить `git fetch --prune origin` и `git pull --ff-only origin develop`;
-2. создать `task branch` в формате `<type>/<NNNNNN>-<slug>`;
+2. создать рабочую ветку в формате `<type>/<NNNNNN>-<slug>`;
 3. сделать серию локальных коммитов в этой ветке;
-4. выполнять локальный self-check после каждого коммита;
-5. делать `final push` только после завершения задачи;
+4. выполнять локальную самопроверку после каждого коммита;
+5. делать финальный `push` только после завершения задачи;
 6. перед созданием PR проверить, нет ли уже открытого PR для head-ветки;
 7. если `gh pr create --help` не содержит `--dry-run`, не использовать этот флаг;
 8. если `gh` не сработал, не переавторизовывать CLI автоматически, а вывести готовую команду `gh pr create`;
@@ -136,13 +136,14 @@ python3 Tools/bp_lint.py --repo .
 
 Если ошибок нет, базовая среда считается корректной.
 
-## Smoke bootstrap и failed-start cleanup
-- product bootstrap smoke выполняется только во временный target path вне дерева `BytePress`;
-- ранний generated product repo должен оставаться discovery-only, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;
-- для live product-start generated repo сначала переводится в baseline `develop`, а затем открывает task-ветку до первого writable action, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`;
-- если early product-start привёл к out-of-gate drift в generated repo, canonical cleanup route: `scripts/reset-product-start.sh`, а при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*` — fresh bootstrap в новый target вместо salvage текущего baseline.
+## Smoke bootstrap и очистка неудачного старта
+- smoke-проверка начального развёртывания продукта выполняется только во временный target path вне дерева `BytePress`;
+- ранний созданный продукт должен оставаться только в аналитическом режиме, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;
+- для живого старта созданный продукт сначала переводится в baseline `develop`, затем открывает рабочую ветку до первого writable action, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`;
+- если ранний продуктовый старт привёл к drift за пределами гейта, канонический маршрут очистки — `scripts/reset-product-start.sh`;
+- если tracked drift затронул файлы вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`, нужен свежий bootstrap в новый target вместо salvage текущего baseline.
 
-## Release branch workflow
+## Маршрут release-ветки
 Создать release-ветку только от `develop`:
 
 ```bash
@@ -179,7 +180,7 @@ git tag -a 0.2.0 -m "Release BytePress 0.2.0"
 git push origin 0.2.0
 ```
 
-После merge и tag push удалить release-ветку:
+После merge и отправки tag удалить release-ветку:
 
 ```bash
 git branch -d release/000020-0.2.0-rc1
@@ -198,7 +199,7 @@ git push -u origin docs/000080-sync-develop-after-release-0.2.0
 gh pr create --base develop --head docs/000080-sync-develop-after-release-0.2.0
 ```
 
-Фактический release logging выполняется только после подтверждённых merge/tag facts.
+Фактическая запись о выпуске выполняется только после подтверждённых merge/tag facts.
 
-- Если tag/history уже подтверждают release event, следующий узкий sync-pass в `develop` добавляет factual запись в `Logs/ReleaseLog.md`.
+- Если tag/history уже подтверждают release event, следующий узкий sync-pass в `develop` добавляет фактическую запись в `Logs/ReleaseLog.md`.
 - `ReleaseLog.md` не хранит release candidate, прогноз или намерение; там живут только фактически состоявшиеся release events.

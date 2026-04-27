@@ -111,7 +111,7 @@ def render_starter_terms(terms: tuple[StarterTerm, ...]) -> str:
         "# Base_Terms",
         "",
         "## Назначение",
-        "Этот файл содержит минимальный стартовый пакет терминов replicated product repo.",
+        "Этот файл содержит минимальный стартовый пакет терминов продуктового репозитория.",
         "Полный словарь `BytePress` сюда не копируется.",
         "",
         "## Индекс",
@@ -182,7 +182,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "README.md",
         f"# {ctx.name}\n\n"
-        f"{ctx.name} — first-usable replicated product repo, materialized by `BytePress` bootstrap.\n\n"
+        f"{ctx.name} — первый пригодный к работе продуктовый репозиторий, созданный `BytePress` bootstrap.\n\n"
         "`README.md` — карта для человека.\n"
         "`AGENTS.md` — карта для агента.\n\n"
         "## Стартовый маршрут\n"
@@ -190,34 +190,34 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. Прочитать `Docs/Terms/Base_Terms.md`.\n"
         "3. Прочитать `Docs/Discovery/Interview.md` и подтвердить current truth ответами пользователя.\n"
         "4. Подготовить среду по `Setup_Guide.md`.\n"
-        "5. Проверить current stage/task/pass в `Plans/*`.\n"
-        "6. Использовать `scripts/dev-test.sh`, если нужен structural check через `BytePress`.\n"
-        "7. Использовать `scripts/reset-product-start.sh`, если ранний product-start сорвался и нужен cleanup route.\n"
-        "8. Использовать `scripts/integration-smoke.sh`, если нужен minimal integration handoff check.\n\n"
+        "5. Проверить текущие этап, задачу и план в `Plans/*`.\n"
+        "6. Использовать `scripts/dev-test.sh`, если нужна структурная проверка через `BytePress`.\n"
+        "7. Использовать `scripts/reset-product-start.sh`, если ранний product-start сорвался и нужен маршрут очистки.\n"
+        "8. Использовать `scripts/integration-smoke.sh`, если нужен минимальный интеграционный smoke-маршрут.\n\n"
         "## Доменная карта\n"
-        "- `Docs/Discovery/*` — current-truth и интервью продукта.\n"
-        "- `Docs/User/*` — human-facing layer продукта.\n"
+        "- `Docs/Discovery/*` — current truth и интервью продукта.\n"
+        "- `Docs/User/*` — пользовательский слой продукта.\n"
         "- `Docs/Product/*` — прикладная рамка продукта.\n"
-        "- `Docs/Technical/*` — стартовый technical contour продукта.\n"
-        "- `Plans/*` — current roadmap, backlog и current plan продукта.\n"
-        "- `Logs/*` — факты, изменения и quality evidence продукта.\n"
-        "- `Adapters/*` — модельный contour продукта.\n"
-        "- `scripts/*` — project entry scripts.\n",
+        "- `Docs/Technical/*` — стартовый технический контур продукта.\n"
+        "- `Plans/*` — дорожная карта, реестр работ и текущий план продукта.\n"
+        "- `Logs/*` — факты, изменения и доказательства качества продукта.\n"
+        "- `Adapters/*` — модельный контур продукта.\n"
+        "- `scripts/*` — проектные точки входа.\n",
     )
     write(
         target / "AGENTS.md",
         f"# AGENTS\n\n"
-        f"`AGENTS.md` — карта входа агента в replicated product repo `{ctx.name}`.\n\n"
+        f"`AGENTS.md` — карта входа агента в продуктовый репозиторий `{ctx.name}`.\n\n"
         "## Что делает агент\n"
         "- человек направляет, агент исполняет;\n"
-        "- агент работает внутри контрактов product repo;\n"
+        "- агент работает внутри договоров продуктового репозитория;\n"
         "- каждое изменение проходит через task-ветку, локальные проверки и PR.\n\n"
         "## Как читать истину\n"
-        "1. Текущий task-source пользователя.\n"
-        "2. `Docs/Discovery/*` как current-truth route продукта.\n"
-        "3. `Plans/*` как stage/task/pass owner.\n"
-        "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как product knowledge layers.\n"
-        "5. `Logs/*`, `Setup_Guide.md`, `Adapters/*` и `scripts/*` как execution support.\n\n"
+        "1. Текущий источник задачи от пользователя.\n"
+        "2. `Docs/Discovery/*` как маршрут current truth продукта.\n"
+        "3. `Plans/*` как владелец этапа, задачи и прохода.\n"
+        "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как слои знания продукта.\n"
+        "5. `Logs/*`, `Setup_Guide.md`, `Adapters/*` и `scripts/*` как поддержка исполнения.\n\n"
         "## Startup-handshake первого ответа\n"
         "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
         "`Приветствие:` короткая рабочая фраза.\n"
@@ -232,9 +232,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Bootstrap-created repo стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
         "- Пока пользователь не дал явные ответы и current truth не подтверждена, агент работает только в discovery-only mode.\n"
         "- До открытия task-ветки любые writable changes запрещены, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
-        "- В этом gate допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и cleanup route failed pass, но сам writable pass начинается только после branch action в task-ветку.\n"
-        "- В этом gate placeholders bootstrap'а не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.\n"
-        "- Если failed start дал tracked drift вне разрешённого раннего contour, canonical reset route — fresh bootstrap в новый target.\n\n"
+        "- В этом gate допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и маршрут очистки failed pass, но сам writable pass начинается только после branch action в task-ветку.\n"
+        "- В этом gate bootstrap placeholders не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.\n"
+        "- Если failed start дал tracked drift вне разрешённого раннего контура, canonical reset route — fresh bootstrap в новый target.\n\n"
         "## Start route\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
@@ -244,7 +244,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Для failed start использовать `scripts/reset-product-start.sh`.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
-        "- этот файл только направляет агента к owner-documents replicated product repo.\n",
+        "- этот файл только направляет агента к owner-documents продуктового репозитория.\n",
     )
     write(
         target / "Setup_Guide.md",
@@ -265,7 +265,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Проверка\n"
         "- первый product-start pass остаётся discovery-only, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;\n"
         "- первый writable action, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки;\n"
-        "- для structural и integration smoke checks replicated repo установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
+        "- для structural и integration smoke checks продуктового репозитория установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
         "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`;\n"
         "- если ранний product-start сорвался, выполнить `scripts/reset-product-start.sh` и прочитать его drift report;\n"
         "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`;\n"
@@ -276,17 +276,17 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Docs/Discovery/README.md",
         "# Discovery\n\n"
-        "`Docs/Discovery/*` хранит current-truth продукта до перевода в требования и planning contour.\n\n"
+        "`Docs/Discovery/*` хранит current truth продукта до перевода в требования и плановый контур.\n\n"
         "## Current-truth owner\n"
         "- `Interview.md` — owner текущей аналитической истины generated product repo.\n\n"
         "## Bootstrap minimum раннего product-start contour\n"
-        "- `README.md` — карта discovery-layer.\n"
+        "- `README.md` — карта аналитического слоя.\n"
         "- `Interview.md` — текущее интервью продукта.\n\n"
         "## Gate текущей истины\n"
         "- bootstrap-created interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;\n"
         "- пока пользователь не ответил явно, generated repo остаётся в discovery-only contour;\n"
         "- даже в discovery-only contour первый writable action допускается только после открытия task-ветки;\n"
-        "- placeholders bootstrap'а не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и предметной реализации.\n\n"
+        "- bootstrap placeholders не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и предметной реализации.\n\n"
         "## Interview protocol\n"
         "- owner протокола интервью один: `Interview.md`;\n"
         "- вопросы первого прохода собираются по классам `Контекст`, `Граница`, `Ограничение`, `Владение`, `Переход`;\n"
@@ -295,7 +295,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- delta-интервью всё равно использует тот же numbered / lettered / recommended format.\n\n"
         "## Границы\n"
         "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
-        "- history-fact изменений discovery-layer закрывается через planning/log contour;\n"
+        "- history-fact изменений аналитического слоя закрывается через planning/log contour;\n"
         "- `Discussion`, `Research` и `Requirements` не materialize до отдельного pass, который явно открывает расширенный discovery contour.\n",
     )
     write(
@@ -382,30 +382,30 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Docs/User/README.md",
         "# User\n\n"
-        "`Docs/User/*` — канонический human-facing layer replicated product repo.\n\n"
+        "`Docs/User/*` — пользовательский слой продуктового репозитория.\n\n"
         "## Состав\n"
-        "- `README.md` — карта user-layer.\n"
-        "- `Operating_Mode.md` — human operating mode продукта.\n"
+        "- `README.md` — карта пользовательского слоя.\n"
+        "- `Operating_Mode.md` — режим работы человека с продуктом.\n"
         "- `First_Start.md` — первый маршрут входа.\n"
         "- `Pass_Request.md` — как формулировать pass для агента.\n"
         "- `Usage_Scenarios.md` — базовые сценарии использования.\n\n"
         "## Границы\n"
-        "- user-layer не дублирует `AGENTS.md`, `Setup_Guide.md` и `Docs/Technical/*`;\n"
-        "- user-layer направляет к owner-documents replicated product repo.\n",
+        "- пользовательский слой не дублирует `AGENTS.md`, `Setup_Guide.md` и `Docs/Technical/*`;\n"
+        "- пользовательский слой направляет к owner-documents продуктового репозитория.\n",
     )
     write(
         target / "Docs/User/Operating_Mode.md",
         "# Operating Mode\n\n"
         "## Назначение\n"
-        "Этот документ фиксирует human operating mode продукта.\n\n"
+        "Этот документ фиксирует режим работы человека с продуктом.\n\n"
         "## Базовый режим\n"
-        "- человек формулирует scope и expected outcome pass;\n"
-        "- агент исполняет pass внутри contracts продукта;\n"
-        "- current stage/task/pass читаются из `../../Plans/*`.\n\n"
+        "- человек формулирует scope и ожидаемый outcome pass;\n"
+        "- агент исполняет pass внутри договоров продукта;\n"
+        "- текущие этап, задача и план читаются из `../../Plans/*`.\n\n"
         "## Куда идти дальше\n"
-        "- current planning-state: `../../Plans/README.md`;\n"
-        "- agent route: `../../AGENTS.md`;\n"
-        "- setup и checks: `../../Setup_Guide.md`.\n",
+        "- текущее состояние планирования: `../../Plans/README.md`;\n"
+        "- маршрут агента: `../../AGENTS.md`;\n"
+        "- настройка и проверки: `../../Setup_Guide.md`.\n",
     )
     write(
         target / "Docs/User/First_Start.md",
@@ -414,46 +414,46 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. Прочитать `../../README.md`.\n"
         "2. Прочитать `Operating_Mode.md`.\n"
         "3. Прочитать `../../Setup_Guide.md` и открыть task-ветку до первого writable action.\n"
-        "4. Проверить current stage/task/pass в `../../Plans/*`.\n"
+        "4. Проверить текущие этап, задачу и план в `../../Plans/*`.\n"
         "5. Прочитать `../Discovery/Interview.md` и только после task-ветки ответить на вопросы, которые подтверждают current truth.\n"
         "6. Из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`.\n"
         "7. Если ранний product-start сорвался, выполнить `../../scripts/reset-product-start.sh`.\n\n"
         "## Что дальше\n"
         "- если нужен новый pass: `Pass_Request.md`;\n"
-        "- если нужен agent execution route: `../../AGENTS.md`.\n",
+        "- если нужен маршрут исполнения агентом: `../../AGENTS.md`.\n",
     )
     write(
         target / "Docs/User/Pass_Request.md",
         "# Pass Request\n\n"
         "## Назначение\n"
-        "Этот документ объясняет, как человеку формулировать pass для агента внутри replicated product repo.\n\n"
+        "Этот документ объясняет, как человеку формулировать pass для агента внутри продуктового репозитория.\n\n"
         "## Минимальная форма\n"
         "1. Назвать текущий `ROAD-*` или указать новый pass внутри него.\n"
         "2. Сформулировать узкую цель pass.\n"
         "3. Перечислить scope и owner-documents.\n"
         "4. Перечислить ограничения и допустимые sync-поверхности.\n"
-        "5. Указать desired outcome и проверки, если они не спорят с repo contracts.\n\n"
+        "5. Указать ожидаемый outcome и проверки, если они не спорят с договорами репозитория.\n\n"
         "## На что опираться\n"
         "- `../../Plans/*`;\n"
         "- `../../Docs/User/*`, `../../Docs/Product/*`, `../../Docs/Technical/*`;\n"
-        "- `../../Setup_Guide.md` и `../../scripts/*` для run/check route.\n",
+        "- `../../Setup_Guide.md` и `../../scripts/*` для маршрута запуска и проверки.\n",
     )
     write(
         target / "Docs/User/Usage_Scenarios.md",
         "# Usage Scenarios\n\n"
-        "## Сценарий 1. Войти в replicated product repo\n"
+        "## Сценарий 1. Войти в продуктовый репозиторий\n"
         "- Прочитать `../../README.md` и `First_Start.md`.\n"
         "- Подтвердить current truth в `../../Docs/Discovery/Interview.md` до предметных правок.\n"
         "- Подготовить среду по `../../Setup_Guide.md`.\n"
-        "- Проверить structural contour через `scripts/dev-test.sh`.\n\n"
+        "- Проверить структурный контур через `scripts/dev-test.sh`.\n\n"
         "## Сценарий 2. Запустить новый pass с агентом\n"
-        "- Найти current stage/task/pass в `../../Plans/*`.\n"
+        "- Найти текущие этап, задачу и план в `../../Plans/*`.\n"
         "- Сформулировать pass через `Pass_Request.md`.\n"
         "- Направить агента на работу через contracts продукта.\n\n"
-        "## Сценарий 3. Работать с продуктовым knowledge contour\n"
+        "## Сценарий 3. Работать с продуктовым контуром знания\n"
         "- `Docs/Product/*` — прикладная рамка продукта.\n"
-        "- `Docs/Technical/*` — стартовый technical contour.\n"
-        "- `Logs/*` — факты и quality evidence.\n",
+        "- `Docs/Technical/*` — стартовый технический контур.\n"
+        "- `Logs/*` — факты и доказательства качества.\n",
     )
     write(
         target / "Docs/Product/README.md",
@@ -561,29 +561,29 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Docs/Technical/README.md",
         "# Technical\n\n"
-        "`Docs/Technical/*` хранит стартовый technical contour replicated product repo.\n\n"
+        "`Docs/Technical/*` хранит стартовый технический контур продуктового репозитория.\n\n"
         "## Состав\n"
         "- `Architecture.md`\n"
         "- `Interfaces.md`\n"
         "- `System_Invariants.md`\n\n"
         "## Границы\n"
-        "- technical-layer не подменяет `Plans/*` и `Docs/User/*`;\n"
+        "- технический слой не подменяет `Plans/*` и `Docs/User/*`;\n"
         "- это только startup subset, а не полная копия technical-layer `BytePress`.\n",
     )
     write(
         target / "Docs/Technical/Architecture.md",
         f"# Architecture\n\n"
-        f"`{ctx.name}` materialized как first-usable replicated product repo с разделением human/user entry, product knowledge, technical startup contour и planning contour.\n",
+        f"`{ctx.name}` создан как first-usable product repo с разделением пользовательского входа, продуктового знания, стартового технического контура и планового контура.\n",
     )
     write(
         target / "Docs/Technical/Interfaces.md",
         "# Interfaces\n\n"
         "## Стартовые интерфейсы\n"
-        "- human entry: `README.md`, `Docs/User/*`, `Setup_Guide.md`;\n"
-        "- agent entry: `AGENTS.md`;\n"
-        "- planning entry: `Plans/*`;\n"
-        "- structural check route: `scripts/dev-test.sh` с `BYTEPRESS_ROOT`;\n"
-        "- integration smoke route: `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n",
+        "- пользовательский вход: `README.md`, `Docs/User/*`, `Setup_Guide.md`;\n"
+        "- агентный вход: `AGENTS.md`;\n"
+        "- плановый вход: `Plans/*`;\n"
+        "- маршрут структурной проверки: `scripts/dev-test.sh` с `BYTEPRESS_ROOT`;\n"
+        "- маршрут integration smoke: `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n",
     )
     write(
         target / "Docs/Technical/System_Invariants.md",
@@ -626,11 +626,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Plans/README.md",
         "# Plans\n\n"
-        "`Plans/*` хранит current stage/task/pass replicated product repo.\n\n"
+        "`Plans/*` хранит текущие этап, задачу и план продуктового репозитория.\n\n"
         "## Состав\n"
-        "- `Roadmap.md` — stages продукта.\n"
-        "- `Backlog.md` — active backlog текущего stage.\n"
-        f"- `Plans/{plan_filename}` — current plan продукта.\n",
+        "- `Roadmap.md` — этапы продукта.\n"
+        "- `Backlog.md` — активный реестр работ текущего этапа.\n"
+        f"- `Plans/{plan_filename}` — текущий план продукта.\n",
     )
     write(
         target / "Plans/Roadmap.md",
@@ -652,7 +652,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Зависимости:\n"
         "Связанные_backlog: BACK-000001\n\n"
         "### Описание\n"
-        "Bootstrap уже materialize first-usable replicated repo, но первый product-start pass остаётся discovery-only, пока пользователь не подтвердил `Docs/Discovery/Interview.md`. Только после этого допустимо открывать предметный pass вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n",
+        "Bootstrap уже создал first-usable product repo, но первый product-start pass остаётся discovery-only, пока пользователь не подтвердил `Docs/Discovery/Interview.md`. Только после этого допустимо открывать предметный pass вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n",
     )
     write(
         target / "Plans/Backlog.md",
@@ -675,7 +675,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Приоритет: Высокий\n"
         "Статус: В_работе\n"
         "Связи: ROAD-000001, PLAN-000001\n"
-        "Источник: Первый current pass replicated product repo\n"
+        "Источник: Первый current pass продуктового репозитория\n"
         f"Дата_создания: {ctx.current_date}\n"
         f"Дата_изменения: {ctx.current_date}\n\n"
         "##### Описание\n"
@@ -693,10 +693,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Название: Product initialization\n"
         "Статус: В_работе\n"
         "Связи: BACK-000001\n"
-        "Источник: First current pass replicated product repo\n"
+        "Источник: Первый current pass продуктового репозитория\n"
         f"Дата_создания: {ctx.current_date}\n"
         f"Дата_изменения: {ctx.current_date}\n"
-        "Основание: Bootstrap materialize first-usable replicated product repo; первый pass должен подтвердить discovery current truth ответами пользователя и не трактовать placeholders как разрешение на implementation.\n"
+        "Основание: Bootstrap создал first-usable product repo; первый pass должен подтвердить discovery current truth ответами пользователя и не трактовать placeholders как разрешение на implementation.\n"
         "Связанные_требования:\n"
         "Связанные_backlog: BACK-000001\n"
         "Связанные_ADR:\n\n"
@@ -728,7 +728,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Adapters/README.md",
         "# Adapters\n\n"
-        "`Adapters/*` хранит минимальный модельный contour replicated product repo.\n\n"
+        "`Adapters/*` хранит минимальный модельный контур продуктового репозитория.\n\n"
         "## Состав\n"
         "- `Policy.md`\n"
         "- `Registry.md`\n"
@@ -737,7 +737,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Adapters/Policy.md",
         "# Policy\n\n"
-        "1. Канонический исполнитель replicated product repo — `Codex`.\n"
+        "1. Канонический исполнитель продуктового репозитория — `Codex`.\n"
         "2. Резервные адаптеры не становятся активным multi-model contour автоматически.\n"
         "3. Адаптеры не подменяют planning, technical или user contracts продукта.\n",
     )
@@ -755,11 +755,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Название: Codex\n"
         "Статус: Активен\n"
         "Связи: PROF-000001\n"
-        "Источник: Replicated product repo bootstrap\n"
+        "Источник: Bootstrap продуктового репозитория\n"
         f"Дата_создания: {ctx.current_date}\n"
         f"Дата_изменения: {ctx.current_date}\n\n"
         "### Описание\n"
-        "Канонический исполнитель replicated product repo.\n",
+        "Канонический исполнитель продуктового репозитория.\n",
     )
     for adapter in ["Codex", "Claude", "Gemini", "Local"]:
         write(target / f"Adapters/{adapter}/README.md", f"# {adapter}\n\nКаркас адаптера {adapter}.\n")
@@ -767,7 +767,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "scripts/README.md",
         "# scripts\n\n"
-        "`scripts/*` — project entry scripts replicated product repo.\n\n"
+        "`scripts/*` — проектные точки входа продуктового репозитория.\n\n"
         "- `dev-up.sh` — placeholder старта локального product contour.\n"
         "- `dev-down.sh` — placeholder остановки локального contour.\n"
         "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT` с автоопределением режима fresh/developed product repo.\n"
