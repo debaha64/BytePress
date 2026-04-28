@@ -1,84 +1,93 @@
 # Product Bootstrap Domain Matrix
 
 ## Назначение
-`Docs/Technical/Product_Bootstrap_Domain_Matrix.md` фиксирует каноническую классификацию всех top-level доменов `BytePress` для product bootstrap.
+`Docs/Technical/Product_Bootstrap_Domain_Matrix.md` фиксирует целевую матрицу профильных пакетов каркаса продукта.
 
 Этот document отвечает на вопросы:
-- какие top-level домены materialize по умолчанию в generated product repo;
-- какие домены не materialize в bootstrap default и могут появиться только отдельным product-pass;
-- какие домены остаются только в самом `BytePress`;
-- есть ли в текущем каноне optional bootstrap profile.
+- какие пакеты каркаса собирает продуктовый профиль;
+- какие домены создаваемого продукта являются базовыми для всех профилей;
+- какие пакеты включаются только по profile decision;
+- какие домены прежней модели не должны materialize без реального механизма;
+- какие части текущего `BytePress` остаются фабричными и не копируются как operational clone.
 
-## Категории матрицы
-- `Default` — materialize текущим bootstrap contract как часть first-usable generated product repo.
-- `Optional` — materialize только отдельным явно поддержанным bootstrap profile. В текущем каноне таких доменов нет.
-- `Later product-pass` — не materialize bootstrap'ом; могут появиться в product repo только отдельным утверждённым product-pass.
-- `BytePress-only` — не materialize в product repo текущим каноном и не считаются частью раннего product-side replication contour.
+## Статус реализации
+Матрица ниже является целевым договором после решения `ADR-000022`.
 
-## Каркас репозитория по матрице
-Термин `Каркас репозитория` в bootstrap scope означает именно bootstrap-default из этой матрицы:
-- `README.md`
-- `AGENTS.md`
-- `Setup_Guide.md`
-- `.gitignore`
-- `scripts/*`
+Текущие `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` ещё materialize и проверяют прежний bootstrap baseline. До отдельного tool-migration pass этот файл задаёт направление рефакторинга, а не утверждает, что текущий bootstrap уже реализует профильную фабрику.
 
-и default-домены:
-- `Docs/*` только в минимальном startup subset;
-- `Plans/*`;
-- `Logs/*`;
-- `Runtime/*`;
-- `Profiles/Product.md`;
-- `Adapters/*`.
+## Категории пакетов
+- `Core` — materialize каждым product profile.
+- `Profile` — materialize только если выбранный product profile включает пакет.
+- `Factory-only` — остаётся в `BytePress` как фабричный слой и не копируется в продукт.
+- `Retired-before-mechanism` — не materialize и подлежит удалению или переносу до появления реального механизма.
 
-Это не полная копия доменной структуры `BytePress`, а только обязательный bootstrap outcome раннего product-start.
+## Принцип профильного каркаса
+Каркас продукта зависит от профиля продукта. Профиль выбирает состав пакетов, но каждый созданный продукт должен быть самодостаточным после создания: локальные `Tools/*` продукта выполняют проверки и служебные сценарии без зависимости от `BYTEPRESS_ROOT`.
 
-## Каноническая матрица
-| Top-level domain `BytePress` | Канон | Product-side materialization | Причина |
-| --- | --- | --- | --- |
-| `Docs/` | `Default` | materialize только минимальный startup subset: `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, ограниченный `Docs/Technical/*`, `Docs/Terms/Base_Terms.md` и `Docs/Terms/README.md` | generated repo должен иметь маршрут текущей истины, human entry, product-заготовки, минимальный technical contour и стартовый пакет терминов, но не полную копию knowledge-layer `BytePress` |
-| `Plans/` | `Default` | materialize initial roadmap/backlog/current plan продукта | ранний product-start gate обязан иметь repo-native planning owner |
-| `Logs/` | `Default` | materialize singleton fact logs продукта | pass-close contour не должен зависеть только от памяти или runtime |
-| `Runtime/` | `Default` | materialize temporary execution carrier продукта | нужен controlled runtime-local contour и cleanup route, но не новый source-of-truth |
-| `Profiles/` | `Default` | materialize только `Profiles/Product.md` | product repo должен иметь собственный product profile, а brand profiles остаются в `BytePress` |
-| `Adapters/` | `Default` | materialize minimal adapter policy/registry contour продукта | product repo получает controlled execution contour без переноса `MCP/*` |
-| `Pipeline/` | `Later product-pass` | не materialize bootstrap'ом | раннему product-start gate достаточно `Plans/*`; repo-native process-canon требует отдельного product decision |
-| `Rules/` | `Later product-pass` | не materialize bootstrap'ом | отдельный product rule-layer допустим только после явного решения, а не как неявная копия `BytePress` |
-| `Standards/` | `Later product-pass` | не materialize bootstrap'ом | product-side normative layer вводится только отдельным governance pass |
-| `Schemas/` | `Later product-pass` | не materialize bootstrap'ом | ранний product-start не требует repo-native schema layer |
-| `Templates/` | `Later product-pass` | не materialize bootstrap'ом | product-side template layer нужен только после отдельного решения о serial/hybrid artifacts продукта |
-| `Roles/` | `Later product-pass` | не materialize bootstrap'ом | раннему старту достаточно agent/user entry, без local role catalog |
-| `Skills/` | `Later product-pass` | не materialize bootstrap'ом | product-side procedural library не должна materialize по умолчанию |
-| `Tools/` | `BytePress-only` | не materialize в product repo; generated repo использует только `scripts/*` и `BYTEPRESS_ROOT` handoff | canonical tool ownership остаётся в `BytePress`, чтобы bootstrap/lint/smoke не расходились между двумя copies |
-| `Memory/` | `BytePress-only` | не materialize | future memory contour не нужен раннему product-start и не должен создавать ложное впечатление active storage layer |
-| `MCP/` | `BytePress-only` | не materialize | connector policy и registry остаются в `BytePress`; generated repo получает только controlled handoff через `scripts/*` |
+`BytePress` остаётся фабрикой, которая описывает пакеты, генерирует начальный продукт и проверяет миграционный contract самой фабрики. Продукт после создания не должен быть operational child процесса `BytePress`.
 
-## Optional bootstrap profile
-Текущий канон не вводит ни одного `Optional` top-level domain.
+## Целевая матрица пакетов продукта
+| Package | Категория | Product-side materialization | Обязательные артефакты | Причина |
+| --- | --- | --- | --- | --- |
+| Repository entry | `Core` | root entry files | `README.md`, `AGENTS.md`, `Setup_Guide.md`, `.gitignore` | продукт должен иметь human/agent entry без чтения фабрики |
+| Discovery | `Core` | минимальный current-truth route | `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` | первый product-start остаётся аналитическим до подтверждения текущей истины |
+| Product knowledge | `Core` | стартовые product docs | `Docs/Product/README.md`, `JTBD.md`, `PRD.md`, `Delivery.md` | продукт получает место для собственной продуктовой истины |
+| User docs | `Core` | краткий пользовательский контур | `Docs/User/README.md`, `First_Start.md`, `Operating_Mode.md`, `Pass_Request.md`, `Usage_Scenarios.md` | человек должен понимать запуск и формат pass request внутри продукта |
+| Technical docs | `Core` | сокращённый technical subset продукта | `Docs/Technical/README.md`, `Architecture.md`, `Interfaces.md`, `System_Invariants.md` | продукту нужен локальный минимальный technical contract без полного `BytePress` core |
+| Terms | `Core` | стартовый словарь продукта | `Docs/Terms/README.md`, `Base_Terms.md` | продукт получает минимальный язык, но не копию полного словаря фабрики |
+| Plans | `Core` | локальный planning contour | `Plans/README.md`, `Roadmap.md`, `Backlog.md`, initial plan | продукт сам владеет stage/task/pass после создания |
+| Logs | `Core` | локальные fact logs | `Logs/README.md`, `ChangeLog.md`, `ADRlog.md`, `QualityLog.md`, `ReleaseLog.md`, `SupportLog.md` | продукт фиксирует свои факты независимо от `BytePress` |
+| Pipeline | `Core` | лёгкий локальный process contour | `Pipeline/README.md`, `Phases.md`, `Workflows.md`, `Gates.md` | каждый продукт получает минимальный управляемый процесс без полного pipeline BytePress |
+| Tools | `Core` | локальные product tools | `Tools/README.md`, `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py` или profile-equivalent scripts | проверки и служебные маршруты должны быть независимыми после создания |
+| Rules | `Profile` | только проектно-специфичные обязательные правила | `Rules/README.md` и выбранные `RULE-*` | правила нужны только там, где профиль вводит реальные обязательства продукта |
+| Templates | `Profile` | только шаблоны артефактов, materialized в каркасе | `Templates/README.md` и template files для включённых артефактов | продукт не получает шаблоны сущностей, которых у него нет |
+| Schemas | `Profile` | только схемы проверяемых артефактов | `Schemas/README.md` и schema files для реально проверяемых артефактов | schema-layer не должен быть декоративным |
+| Standards | `Factory-only` | не materialize как отдельный product domain | нет | обязательные нормы переходят в `Rules/*`; остальное удаляется или остаётся историей решения |
+| Skills | `Factory-only` | не materialize как отдельный product domain | нет | процедуры переносятся в `Pipeline/*` как workflows |
+| Profiles | `Factory-only` | не materialize как отдельный domain продукта | profile data в generated config или `README` пакетов | профиль является входом фабрики, а не отдельным operational layer продукта |
+| Adapters | `Retired-before-mechanism` | не materialize | нет | домен удаляется до появления реального adapter mechanism |
+| Memory | `Retired-before-mechanism` | не materialize | нет | future memory contour не должен выглядеть активным storage layer |
+| MCP | `Retired-before-mechanism` | не materialize | нет | connector domain появится только вместе с реальным controlled mechanism |
+| Runtime | `Retired-before-mechanism` | не materialize как домен | временные файлы допустимы только в tool-local ignored paths | runtime-domain удаляется до появления обоснованного execution mechanism |
+| Roles | `Retired-before-mechanism` | не materialize | нет | role catalog удаляется до реального role execution mechanism |
 
-Это означает:
-- current `bp_bootstrap.py` не materialize отдельный optional profile;
-- если product repo когда-либо потребуется optional governance pack, такой профиль должен быть принят отдельным pass и синхронизирован между contracts, bootstrap и lint;
-- отсутствие current optional profile является осознанным ограничением, а не пропуском.
+## Профильные пакеты
+Минимальный product profile должен выбирать только `Core` packages.
+
+Расширенный product profile может добавить:
+- `Rules`, если у продукта есть собственные обязательные правила;
+- `Templates`, если профиль materialize соответствующие артефакты;
+- `Schemas`, если локальный `Tools/*` реально проверяет эти артефакты.
+
+Профиль не может включить `Adapters`, `Memory`, `MCP`, `Runtime` или `Roles` как placeholder. Эти домены возвращаются только после отдельного ADR, владельца механизма, tool support и проверочного договора.
+
+## Модель независимого product Tools
+Целевой продукт получает локальный `Tools/*`, а прежние `scripts/*` переносятся в этот домен или становятся тонкими shell aliases к `Tools/*` внутри продукта.
+
+Целевой локальный `Tools/*` продукта обязан:
+- запускать structural check продукта без `BYTEPRESS_ROOT`;
+- проверять только те schemas и packages, которые есть в профиле;
+- хранить deterministic smoke/check reports только в ignored tool-output path;
+- не обращаться к `BytePress` после bootstrap как к runtime dependency.
 
 ## Early product-start gate и матрица
-Default matrix materialize только тот subset, который нужен для controlled first product-start pass.
+Переход к профильной фабрике не отменяет first-start gate:
+- `Docs/Discovery/Interview.md` стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;
+- до явных ответов пользователя продукт остаётся только в аналитическом контуре;
+- первое записываемое действие требует task-ветку;
+- локальные `Tools/*` проверяют этот gate внутри продукта.
 
-Это не даёт права считать generated repo готовым к предметной реализации сразу после bootstrap:
-- bootstrap-created `Docs/Discovery/Interview.md` стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;
-- пока пользователь не дал явные ответы и текущая истина не подтверждена, агент остаётся только в аналитическом контуре;
-- до подтверждения текущей истины допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и reset/cleanup route failed product-start;
-- наличие bootstrap-created `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и `scripts/*` не считается разрешением на их предметное изменение в первом pass.
-
-## Failed product-start reset route
-Канонический reset/cleanup route после failed product-start:
-1. запустить `scripts/reset-product-start.sh` в generated repo, чтобы убрать runtime-local smoke artifact и получить явный drift report;
-2. если drift ограничен `Docs/Discovery/*`, `Plans/*` и `Logs/*`, решить отдельно, какие текущие current-truth/planning/log edits сохранить;
-3. если появились tracked changes вне раннего аналитического контура, canonical cleanup route — отбросить damaged repo и materialize fresh target новым bootstrap run, а не чинить out-of-gate drift вручную как новый baseline.
+## Миграционная граница
+В этом pass домены не удаляются и инструменты не переписываются. Целевая матрица требует отдельного refactoring sequence:
+1. обновить `bp_bootstrap.py` под profile packages и локальный product `Tools/*`;
+2. обновить `bp_lint.py`, чтобы проверять новую модель продукта и сохранить проверку текущего BytePress до удаления доменов;
+3. перенести процедуры `Skills/*` в `Pipeline/*`;
+4. перенести обязательные нормы `Standards/*` в сокращённые `Rules/*`;
+5. удалить преждевременные домены только после того, как checks перестанут требовать их наличие.
 
 ## Граница документа
 `Product_Bootstrap_Domain_Matrix.md`:
 - не подменяет `Product_Bootstrap_Contract.md` как owner bootstrap obligations;
 - не подменяет `Product_Bootstrap_Validation.md` как owner acceptance criteria;
-- не подменяет `Artifact_Lifecycle.md` как owner sync-loop и lifecycle policy;
-- фиксирует только top-level replication canon и ранний bootstrap perimeter.
+- не подменяет `Docs/Technical/Domain_Model_Migration_Plan.md` как порядок refactoring;
+- фиксирует целевую пакетную модель продукта и migration guardrails.

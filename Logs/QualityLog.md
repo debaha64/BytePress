@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000086
+ID: QL-000086
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000026` / `BACK-000091` / `PLAN-000079` открыты и закрыты в одном архитектурном pass; `ADR-000022`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Domain_Model_Migration_Plan.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Interfaces.md`, `Docs/Technical/System_Invariants.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Rules/*`, `Standards/README.md`, `Pipeline/README.md`, `Tools/README.md`, `Plans/*` и `Logs/*` синхронизированы вокруг профильной фабрики самодостаточных продуктовых каркасов; `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract intentionally unaffected`.
+Результат: целевая доменная модель и migration plan зафиксированы без массового удаления файлов, без изменения `Minesweeper`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py`; known implementation gap перенесён в следующий tool-migration pass.
+
+---
+
 ## QL-000085
 ID: QL-000085
 Дата: 2026-04-27

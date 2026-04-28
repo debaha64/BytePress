@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000091 — Profiled product factory target domain model documented
 - CHG-000090 — Russian lint markers accepted in active and generated layers
 - CHG-000089 — Domain map and ADR decision contracts formalized
 - CHG-000088 — Language and domain maps cleaned up
@@ -91,6 +92,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000091 — Profiled product factory target domain model documented
+ID: CHG-000091
+Дата: 2026-04-28
+Тип_изменения: Документация
+Источник: PLAN-000079
+Связи: ROAD-000026, BACK-000091, ADR-000022, QL-000086
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+Зафиксирована целевая архитектурная модель `BytePress` как профильной фабрики самодостаточных продуктовых каркасов. `Product_Bootstrap_Domain_Matrix.md` переписан как матрица profile packages; добавлен `Domain_Model_Migration_Plan.md`; добавлено правило `Premature_Domains_Are_Removed`; синхронизированы architecture/model/interfaces/system invariants, bootstrap contract, technical/rules/standards/pipeline/tools maps и планово-журнальный контур.
+
+### Эффект
+Будущая миграция получила безопасный порядок: сначала profile packages, local product `Tools/*`, transitional checks и перенос procedures/norms, затем удаление retired domains. В этом pass не удалялись домены, не менялись `Minesweeper`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py`.
 
 ---
 
