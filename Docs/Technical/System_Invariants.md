@@ -87,16 +87,18 @@
 
 ### INV-004 — Ownership state cannot move to runtime or logs
 Свойство:
-- `Runtime/*` хранит только временный execution context, а `Logs/*` хранят только подтверждённые факты.
+- legacy `Runtime/*` не хранит source of truth, а `Logs/*` хранят только подтверждённые факты. В целевой модели временные execution outputs принадлежат ignored tool-output paths, а не отдельному top-level domain.
 
 Поддерживающие контуры и документы:
 - `Docs/Technical/Model.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
 - `Rules/Runtime_Is_Temporary.md`
 - `Rules/Logs_Record_Facts_Only.md`
+- `Rules/Premature_Domains_Are_Removed.md`
 
 Нарушением считается:
 - чтение runtime как канонического плана;
+- создание нового top-level runtime-domain в продукте без реального execution mechanism;
 - хранение будущего scope в журнале;
 - отсутствие переноса подтверждённого результата из runtime в logs, когда pass реально изменил систему.
 
@@ -210,6 +212,23 @@
 
 Последствие нарушения:
 - человеко-читаемый и инструментальный контуры расходятся.
+
+### INV-011 — Products become self-contained after bootstrap
+Свойство:
+- целевой product repo после создания имеет local `Tools/*` и не зависит от `BytePress` как runtime/tool dependency для обычной структурной проверки.
+
+Поддерживающие контуры и документы:
+- `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`
+- `Docs/Technical/Product_Bootstrap_Contract.md`
+- `Docs/Technical/Domain_Model_Migration_Plan.md`
+- `Logs/ADRlog.md` / `ADR-000022`
+
+Нарушением считается:
+- generated product repo, которому нужен `BYTEPRESS_ROOT` для обычного `dev-test` после завершения profile bootstrap migration;
+- копирование `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` или `Standards/*` в продукт как placeholder domains.
+
+Последствие нарушения:
+- продукт остаётся operational child фабрики и не является самодостаточным каркасом.
 
 ## Недопустимые нарушения по контурам
 ### К `Plans/*`

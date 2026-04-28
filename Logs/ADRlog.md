@@ -1,6 +1,7 @@
 # ADRlog
 
 ## Индекс
+- ADR-000022 — Profiled self-contained product skeleton factory adopted
 - ADR-000021 — Russian lint markers accepted without weakening product gates
 - ADR-000020 — Domain maps and created product service-layer update route formalized
 - ADR-000019 — Fresh and developed product repository checks separated
@@ -22,6 +23,27 @@
 - ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-000002 — Развести знание, оперативную среду, планы и журналы
 - ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000022 — Profiled self-contained product skeleton factory adopted
+ID: ADR-000022
+Дата: 2026-04-28
+Статус: Принято
+Связи: ROAD-000026, BACK-000091, PLAN-000079, CHG-000091
+Утверждено: Человек
+Источник: Решение владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Контекст
+Широкое архитектурное ревью показало, что доменная модель `BytePress` разрослась за счёт placeholder domains и преждевременного product-side replication contour. Прежняя модель делала создаваемый продукт зависимым от `BytePress` через generated `scripts/*` и `BYTEPRESS_ROOT`, materialize `Adapters/*` и `Runtime/*` без реального механизма и оставляла `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Memory/*` и `MCP/*` как потенциальные источники раздувания.
+
+### Решение
+Принять целевую модель `BytePress` как профильной фабрики самодостаточных продуктовых каркасов. Состав создаваемого продукта определяется product profile. Каждый продукт получает lightweight local `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` только для materialized artifacts и `Schemas/*` только для реально проверяемых artifacts. Generated `scripts/*` должны быть перенесены в product-local `Tools/*` или стать thin aliases. `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*` и `Roles/*` удаляются до появления реального mechanism contract. `Skills/*` переносится в `Pipeline/*` как procedures/workflows. `Standards/*` сворачивается: обязательные нормы переносятся в `Rules/*`, остальное удаляется. `Rules/*` сокращается до проектно-специфичных обязательных правил. `Docs/Technical/*` сокращается и объединяет повторяющиеся verification/validation contracts отдельными passes.
+
+### Последствия
+`Product_Bootstrap_Domain_Matrix.md` становится матрицей profile packages, а не списком копируемых top-level domains. Текущие `bp_bootstrap.py` и `bp_lint.py` не меняются в этом pass и временно остаются реализацией прежнего baseline; это зафиксированный implementation gap до tool-migration pass. Массовое удаление доменов запрещено до обновления contracts, checks и replacement routes. Будущие passes должны сначала реализовать local product `Tools/*`, transitional lint modes и profile package checks, затем переносить procedures/norms и только после этого удалять retired domains.
 
 ---
 
