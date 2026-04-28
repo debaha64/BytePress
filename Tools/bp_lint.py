@@ -129,6 +129,15 @@ def check_template_artifact_id(path: Path) -> str | None:
     return None
 
 
+def extract_template_artifact_id(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    match = TEMPLATE_ID_LINE.search(path.read_text(encoding="utf-8"))
+    if not match:
+        return None
+    return match.group(0).removeprefix("<!-- ID:").removesuffix(" -->").strip()
+
+
 def check_schema_artifact_id(path: Path) -> str | None:
     if not path.exists():
         return None
@@ -407,6 +416,7 @@ def check_product_repo(root: Path, mode: str) -> int:
         "Docs/User/Pass_Request.md",
         "Docs/User/Usage_Scenarios.md",
         "Docs/Product/README.md",
+        "Docs/Product/Product_Passport.md",
         "Docs/Product/JTBD.md",
         "Docs/Product/PRD.md",
         "Docs/Product/Delivery.md",
@@ -449,6 +459,7 @@ def check_product_repo(root: Path, mode: str) -> int:
     ]
     forbidden_dirs = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
     missing: list[str] = []
+    errors: list[str] = []
     for item in required:
         if not (root / item).exists():
             missing.append(item)
@@ -463,7 +474,6 @@ def check_product_repo(root: Path, mode: str) -> int:
     if plan_path is None:
         missing.append("Plans/<PRODUCT_CODE>-000001-product-initialization.md")
 
-    errors: list[str] = []
     detected_mode = detect_product_lint_mode(root)
     if mode == "auto":
         mode = detected_mode
@@ -535,6 +545,20 @@ def check_product_repo(root: Path, mode: str) -> int:
     for path in sorted((root / "Schemas").glob("*.json")):
         if check_schema_artifact_id(path):
             errors.append(f"{path.relative_to(root)}: missing schema ID")
+    template_ids: dict[str, Path] = {}
+    for path in sorted((root / "Templates").glob("*.md")):
+        if path.name == "README.md":
+            continue
+        template_id = extract_template_artifact_id(path)
+        if template_id is None:
+            errors.append(f"{path.relative_to(root)}: missing template artifact ID")
+            continue
+        if template_id in template_ids:
+            errors.append(
+                f"{path.relative_to(root)}: duplicate template artifact ID `{template_id}` also used by {template_ids[template_id].relative_to(root)}"
+            )
+        else:
+            template_ids[template_id] = path
 
     if missing or errors:
         if missing:

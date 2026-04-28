@@ -43,6 +43,7 @@ BASE_PATHS = [
     "Docs/User/Pass_Request.md",
     "Docs/User/Usage_Scenarios.md",
     "Docs/Product/README.md",
+    "Docs/Product/Product_Passport.md",
     "Docs/Product/JTBD.md",
     "Docs/Product/PRD.md",
     "Docs/Product/Delivery.md",
@@ -91,6 +92,7 @@ PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено поль
 STATUS = re.compile(r"^Статус:\s+(\S+)$", re.MULTILINE)
 PLAN_ID = re.compile(r"^ID:\s+PLAN-([0-9]{6})$", re.MULTILINE)
 SCHEMA_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
+TEMPLATE_ID = re.compile(r"^<!-- ID:\s+(TPL-[0-9]{6}) -->$", re.MULTILINE)
 
 
 def text(path: Path) -> str:
@@ -154,6 +156,19 @@ def check(root: Path, mode: str) -> list[str]:
     for path in sorted((root / "Schemas").glob("*.json")):
         if not contains(path, SCHEMA_ID):
             errors.append(f"{path.relative_to(root)}: missing schema ID")
+    template_ids: dict[str, Path] = {}
+    for path in sorted((root / "Templates").glob("*.md")):
+        if path.name == "README.md":
+            continue
+        match = TEMPLATE_ID.search(text(path))
+        if not match:
+            errors.append(f"{path.relative_to(root)}: missing template ID")
+            continue
+        template_id = match.group(1)
+        if template_id in template_ids:
+            errors.append(f"{path.relative_to(root)}: duplicate template ID {template_id}")
+        else:
+            template_ids[template_id] = path
     if "Tools/.reports/" not in text(root / ".gitignore"):
         errors.append(".gitignore: missing Tools/.reports/ ignore")
 
@@ -685,9 +700,30 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Назначение\n"
         "Слой `Docs/Product/` описывает продукт в прикладных терминах первой версии.\n\n"
         "## Состав слоя\n"
+        "- `Product_Passport.md` — паспорт созданного каркаса без домена `Profiles/*`.\n"
         "- `JTBD.md` — пользовательские задачи и ценный результат.\n"
         "- `PRD.md` — продуктовые требования первой версии.\n"
         "- `Delivery.md` — краткая модель поставки продукта.\n",
+    )
+    write(
+        target / "Docs/Product/Product_Passport.md",
+        f"# Product Passport — {ctx.name}\n\n"
+        "## Назначение\n\n"
+        "Паспорт фиксирует минимальные параметры созданного каркаса без возвращения домена `Profiles/*` в продукт.\n\n"
+        "---\n\n"
+        f"Название: {ctx.name}\n"
+        f"Код_продукта: {ctx.product_code}\n"
+        f"Брендовый_профиль: {ctx.brand_profile.name}\n"
+        f"Язык_взаимодействия: {ctx.brand_profile.interaction_language}\n"
+        "Пакеты_каркаса:\n"
+        "- Docs\n"
+        "- Plans\n"
+        "- Logs\n"
+        "- Pipeline\n"
+        "- Tools\n"
+        "- Templates\n"
+        "- Schemas\n"
+        "- scripts compatibility wrappers\n",
     )
     write(
         target / "Docs/Product/JTBD.md",
@@ -881,16 +917,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "# Templates\n\n"
         "`Templates/*` хранит только шаблоны артефактов, которые materialize в каркасе продукта.\n",
     )
-    for name, title in [
-        ("Interview.md", "Interview"),
-        ("Roadmap.md", "Roadmap"),
-        ("Backlog.md", "Backlog"),
-        ("Plan.md", "Plan"),
-        ("ChangeLog.md", "ChangeLog"),
-        ("ADRlog.md", "ADRlog"),
-        ("QualityLog.md", "QualityLog"),
+    for name, template_id, title in [
+        ("Interview.md", "TPL-000001", "Interview"),
+        ("Roadmap.md", "TPL-000002", "Roadmap"),
+        ("Backlog.md", "TPL-000003", "Backlog"),
+        ("Plan.md", "TPL-000004", "Plan"),
+        ("ChangeLog.md", "TPL-000005", "ChangeLog"),
+        ("ADRlog.md", "TPL-000006", "ADRlog"),
+        ("QualityLog.md", "TPL-000007", "QualityLog"),
     ]:
-        write(target / "Templates" / name, f"# {title}\n\n<!-- ID: TPL-000001 -->\n\nШаблон артефакта `{title}` продуктового каркаса.\n")
+        write(target / "Templates" / name, f"# {title}\n\n<!-- ID: {template_id} -->\n\nШаблон артефакта `{title}` продуктового каркаса.\n")
 
     write(
         target / "Schemas/README.md",

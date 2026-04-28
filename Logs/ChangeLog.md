@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000093 — Product skeleton terms and lint corrections synchronized
 - CHG-000092 — Product bootstrap creates local tools skeleton
 - CHG-000091 — Profiled product factory target domain model documented
 - CHG-000090 — Russian lint markers accepted in active and generated layers
@@ -93,6 +94,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000093 — Product skeleton terms and lint corrections synchronized
+ID: CHG-000093
+Дата: 2026-04-28
+Тип_изменения: Инструмент
+Источник: PLAN-000081
+Связи: ROAD-000028, BACK-000093, QL-000088
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+Термины `Каркас репозитория` и `Профиль продукта`, active `Docs/Discovery/Interview.md`, bootstrap contracts и generated product artifacts синхронизированы с новым product skeleton. `Docs/Product/Product_Passport.md` выбран как минимальное место паспорта созданного каркаса без возврата домена `Profiles/*` в продукт. `bp_lint.py` исправлен так, чтобы forbidden product domains давали нормальную ошибку проверки, а generated `Templates/*` получают уникальные `TPL-*` IDs.
+
+### Эффект
+Новый product skeleton больше не описывается через `Runtime/*`, `Profiles/Product.md` и `Adapters/*`; negative product lint проверка для запрещённого домена работает без traceback. `Skills/*` не переносились, legacy domains `BytePress` не удалялись, `Minesweeper` не изменялся.
 
 ---
 
