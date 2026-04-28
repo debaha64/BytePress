@@ -23,15 +23,19 @@
 - `--repo .` — структурная проверка самого `BytePress`.
 - `--mode product-fresh` — строгая проверка состояния сразу после `bp_bootstrap.py`.
 - `--mode product-developed` — проверка продукта после подтверждения текущей истины и закрытия первого прохода.
-- `--mode auto` — режим generated `scripts/dev-test.sh`; выбор fresh/developed идёт по статусу текущей истины.
+- `--mode auto` — режим проверки generated product repo; выбор fresh/developed идёт по статусу текущей истины.
 
 `bp_lint.py` остаётся структурной проверкой. Он подсвечивает противоречия жизненного цикла, но не оценивает предметное качество продукта.
 
 Проверочные маркеры в документах могут быть русскими. `bp_lint.py` принимает русские эквиваленты для стартового отчёта, аналитического гейта, текущей истины, документов-владельцев и записываемых действий, сохраняя прежние структурные условия.
 
+## Product-local tools
+`bp_bootstrap.py` materialize generated product repo с локальным `Tools/*`:
+- `Tools/product_check.py` — основной structural check продукта без `BYTEPRESS_ROOT`;
+- `Tools/product_bootstrap_smoke.py` — локальный smoke route с отчётом в `Tools/.reports/`;
+- generated `scripts/*` остаются только transition aliases к локальному `Tools/*`.
+
 ## Будущий периметр
-- `bp_bootstrap.py` должен перейти на profile packages и local product `Tools/*` отдельным migration pass.
-- Generated `scripts/*` должны быть перенесены в product-local `Tools/*`; shell scripts допустимы только как aliases внутри продукта.
 - `bp_check` может стать единым входом автоматических проверок только после отдельного договора.
 - `bp_verify` может собирать пакет доказательств только после отдельного договора.
 - tooling для validation допустим только как поддержка упаковки и связей, без автоматического verdict.

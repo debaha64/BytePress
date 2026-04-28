@@ -85,12 +85,12 @@ Bootstrap note:
 
 Роль:
 - держать только временный рабочий контекст во время активного pass.
-- для generated product repo early product-start contour сюда же относится runtime-local artifact `Runtime/Integration_Smoke_Report.json`, если он выпускается integration smoke route.
+- для generated product repo early product-start contour сюда же относится local tool report `Tools/.reports/product_bootstrap_smoke.json`, если он выпускается product bootstrap smoke route.
 - для generated product repo failed-start cleanup route может удалять runtime-local artifacts, но не превращается в silent restore tracked baseline.
 
 Источник истины:
 - runtime не является source-of-truth слоем; это временный execution context.
-- `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit по умолчанию и не становится canonical evidence сам по себе; если отдельный pass явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
+- `Tools/.reports/product_bootstrap_smoke.json` не входит в bootstrap baseline commit по умолчанию и не становится canonical evidence сам по себе; если отдельный pass явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
 
 ### Fact records
 - `Logs/ADRlog.md`
@@ -214,11 +214,11 @@ Bootstrap note:
 ### Runtime -> Logs
 Допустимо:
 - подтверждённый результат исполнения переносится из runtime-context в `Logs/*` как факт.
-- runtime-local `Runtime/Integration_Smoke_Report.json` может использоваться как локальный carrier smoke verdict до его явной фиксации в pass report или `Logs/*`.
+- local `Tools/.reports/product_bootstrap_smoke.json` может использоваться как локальный carrier smoke verdict до его явной фиксации в pass report или `Logs/*`.
 
 Недопустимо:
 - runtime считается самодостаточным фактом без log fixation.
-- baseline generated product repo коммитится с уже materialized `Runtime/Integration_Smoke_Report.json` без отдельного evidence-preservation решения.
+- baseline generated product repo коммитится с уже materialized `Tools/.reports/product_bootstrap_smoke.json` без отдельного evidence-preservation решения.
 - failed early product-start silently salvage'ится как новый baseline при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`.
 
 ### Archive -> Active

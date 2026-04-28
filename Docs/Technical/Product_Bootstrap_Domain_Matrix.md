@@ -11,9 +11,9 @@
 - какие части текущего `BytePress` остаются фабричными и не копируются как operational clone.
 
 ## Статус реализации
-Матрица ниже является целевым договором после решения `ADR-000022`.
+Матрица ниже является целевым договором после решения `ADR-000022` и переходным implemented baseline после `PLAN-000080`.
 
-Текущие `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` ещё materialize и проверяют прежний bootstrap baseline. До отдельного tool-migration pass этот файл задаёт направление рефакторинга, а не утверждает, что текущий bootstrap уже реализует профильную фабрику.
+Текущие `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` уже materialize и проверяют `Core` package subset: local product `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`. Optional `Profile` packages beyond this subset требуют отдельных passes.
 
 ## Категории пакетов
 - `Core` — materialize каждым product profile.

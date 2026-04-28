@@ -38,7 +38,7 @@ PRODUCT_PROFILE_TYPE = re.compile(r"^Тип_профиля:\s+product$", re.MULT
 PRODUCT_PROFILE_ID = re.compile(r"^ID:\s+PROF-000001$", re.MULTILINE)
 PRODUCT_BASE_TERMS_SECTION = re.compile(r"^## Стартовый пакет терминов$", re.MULTILINE)
 PRODUCT_GITIGNORE_CODEX = re.compile(r"^\.codex/?$", re.MULTILINE)
-PRODUCT_GITIGNORE_SMOKE_REPORT = re.compile(r"^Runtime/Integration_Smoke_Report\.json$", re.MULTILINE)
+PRODUCT_GITIGNORE_TOOL_REPORTS = re.compile(r"^Tools/\.reports/$", re.MULTILINE)
 PRODUCT_ROADMAP_IN_PROGRESS = re.compile(r"## ROAD-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_BACKLOG_IN_PROGRESS = re.compile(r"### Активные[\s\S]*?#### BACK-000001[\s\S]*?Статус:\s+В_работе")
 PRODUCT_PLAN_IN_PROGRESS = re.compile(r"^Статус:\s+В_работе$", re.MULTILINE)
@@ -49,7 +49,7 @@ PRODUCT_INTERVIEW_PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтвер�
 PRODUCT_INTERVIEW_GATE = re.compile(r"не разрешает изменения вне `Docs/Discovery/\*`, `Plans/\*` и `Logs/\*`", re.IGNORECASE)
 PRODUCT_START_GATE_SECTION = re.compile(r"^## (First product-start gate|Первый product-start gate|Первый стартовый гейт продукта)$", re.MULTILINE)
 PRODUCT_START_GATE_DISCOVERY_ONLY = re.compile(r"discovery-only|только аналитическ|аналитическ(ий|ом) контур", re.IGNORECASE)
-PRODUCT_START_GATE_RESET = re.compile(r"scripts/reset-product-start\.sh", re.IGNORECASE)
+PRODUCT_START_GATE_TOOLS = re.compile(r"Tools/product_check\.py|Tools/\*", re.IGNORECASE)
 PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена", re.IGNORECASE)
 PRODUCT_START_GATE_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
 PRODUCT_START_GATE_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action|записываем\S* (действи\S*|изменени\S*)|правки запрещены|первый проход с правками", re.IGNORECASE)
@@ -241,7 +241,7 @@ def has_product_start_gate(path: Path) -> list[str]:
     required = [
         PRODUCT_START_GATE_SECTION,
         PRODUCT_START_GATE_DISCOVERY_ONLY,
-        PRODUCT_START_GATE_RESET,
+        PRODUCT_START_GATE_TOOLS,
         PRODUCT_START_GATE_UNCONFIRMED,
         PRODUCT_START_GATE_TASK_BRANCH,
         PRODUCT_START_GATE_WRITABLE,
@@ -376,7 +376,7 @@ def check_profile_reference_lists(path: Path) -> list[str]:
 
 
 def is_bytepress_repo(root: Path) -> bool:
-    return (root / "Tools").exists() and (root / "Schemas").exists() and (root / "Templates").exists()
+    return (root / "Tools" / "bp_lint.py").exists() and (root / "Tools" / "bp_bootstrap.py").exists()
 
 
 def get_git_branch(root: Path) -> str | None:
@@ -395,8 +395,8 @@ def get_git_branch(root: Path) -> str | None:
 
 def check_product_repo(root: Path, mode: str) -> int:
     required = [
-        "README.md", "AGENTS.md", "Setup_Guide.md", "Docs", "Runtime", "Plans", "Logs",
-        "Profiles", "Adapters", "scripts"
+        "README.md", "AGENTS.md", "Setup_Guide.md", "Docs", "Plans", "Logs",
+        "Pipeline", "Tools", "Templates", "Schemas"
     ]
     required_paths = [
         "Docs/Discovery/README.md",
@@ -425,20 +425,29 @@ def check_product_repo(root: Path, mode: str) -> int:
         "Logs/QualityLog.md",
         "Logs/ReleaseLog.md",
         "Logs/SupportLog.md",
-        "Profiles/Product.md",
-        "Adapters/README.md",
-        "Adapters/Policy.md",
-        "Adapters/Registry.md",
-        "Adapters/Codex/README.md",
-        "Adapters/Claude/README.md",
-        "Adapters/Gemini/README.md",
-        "Adapters/Local/README.md",
-        "scripts/dev-up.sh",
-        "scripts/dev-down.sh",
-        "scripts/dev-test.sh",
-        "scripts/integration-smoke.sh",
-        "scripts/reset-product-start.sh",
+        "Pipeline/README.md",
+        "Pipeline/Phases.md",
+        "Pipeline/Workflows.md",
+        "Pipeline/Gates.md",
+        "Tools/README.md",
+        "Tools/product_check.py",
+        "Tools/product_bootstrap_smoke.py",
+        "Templates/README.md",
+        "Templates/Interview.md",
+        "Templates/Roadmap.md",
+        "Templates/Backlog.md",
+        "Templates/Plan.md",
+        "Templates/ChangeLog.md",
+        "Templates/ADRlog.md",
+        "Templates/QualityLog.md",
+        "Schemas/README.md",
+        "Schemas/roadmap_item.schema.json",
+        "Schemas/backlog_item.schema.json",
+        "Schemas/plan.schema.json",
+        "Schemas/changelog_entry.schema.json",
+        "Schemas/adr_entry.schema.json",
     ]
+    forbidden_dirs = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
     missing: list[str] = []
     for item in required:
         if not (root / item).exists():
@@ -446,6 +455,9 @@ def check_product_repo(root: Path, mode: str) -> int:
     for item in required_paths:
         if not (root / item).exists():
             missing.append(item)
+    for item in forbidden_dirs:
+        if (root / item).exists():
+            errors.append(f"{item}: forbidden placeholder domain in profile product skeleton")
 
     plan_path = find_initial_product_plan(root)
     if plan_path is None:
@@ -462,18 +474,12 @@ def check_product_repo(root: Path, mode: str) -> int:
     elif mode not in {"product-fresh", "product-developed"}:
         errors.append(f"lint mode: unsupported product mode `{mode}`")
 
-    profile_path = root / "Profiles" / "Product.md"
-    if profile_path.exists():
-        if not contains_pattern(profile_path, PRODUCT_PROFILE_TYPE):
-            errors.append("Profiles/Product.md: missing `Тип_профиля: product`")
-        if not contains_pattern(profile_path, PRODUCT_PROFILE_ID):
-            errors.append("Profiles/Product.md: missing `ID: PROF-000001`")
     gitignore_path = root / ".gitignore"
     if gitignore_path.exists():
         if not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_CODEX):
             errors.append(".gitignore: missing `.codex/` ignore")
-        if not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_SMOKE_REPORT):
-            errors.append(".gitignore: missing `Runtime/Integration_Smoke_Report.json` runtime ignore")
+        if not contains_pattern(gitignore_path, PRODUCT_GITIGNORE_TOOL_REPORTS):
+            errors.append(".gitignore: missing `Tools/.reports/` ignore")
     if not contains_pattern(root / "AGENTS.md", PRODUCT_DISCOVERY_ROUTE):
         errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
     if not has_startup_handshake_contract(root / "AGENTS.md"):
@@ -518,10 +524,17 @@ def check_product_repo(root: Path, mode: str) -> int:
             errors.append(
                 "git branch: generated product-start with unconfirmed current truth must run from a task branch before any writable changes"
             )
+    for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
+        path = root / rel
+        if path.exists() and not is_executable(path):
+            errors.append(f"{rel}: tool is not executable")
     for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh", "scripts/reset-product-start.sh"]:
         path = root / rel
         if path.exists() and not is_executable(path):
-            errors.append(f"{rel}: script is not executable")
+            errors.append(f"{rel}: compatibility script is not executable")
+    for path in sorted((root / "Schemas").glob("*.json")):
+        if check_schema_artifact_id(path):
+            errors.append(f"{path.relative_to(root)}: missing schema ID")
 
     if missing or errors:
         if missing:

@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000087
+ID: QL-000087
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000027` / `BACK-000092` / `PLAN-000080` открыты и закрыты в одном pass; `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Tools/README.md`, bootstrap/validation/lifecycle/evidence contracts, migration plan, `Plans/*` и `Logs/*` синхронизированы вокруг local product `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, `product-fresh`, `auto`, local `Tools/product_check.py`, local `Tools/product_bootstrap_smoke.py`, моделирование developed state и `product-developed` пройдены; `bp_lint contract affected`.
+Результат: новый generated product skeleton проверяется как самодостаточный локальный продукт без `Runtime/*`, `Adapters/*`, `Memory/*`, `MCP/*`, `Roles/*`, `Skills/*`, `Standards/*` и без primary `BYTEPRESS_ROOT` route; legacy domains `BytePress` и `Minesweeper` не изменялись.
+
+---
+
 ## QL-000086
 ID: QL-000086
 Дата: 2026-04-28

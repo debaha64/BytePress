@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
 - ROAD-000026 — Профильная фабрика продуктовых каркасов и сокращение доменной модели
 - ROAD-000025 — Русские проверочные маркеры lint-договора
 - ROAD-000024 — Договор карт доменов и ADR-журнала
@@ -35,6 +36,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
+ID: ROAD-000027
+Этап: Локальный Tools создаваемого продукта и переходный product lint
+Статус: Завершено
+Связи: BACK-000092, PLAN-000080, CHG-000092
+Источник: Запрос владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+Цель: Начать инструментальную реализацию профильного самодостаточного product skeleton: local product `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, без удаления legacy domains `BytePress`.
+Зависимости: ROAD-000026
+Связанные_backlog: BACK-000092
+
+### Описание
+Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` сохраняет проверку текущего `BytePress` с legacy domains и проверяет новый product skeleton через local tools contract.
 
 ---
 

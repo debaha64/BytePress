@@ -25,6 +25,231 @@ STARTER_TERM_PURPOSES = {
     "TERM-000009": "Помогает читать и вести один текущий pass продукта.",
 }
 
+PRODUCT_TOOL_CHECK = r'''#!/usr/bin/env python3
+from __future__ import annotations
+
+from pathlib import Path
+import argparse
+import re
+import sys
+
+ROOT_MARKERS = ["README.md", "AGENTS.md", "Setup_Guide.md"]
+BASE_PATHS = [
+    "Docs/Discovery/README.md",
+    "Docs/Discovery/Interview.md",
+    "Docs/User/README.md",
+    "Docs/User/Operating_Mode.md",
+    "Docs/User/First_Start.md",
+    "Docs/User/Pass_Request.md",
+    "Docs/User/Usage_Scenarios.md",
+    "Docs/Product/README.md",
+    "Docs/Product/JTBD.md",
+    "Docs/Product/PRD.md",
+    "Docs/Product/Delivery.md",
+    "Docs/Technical/README.md",
+    "Docs/Technical/Architecture.md",
+    "Docs/Technical/Interfaces.md",
+    "Docs/Technical/System_Invariants.md",
+    "Docs/Terms/README.md",
+    "Docs/Terms/Base_Terms.md",
+    "Plans/README.md",
+    "Plans/Roadmap.md",
+    "Plans/Backlog.md",
+    "Logs/README.md",
+    "Logs/ChangeLog.md",
+    "Logs/ADRlog.md",
+    "Logs/QualityLog.md",
+    "Logs/ReleaseLog.md",
+    "Logs/SupportLog.md",
+    "Pipeline/README.md",
+    "Pipeline/Phases.md",
+    "Pipeline/Workflows.md",
+    "Pipeline/Gates.md",
+    "Tools/README.md",
+    "Tools/product_check.py",
+    "Tools/product_bootstrap_smoke.py",
+    "Templates/README.md",
+    "Templates/Interview.md",
+    "Templates/Roadmap.md",
+    "Templates/Backlog.md",
+    "Templates/Plan.md",
+    "Templates/ChangeLog.md",
+    "Templates/ADRlog.md",
+    "Templates/QualityLog.md",
+    "Schemas/README.md",
+    "Schemas/roadmap_item.schema.json",
+    "Schemas/backlog_item.schema.json",
+    "Schemas/plan.schema.json",
+    "Schemas/changelog_entry.schema.json",
+    "Schemas/adr_entry.schema.json",
+]
+FORBIDDEN_DIRS = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
+PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
+UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
+CONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Подтверждена$", re.MULTILINE)
+PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено пользователем\.$", re.MULTILINE)
+STATUS = re.compile(r"^Статус:\s+(\S+)$", re.MULTILINE)
+PLAN_ID = re.compile(r"^ID:\s+PLAN-([0-9]{6})$", re.MULTILINE)
+SCHEMA_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
+
+
+def text(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def contains(path: Path, pattern: re.Pattern[str]) -> bool:
+    return bool(pattern.search(text(path)))
+
+
+def initial_plan(root: Path) -> Path | None:
+    matches = [path for path in (root / "Plans").glob("*.md") if PLAN_FILE.match(path.name)]
+    return matches[0] if matches else None
+
+
+def status_of(path: Path) -> str | None:
+    match = STATUS.search(text(path))
+    return match.group(1) if match else None
+
+
+def section_status(path: Path, artifact_id: str) -> str | None:
+    lines = text(path).splitlines()
+    for index, line in enumerate(lines):
+        if line == f"ID: {artifact_id}":
+            for candidate in lines[index + 1:index + 12]:
+                if candidate.startswith("Статус: "):
+                    return candidate.removeprefix("Статус: ")
+    return None
+
+
+def has_later_plan(root: Path) -> bool:
+    for path in sorted((root / "Plans").glob("*.md")):
+        if path.name in {"README.md", "Roadmap.md", "Backlog.md"}:
+            continue
+        plan_text = text(path)
+        match = PLAN_ID.search(plan_text)
+        if not match:
+            continue
+        if int(match.group(1)) > 1 and status_of(path) in {"В_работе", "Завершено"}:
+            return True
+    return False
+
+
+def detect_mode(root: Path) -> str:
+    interview = root / "Docs" / "Discovery" / "Interview.md"
+    if contains(interview, UNCONFIRMED):
+        return "fresh"
+    if contains(interview, CONFIRMED):
+        return "developed"
+    return "unknown"
+
+
+def check(root: Path, mode: str) -> list[str]:
+    errors: list[str] = []
+    for item in ROOT_MARKERS + BASE_PATHS:
+        if not (root / item).exists():
+            errors.append(f"missing {item}")
+    for item in FORBIDDEN_DIRS:
+        if (root / item).exists():
+            errors.append(f"forbidden placeholder domain present: {item}")
+    for path in sorted((root / "Schemas").glob("*.json")):
+        if not contains(path, SCHEMA_ID):
+            errors.append(f"{path.relative_to(root)}: missing schema ID")
+    if "Tools/.reports/" not in text(root / ".gitignore"):
+        errors.append(".gitignore: missing Tools/.reports/ ignore")
+
+    plan = initial_plan(root)
+    if plan is None:
+        errors.append("missing Plans/<PRODUCT_CODE>-000001-product-initialization.md")
+    actual_mode = detect_mode(root) if mode == "auto" else mode
+    if actual_mode == "unknown":
+        errors.append("Docs/Discovery/Interview.md: cannot detect current-truth lifecycle state")
+    interview = root / "Docs" / "Discovery" / "Interview.md"
+    if actual_mode == "fresh":
+        if not contains(interview, UNCONFIRMED):
+            errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
+        if not contains(interview, PLACEHOLDER):
+            errors.append("Docs/Discovery/Interview.md: missing placeholder answers")
+        if section_status(root / "Plans" / "Roadmap.md", "ROAD-000001") != "В_работе":
+            errors.append("Plans/Roadmap.md: ROAD-000001 must be В_работе in fresh state")
+        if section_status(root / "Plans" / "Backlog.md", "BACK-000001") != "В_работе":
+            errors.append("Plans/Backlog.md: BACK-000001 must be В_работе in fresh state")
+        if plan and status_of(plan) != "В_работе":
+            errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be В_работе in fresh state")
+    elif actual_mode == "developed":
+        if contains(interview, UNCONFIRMED) or contains(interview, PLACEHOLDER):
+            errors.append("Docs/Discovery/Interview.md: developed state keeps fresh placeholders")
+        if section_status(root / "Plans" / "Roadmap.md", "ROAD-000001") != "Завершено":
+            errors.append("Plans/Roadmap.md: ROAD-000001 must be Завершено in developed state")
+        if section_status(root / "Plans" / "Backlog.md", "BACK-000001") != "Завершено":
+            errors.append("Plans/Backlog.md: BACK-000001 must be Завершено in developed state")
+        if plan and status_of(plan) != "Завершено":
+            errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be Завершено in developed state")
+        if not has_later_plan(root):
+            errors.append("Plans/*: developed state needs a later active or completed plan")
+        if "PLAN-000001" not in text(root / "Logs" / "ChangeLog.md"):
+            errors.append("Logs/ChangeLog.md: missing PLAN-000001 closure link")
+        if "PLAN-000001" not in text(root / "Logs" / "QualityLog.md"):
+            errors.append("Logs/QualityLog.md: missing PLAN-000001 check link")
+    return errors
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Проверка локального продуктового каркаса.")
+    parser.add_argument("--repo", default=".")
+    parser.add_argument("--mode", choices=["auto", "fresh", "developed"], default="auto")
+    args = parser.parse_args()
+    root = Path(args.repo).resolve()
+    errors = check(root, args.mode)
+    if errors:
+        print("Ошибки продуктового каркаса:")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print(f"Локальный продуктовый каркас выглядит полным. Режим: {detect_mode(root) if args.mode == 'auto' else args.mode}.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+'''
+
+PRODUCT_BOOTSTRAP_SMOKE = r'''#!/usr/bin/env python3
+from __future__ import annotations
+
+from pathlib import Path
+import json
+import subprocess
+import sys
+
+
+def main() -> int:
+    root = Path(__file__).resolve().parent.parent
+    report_dir = root / "Tools" / ".reports"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    result = subprocess.run(
+        [sys.executable, str(root / "Tools" / "product_check.py"), "--repo", str(root), "--mode", "auto"],
+        text=True,
+        capture_output=True,
+    )
+    report = {
+        "check": "product_bootstrap_smoke",
+        "returncode": result.returncode,
+        "stdout": result.stdout.strip(),
+        "stderr": result.stderr.strip(),
+    }
+    (report_dir / "product_bootstrap_smoke.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Product bootstrap smoke report written to: {report_dir / 'product_bootstrap_smoke.json'}")
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    return result.returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+'''
+
 
 @dataclass(frozen=True)
 class BrandProfile:
@@ -163,21 +388,19 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Docs/Product",
         "Docs/Technical",
         "Docs/Terms",
-        "Runtime",
         "Plans",
         "Logs",
-        "Profiles",
-        "Adapters/Codex",
-        "Adapters/Claude",
-        "Adapters/Gemini",
-        "Adapters/Local",
+        "Pipeline",
+        "Tools",
+        "Templates",
+        "Schemas",
         "scripts",
     ]:
         (target / path).mkdir(parents=True, exist_ok=True)
 
     write(
         target / ".gitignore",
-        "__pycache__/\n*.pyc\n.env\n.env.*\n.venv/\n.codex\n.codex/\nRuntime/Integration_Smoke_Report.json\n",
+        "__pycache__/\n*.pyc\n.env\n.env.*\n.venv/\n.codex\n.codex/\nTools/.reports/\n",
     )
     write(
         target / "README.md",
@@ -191,9 +414,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "3. Прочитать `Docs/Discovery/Interview.md` и подтвердить текущую истину ответами пользователя.\n"
         "4. Подготовить среду по `Setup_Guide.md`.\n"
         "5. Проверить текущие этап, задачу и план в `Plans/*`.\n"
-        "6. Использовать `scripts/dev-test.sh`, если нужна структурная проверка через `BytePress`.\n"
-        "7. Использовать `scripts/reset-product-start.sh`, если ранний product-start сорвался и нужен маршрут очистки.\n"
-        "8. Использовать `scripts/integration-smoke.sh`, если нужен минимальный интеграционный smoke-маршрут.\n\n"
+        "6. Использовать `Tools/product_check.py`, если нужна структурная проверка продукта.\n"
+        "7. Использовать `Tools/product_bootstrap_smoke.py`, если нужен локальный smoke-маршрут.\n"
+        "8. Использовать `scripts/*` только как совместимые оболочки к локальному `Tools/*`.\n\n"
         "## Доменная карта\n"
         "- `Docs/Discovery/*` — текущая истина и интервью продукта.\n"
         "- `Docs/User/*` — пользовательский слой продукта.\n"
@@ -201,8 +424,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `Docs/Technical/*` — стартовый технический контур продукта.\n"
         "- `Plans/*` — дорожная карта, реестр работ и текущий план продукта.\n"
         "- `Logs/*` — факты, изменения и доказательства качества продукта.\n"
-        "- `Adapters/*` — модельный контур продукта.\n"
-        "- `scripts/*` — проектные точки входа.\n",
+        "- `Pipeline/*` — лёгкий локальный процессный контур продукта.\n"
+        "- `Tools/*` — локальные проверки и служебные команды продукта.\n"
+        "- `Templates/*` — шаблоны только для созданных артефактов.\n"
+        "- `Schemas/*` — схемы только для проверяемых артефактов.\n"
+        "- `scripts/*` — переходные shell-оболочки к `Tools/*`.\n",
     )
     write(
         target / "AGENTS.md",
@@ -217,7 +443,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. `Docs/Discovery/*` как маршрут текущей истины продукта.\n"
         "3. `Plans/*` как владелец этапа, задачи и прохода.\n"
         "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как слои знания продукта.\n"
-        "5. `Logs/*`, `Setup_Guide.md`, `Adapters/*` и `scripts/*` как поддержка исполнения.\n\n"
+        "5. `Logs/*`, `Pipeline/*`, `Tools/*`, `Templates/*`, `Schemas/*` и `Setup_Guide.md` как поддержка исполнения.\n\n"
         "## Стартовый отчёт первого ответа\n"
         "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
         "`Приветствие:` короткая рабочая фраза.\n"
@@ -233,15 +459,15 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Пока пользователь не дал явные ответы и текущая истина не подтверждена, агент работает только в аналитическом контуре.\n"
         "- До открытия task-ветки любые записываемые изменения запрещены, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "- В этом гейте допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и маршрут очистки failed pass, но сам проход с правками начинается только после действия с веткой в task-ветку.\n"
-        "- В этом гейте bootstrap-заготовки не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*`, `scripts/*` или предметной реализации.\n"
+        "- В этом гейте bootstrap-заготовки не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации.\n"
         "- Если failed start дал tracked drift вне разрешённого раннего контура, канонический маршрут reset — fresh bootstrap в новый target.\n\n"
         "## Start route\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
         "- Первый проход с правками начинать только после открытия task-ветки.\n"
-        "- Для structural check использовать `scripts/dev-test.sh` с `BYTEPRESS_ROOT`.\n"
-        "- Для integration handoff использовать `scripts/integration-smoke.sh`.\n"
-        "- Для failed start использовать `scripts/reset-product-start.sh`.\n\n"
+        "- Для structural check использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
+        "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
+        "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
         "- этот файл только направляет агента к документам-владельцам продуктового репозитория.\n",
@@ -265,12 +491,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Проверка\n"
         "- первый product-start pass остаётся только аналитическим, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;\n"
         "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки;\n"
-        "- для structural и integration smoke checks продуктового репозитория установить `BYTEPRESS_ROOT` на путь к исходному `BytePress`;\n"
-        "- затем из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`;\n"
-        "- если ранний product-start сорвался, выполнить `scripts/reset-product-start.sh` и прочитать его drift report;\n"
-        "- при проверке controlled integration contour выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/integration-smoke.sh`;\n"
-        "- report artifact integration smoke будет записан в `Runtime/Integration_Smoke_Report.json` как runtime-local файл;\n"
-        "- baseline commit generated repo не должен содержать этот artifact по умолчанию; если текущий pass явно сохраняет smoke evidence в Git, это решение должно быть зафиксировано в current `Plan` и итоговом отчёте.\n",
+        "- structural check выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
+        "- smoke check выполняется локально: `python3 Tools/product_bootstrap_smoke.py`;\n"
+        "- переходные `scripts/*` можно использовать только как оболочки к этим локальным tools;\n"
+        "- report artifacts пишутся в `Tools/.reports/` и не входят в baseline commit.\n",
     )
 
     write(
@@ -286,7 +510,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- bootstrap-created interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;\n"
         "- пока пользователь не ответил явно, generated repo остаётся только в аналитическом контуре;\n"
         "- даже в аналитическом контуре первое записываемое действие допускается только после открытия task-ветки;\n"
-        "- bootstrap-заготовки не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` и предметной реализации.\n\n"
+        "- bootstrap-заготовки не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` и предметной реализации.\n\n"
         "## Interview protocol\n"
         "- владелец протокола интервью один: `Interview.md`;\n"
         "- вопросы первого прохода собираются по классам `Контекст`, `Граница`, `Ограничение`, `Владение`, `Переход`;\n"
@@ -416,8 +640,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "3. Прочитать `../../Setup_Guide.md` и открыть task-ветку до первого записываемого действия.\n"
         "4. Проверить текущие этап, задачу и план в `../../Plans/*`.\n"
         "5. Прочитать `../Discovery/Interview.md` и только после task-ветки ответить на вопросы, которые подтверждают текущую истину.\n"
-        "6. Из корня продукта выполнить `BYTEPRESS_ROOT=/path/to/BytePress scripts/dev-test.sh`.\n"
-        "7. Если ранний product-start сорвался, выполнить `../../scripts/reset-product-start.sh`.\n\n"
+        "6. Из корня продукта выполнить `python3 Tools/product_check.py --repo . --mode auto`.\n"
+        "7. Если нужен локальный smoke, выполнить `python3 Tools/product_bootstrap_smoke.py`.\n\n"
         "## Что дальше\n"
         "- если нужен новый pass: `Pass_Request.md`;\n"
         "- если нужен маршрут исполнения агентом: `../../AGENTS.md`.\n",
@@ -436,7 +660,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## На что опираться\n"
         "- `../../Plans/*`;\n"
         "- `../../Docs/User/*`, `../../Docs/Product/*`, `../../Docs/Technical/*`;\n"
-        "- `../../Setup_Guide.md` и `../../scripts/*` для маршрута запуска и проверки.\n",
+        "- `../../Setup_Guide.md` и `../../Tools/*` для маршрута запуска и проверки.\n",
     )
     write(
         target / "Docs/User/Usage_Scenarios.md",
@@ -445,7 +669,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Прочитать `../../README.md` и `First_Start.md`.\n"
         "- Подтвердить текущую истину в `../../Docs/Discovery/Interview.md` до предметных правок.\n"
         "- Подготовить среду по `../../Setup_Guide.md`.\n"
-        "- Проверить структурный контур через `scripts/dev-test.sh`.\n\n"
+        "- Проверить структурный контур через `Tools/product_check.py`.\n\n"
         "## Сценарий 2. Запустить новый pass с агентом\n"
         "- Найти текущие этап, задачу и план в `../../Plans/*`.\n"
         "- Сформулировать pass через `Pass_Request.md`.\n"
@@ -582,8 +806,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- пользовательский вход: `README.md`, `Docs/User/*`, `Setup_Guide.md`;\n"
         "- агентный вход: `AGENTS.md`;\n"
         "- плановый вход: `Plans/*`;\n"
-        "- маршрут структурной проверки: `scripts/dev-test.sh` с `BYTEPRESS_ROOT`;\n"
-        "- маршрут integration smoke: `scripts/integration-smoke.sh` с `BYTEPRESS_ROOT`.\n",
+        "- маршрут структурной проверки: `Tools/product_check.py`;\n"
+        "- маршрут local smoke: `Tools/product_bootstrap_smoke.py`.\n",
     )
     write(
         target / "Docs/Technical/System_Invariants.md",
@@ -591,7 +815,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Инварианты\n"
         "- продукт остаётся отдельным репозиторием вне дерева `BytePress`;\n"
         "- human/agent entry contour не спорит с planning contour;\n"
-        "- незаполненный discovery bootstrap не считается разрешением на изменение `Docs/Product/*`, `Docs/Technical/*`, `Runtime/*` или предметной реализации;\n"
+        "- незаполненный discovery bootstrap не считается разрешением на изменение `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации;\n"
         "- product repo не превращается в полную копию `BytePress`.\n",
     )
     write(
@@ -604,24 +828,90 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(target / "Docs/Terms/Base_Terms.md", render_starter_terms(ctx.starter_terms))
 
     write(
-        target / "Runtime/README.md",
-        "# Runtime\n\n"
-        "Оперативная среда текущего исполнения.\n\n"
-        "- `Runtime/Integration_Smoke_Report.json` materialize только после фактического smoke run;\n"
-        "- baseline commit generated repo не должен содержать этот artifact по умолчанию.\n",
+        target / "Pipeline/README.md",
+        "# Pipeline\n\n"
+        "`Pipeline/*` хранит лёгкий локальный процессный контур продукта.\n\n"
+        "## Состав\n"
+        "- `Phases.md` — минимальные фазы product pass.\n"
+        "- `Workflows.md` — рабочие процедуры первого product-start.\n"
+        "- `Gates.md` — обязательные переходы и проверки.\n",
     )
-    write(target / "Runtime/Context.md", "# Context\n\nТекущий контекст исполнения.\n")
-    write(target / "Runtime/Task.md", "# Task\n\nТекущая задача.\n")
-    write(target / "Runtime/Session_Log.md", "# Session_Log\n\nЖурнал текущей сессии.\n")
-    write(target / "Runtime/Handover.md", "# Handover\n\nПередача текущего состояния между сессиями.\n")
+    write(
+        target / "Pipeline/Phases.md",
+        "# Phases\n\n"
+        "1. Discovery confirmation.\n"
+        "2. Planning update.\n"
+        "3. Implementation or documentation pass.\n"
+        "4. Local tools check.\n"
+        "5. Logs closure.\n",
+    )
+    write(
+        target / "Pipeline/Workflows.md",
+        "# Workflows\n\n"
+        "## First product-start\n"
+        "1. Открыть task-ветку.\n"
+        "2. Подтвердить `Docs/Discovery/Interview.md`.\n"
+        "3. Синхронизировать `Plans/*` и `Logs/*`.\n"
+        "4. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n",
+    )
+    write(
+        target / "Pipeline/Gates.md",
+        "# Gates\n\n"
+        "## First-start gate\n"
+        "- `Статус_текущей_истины: Не_подтверждена` удерживает продукт в аналитическом контуре.\n"
+        "- Первое записываемое действие требует task-ветку.\n"
+        "- Fresh state проверяется локальным `Tools/product_check.py`.\n",
+    )
 
-    write(target / "Profiles/Product.md", f"# Product\n\n"
-        f"ID: PROF-000001\n"
-        f"Тип_профиля: product\n"
-        f"Название: {ctx.name}\n"
-        f"Код_продукта: {ctx.product_code}\n"
-        f"Брендовый_профиль: {ctx.brand_profile.name}\n"
-        f"Язык_взаимодействия: {ctx.brand_profile.interaction_language}\n")
+    write(
+        target / "Tools/README.md",
+        "# Tools\n\n"
+        "`Tools/*` хранит локальные служебные команды продукта.\n\n"
+        "## Команды\n"
+        "- `product_check.py` — структурная проверка fresh/developed product state.\n"
+        "- `product_bootstrap_smoke.py` — локальный smoke route с отчётом в `Tools/.reports/`.\n\n"
+        "## Граница\n"
+        "Продукт не зависит от `BYTEPRESS_ROOT` для обычной проверки после bootstrap.\n",
+    )
+    write_executable(target / "Tools/product_check.py", PRODUCT_TOOL_CHECK)
+    write_executable(target / "Tools/product_bootstrap_smoke.py", PRODUCT_BOOTSTRAP_SMOKE)
+
+    write(
+        target / "Templates/README.md",
+        "# Templates\n\n"
+        "`Templates/*` хранит только шаблоны артефактов, которые materialize в каркасе продукта.\n",
+    )
+    for name, title in [
+        ("Interview.md", "Interview"),
+        ("Roadmap.md", "Roadmap"),
+        ("Backlog.md", "Backlog"),
+        ("Plan.md", "Plan"),
+        ("ChangeLog.md", "ChangeLog"),
+        ("ADRlog.md", "ADRlog"),
+        ("QualityLog.md", "QualityLog"),
+    ]:
+        write(target / "Templates" / name, f"# {title}\n\n<!-- ID: TPL-000001 -->\n\nШаблон артефакта `{title}` продуктового каркаса.\n")
+
+    write(
+        target / "Schemas/README.md",
+        "# Schemas\n\n"
+        "`Schemas/*` хранит только схемы артефактов, которые локальный `Tools/product_check.py` реально проверяет структурно.\n",
+    )
+    for name, schema_id, title in [
+        ("roadmap_item.schema.json", "SCH-000001", "Roadmap item"),
+        ("backlog_item.schema.json", "SCH-000002", "Backlog item"),
+        ("plan.schema.json", "SCH-000003", "Plan"),
+        ("changelog_entry.schema.json", "SCH-000004", "ChangeLog entry"),
+        ("adr_entry.schema.json", "SCH-000005", "ADR entry"),
+    ]:
+        write(
+            target / "Schemas" / name,
+            "{\n"
+            f"  \"$id\": \"{schema_id}\",\n"
+            f"  \"title\": \"{title}\",\n"
+            "  \"type\": \"object\"\n"
+            "}\n",
+        )
 
     write(
         target / "Plans/README.md",
@@ -696,7 +986,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Источник: Первый current pass продуктового репозитория\n"
         f"Дата_создания: {ctx.current_date}\n"
         f"Дата_изменения: {ctx.current_date}\n"
-        "Основание: Bootstrap создал первый пригодный к работе product repo; первый pass должен подтвердить текущую истину discovery-слоя ответами пользователя и не трактовать заготовки как разрешение на implementation.\n"
+        "Основание: Bootstrap создал первый пригодный к работе product repo; первый product-start pass остаётся только аналитическим, должен подтвердить текущую истину discovery-слоя ответами пользователя и не трактовать заготовки как разрешение на implementation.\n"
         "Связанные_требования:\n"
         "Связанные_backlog: BACK-000001\n"
         "Связанные_ADR:\n\n"
@@ -713,7 +1003,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- bootstrap-заготовки могут быть ошибочно приняты за утверждённый scope;\n"
         "- отсутствие явных ответов пользователя заблокирует предметный pass.\n\n"
         "## Артефакты\n"
-        "- AGENTS.md\n- Docs/*\n- Plans/*\n- Logs/*\n- Profiles/Product.md\n- Adapters/*\n- scripts/*\n\n"
+        "- AGENTS.md\n- Docs/*\n- Pipeline/*\n- Plans/*\n- Logs/*\n- Tools/*\n- Templates/*\n- Schemas/*\n\n"
         "## DoD\n"
         "Bootstrap-created текущая истина подтверждена, аналитический гейт снят явным решением, а следующий предметный pass открыт отдельно.\n",
     )
@@ -726,111 +1016,44 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(target / "Logs/SupportLog.md", "# SupportLog\n")
 
     write(
-        target / "Adapters/README.md",
-        "# Adapters\n\n"
-        "`Adapters/*` хранит минимальный модельный контур продуктового репозитория.\n\n"
-        "## Состав\n"
-        "- `Policy.md`\n"
-        "- `Registry.md`\n"
-        "- `Codex/`, `Claude/`, `Gemini/`, `Local/`\n",
-    )
-    write(
-        target / "Adapters/Policy.md",
-        "# Policy\n\n"
-        "1. Канонический исполнитель продуктового репозитория — `Codex`.\n"
-        "2. Резервные адаптеры не становятся активным multi-model contour автоматически.\n"
-        "3. Адаптеры не подменяют planning, technical или user contracts продукта.\n",
-    )
-    write(
-        target / "Adapters/Registry.md",
-        "# Registry\n\n"
-        "## Индекс\n"
-        "- `ADP-000001` — `Codex`\n"
-        "- `ADP-000002` — `Claude`\n"
-        "- `ADP-000003` — `Gemini`\n"
-        "- `ADP-000004` — `Local`\n\n"
-        "---\n\n"
-        "## ADP-000001 — Codex\n"
-        "ID: ADP-000001\n"
-        "Название: Codex\n"
-        "Статус: Активен\n"
-        "Связи: PROF-000001\n"
-        "Источник: Bootstrap продуктового репозитория\n"
-        f"Дата_создания: {ctx.current_date}\n"
-        f"Дата_изменения: {ctx.current_date}\n\n"
-        "### Описание\n"
-        "Канонический исполнитель продуктового репозитория.\n",
-    )
-    for adapter in ["Codex", "Claude", "Gemini", "Local"]:
-        write(target / f"Adapters/{adapter}/README.md", f"# {adapter}\n\nКаркас адаптера {adapter}.\n")
-
-    write(
         target / "scripts/README.md",
         "# scripts\n\n"
-        "`scripts/*` — проектные точки входа продуктового репозитория.\n\n"
-        "- `dev-up.sh` — заготовка старта локального product contour.\n"
-        "- `dev-down.sh` — заготовка остановки локального contour.\n"
-        "- `dev-test.sh` — structural check route через `BYTEPRESS_ROOT` с автоопределением режима fresh/developed product repo.\n"
-        "- `integration-smoke.sh` — controlled integration handoff route через `BYTEPRESS_ROOT` с runtime-local report artifact в `Runtime/Integration_Smoke_Report.json`.\n"
-        "- `reset-product-start.sh` — cleanup route failed early product-start с drift report.\n"
-        "- report artifact по умолчанию остаётся вне baseline commit и force-add допускается только при явном evidence-preservation решении текущего pass.\n"
-        "\n"
-        "## Service-layer update\n"
-        "После первого product-start pass обновляйте `scripts/dev-test.sh` и этот `README.md` точечным product-side pass: возьмите delta из актуального `BytePress`, перенесите только service files, не пересоздавайте product repo и подтвердите результат через `scripts/dev-test.sh`.\n",
+        "`scripts/*` — переходные shell-оболочки к локальному `Tools/*`.\n\n"
+        "Основной служебный слой продукта — `Tools/*`. Новые сценарии должны вызывать `Tools/product_check.py` и `Tools/product_bootstrap_smoke.py` напрямую.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",
-        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No runtime services are required in baseline 0.2.0. Continue with product-specific setup if needed.\"\n",
+        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No local runtime services are required by this product skeleton.\"\n",
     )
     write_executable(
         target / "scripts/dev-down.sh",
-        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No runtime services are running in baseline 0.2.0.\"\n",
+        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No local runtime services are managed by this product skeleton.\"\n",
     )
     write_executable(
         target / "scripts/dev-test.sh",
         "#!/usr/bin/env bash\n"
         "set -euo pipefail\n\n"
         "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "if [[ -z \"${BYTEPRESS_ROOT:-}\" ]]; then\n"
-        "  echo \"Set BYTEPRESS_ROOT to the BytePress repository path before running dev-test.sh.\"\n"
-        "  exit 1\n"
-        "fi\n\n"
-        "LINT_SCRIPT=\"$BYTEPRESS_ROOT/Tools/bp_lint.py\"\n"
-        "if [[ ! -f \"$LINT_SCRIPT\" ]]; then\n"
-        "  echo \"BytePress lint script not found at: $LINT_SCRIPT\"\n"
-        "  exit 1\n"
-        "fi\n\n"
-        "python3 \"$LINT_SCRIPT\" --repo \"$ROOT_DIR\" --mode auto\n",
+        "exec python3 \"$ROOT_DIR/Tools/product_check.py\" --repo \"$ROOT_DIR\" --mode auto\n",
     )
     write_executable(
         target / "scripts/integration-smoke.sh",
         "#!/usr/bin/env bash\n"
         "set -euo pipefail\n\n"
         "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "if [[ -z \"${BYTEPRESS_ROOT:-}\" ]]; then\n"
-        "  echo \"Set BYTEPRESS_ROOT to the BytePress repository path before running integration-smoke.sh.\"\n"
-        "  exit 1\n"
-        "fi\n\n"
-        "SMOKE_SCRIPT=\"$BYTEPRESS_ROOT/Tools/bp_integration_smoke.py\"\n"
-        "REPORT_PATH=\"$ROOT_DIR/Runtime/Integration_Smoke_Report.json\"\n"
-        "if [[ ! -f \"$SMOKE_SCRIPT\" ]]; then\n"
-        "  echo \"BytePress integration smoke script not found at: $SMOKE_SCRIPT\"\n"
-        "  exit 1\n"
-        "fi\n\n"
-        "python3 \"$SMOKE_SCRIPT\" --repo \"$ROOT_DIR\" --report \"$REPORT_PATH\"\n"
-        "echo \"Integration smoke report written to: $REPORT_PATH\"\n",
+        "exec python3 \"$ROOT_DIR/Tools/product_bootstrap_smoke.py\"\n",
     )
     write_executable(
         target / "scripts/reset-product-start.sh",
         "#!/usr/bin/env bash\n"
         "set -euo pipefail\n\n"
         "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "REPORT_PATH=\"$ROOT_DIR/Runtime/Integration_Smoke_Report.json\"\n"
-        "if [[ -f \"$REPORT_PATH\" ]]; then\n"
-        "  rm -f \"$REPORT_PATH\"\n"
-        "  echo \"Removed runtime-local smoke artifact: $REPORT_PATH\"\n"
+        "REPORT_DIR=\"$ROOT_DIR/Tools/.reports\"\n"
+        "if [[ -d \"$REPORT_DIR\" ]]; then\n"
+        "  rm -rf \"$REPORT_DIR\"\n"
+        "  echo \"Removed local tool reports: $REPORT_DIR\"\n"
         "else\n"
-        "  echo \"No runtime-local smoke artifact to remove.\"\n"
+        "  echo \"No local tool reports to remove.\"\n"
         "fi\n\n"
         "if ! command -v git >/dev/null 2>&1; then\n"
         "  echo \"Git is not available; runtime cleanup completed, but tracked drift was not inspected.\"\n"
@@ -838,7 +1061,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "fi\n\n"
         "cd \"$ROOT_DIR\"\n"
         "if ! git rev-parse --show-toplevel >/dev/null 2>&1; then\n"
-        "  echo \"Runtime cleanup completed. Git repository is not initialized yet, so tracked drift was not inspected.\"\n"
+        "  echo \"Tool report cleanup completed. Git repository is not initialized yet, so tracked drift was not inspected.\"\n"
         "  exit 0\n"
         "fi\n\n"
         "STATUS_OUTPUT=\"$(git status --short)\"\n"

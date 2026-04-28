@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000092 — Product bootstrap creates local tools skeleton
 - CHG-000091 — Profiled product factory target domain model documented
 - CHG-000090 — Russian lint markers accepted in active and generated layers
 - CHG-000089 — Domain map and ADR decision contracts formalized
@@ -92,6 +93,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000092 — Product bootstrap creates local tools skeleton
+ID: CHG-000092
+Дата: 2026-04-28
+Тип_изменения: Инструмент
+Источник: PLAN-000080
+Связи: ROAD-000027, BACK-000092, QL-000087
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+`Tools/bp_bootstrap.py` обновлён для переходной профильной модели: generated product repo получает local `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`; `scripts/*` остаются только transition wrappers. `Tools/bp_lint.py` сохраняет legacy checks самого `BytePress`, но проверяет новый product skeleton без обязательных `Runtime/*`, `Adapters/*`, `Profiles/*` и primary `scripts/*` domains.
+
+### Эффект
+Новый продуктовый каркас становится самодостаточным для базовых structural/smoke checks после bootstrap и не получает premature domains `Adapters`, `Memory`, `MCP`, `Runtime`, `Roles`, `Skills`, `Standards`. Старые домены `BytePress`, `Minesweeper` и уже созданные продукты не изменялись.
 
 ---
 
