@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000029 — Маршрут обновления already-created product repo на local tools baseline
 - ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
 - ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
 - ROAD-000026 — Профильная фабрика продуктовых каркасов и сокращение доменной модели
@@ -37,6 +38,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000029 — Маршрут обновления already-created product repo на local tools baseline
+ID: ROAD-000029
+Этап: Маршрут обновления already-created product repo на local tools baseline
+Статус: Завершено
+Связи: BACK-000094, PLAN-000082, CHG-000094
+Источник: Запрос владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+Цель: Зафиксировать add/replace/delete route для обновления уже созданного продукта со старого service layer на local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*` без повторного bootstrap и без потери product-owned artifacts.
+Зависимости: ROAD-000027, ROAD-000028
+Связанные_backlog: BACK-000094
+
+### Описание
+Этап закрыт одним документно-проверочным pass `PLAN-000082`. Добавлен `Docs/Technical/Product_Service_Update_Route.md` как owner-document service update route, bootstrap/validation contracts и migration plan синхронизированы с переносом old product repo на local tools baseline. Route фиксирует add set, replace set, delete set, protected artifacts и migration smoke scenario; legacy domains `BytePress`, `Skills/*`, `scripts/*` transition layer и `Minesweeper` не изменялись.
 
 ---
 

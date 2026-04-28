@@ -23,6 +23,7 @@
 - `Platform_Contracts.md` — рабочая платформа, среда исполнения и инструментальный периметр.
 - `Product_Bootstrap_Contract.md` — что создаёт `Tools/bp_bootstrap.py` и где заканчивается его ответственность.
 - `Product_Bootstrap_Domain_Matrix.md` — целевая матрица профильных пакетов каркаса продукта.
+- `Product_Service_Update_Route.md` — маршрут обновления service layer уже созданного product repo без повторного bootstrap.
 - `Domain_Model_Migration_Plan.md` — безопасный план сокращения доменной модели и перехода к самодостаточному product tools.
 - `Product_Bootstrap_Validation.md` — границы проверки результата начального развёртывания.
 - `Verification.md` — карта проверочного контура и его границ.
@@ -36,6 +37,7 @@
 - архитектура: `Architecture.md`;
 - жизненный цикл: `Artifact_Lifecycle.md`;
 - начальное развёртывание продукта: `Product_Bootstrap_Contract.md`;
+- обновление уже созданного продукта: `Product_Service_Update_Route.md`;
 - проверки: `Verification.md`;
 - подтверждение результата: `Validation.md`;
 - инструменты: `../../Tools/README.md`;

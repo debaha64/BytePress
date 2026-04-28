@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000094 — Created product local tools update route documented
 - CHG-000093 — Product skeleton terms and lint corrections synchronized
 - CHG-000092 — Product bootstrap creates local tools skeleton
 - CHG-000091 — Profiled product factory target domain model documented
@@ -94,6 +95,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000094 — Created product local tools update route documented
+ID: CHG-000094
+Дата: 2026-04-28
+Тип_изменения: Документация
+Источник: PLAN-000082
+Связи: ROAD-000029, BACK-000094, QL-000089
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+Добавлен `Docs/Technical/Product_Service_Update_Route.md` как owner-document для обновления already-created product repo со старого service layer на local `Tools/*` baseline. Route фиксирует add set, replace set, delete set, protected artifacts, verification route и migration smoke scenario. `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Domain_Model_Migration_Plan.md` и technical map синхронизированы ссылками на новый route.
+
+### Эффект
+Уже созданный продукт может получить local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*` и transition wrappers без fresh bootstrap reset и без переписывания confirmed current truth, product docs, planning/log history или предметного кода. `Minesweeper`, legacy domains `BytePress`, `Skills/*` и transition `scripts/*` не изменялись.
 
 ---
 

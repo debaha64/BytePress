@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000089
+ID: QL-000089
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000029` / `BACK-000094` / `PLAN-000082` открыты и закрыты в одном документно-проверочном pass; `Docs/Technical/Product_Service_Update_Route.md`, `Docs/Technical/README.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Domain_Model_Migration_Plan.md`, `Plans/*` и `Logs/*` синхронизированы вокруг update route already-created product repo на local tools baseline; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh/auto checks, modeled old product update, migrated developed product check, local `Tools/product_check.py`, compatibility `scripts/dev-test.sh` и local smoke route пройдены; `bp_lint contract unaffected`.
+Результат: route фиксирует add/replace/delete наборы, protected artifacts и migration smoke scenario без повторного bootstrap, без изменения `Minesweeper`, без удаления legacy domains `BytePress`, без переноса `Skills/*` и без удаления transition `scripts/*`.
+
+---
+
 ## QL-000088
 ID: QL-000088
 Дата: 2026-04-28
