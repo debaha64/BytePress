@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000088
+ID: QL-000088
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000028` / `BACK-000093` / `PLAN-000081` открыты и закрыты в одном корректирующем pass; термины `TERM-000019` и `TERM-000018`, `Docs/Discovery/Interview.md`, bootstrap contracts, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Plans/*` и `Logs/*` синхронизированы вокруг нового product skeleton и паспорта `Docs/Product/Product_Passport.md`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh product check, auto mode, negative forbidden-domain check, modeled developed product, developed product check и local product `Tools/*` пройдены; `bp_lint contract affected`.
+Результат: product skeleton terms/checks больше не требуют `Runtime/*`, `Profiles/Product.md` или `Adapters/*`; forbidden product domain даёт нормальную lint error; generated templates имеют уникальные `TPL-*` IDs; `Skills/*`, legacy domains `BytePress` и `Minesweeper` не изменялись.
+
+---
+
 ## QL-000087
 ID: QL-000087
 Дата: 2026-04-28

@@ -76,11 +76,11 @@
 
 ### 3. Что входит в каркас репозитория продукта по умолчанию?
 Класс вопроса: Граница
-Ответ: Корневые точки входа, ограниченный `Docs/*`, `Plans/*`, `Logs/*`, `Runtime/*`, `Profiles/Product.md`, `Adapters/*` и `scripts/*`.
+Ответ: Корневые точки входа, ограниченный `Docs/*`, `Plans/*`, `Logs/*`, лёгкий `Pipeline/*`, локальный `Tools/*`, bounded `Templates/*`, bounded `Schemas/*` и переходные `scripts/*` только как оболочки к `Tools/*`.
 
 ### 4. Что остаётся вне bootstrap-default и может появиться только отдельным product-pass?
 Класс вопроса: Граница
-Ответ: Product-side `Pipeline/`, `Rules/`, `Standards/`, `Schemas/`, `Templates/`, `Roles/`, `Skills/` и другие расширения контура.
+Ответ: `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` не входят в новый product skeleton. `Rules/*` может появиться только отдельным профильным pass, если продукту нужны собственные обязательные правила.
 
 ### 5. Какое ограничение сильнее всего действует на ранний product-start?
 Класс вопроса: Ограничение

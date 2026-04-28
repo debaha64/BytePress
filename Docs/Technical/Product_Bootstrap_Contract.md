@@ -129,11 +129,14 @@ Bootstrap обязан создать:
 - `Docs/User/Pass_Request.md`
 - `Docs/User/Usage_Scenarios.md`
 - `Docs/Product/README.md`
+- `Docs/Product/Product_Passport.md`
 - `Docs/Product/JTBD.md`
 - `Docs/Product/PRD.md`
 - `Docs/Product/Delivery.md`
 
 Эти документы создаются как first-usable startup contour и content skeleton, а не как полностью предметно заполненный product package.
+
+`Docs/Product/Product_Passport.md` фиксирует минимальный паспорт созданного каркаса без materialization домена `Profiles/*` внутри продукта.
 
 ### Technical layer продукта
 Bootstrap обязан создать:
