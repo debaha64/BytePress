@@ -85,8 +85,8 @@
 ## Последовательность passes
 1. Зафиксировать ADR, target matrix и этот migration plan без удаления доменов.
 2. Добавить profile package contract и версионирование product profiles.
-3. Обновить `bp_bootstrap.py` для генерации local product `Tools/*`, lightweight `Pipeline/*`, profile-bound `Templates/*` и `Schemas/*`.
-4. Обновить `bp_lint.py` под transitional checks.
+3. Обновить `bp_bootstrap.py` для генерации local product `Tools/*`, lightweight `Pipeline/*`, profile-bound `Templates/*` и `Schemas/*`. Статус: начато в `PLAN-000080`.
+4. Обновить `bp_lint.py` под transitional checks. Статус: начато в `PLAN-000080`.
 5. Перенести procedures из `Skills/*` в `Pipeline/*`.
 6. Перенести обязательные norms из `Standards/*` в `Rules/*` и сократить ruleset.
 7. Удалить retired domains после прохождения updated checks.

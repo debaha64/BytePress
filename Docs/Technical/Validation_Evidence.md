@@ -58,7 +58,7 @@ ID: DOC-000004
 - ссылка на current `Plan`;
 - ссылка на соответствующую backlog-задачу;
 - ссылка на релевантный verification evidence package;
-- ссылка на deterministic `Runtime/Integration_Smoke_Report.json`, если validation scope включает controlled integration smoke contour;
+- ссылка на deterministic `Tools/.reports/product_bootstrap_smoke.json`, если validation scope включает local product smoke contour;
 - перечень реально затронутых active artifacts.
 
 Где хранится:

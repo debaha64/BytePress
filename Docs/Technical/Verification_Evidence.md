@@ -34,12 +34,12 @@
 
 Примеры:
 - результат `python3 Tools/bp_lint.py --repo .`.
-- deterministic report artifact `Runtime/Integration_Smoke_Report.json`, выпущенный существующим `integration-smoke` route generated product repo.
+- deterministic report artifact `Tools/.reports/product_bootstrap_smoke.json`, выпущенный local product smoke route generated product repo.
 
 Где хранится:
 - как summary в current `Plan` (и/или в user-facing отчёте);
 - при необходимости как факт проверки в `Logs/QualityLog.md`.
-- для generated product repo допускается repo-native carrier в `Runtime/Integration_Smoke_Report.json`, если он затем явно связан с current `Plan` и итоговым отчётом.
+- для generated product repo допускается repo-native carrier в `Tools/.reports/product_bootstrap_smoke.json`, если он затем явно связан с current `Plan` и итоговым отчётом.
 
 ### EVC-002 — Repo state evidence
 Что это:
