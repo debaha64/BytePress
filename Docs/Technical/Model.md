@@ -190,7 +190,7 @@
 - не становиться обязательным для проверок после migration pass.
 
 Владелец состояния:
-- `Docs/Technical/Domain_Model_Migration_Plan.md` и `Rules/Premature_Domains_Are_Removed.md` до удаления.
+- `Docs/Technical/Domain_Model_Migration_Plan.md` и `Rules/Domains.md` до удаления.
 
 ## Ownership состояния
 ### Канонические владельцы
@@ -202,7 +202,6 @@
 - `Docs/Technical/*` владеет technical contracts.
 - `Profiles/*` владеют operating profile.
 - `Rules/*` владеют обязательными ограничениями.
-- `Rules/*` остаётся legacy source до переноса обязательных норм в `Rules/*`.
 - `Schemas/*` владеют формальными data contracts.
 - `Templates/*` владеют reusable human-facing forms.
 - `Tools/*` владеют tooling behavior, но не содержательным состоянием сущностей.

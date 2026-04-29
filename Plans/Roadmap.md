@@ -90,7 +90,7 @@ ID: ROAD-000029
 Связанные_backlog: BACK-000094
 
 ### Описание
-Этап закрыт одним широким корректирующим pass `PLAN-000082`. Процедуры прежнего `Skills/*` перенесены в `Pipeline/Workflows.md`, обязательные нормы прежнего `Standards/*` перенесены в `Rules/*`, retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
+Этап закрыт одним широким корректирующим pass `PLAN-000082`. Рабочие процедуры перенесены в `Pipeline/Workflows.md`, обязательные нормы перенесены в `Rules/*`, retired domains удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
 
 ---
 
@@ -124,7 +124,7 @@ ID: ROAD-000027
 Связанные_backlog: BACK-000092
 
 ### Описание
-Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` сохраняет проверку текущего `BytePress` с legacy domains и проверяет новый product skeleton через local tools contract.
+Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт retired domains в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` проверяет новый product skeleton через local tools contract.
 
 ---
 
@@ -141,7 +141,7 @@ ID: ROAD-000026
 Связанные_backlog: BACK-000091
 
 ### Описание
-Этап закрыт одним архитектурным pass `PLAN-000079`. Добавлены `ADR-000022`, целевая профильная матрица пакетов продукта, migration plan сокращения доменной модели и правило удаления преждевременных доменов. Документы-владельцы синхронизированы вокруг решения: продукт зависит от профиля, получает lightweight `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` и `Schemas/*`, а `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и legacy `Standards/*` выводятся в миграционный контур без удаления в этом pass.
+Этап закрыт одним архитектурным pass `PLAN-000079`. Добавлены `ADR-000022`, целевая профильная матрица пакетов продукта, migration plan сокращения доменной модели и правило удаления преждевременных доменов. Документы-владельцы синхронизированы вокруг решения: продукт зависит от профиля, получает lightweight `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` и `Schemas/*`, а retired domains выводятся в миграционный контур без удаления в этом pass.
 
 ---
 
@@ -498,7 +498,7 @@ ID: ROAD-000015
 Связанные_backlog: BACK-000079
 
 ### Описание
-Этап закрыт одним corrective pass: `Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
+Этап закрыт одним corrective pass: `Setup_Guide.md`, release workflow contract, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
 
 ---
 

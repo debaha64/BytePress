@@ -21,6 +21,10 @@ REQUIRED_TEMPLATES = [
     "Discussion.md", "Research.md", "Requirements.md"
 ]
 REQUIRED_TOOLS = ["bp_lint.py", "bp_bootstrap.py", "bp_integration_smoke.py", "bp_normalize_terms.py"]
+REQUIRED_RULES = [
+    "Source.md", "Security.md", "Domains.md", "Workflow.md", "Git.md",
+    "Logs.md", "Dependencies.md", "Terms.md", "Naming.md"
+]
 ID_LINE = re.compile(r"^ID:\s+\S+", re.MULTILINE)
 TEMPLATE_ID_LINE = re.compile(r"^<!-- ID:\s+TPL-[0-9]{6} -->$", re.MULTILINE)
 SCHEMA_ARTIFACT_ID = re.compile(r'^\s*"\$id":\s*"SCH-[0-9]{6}"', re.MULTILINE)
@@ -612,21 +616,12 @@ def main() -> int:
         if err:
             id_errors.append(err)
 
-    for rel in [
-        "Rules/Approval_Strictness.md",
-        "Rules/Contracts_Before_Mass_Content.md",
-        "Rules/Domain_Boundaries_Are_Explicit.md",
-        "Rules/Logs_Record_Facts_Only.md",
-        "Rules/No_Secrets_In_Git.md",
-        "Rules/Plans_Require_Approved_Backlog.md",
-        "Rules/Repository_As_Source_Of_Truth.md",
-        "Rules/Rules_Are_Not_Standards.md",
-        "Rules/Runtime_Is_Temporary.md",
-        "Rules/Terms_Governance.md",
-        "Rules/Dependency_Selection.md",
-        "Rules/PR_Route_Uses_GH.md",
-        "Rules/Semantic_Commits.md",
-    ]:
+    missing.extend(collect_missing(root, REQUIRED_RULES, "Rules"))
+    actual_rules = sorted(path.name for path in (root / "Rules").glob("*.md") if path.name != "README.md")
+    if actual_rules != sorted(REQUIRED_RULES):
+        missing.append("Rules/*: file set differs from Rules/README.md contract")
+
+    for rel in [f"Rules/{name}" for name in REQUIRED_RULES]:
         err = check_has_id(root / rel)
         if err:
             id_errors.append(err)

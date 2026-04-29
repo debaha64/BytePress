@@ -70,8 +70,8 @@
 - ad hoc local scripts вне `Tools/*` не становятся частью supported platform perimeter только по факту использования.
 
 ### External isolation contract
-- продуктовые репозитории и их runtime не являются execution substrate самого `BytePress`;
-- model adapters, memory и MCP остаются отдельными extension domains и не подменяют ядро знания и governance;
+- продуктовые репозитории и их execution context не являются execution substrate самого `BytePress`;
+- внешние connectors, model adapters и memory mechanisms не подменяют ядро знания и governance без отдельного mechanism contract;
 - secrets, credentials и внешние service tokens не попадают в Git и не становятся частью canonical platform state.
 
 ## Supported tool perimeter
@@ -141,7 +141,7 @@
 Не роль:
 - не открывает реальные внешние подключения;
 - не становится vendor runtime engine;
-- не подменяет `bp_lint.py`, `MCP/*` или procedural audit integration-layer.
+- не подменяет `bp_lint.py`, process workflow или procedural audit integration-layer.
 
 ### `gh`
 Роль:

@@ -7,7 +7,7 @@
 - какие группы артефактов система считает ключевыми;
 - где для каждой группы находится источник истины;
 - какие синхронизации обязательны после изменения;
-- какие переходы между active, archive, runtime и log слоями допустимы;
+- какие переходы между active, archive, execution-output и log слоями допустимы;
 - какой closure-loop обязателен перед завершением pass;
 - какие lifecycle-пропуски и смешения ответственности недопустимы.
 
@@ -80,16 +80,16 @@ Bootstrap note:
 - соответствующий file внутри `Pipeline/*`, в зависимости от process-topic.
 - compact lifecycle/handoff map живёт в `Pipeline/Inputs_Outputs.md`.
 
-### Runtime context
+### Execution context
 - ignored tool-output paths
 
 Роль:
 - держать только временный рабочий контекст во время активного pass.
 - для generated product repo early product-start contour сюда же относится local tool report `Tools/.reports/product_bootstrap_smoke.json`, если он выпускается product bootstrap smoke route.
-- для generated product repo failed-start cleanup route может удалять runtime-local artifacts, но не превращается в silent restore tracked baseline.
+- для generated product repo failed-start cleanup route может удалять tool-local artifacts, но не превращается в silent restore tracked baseline.
 
 Источник истины:
-- runtime не является source-of-truth слоем; это временный execution context.
+- execution context не является source-of-truth слоем.
 - `Tools/.reports/product_bootstrap_smoke.json` не входит в bootstrap baseline commit по умолчанию и не становится canonical evidence сам по себе; если отдельный pass явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
 
 ### Fact records
@@ -124,10 +124,10 @@ Bootstrap note:
 - task-state текущего этапа живёт в `Plans/Backlog.md`;
 - current pass-state живёт в active `Plans/PLAN-<NNNNNN>-<slug>.md`;
 - process-canon живёт в `Pipeline/*`;
-- runtime-state живёт только временно в ignored tool-output paths;
+- execution-state живёт только временно в ignored tool-output paths;
 - fact-state живёт в `Logs/*`;
 - architecture, model, lifecycle, interfaces и invariants живут в `Docs/Technical/*`;
-- form and validation contracts живут в `Templates/*`, `Schemas/*`, `Rules/*`, `Rules/*` и `Tools/*`.
+- form and validation contracts живут в `Templates/*`, `Schemas/*`, `Rules/*` и `Tools/*`.
 
 Если один и тот же факт можно прочитать в двух местах, каноническим считается только тот домен, который владеет соответствующим типом состояния.
 
@@ -175,23 +175,23 @@ Bootstrap note:
 - `Logs/*`, если изменение уже подтверждено как факт.
 
 ### При изменении supporting contracts
-Если меняются `Templates/*`, `Schemas/*`, `Rules/*`, `Rules/*` или `Tools/*`, обязательно проверить:
+Если меняются `Templates/*`, `Schemas/*`, `Rules/*` или `Tools/*`, обязательно проверить:
 - документы и журналы, которые реально materialize или проверяются этим contract;
 - `Tools/bp_bootstrap.py`, если меняется generation contract;
 - `Tools/bp_lint.py`, если меняется обязательный check;
 - релевантные `Docs/Technical/*`, если изменился сам technical contract системы.
 
 ## Допустимые переходы между слоями
-### Active -> Runtime
+### Active -> Execution context
 Допустимо:
-- active `Plan` порождает временный runtime context во время исполнения.
-- generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить runtime-local smoke artifact и зафиксировать drift report после failed early product-start.
+- active `Plan` порождает временный execution context во время исполнения.
+- generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить tool-local smoke artifact и зафиксировать drift report после failed early product-start.
 - generated product repo может использовать generated `scripts/dev-test.sh` как automatic structural check route; script запускает `bp_lint.py --mode auto`, чтобы fresh bootstrap и developed product lifecycle проверялись разными gates.
 - generated product repo после первого pass может обновлять служебные файлы `scripts/*` отдельным product-side pass без fresh bootstrap reset, если planning/log closure и product-developed check сохраняют подтверждённую текущую истину и предметные артефакты.
 
 Недопустимо:
-- runtime становится каноническим планом;
-- runtime хранит утверждённую planning-history.
+- execution context становится каноническим планом;
+- execution context хранит утверждённую planning-history.
 
 ### Active -> Logs
 Допустимо:
@@ -211,13 +211,13 @@ Bootstrap note:
 - active `Plan` архивируется до завершения pass;
 - historical backlog остаётся в active `Backlog.md` после закрытия этапа.
 
-### Runtime -> Logs
+### Execution context -> Logs
 Допустимо:
-- подтверждённый результат исполнения переносится из runtime-context в `Logs/*` как факт.
+- подтверждённый результат исполнения переносится из execution context в `Logs/*` как факт.
 - local `Tools/.reports/product_bootstrap_smoke.json` может использоваться как локальный carrier smoke verdict до его явной фиксации в pass report или `Logs/*`.
 
 Недопустимо:
-- runtime считается самодостаточным фактом без log fixation.
+- execution context считается самодостаточным фактом без log fixation.
 - baseline generated product repo коммитится с уже materialized `Tools/.reports/product_bootstrap_smoke.json` без отдельного evidence-preservation решения.
 - failed early product-start silently salvage'ится как новый baseline при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`.
 
@@ -245,18 +245,18 @@ Bootstrap note:
 - менять канонический source-of-truth и не проверять связанные active artifacts;
 - закрывать pass без фиксации результата проверки в `QualityLog`;
 - записывать в `ReleaseLog` release candidate, прогноз или намерение вместо factual release event;
-- считать runtime контур завершённым результатом без фиксации факта в `Logs/*`;
+- считать execution context завершённым результатом без фиксации факта в `Logs/*`;
 - переносить process-canon в `Docs/Technical/*` вместо `Pipeline/*`;
 - переносить ownership planning-state из `Plans/*` в `Docs/Technical/*` или `Logs/*`;
 - использовать archive-layer как current source of truth;
 - менять tooling contract без синхронизации технических документов, на которые он опирается.
 
-## Отношение lifecycle-layer к planning, runtime, facts и process
+## Отношение lifecycle-layer к planning, execution outputs, facts и process
 ### К `Plans/*`
 `Plans/*` задаёт current stage/task/pass. `Artifact_Lifecycle.md` не владеет этими сущностями, а фиксирует, как они должны синхронизироваться с соседними слоями.
 
 ### К ignored tool-output paths
-ignored tool-output paths остаётся только временным execution context. `Artifact_Lifecycle.md` фиксирует допустимый переход runtime -> logs, но не делает runtime источником истины.
+ignored tool-output paths остаётся только временным execution context. `Artifact_Lifecycle.md` фиксирует допустимый переход execution output -> logs, но не делает временный output источником истины.
 
 ### К `Logs/*`
 `Logs/*` остаются fact-layer. `Artifact_Lifecycle.md` фиксирует, когда факт обязан быть записан, но не подменяет сами журналы.

@@ -49,7 +49,7 @@
 - продукт получает локальный `Tools/*`, а прежние generated `scripts/*` переносятся в product tools или остаются только тонкими aliases;
 - продукт получает `Templates/*` только для артефактов, которые есть в каркасе;
 - продукт получает `Schemas/*` только для артефактов, которые local product tools реально проверяют;
-- `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` не входят в product baseline;
+- retired domains не входят в product baseline;
 - `Rules/*` в продукте допускается только как сокращённый профильный пакет обязательных project-specific rules.
 
 Текущий `bp_bootstrap.py` начал переходную реализацию этой модели: новый продукт получает local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, а legacy `scripts/*` остаётся только совместимой оболочкой.
@@ -272,7 +272,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 Bootstrap не обязан:
 - копировать в product repo полный доменный состав самого `BytePress`;
 - materialize domains, не выбранные product profile;
-- создавать `Adapters/`, `Memory/`, `MCP/`, `Runtime/`, `Roles/`, `Skills/` или `Standards/` внутри product repo;
+- создавать retired domains внутри product repo;
 - materialize `Docs/Technical/Model.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Platform_Contracts.md` или другие advanced technical contracts продукта;
 - создавать предметно завершённые product requirements, delivery model или terminology base;
 - переносить в generated repo полный словарь `BytePress` вместо стартового пакета терминов;
