@@ -1,5 +1,23 @@
 # QualityLog
 
+## QL-000091
+ID: QL-000091
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000031` / `BACK-000096` / `PLAN-000084` / `ADR-000024` закрыты в одном системном pass; исправлен дубль `PLAN-000082`; `Rules/*`, active docs, terms, Pipeline, Plans, `Tools/bp_lint.py` и generated product skeleton синхронизированы; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-semantic-check-product`, fresh product check, auto mode, local `Tools/product_check.py`, проверка отсутствия retired domains в generated product, проверка generated `AGENTS.md` и `Pipeline`, modeled developed product, developed product check, repeated auto и сверка `Rules/README.md` с фактическими файлами `Rules/*`; `bp_lint contract affected`.
+Результат: semantic cleanup завершён без изменения `Minesweeper`, без новых доменов и без ослабления fresh/developed product checks.
+
+---
+
+## QL-000090
+ID: QL-000090
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: Ошибочный дубль `PLAN-000082-created-product-update-route.md` найден и исправлен: архивный проход про route обновления already-created product repo получил `PLAN-000083`, `ROAD-000030`, `BACK-000095`, `CHG-000095`; `Plans/Roadmap.md`, `Plans/Archive/Backlog/ROAD-000030.md`, `Logs/ChangeLog.md` и прямые ссылки синхронизированы; исторический смысл прохода не изменялся.
+Результат: `PLAN-000082` остаётся только у `Plans/Archive/PLAN-000082-product-pipeline-domain-cleanup.md`.
+
+---
+
 ## QL-000089
 ID: QL-000089
 Дата: 2026-04-29

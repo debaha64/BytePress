@@ -39,7 +39,7 @@
 - текущее состояние `BytePress` читается из репозитория и его канонических active documents.
 
 Поддерживающие контуры и документы:
-- `Rules/Repository_As_Source_Of_Truth.md`
+- `Rules/Source.md`
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
 
@@ -57,7 +57,7 @@
 Поддерживающие контуры и документы:
 - `Docs/Technical/Architecture.md`
 - `Docs/Technical/Model.md`
-- `Rules/Domain_Boundaries_Are_Explicit.md`
+- `Rules/Domains.md`
 
 Нарушением считается:
 - перенос planning-state в ignored tool-output paths или `Logs/*`;
@@ -91,15 +91,14 @@
 Поддерживающие контуры и документы:
 - `Docs/Technical/Model.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
-- `Rules/Runtime_Is_Temporary.md`
-- `Rules/Logs_Record_Facts_Only.md`
-- `Rules/Premature_Domains_Are_Removed.md`
+- `Rules/Domains.md`
+- `Rules/Logs.md`
 
 Нарушением считается:
-- чтение runtime как канонического плана;
-- создание нового top-level runtime-domain в продукте без реального execution mechanism;
+- чтение временного tool output как канонического плана;
+- создание нового top-level execution-output domain в продукте без реального execution mechanism;
 - хранение будущего scope в журнале;
-- отсутствие переноса подтверждённого результата из runtime в logs, когда pass реально изменил систему.
+- отсутствие переноса подтверждённого результата из tool output в logs, когда pass реально изменил систему.
 
 Последствие нарушения:
 - execution-layer и fact-layer перестают быть различимыми.

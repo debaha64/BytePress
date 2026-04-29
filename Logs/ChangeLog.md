@@ -1,6 +1,8 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000096 — Rules catalog and semantic cleanup completed
+- CHG-000095 — Already-created product update route ID corrected
 - CHG-000094 — Product pipeline controls and retired domain cleanup completed
 - CHG-000093 — Product skeleton terms and lint corrections synchronized
 - CHG-000092 — Product bootstrap creates local tools skeleton
@@ -95,6 +97,40 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000096 — Rules catalog and semantic cleanup completed
+ID: CHG-000096
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000084
+Связи: ROAD-000031, BACK-000096, ADR-000024, QL-000091
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`Rules/*` объединён в предметные файлы `Source.md`, `Security.md`, `Domains.md`, `Workflow.md`, `Git.md`, `Logs.md`, `Dependencies.md`, `Terms.md` и `Naming.md`; обязательные условия и `RULE-*` ID сохранены. `Rules/Naming.md` закрепляет semantic path/file naming. Active docs, terms, Pipeline, Plans и technical contracts синхронизированы после удаления retired domains. `Tools/bp_lint.py` проверяет новый набор rule-файлов и соответствие `Rules/README.md`.
+
+### Эффект
+Активный слой больше не зависит от старых rule filenames и не направляет агента в удалённые домены как в действующих владельцев смысла. Generated product skeleton сохраняет fresh/auto/developed checks и не получает retired domains. `Minesweeper` не изменялся.
+
+---
+
+## CHG-000095 — Already-created product update route ID corrected
+ID: CHG-000095
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000083
+Связи: ROAD-000030, BACK-000095, QL-000090
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+Архивный план route обновления already-created product repo на local tools baseline выделен из ошибочного дублирования `PLAN-000082`: файл переименован в `Plans/Archive/PLAN-000083-created-product-update-route.md`, внутренний ID изменён на `PLAN-000083`, а связи заменены на `ROAD-000030 / BACK-000095 / CHG-000095 / QL-000090`.
+
+### Эффект
+`PLAN-000082` снова однозначно относится к product pipeline control and retired domain cleanup. Исторический смысл route обновления already-created product repo не переписан; исправлена только идентификационная ошибка и прямые ссылки планового и журнального контура.
 
 ---
 

@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000031 — Semantic cleanup after retired domain removal
+- ROAD-000030 — Already-created product service update route ID correction
 - ROAD-000029 — Product pipeline control and retired domain cleanup
 - ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
 - ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
@@ -41,6 +43,40 @@
 
 ---
 
+## ROAD-000031 — Semantic cleanup after retired domain removal
+ID: ROAD-000031
+Этап: Semantic cleanup after retired domain removal
+Статус: Завершено
+Связи: BACK-000096, PLAN-000084, ADR-000024, CHG-000096
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Навести семантический порядок после удаления преждевременных доменов: исправить остатки retired domains, упорядочить `Rules/*`, закрепить правило именования путей и файлов, устранить дубли планового контура и синхронизировать tools/checks.
+Зависимости: ROAD-000029, ROAD-000030
+Связанные_backlog: BACK-000096
+
+### Описание
+Этап закрыт одним широким системным pass `PLAN-000084`. Дублирование `PLAN-000082` исправлено через отдельный исторический контур `PLAN-000083`; `Rules/*` сгруппирован по предметным областям; semantic path/file naming закреплён в `Rules/Naming.md`; active references на retired domains заменены owner-доменами или оставлены только как forbidden/history context; `bp_lint.py` синхронизирован с новым ruleset. `Minesweeper`, новые домены и полная языковая чистка архивов не выполнялись.
+
+---
+
+## ROAD-000030 — Already-created product service update route ID correction
+ID: ROAD-000030
+Этап: Already-created product service update route ID correction
+Статус: Завершено
+Связи: BACK-000095, PLAN-000083, CHG-000095, QL-000090
+Источник: Идентификационная коррекция архива от 2026-04-30
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-30
+Цель: Выделить архивный проход про маршрут обновления already-created product repo на local tools baseline из ошибочного дублирования `PLAN-000082`.
+Зависимости: ROAD-000027, ROAD-000028
+Связанные_backlog: BACK-000095
+
+### Описание
+Исторический смысл прохода сохранён: он описывает service update route для уже созданного product repo после перехода product skeleton на local `Tools/*`. Исправлена только идентификация: архивный план получает `PLAN-000083`, собственные `ROAD/BACK/CHG/QL` связи и перестаёт ссылаться на `ROAD-000029 / BACK-000094 / CHG-000094 / QL-000089`, которые принадлежат product pipeline cleanup.
+
+---
+
 ## ROAD-000029 — Product pipeline control and retired domain cleanup
 ID: ROAD-000029
 Этап: Product pipeline control and retired domain cleanup
@@ -54,7 +90,7 @@ ID: ROAD-000029
 Связанные_backlog: BACK-000094
 
 ### Описание
-Этап закрыт одним широким корректирующим pass `PLAN-000082`. Процедуры прежнего `Skills/*` перенесены в `Pipeline/Workflows.md`, обязательные нормы прежнего `Standards/*` перенесены в `Rules/*`, retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
+Этап закрыт одним широким корректирующим pass `PLAN-000082`. Рабочие процедуры перенесены в `Pipeline/Workflows.md`, обязательные нормы перенесены в `Rules/*`, retired domains удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
 
 ---
 
@@ -88,7 +124,7 @@ ID: ROAD-000027
 Связанные_backlog: BACK-000092
 
 ### Описание
-Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` сохраняет проверку текущего `BytePress` с legacy domains и проверяет новый product skeleton через local tools contract.
+Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт retired domains в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` проверяет новый product skeleton через local tools contract.
 
 ---
 
@@ -105,7 +141,7 @@ ID: ROAD-000026
 Связанные_backlog: BACK-000091
 
 ### Описание
-Этап закрыт одним архитектурным pass `PLAN-000079`. Добавлены `ADR-000022`, целевая профильная матрица пакетов продукта, migration plan сокращения доменной модели и правило удаления преждевременных доменов. Документы-владельцы синхронизированы вокруг решения: продукт зависит от профиля, получает lightweight `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` и `Schemas/*`, а `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и legacy `Standards/*` выводятся в миграционный контур без удаления в этом pass.
+Этап закрыт одним архитектурным pass `PLAN-000079`. Добавлены `ADR-000022`, целевая профильная матрица пакетов продукта, migration plan сокращения доменной модели и правило удаления преждевременных доменов. Документы-владельцы синхронизированы вокруг решения: продукт зависит от профиля, получает lightweight `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` и `Schemas/*`, а retired domains выводятся в миграционный контур без удаления в этом pass.
 
 ---
 
@@ -462,7 +498,7 @@ ID: ROAD-000015
 Связанные_backlog: BACK-000079
 
 ### Описание
-Этап закрыт одним corrective pass: `Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
+Этап закрыт одним corrective pass: `Setup_Guide.md`, release workflow contract, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
 
 ---
 

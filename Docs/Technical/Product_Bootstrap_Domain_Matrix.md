@@ -42,8 +42,8 @@
 | Rules | `Profile` | только проектно-специфичные обязательные правила | `Rules/README.md` и выбранные `RULE-*` | правила нужны только там, где профиль вводит реальные обязательства продукта |
 | Templates | `Profile` | только шаблоны артефактов, materialized в каркасе | `Templates/README.md` и template files для включённых артефактов | продукт не получает шаблоны сущностей, которых у него нет |
 | Schemas | `Profile` | только схемы проверяемых артефактов | `Schemas/README.md` и schema files для реально проверяемых артефактов | schema-layer не должен быть декоративным |
-| Standards | `Factory-only` | не materialize как отдельный product domain | нет | обязательные нормы переходят в `Rules/*`; остальное удаляется или остаётся историей решения |
-| Skills | `Factory-only` | не materialize как отдельный product domain | нет | процедуры переносятся в `Pipeline/*` как workflows |
+| Former standards layer | `Factory-only` | не materialize как отдельный product domain | нет | обязательные нормы живут в `Rules/*`; остальное остаётся историей решения |
+| Former procedure layer | `Factory-only` | не materialize как отдельный product domain | нет | процедуры живут в `Pipeline/*` как workflows |
 | Profiles | `Factory-only` | не materialize как отдельный domain продукта | profile data в generated config или `README` пакетов | профиль является входом фабрики, а не отдельным operational layer продукта |
 | Adapters | `Retired-before-mechanism` | не materialize | нет | домен удаляется до появления реального adapter mechanism |
 | Memory | `Retired-before-mechanism` | не materialize | нет | future memory contour не должен выглядеть активным storage layer |
@@ -81,8 +81,8 @@
 В этом pass домены не удаляются и инструменты не переписываются. Целевая матрица требует отдельного refactoring sequence:
 1. обновить `bp_bootstrap.py` под profile packages и локальный product `Tools/*`;
 2. обновить `bp_lint.py`, чтобы проверять новую модель продукта и сохранить проверку текущего BytePress до удаления доменов;
-3. процедуры `Skills/*` перенесены в `Pipeline/Workflows.md`;
-4. перенести обязательные нормы `Rules/*` в сокращённые `Rules/*`;
+3. процедуры перенесены в `Pipeline/Workflows.md`;
+4. обязательные нормы собраны в сокращённые предметные файлы `Rules/*`;
 5. удалить преждевременные домены только после того, как checks перестанут требовать их наличие.
 
 ## Граница документа
