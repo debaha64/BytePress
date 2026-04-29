@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000029 — Product pipeline control and retired domain cleanup
 - ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
 - ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
 - ROAD-000026 — Профильная фабрика продуктовых каркасов и сокращение доменной модели
@@ -37,6 +38,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000029 — Product pipeline control and retired domain cleanup
+ID: ROAD-000029
+Этап: Product pipeline control and retired domain cleanup
+Статус: Завершено
+Связи: BACK-000094, PLAN-000082, ADR-000023, CHG-000094
+Источник: Запрос владельца от 2026-04-29
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+Цель: Закрыть проблемы нового полевого теста `Minesweeper`, усилить создаваемый product Pipeline и завершить удаление retired domains `BytePress` после переноса полезного смысла.
+Зависимости: ROAD-000028
+Связанные_backlog: BACK-000094
+
+### Описание
+Этап закрыт одним широким корректирующим pass `PLAN-000082`. Процедуры прежнего `Skills/*` перенесены в `Pipeline/Workflows.md`, обязательные нормы прежнего `Standards/*` перенесены в `Rules/*`, retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
 
 ---
 
