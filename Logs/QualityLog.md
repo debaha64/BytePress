@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000090
+ID: QL-000090
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: Ошибочный дубль `PLAN-000082-created-product-update-route.md` найден и исправлен: архивный проход про route обновления already-created product repo получил `PLAN-000083`, `ROAD-000030`, `BACK-000095`, `CHG-000095`; `Plans/Roadmap.md`, `Plans/Archive/Backlog/ROAD-000030.md`, `Logs/ChangeLog.md` и прямые ссылки синхронизированы; исторический смысл прохода не изменялся.
+Результат: `PLAN-000082` остаётся только у `Plans/Archive/PLAN-000082-product-pipeline-domain-cleanup.md`.
+
+---
+
 ## QL-000089
 ID: QL-000089
 Дата: 2026-04-29

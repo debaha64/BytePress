@@ -1,17 +1,17 @@
-# PLAN-000082 — Маршрут обновления already-created product repo на local tools baseline
+# PLAN-000083 — Маршрут обновления already-created product repo на local tools baseline
 
-ID: PLAN-000082
+ID: PLAN-000083
 Название: Маршрут обновления already-created product repo на local tools baseline
 Статус: Завершено
-Связи: ROAD-000029, BACK-000094, CHG-000094, QL-000089
+Связи: ROAD-000030, BACK-000095, CHG-000095, QL-000090
 Источник: Запрос владельца от 2026-04-28
 Дата_создания: 2026-04-28
-Дата_изменения: 2026-04-28
+Дата_изменения: 2026-04-30
 Основание: После перехода нового product skeleton на local `Tools/*` уже созданные продукты со старым service layer требуют явного update route без повторного bootstrap.
 Связанные_требования:
 - AGENTS.md
 Связанные_backlog:
-- BACK-000094
+- BACK-000095
 Связанные_ADR:
 - ADR-000022
 Артефакты:
@@ -22,7 +22,7 @@ ID: PLAN-000082
 - Docs/Technical/Domain_Model_Migration_Plan.md
 - Plans/Roadmap.md
 - Plans/Backlog.md
-- Plans/Archive/Backlog/ROAD-000029.md
+- Plans/Archive/Backlog/ROAD-000030.md
 - Logs/ChangeLog.md
 - Logs/QualityLog.md
 Риски:

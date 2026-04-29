@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000031 — Semantic cleanup after retired domain removal
+- ROAD-000030 — Already-created product service update route ID correction
 - ROAD-000029 — Product pipeline control and retired domain cleanup
 - ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
 - ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
@@ -38,6 +40,40 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000031 — Semantic cleanup after retired domain removal
+ID: ROAD-000031
+Этап: Semantic cleanup after retired domain removal
+Статус: В_работе
+Связи: BACK-000096, PLAN-000084, ADR-000024
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Навести семантический порядок после удаления преждевременных доменов: исправить остатки retired domains, упорядочить `Rules/*`, закрепить правило именования путей и файлов, устранить дубли планового контура и синхронизировать tools/checks.
+Зависимости: ROAD-000029, ROAD-000030
+Связанные_backlog: BACK-000096
+
+### Описание
+Этап открыт одним широким системным pass `PLAN-000084`. Scope ограничен активным слоем `BytePress`, планово-журнальным контуром, `Rules/*`, `Docs/*`, `Pipeline/*`, `Tools/*`, generated product skeleton checks и прямыми ссылками. `Minesweeper`, новые домены и полная языковая чистка архивов вне scope.
+
+---
+
+## ROAD-000030 — Already-created product service update route ID correction
+ID: ROAD-000030
+Этап: Already-created product service update route ID correction
+Статус: Завершено
+Связи: BACK-000095, PLAN-000083, CHG-000095, QL-000090
+Источник: Идентификационная коррекция архива от 2026-04-30
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-30
+Цель: Выделить архивный проход про маршрут обновления already-created product repo на local tools baseline из ошибочного дублирования `PLAN-000082`.
+Зависимости: ROAD-000027, ROAD-000028
+Связанные_backlog: BACK-000095
+
+### Описание
+Исторический смысл прохода сохранён: он описывает service update route для уже созданного product repo после перехода product skeleton на local `Tools/*`. Исправлена только идентификация: архивный план получает `PLAN-000083`, собственные `ROAD/BACK/CHG/QL` связи и перестаёт ссылаться на `ROAD-000029 / BACK-000094 / CHG-000094 / QL-000089`, которые принадлежат product pipeline cleanup.
 
 ---
 
