@@ -46,8 +46,8 @@
 ## ROAD-000031 — Semantic cleanup after retired domain removal
 ID: ROAD-000031
 Этап: Semantic cleanup after retired domain removal
-Статус: В_работе
-Связи: BACK-000096, PLAN-000084, ADR-000024
+Статус: Завершено
+Связи: BACK-000096, PLAN-000084, ADR-000024, CHG-000096
 Источник: Запрос владельца от 2026-04-30
 Дата_создания: 2026-04-30
 Дата_изменения: 2026-04-30
@@ -56,7 +56,7 @@ ID: ROAD-000031
 Связанные_backlog: BACK-000096
 
 ### Описание
-Этап открыт одним широким системным pass `PLAN-000084`. Scope ограничен активным слоем `BytePress`, планово-журнальным контуром, `Rules/*`, `Docs/*`, `Pipeline/*`, `Tools/*`, generated product skeleton checks и прямыми ссылками. `Minesweeper`, новые домены и полная языковая чистка архивов вне scope.
+Этап закрыт одним широким системным pass `PLAN-000084`. Дублирование `PLAN-000082` исправлено через отдельный исторический контур `PLAN-000083`; `Rules/*` сгруппирован по предметным областям; semantic path/file naming закреплён в `Rules/Naming.md`; active references на retired domains заменены owner-доменами или оставлены только как forbidden/history context; `bp_lint.py` синхронизирован с новым ruleset. `Minesweeper`, новые домены и полная языковая чистка архивов не выполнялись.
 
 ---
 

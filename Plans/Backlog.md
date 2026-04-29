@@ -1,7 +1,7 @@
 # Backlog
 
 ## Индекс
-- BACK-000096 — Semantic cleanup after retired domain removal
+- нет активного этапа; backlog `ROAD-000031` выведен в `Plans/Archive/Backlog/ROAD-000031.md`
 
 ## Легенда типов
 - Система
@@ -32,25 +32,8 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ---
 
-Активный этап: `ROAD-000031`.
+Активный этап отсутствует.
 
-`ROAD-000030` и `ROAD-000029` завершены и выведены в `Plans/Archive/Backlog/ROAD-000030.md` и `Plans/Archive/Backlog/ROAD-000029.md`.
+`ROAD-000031`, `ROAD-000030` и `ROAD-000029` завершены и выведены в `Plans/Archive/Backlog/ROAD-000031.md`, `Plans/Archive/Backlog/ROAD-000030.md` и `Plans/Archive/Backlog/ROAD-000029.md`.
 
----
-
-## BACK-000096 — Semantic cleanup after retired domain removal
-ID: BACK-000096
-Название: Semantic cleanup after retired domain removal
-Тип: Система
-Приоритет: Критический
-Статус: В_работе
-Связи: ROAD-000031, PLAN-000084, ADR-000024
-Источник: Запрос владельца от 2026-04-30
-Дата_создания: 2026-04-30
-Дата_изменения: 2026-04-30
-
-### Описание
-Исправить остатки удалённых доменов в активном слое, упорядочить `Rules/*`, закрепить semantic path/file naming, устранить дубли планового контура и синхронизировать `Tools/*` без изменения `Minesweeper`, без новых доменов и без ослабления проверок.
-
-### Результат
-В работе в `PLAN-000084`.
+Новый `ROAD-*` не активирован автоматически.

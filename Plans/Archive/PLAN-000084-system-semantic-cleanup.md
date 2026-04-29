@@ -2,8 +2,8 @@
 
 ID: PLAN-000084
 Название: Semantic cleanup after retired domain removal
-Статус: В_работе
-Связи: ROAD-000031, BACK-000096, ADR-000024
+Статус: Завершено
+Связи: ROAD-000031, BACK-000096, ADR-000024, CHG-000096, QL-000091
 Источник: Запрос владельца от 2026-04-30
 Дата_создания: 2026-04-30
 Дата_изменения: 2026-04-30
@@ -58,4 +58,4 @@ DoD:
    - DoD: `ChangeLog`, `QualityLog`, planning archive и PR в `develop` согласованы.
 
 ## Результат
-Не заполнено до завершения прохода.
+Системный pass завершён: дублирование `PLAN-000082` исправлено выделением `PLAN-000083`, `Rules/*` объединён в предметные файлы, semantic path/file naming закреплён в `Rules/Naming.md`, active references на retired domains заменены owner-доменами или оставлены только как forbidden/history context, `bp_lint.py` синхронизирован с новым ruleset и проверкой `Rules/README.md`, generated product checks подтверждены.
