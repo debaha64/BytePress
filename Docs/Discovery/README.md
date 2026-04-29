@@ -29,5 +29,5 @@ Bootstrap-created product repo стартует с `Статус_текущей_
 ## Куда идти дальше
 - продуктовая рамка: `../Product/README.md`;
 - планирование: `../../Plans/README.md`;
-- навык интервью: `../../Skills/Interview.md`;
+- рабочий процесс интервью: `../../Pipeline/Workflows.md`;
 - шаблон интервью: `../../Templates/Interview.md`.

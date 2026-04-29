@@ -1,6 +1,7 @@
 # ADRlog
 
 ## Индекс
+- ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
 - ADR-000022 — Profiled self-contained product skeleton factory adopted
 - ADR-000021 — Russian lint markers accepted without weakening product gates
 - ADR-000020 — Domain maps and created product service-layer update route formalized
@@ -23,6 +24,27 @@
 - ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-000002 — Развести знание, оперативную среду, планы и журналы
 - ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
+ID: ADR-000023
+Дата: 2026-04-29
+Статус: Принято
+Связи: ROAD-000029, BACK-000094, PLAN-000082, CHG-000094
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-29
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+
+### Контекст
+Новый полевой тест `Minesweeper` подтвердил работоспособность product skeleton, но выявил управленческие дефекты: агент мог подтверждать текущую истину догадками, выбирать GUI-стек без явного источника, идти по слабому generated Pipeline, пробовать PR route не через `gh` и закрывать широкий pass одним коммитом. Одновременно в active layer оставались retired domains, уже признанные преждевременными в `ADR-000022`.
+
+### Решение
+Сделать `Pipeline/*` владельцем рабочего процесса и перенести туда процедуры прежнего `Skills/*`. Обязательные нормы прежнего `Standards/*` перенести в `Rules/*`. Удалить retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` из active layer после обновления contracts, tools и checks. Закрепить, что PR создаётся через `gh`, а GitHub connector не используется для создания PR. Generated product skeleton должен получать усиленный local `Pipeline/*`, запрет на guessed current truth, dependency gate и разделённые уровни проверок.
+
+### Последствия
+`BytePress` становится меньше и строже: процесс живёт в `Pipeline/*`, обязательные нормы в `Rules/*`, продуктовый каркас проверяется local tools и не получает retired domains. Исторические записи могут сохранять ссылки на удалённые домены как факты прошлого. Возврат любого retired domain требует нового ADR, владельца механизма, потребителя и проверки.
 
 ---
 

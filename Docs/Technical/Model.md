@@ -40,7 +40,7 @@
 - целостное состояние системы не принадлежит одному файлу; оно складывается из канонических source-of-truth доменов.
 
 ### Domain
-Верхнеуровневая зона ответственности в репозитории: `Docs/*`, `Pipeline/*`, `Plans/*`, `Runtime/*`, `Logs/*`, `Rules/*`, `Standards/*`, `Profiles/*`, `Schemas/*`, `Templates/*`, `Tools/*` и соседние домены.
+Верхнеуровневая зона ответственности в репозитории: `Docs/*`, `Pipeline/*`, `Plans/*`, `Logs/*` и ignored tool-output paths, `Rules/*`, `Rules/*`, `Profiles/*`, `Schemas/*`, `Templates/*`, `Tools/*` и соседние домены.
 
 Роль:
 - хранить только свой тип состояния;
@@ -148,7 +148,7 @@
 - не подменять обязательный запрет уровня rule.
 
 Владелец состояния:
-- legacy `Standards/*` до миграции; целевое обязательное состояние переносится в `Rules/*`.
+- legacy `Rules/*` до миграции; целевое обязательное состояние переносится в `Rules/*`.
 
 ### Schema
 Формальный data contract.
@@ -202,7 +202,7 @@
 - `Docs/Technical/*` владеет technical contracts.
 - `Profiles/*` владеют operating profile.
 - `Rules/*` владеют обязательными ограничениями.
-- `Standards/*` остаётся legacy source до переноса обязательных норм в `Rules/*`.
+- `Rules/*` остаётся legacy source до переноса обязательных норм в `Rules/*`.
 - `Schemas/*` владеют формальными data contracts.
 - `Templates/*` владеют reusable human-facing forms.
 - `Tools/*` владеют tooling behavior, но не содержательным состоянием сущностей.
@@ -233,7 +233,7 @@
 - `Model.md` может ссылаться на `Artifact_Lifecycle.md`, чтобы не дублировать lifecycle и sync-order.
 - `Plans/*` могут ссылаться на `Docs/Technical/*` как на contracts, нужные для текущего pass.
 - `Logs/*` могут ссылаться на `Plans/*` и `Docs/Technical/*`, когда фиксируют факт изменения конкретной сущности или контракта.
-- `Tools/*` могут опираться на `Docs/Technical/*`, `Rules/*`, `Standards/*`, `Schemas/*` и `Templates/*`, когда materialize или проверяют контракт.
+- `Tools/*` могут опираться на `Docs/Technical/*`, `Rules/*`, `Rules/*`, `Schemas/*` и `Templates/*`, когда materialize или проверяют контракт.
 
 ## Недопустимые подмены и смешения ответственности
 - `Model.md` не подменяет `Architecture.md` как карту доменов и слоёв.
@@ -275,4 +275,3 @@
 - `TERM-000003`
 - `TERM-000004`
 - `TERM-000005`
-- `STD-000003`

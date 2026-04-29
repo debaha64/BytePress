@@ -23,7 +23,7 @@
 - `Код_бренда` в текущем договоре не вводится.
 
 ## Куда идти дальше
-- стандарт именования: `Standards/Naming.md`;
-- роли: `Roles/README.md`;
-- адаптеры: `Adapters/README.md`;
+- правила: `../Rules/README.md`;
+- рабочий процесс: `../Pipeline/Workflows.md`;
+- проверка структуры: `../Tools/bp_lint.py`;
 - начальное развёртывание продукта: `Docs/Technical/Product_Bootstrap_Contract.md`.

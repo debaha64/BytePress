@@ -39,7 +39,7 @@
 Verification-layer находится между system contracts, planning-contour, process-layer и tool perimeter.
 
 Его место в системе:
-- читает active contracts из `Docs/Technical/*`, `Rules/*`, `Standards/*`, `Plans/*` и реально затронутых active domains;
+- читает active contracts из `Docs/Technical/*`, `Rules/*`, `Rules/*`, `Plans/*` и реально затронутых active domains;
 - использует `Tools/*` как execution perimeter automatic checks;
 - использует `Pipeline/*` как process context, в котором verification result может стать gate input;
 - возвращает verification result в pass-close contour через planning sync и fact logs.
@@ -105,7 +105,7 @@ Verification-layer читает только те inputs, которые уже 
 
 Основные inputs:
 - `Docs/Technical/*` как contracts verification context;
-- `Rules/*` и `Standards/*` как normative constraints;
+- `Rules/*` как normative constraints;
 - `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plans/PLAN-<NNNNNN>-<slug>.md` как planning-state для governance checks;
 - `Pipeline/Phase_Gates.md` и связанные `Pipeline/*` как process context для gate boundary;
 - `Tools/*` как execution entrypoint automatic checks;

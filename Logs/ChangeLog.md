@@ -1,7 +1,7 @@
 # ChangeLog
 
 ## Индекс
-- CHG-000094 — Created product local tools update route documented
+- CHG-000094 — Product pipeline controls and retired domain cleanup completed
 - CHG-000093 — Product skeleton terms and lint corrections synchronized
 - CHG-000092 — Product bootstrap creates local tools skeleton
 - CHG-000091 — Profiled product factory target domain model documented
@@ -98,20 +98,20 @@
 
 ---
 
-## CHG-000094 — Created product local tools update route documented
+## CHG-000094 — Product pipeline controls and retired domain cleanup completed
 ID: CHG-000094
-Дата: 2026-04-28
-Тип_изменения: Документация
+Дата: 2026-04-29
+Тип_изменения: Система
 Источник: PLAN-000082
-Связи: ROAD-000029, BACK-000094, QL-000089
-Дата_создания: 2026-04-28
-Дата_изменения: 2026-04-28
+Связи: ROAD-000029, BACK-000094, ADR-000023, QL-000089
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
 
 ### Описание
-Добавлен `Docs/Technical/Product_Service_Update_Route.md` как owner-document для обновления already-created product repo со старого service layer на local `Tools/*` baseline. Route фиксирует add set, replace set, delete set, protected artifacts, verification route и migration smoke scenario. `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Domain_Model_Migration_Plan.md` и technical map синхронизированы ссылками на новый route.
+`Pipeline/Workflows.md` добавлен как владелец процедур прежнего `Skills/*`: основной путь продукта, первый `product-start`, предметный проход, gates, уровни проверок, журнальное закрытие, PR через `gh` и смысловые коммиты. В `Rules/*` добавлены правила выбора стека и зависимостей, PR-маршрута через `gh` и смысловых коммитов. Retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer.
 
 ### Эффект
-Уже созданный продукт может получить local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*` и transition wrappers без fresh bootstrap reset и без переписывания confirmed current truth, product docs, planning/log history или предметного кода. `Minesweeper`, legacy domains `BytePress`, `Skills/*` и transition `scripts/*` не изменялись.
+Generated product skeleton получает усиленный local `Pipeline/*`, `AGENTS.md` направляет в generated Pipeline, `Interview.md` запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`. `Minesweeper` не изменялся.
 
 ---
 

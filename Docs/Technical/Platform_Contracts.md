@@ -145,7 +145,8 @@
 
 ### `gh`
 Роль:
-- автоматизирует PR contour после final push, если среда и аутентификация это позволяют.
+- автоматизирует PR contour после final push, если среда и аутентификация это позволяют;
+- является единственным основным маршрутом создания PR в `develop`.
 
 Не роль:
 - не является обязательным execution substrate для локальной подготовки pass;
@@ -158,6 +159,8 @@
 - выполнять integration smoke только через repo-native tool route, а не через прямые внешние connector calls;
 - использовать shell utilities для чтения, diff и навигации по active layer;
 - использовать `gh` только после final push и после проверки отсутствия existing PR для head-ветки;
+- не использовать GitHub connector для создания PR;
+- если `gh` недоступен или не авторизован, выполнить push и вернуть ссылку или точные параметры для ручного PR;
 - хранить runtime context только как временный execution helper, не превращая его в source of truth.
 
 ## Недопустимые отклонения и anti-patterns
@@ -165,7 +168,7 @@
 - менять active system contract только через tooling behavior без документной синхронизации;
 - выполнять active work напрямую в `develop`, `main` или повторно использовать уже merged head-ветку;
 - считать Windows-native execution без Linux/WSL равноправным каноническим режимом;
-- использовать `Runtime/*` как substitute для planning-state, archive или facts;
+- использовать ignored tool-output paths как substitute для planning-state, archive или facts;
 - использовать `Pipeline/*` как justification для переписывания platform constraints, ownership или planning rules;
 - вносить secrets в Git или считать внешние сервисы частью обязательного execution substrate;
 - подменять supported tool perimeter случайными локальными скриптами, о которых не знает active documentation.
@@ -174,8 +177,8 @@
 ### К `Plans/*`
 `Plans/*` задаёт stage/task/pass и branch-delivery contour. `Platform_Contracts.md` фиксирует, в какой среде и какими инструментами этот contour поддерживается, но не владеет planning-state.
 
-### К `Runtime/*`
-`Runtime/*` остаётся временным execution context. `Platform_Contracts.md` задаёт ограничения среды, в которой runtime допускается, но не делает runtime источником истины.
+### К ignored tool-output paths
+ignored tool-output paths остаётся временным execution context. `Platform_Contracts.md` задаёт ограничения среды, в которой runtime допускается, но не делает runtime источником истины.
 
 ### К `Tools/*`
 `Tools/*` являются materialization and check perimeter текущей платформы. `Platform_Contracts.md` фиксирует их роли и границы, но не переносит в них ownership системных contracts.

@@ -178,7 +178,7 @@ Supporting contract layer поставляет form/validation interfaces для
 
 Недопустимо:
 - оставлять созданный продукт runtime-зависимым от `BytePress` tooling;
-- materialize `Adapters/*`, `MCP/*`, `Memory/*`, `Runtime/*` или `Roles/*` как placeholder integration contour;
+- materialize retired domains `Adapters/*`, `MCP/*`, `Memory/*`, `Runtime/*` или `Roles/*` как placeholder integration contour;
 - вызывать внешние connectors без отдельного mechanism contract.
 
 ### Product contour
@@ -197,7 +197,7 @@ Supporting contract layer поставляет form/validation interfaces для
 - governance/supporting domains могут настраивать и проверять active layer, не подменяя source-of-truth сущности.
 
 ## Недопустимые прямые обходы и смешения
-- прямой обход `Plans/*` через `Runtime/*` для изменения stage/task/pass state;
+- прямой обход `Plans/*` через ignored tool-output paths для изменения stage/task/pass state;
 - прямой обход `Logs/*` как substitute для закрытия pass без sync в backlog и plan;
 - перенос process-canon из `Pipeline/*` в `Docs/Technical/*`;
 - перенос ownership сущностей из `Model.md` в `Interfaces.md`;
@@ -210,7 +210,7 @@ Supporting contract layer поставляет form/validation interfaces для
 ### К `Plans/*`
 `Interfaces.md` фиксирует, как planning-contour стыкуется с соседними доменами, но не владеет stage/task/pass state.
 
-### К `Runtime/*`
+### К ignored tool-output paths
 `Interfaces.md` фиксирует runtime как service interface активного pass, а не как source-of-truth слой.
 
 ### К `Logs/*`
@@ -233,4 +233,3 @@ Supporting contract layer поставляет form/validation interfaces для
 - `RULE-000003`
 - `RULE-000007`
 - `RULE-000009`
-- `STD-000002`

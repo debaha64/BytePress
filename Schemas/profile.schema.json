@@ -72,53 +72,11 @@
       "type": "string",
       "minLength": 1
     },
-    "Активные_роли": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^ROLE-[0-9]{6}$"
-      }
-    },
-    "Резервные_роли": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^ROLE-[0-9]{6}$"
-      }
-    },
     "Активные_правила": {
       "type": "array",
       "items": {
         "type": "string",
         "pattern": "^RULE-[0-9]{6}$"
-      }
-    },
-    "Активные_стандарты": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^STD-[0-9]{6}$"
-      }
-    },
-    "Активные_навыки": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^SKILL-[0-9]{6}$"
-      }
-    },
-    "Активные_адаптеры": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^ADP-[0-9]{6}$"
-      }
-    },
-    "Резервные_адаптеры": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^ADP-[0-9]{6}$"
       }
     }
   },

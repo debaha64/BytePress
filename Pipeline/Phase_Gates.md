@@ -17,3 +17,13 @@ Release-readiness gate тоже не заменяет фактические mer
 
 ## Параметризуемость
 Политика строгости должна задаваться профилем, а не вшиваться в конвейер как неизменяемое правило.
+
+## Исполнительные гейты
+Актуальные исполнительные гейты прохода описаны в `Pipeline/Workflows.md`:
+- `Branch gate`;
+- `Current truth gate`;
+- `Planning gate`;
+- `Dependency gate`;
+- `Verification gate`;
+- `Log closure gate`;
+- `PR gate`.

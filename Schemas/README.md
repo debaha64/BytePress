@@ -28,5 +28,5 @@
 
 ## Куда идти дальше
 - шаблоны: `Templates/README.md`;
-- именование: `Standards/Naming.md`;
-- документация: `Standards/Documentation.md`.
+- правила: `../Rules/README.md`;
+- проверка структуры: `../Tools/bp_lint.py`.

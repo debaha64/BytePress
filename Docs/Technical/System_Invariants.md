@@ -60,7 +60,7 @@
 - `Rules/Domain_Boundaries_Are_Explicit.md`
 
 Нарушением считается:
-- перенос planning-state в `Runtime/*` или `Logs/*`;
+- перенос planning-state в ignored tool-output paths или `Logs/*`;
 - перенос process-canon в `Docs/Technical/*`;
 - перенос facts в `Plans/*` как substitute для журналов.
 
@@ -72,7 +72,6 @@
 - `Roadmap -> Backlog -> Plan` остаётся единственным каноническим planning-contour.
 
 Поддерживающие контуры и документы:
-- `Standards/Planning.md`
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - active `Plans/PLAN-<NNNNNN>-<slug>.md`
@@ -87,7 +86,7 @@
 
 ### INV-004 — Ownership state cannot move to runtime or logs
 Свойство:
-- legacy `Runtime/*` не хранит source of truth, а `Logs/*` хранят только подтверждённые факты. В целевой модели временные execution outputs принадлежат ignored tool-output paths, а не отдельному top-level domain.
+- legacy ignored tool-output paths не хранит source of truth, а `Logs/*` хранят только подтверждённые факты. В целевой модели временные execution outputs принадлежат ignored tool-output paths, а не отдельному top-level domain.
 
 Поддерживающие контуры и документы:
 - `Docs/Technical/Model.md`
@@ -111,7 +110,6 @@
 
 Поддерживающие контуры и документы:
 - `Plans/README.md`
-- `Standards/Planning.md`
 - `Docs/Technical/Artifact_Lifecycle.md`
 
 Нарушением считается:
@@ -127,7 +125,6 @@
 - если у сущности есть canonical `ID`, contract links должны опираться именно на него.
 
 Поддерживающие контуры и документы:
-- `Standards/Naming.md`
 - `Docs/Technical/Interfaces.md`
 - `Docs/Terms/*`
 
@@ -204,7 +201,7 @@
 - `Tools/bp_bootstrap.py`
 - `Docs/Technical/*`
 - `Rules/*`
-- `Standards/*`
+- `Rules/*`
 
 Нарушением считается:
 - внедрение обязательного contract только в код проверки без документной фиксации;
@@ -225,7 +222,7 @@
 
 Нарушением считается:
 - generated product repo, которому нужен `BYTEPRESS_ROOT` для обычного `dev-test` после завершения profile bootstrap migration;
-- копирование `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` или `Standards/*` в продукт как placeholder domains.
+- копирование retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` или `Standards/*` в продукт как placeholder domains.
 
 Последствие нарушения:
 - продукт остаётся operational child фабрики и не является самодостаточным каркасом.
@@ -236,7 +233,7 @@
 - иметь `BACK-*` и `PLAN-*` в несогласованных статусах;
 - хранить current stage/task/pass вне `Plans/*`.
 
-### К `Runtime/*`
+### К ignored tool-output paths
 Недопустимо:
 - превращать runtime в источник истины;
 - оставлять runtime как substitute для archive или logs.
@@ -256,7 +253,7 @@
 - `Model.md` удерживает ownership состояния и допустимые зависимости сущностей.
 - `Interfaces.md` удерживает допустимые touchpoints и запреты обходов.
 - `Artifact_Lifecycle.md` удерживает source-of-truth map, sync-loop и closure rules.
-- `Rules/*` и `Standards/*` закрепляют запреты и нормы представления.
+- `Rules/*` закрепляют запреты и нормы представления.
 - `bp_lint.py` проверяет минимальные structural contracts active layer.
 - governance-сверка перед commit и push подтверждает, что planning-contour не спорит сам с собой.
 
@@ -279,5 +276,3 @@
 - `RULE-000008`
 - `RULE-000009`
 - `RULE-000010`
-- `STD-000003`
-- `STD-000006`
