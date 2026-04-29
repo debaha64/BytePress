@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000094 — Product pipeline controls and retired domain cleanup completed
 - CHG-000093 — Product skeleton terms and lint corrections synchronized
 - CHG-000092 — Product bootstrap creates local tools skeleton
 - CHG-000091 — Profiled product factory target domain model documented
@@ -94,6 +95,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000094 — Product pipeline controls and retired domain cleanup completed
+ID: CHG-000094
+Дата: 2026-04-29
+Тип_изменения: Система
+Источник: PLAN-000082
+Связи: ROAD-000029, BACK-000094, ADR-000023, QL-000089
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+
+### Описание
+`Pipeline/Workflows.md` добавлен как владелец процедур прежнего `Skills/*`: основной путь продукта, первый `product-start`, предметный проход, gates, уровни проверок, журнальное закрытие, PR через `gh` и смысловые коммиты. В `Rules/*` добавлены правила выбора стека и зависимостей, PR-маршрута через `gh` и смысловых коммитов. Retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer.
+
+### Эффект
+Generated product skeleton получает усиленный local `Pipeline/*`, `AGENTS.md` направляет в generated Pipeline, `Interview.md` запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`. `Minesweeper` не изменялся.
 
 ---
 

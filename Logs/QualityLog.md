@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000089
+ID: QL-000089
+Дата: 2026-04-29
+Статус: пройдено
+Проверка: `ROAD-000029` / `BACK-000094` / `PLAN-000082` / `ADR-000023` открыты и закрыты в одном широком corrective pass; `Pipeline/*`, `Rules/*`, `AGENTS.md`, `Docs/Discovery/*`, bootstrap contracts, domain migration plan, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Tools/bp_integration_smoke.py`, `Plans/*` и `Logs/*` синхронизированы вокруг усиленного product Pipeline, запрета guessed current truth, dependency gate, PR через `gh`, смысловых коммитов и удаления retired domains; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, local `Tools/product_check.py`, `product-fresh`, `auto`, отсутствие retired domains в generated product, modeled developed product, `product-developed`, проверка PR-маршрута в документации, проверка generated `AGENTS.md`, проверка generated `Interview.md` и negative forbidden-domain check выполнены; `bp_lint contract affected`.
+Результат: product-start control усилен, retired domains удалены из active layer, generated product skeleton остаётся самодостаточным и не получает удалённые домены; `Minesweeper` не изменялся.
+
+---
+
 ## QL-000088
 ID: QL-000088
 Дата: 2026-04-28
