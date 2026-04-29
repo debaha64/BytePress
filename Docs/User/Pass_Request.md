@@ -7,7 +7,7 @@
 
 ## На что должен опираться pass request
 - на текущий stage/task/pass в `../../Plans/*`;
-- на ограничения и quality contracts из `../../Rules/*` и `../../Standards/*`;
+- на ограничения и quality contracts из `../../Rules/*`, `../../Pipeline/*` и `../../Docs/Technical/*`;
 - на technical-owner documents из `../Technical/*`, если pass затрагивает system contract;
 - на `../../Setup_Guide.md` и `../../Tools/README.md`, если pass зависит от среды или checks.
 

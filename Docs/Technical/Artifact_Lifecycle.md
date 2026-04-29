@@ -81,7 +81,7 @@ Bootstrap note:
 - compact lifecycle/handoff map живёт в `Pipeline/Inputs_Outputs.md`.
 
 ### Runtime context
-- `Runtime/*`
+- ignored tool-output paths
 
 Роль:
 - держать только временный рабочий контекст во время активного pass.
@@ -107,7 +107,7 @@ Bootstrap note:
 
 ### Supporting contracts
 - `Rules/*`
-- `Standards/*`
+- `Rules/*`
 - `Schemas/*`
 - `Templates/*`
 - `Tools/*`
@@ -124,10 +124,10 @@ Bootstrap note:
 - task-state текущего этапа живёт в `Plans/Backlog.md`;
 - current pass-state живёт в active `Plans/PLAN-<NNNNNN>-<slug>.md`;
 - process-canon живёт в `Pipeline/*`;
-- runtime-state живёт только временно в `Runtime/*`;
+- runtime-state живёт только временно в ignored tool-output paths;
 - fact-state живёт в `Logs/*`;
 - architecture, model, lifecycle, interfaces и invariants живут в `Docs/Technical/*`;
-- form and validation contracts живут в `Templates/*`, `Schemas/*`, `Rules/*`, `Standards/*` и `Tools/*`.
+- form and validation contracts живут в `Templates/*`, `Schemas/*`, `Rules/*`, `Rules/*` и `Tools/*`.
 
 Если один и тот же факт можно прочитать в двух местах, каноническим считается только тот домен, который владеет соответствующим типом состояния.
 
@@ -175,7 +175,7 @@ Bootstrap note:
 - `Logs/*`, если изменение уже подтверждено как факт.
 
 ### При изменении supporting contracts
-Если меняются `Templates/*`, `Schemas/*`, `Rules/*`, `Standards/*` или `Tools/*`, обязательно проверить:
+Если меняются `Templates/*`, `Schemas/*`, `Rules/*`, `Rules/*` или `Tools/*`, обязательно проверить:
 - документы и журналы, которые реально materialize или проверяются этим contract;
 - `Tools/bp_bootstrap.py`, если меняется generation contract;
 - `Tools/bp_lint.py`, если меняется обязательный check;
@@ -255,8 +255,8 @@ Bootstrap note:
 ### К `Plans/*`
 `Plans/*` задаёт current stage/task/pass. `Artifact_Lifecycle.md` не владеет этими сущностями, а фиксирует, как они должны синхронизироваться с соседними слоями.
 
-### К `Runtime/*`
-`Runtime/*` остаётся только временным execution context. `Artifact_Lifecycle.md` фиксирует допустимый переход runtime -> logs, но не делает runtime источником истины.
+### К ignored tool-output paths
+ignored tool-output paths остаётся только временным execution context. `Artifact_Lifecycle.md` фиксирует допустимый переход runtime -> logs, но не делает runtime источником истины.
 
 ### К `Logs/*`
 `Logs/*` остаются fact-layer. `Artifact_Lifecycle.md` фиксирует, когда факт обязан быть записан, но не подменяет сами журналы.

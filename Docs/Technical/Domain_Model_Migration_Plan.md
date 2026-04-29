@@ -3,7 +3,7 @@
 ## Назначение
 `Docs/Technical/Domain_Model_Migration_Plan.md` фиксирует безопасный план перехода от разросшейся доменной модели `BytePress` к профильной фабрике самодостаточных продуктовых каркасов.
 
-Этот document не удаляет домены сам по себе. Он задаёт порядок, зависимости, проверки и риски будущих refactoring passes.
+Этот document фиксирует план и итог прохода сокращения доменной модели. Удаление выполнено только после переноса смысла, обновления contracts, tools и checks.
 
 ## Целевое состояние BytePress
 `BytePress` становится фабрикой профилей продукта.
@@ -23,10 +23,12 @@
 - `Adapters/*` — удалить до появления реального adapter mechanism;
 - `Memory/*` — удалить до появления реального memory mechanism;
 - `MCP/*` — удалить до появления реального connector mechanism;
-- `Runtime/*` — удалить как отдельный домен до появления реального execution mechanism;
+- ignored tool-output paths — удалить как отдельный домен до появления реального execution mechanism;
 - `Roles/*` — удалить до появления реального role execution mechanism;
 - `Skills/*` — перенести смысловые процедуры в `Pipeline/*`, затем удалить домен;
-- `Standards/*` — обязательные нормы перенести в `Rules/*`, остальное удалить.
+- `Rules/*` — обязательные нормы перенести в `Rules/*`, остальное удалить.
+
+Статус на 2026-04-29: retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer. Процедуры `Skills/*` перенесены в `Pipeline/Workflows.md`. Обязательные нормы выбора зависимостей, PR-маршрута и смысловых коммитов перенесены в `Rules/*`.
 
 ## Целевое состояние создаваемого продукта
 Создаваемый продукт получает профильный самодостаточный каркас.
@@ -43,23 +45,20 @@
 
 Продукт не получает `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и отдельный `Standards/*` в baseline.
 
-## Что удалить
-Удалять только после tool-gate pass, в котором `bp_lint.py` перестанет требовать наличие домена и появится replacement contract.
-
-Кандидаты на удаление:
-- `Adapters/*` после удаления adapter requirements из bootstrap/lint/contracts;
-- `Memory/*` после фиксации отсутствия active memory mechanism;
-- `MCP/*` после удаления connector placeholder contracts;
-- `Runtime/*` после переноса временных outputs в ignored tool-output paths;
-- `Roles/*` после удаления role references из profiles/interfaces/model;
-- `Skills/*` после переноса процедур в `Pipeline/*`;
-- `Standards/*` после переноса обязательных норм в `Rules/*`.
+## Что удалено
+- `Adapters/*` — active mechanism отсутствовал.
+- `Memory/*` — active memory mechanism отсутствовал.
+- `MCP/*` — active connector mechanism отсутствовал.
+- ignored tool-output paths — временные outputs перенесены в ignored tool-output paths продукта.
+- `Roles/*` — role execution mechanism отсутствовал, profiles очищены от ссылок.
+- `Skills/*` — процедуры перенесены в `Pipeline/Workflows.md`.
+- `Rules/*` — обязательные нормы перенесены в `Rules/*`.
 
 ## Что перенести
-- `Skills/Interview.md`, `Skills/Planning.md`, `Skills/Review.md`, `Skills/Quality.md`, `Skills/Release.md`, `Skills/Support.md`, `Skills/Research.md`, `Skills/Requirements.md`, `Skills/Discussion.md`, `Skills/Implementation.md` перенести в `Pipeline/Workflows.md` или отдельные workflow files.
-- Обязательные нормы из `Standards/Naming.md`, `Standards/Planning.md`, `Standards/Quality.md`, `Standards/Traceability.md`, `Standards/Documentation.md`, `Standards/Terminology.md`, `Standards/Coding.md`, `Standards/Release.md` перенести в сокращённые project-specific `Rules/*` только если они являются запретом или обязательным условием.
+- `Skills/Interview.md`, `Skills/Planning.md`, `Skills/Review.md`, `Skills/Quality.md`, `Skills/Release.md`, `Skills/Support.md`, `Skills/Research.md`, `Skills/Requirements.md`, `Skills/Discussion.md`, `Skills/Implementation.md` перенесены в `Pipeline/Workflows.md`.
+- Обязательные нормы из `Rules/*` перенесены в `Rules/Dependency_Selection.md`, `Rules/PR_Route_Uses_GH.md`, `Rules/Semantic_Commits.md` и существующие правила. Рекомендательные формулировки не перенесены.
 - Generated `scripts/*` перенести в product-local `Tools/*`; shell scripts оставить только как optional aliases, если профиль требует shell entrypoints.
-- Runtime smoke reports перенести из `Runtime/*` в ignored path продукта, принадлежащий `Tools/*`.
+- Runtime smoke reports перенесены из прежнего `Runtime/*` в ignored path продукта, принадлежащий `Tools/*`.
 
 ## Что объединить
 - Повторяющиеся verification/validation/evidence documents объединить в сокращённый technical verification contract.
@@ -68,7 +67,7 @@
 - `Rules/*` сократить до проектно-специфичных обязательных правил; meta-rules оставить только если они реально проверяются или нужны агентному gate.
 
 ## Какие проверки обновить
-- `Tools/bp_lint.py` должен получить transitional mode: старый BytePress layout допустим до удаления, новый target layout обязателен после migration flag или версии.
+- `Tools/bp_lint.py` больше не требует retired domains в самом `BytePress`.
 - Product checks должны перейти с `scripts/*` и `BYTEPRESS_ROOT` на local product `Tools/*`.
 - Bootstrap checks должны проверять profile packages: `Core`, selected `Rules`, selected `Templates`, selected `Schemas`.
 - Negative checks должны падать на placeholder domains `Adapters`, `Memory`, `MCP`, `Runtime`, `Roles` в создаваемом продукте.
@@ -77,7 +76,7 @@
 ## Риски
 - Одновременное удаление доменов и изменение tools может сломать lint без ясного replacement contract.
 - Перенос `scripts/*` в product `Tools/*` меняет operational model уже созданных продуктов и требует отдельного service update route.
-- Сокращение `Standards/*` может потерять полезные нормы, если не отделить обязательное от рекомендательного.
+- Сокращение `Rules/*` может потерять полезные нормы, если не отделить обязательное от рекомендательного.
 - Перенос `Skills/*` в `Pipeline/*` может раздуть process-domain, если workflows станут вторым technical-layer.
 - Локальные product tools могут начать расходиться между продуктами без profile versioning.
 - Сокращение `Docs/Technical/*` может удалить owner-documents, на которые ещё ссылаются `Plans`, `Logs`, `Tools` или generated docs.
@@ -87,9 +86,9 @@
 2. Добавить profile package contract и версионирование product profiles.
 3. Обновить `bp_bootstrap.py` для генерации local product `Tools/*`, lightweight `Pipeline/*`, profile-bound `Templates/*` и `Schemas/*`. Статус: начато в `PLAN-000080`.
 4. Обновить `bp_lint.py` под transitional checks. Статус: начато в `PLAN-000080`.
-5. Перенести procedures из `Skills/*` в `Pipeline/*`.
-6. Перенести обязательные norms из `Standards/*` в `Rules/*` и сократить ruleset.
-7. Удалить retired domains после прохождения updated checks.
+5. Перенести procedures из `Skills/*` в `Pipeline/*`. Статус: выполнено в `PLAN-000082`.
+6. Перенести обязательные norms из `Rules/*` в `Rules/*` и сократить ruleset. Статус: выполнено в `PLAN-000082`.
+7. Удалить retired domains после прохождения updated checks. Статус: выполнено в `PLAN-000082`.
 8. Сократить `Docs/Technical/*` и убрать повторяющиеся verification/validation documents.
 
 ## Граница документа

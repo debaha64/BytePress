@@ -28,5 +28,5 @@
 
 ## Куда идти дальше
 - схемы: `Schemas/README.md`;
-- стандарт документации: `Standards/Documentation.md`;
-- стандарт именования: `Standards/Naming.md`.
+- правила: `../Rules/README.md`;
+- проверка структуры: `../Tools/bp_lint.py`.

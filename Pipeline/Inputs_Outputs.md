@@ -26,10 +26,10 @@
 | `Roadmap` | `Foundation` | пакет основания и stage-level решения | этапы и их статусы | `Plans/Roadmap.md` |
 | `Backlog` | `Foundation` | активный stage и его границы | задачи текущего этапа | `Plans/Backlog.md` |
 | `План` | `Foundation` | backlog-задача, требования и при необходимости ADR | один текущий pass | active `Plans/*` |
-| `Реализация` | `Execution` | current `Plan` | изменённые owner-artifacts и runtime-context | owner-domain + `Runtime/*` |
-| `Проверка` | `Execution` | результат реализации и checks | verdict и evidence | `Logs/QualityLog.md`, при необходимости `Runtime/*` |
+| `Реализация` | `Execution` | current `Plan` | изменённые owner-artifacts и временный контекст исполнения | owner-domain + ignored tool-output paths |
+| `Проверка` | `Execution` | результат реализации и checks | verdict и evidence | `Logs/QualityLog.md`, при необходимости ignored tool-output paths |
 | `Выпуск` | `Execution` | проверенный результат | change/release fact | `Logs/ChangeLog.md`, `Logs/ReleaseLog.md` |
-| `Передача` | `Handoff` | готовый результат и pass-report | краткое handoff-состояние | `Runtime/Handover.md` или другой owner-artifact по scope |
+| `Передача` | `Handoff` | готовый результат и pass-report | краткое handoff-состояние | `Logs/*` или другой owner-artifact по scope |
 | `Поддержка` | `Handoff` | принятый результат | support facts и follow-up queue | `Logs/SupportLog.md`, при необходимости `Plans/*` |
 
 ## Правило передачи вопросов

@@ -120,9 +120,9 @@
 - `Tools/*` фабрики создаёт product-local `Tools/*`, но не должно оставаться runtime dependency созданного продукта.
 
 ## Допустимые направления связей
-- `Docs/Technical/*` может ссылаться на `Pipeline/*`, `Plans/*`, `Runtime/*`, `Logs/*`, чтобы описывать архитектурные границы между ними.
+- `Docs/Technical/*` может ссылаться на `Pipeline/*`, `Plans/*`, `Logs/*` и ignored tool-output paths, чтобы описывать архитектурные границы между ними.
 - `Pipeline/*` может определять, какие домены участвуют в фазах и переходах, но не забирает у них владение состоянием.
-- `Plans/*` может ссылаться на `Docs/Technical/*`, `Logs/*`, `Rules/*` и `Standards/*` как на contracts и факты, нужные для текущего pass.
+- `Plans/*` может ссылаться на `Docs/Technical/*`, `Logs/*`, `Rules/*` как на contracts и факты, нужные для текущего pass.
 - `Logs/*` могут ссылаться на `Plans/*` и `Docs/Technical/*`, чтобы фиксировать факт изменения и проверки конкретного контракта.
 
 Допустимая общая схема направления такова:
@@ -138,7 +138,7 @@
 - `Rules/*` не становится свалкой рекомендаций; в нём остаются только обязательные проектно-специфичные правила.
 - `Schemas/*` не подменяют `Templates/*`, а `Templates/*` не подменяют канонические документы доменов.
 - `Tools/*` не подменяют source-of-truth документы, а materialize и проверяют их contracts.
-- `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` не должны возвращаться или копироваться в продукт как placeholder domains.
+- retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` не должны возвращаться или копироваться в продукт как placeholder domains.
 
 ## Отношение technical-layer к process, planning, tools и facts
 ### К `Pipeline/*`
