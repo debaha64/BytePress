@@ -87,10 +87,11 @@
 2. Добавить profile package contract и версионирование product profiles.
 3. Обновить `bp_bootstrap.py` для генерации local product `Tools/*`, lightweight `Pipeline/*`, profile-bound `Templates/*` и `Schemas/*`. Статус: начато в `PLAN-000080`.
 4. Обновить `bp_lint.py` под transitional checks. Статус: начато в `PLAN-000080`.
-5. Перенести procedures из `Skills/*` в `Pipeline/*`.
-6. Перенести обязательные norms из `Standards/*` в `Rules/*` и сократить ruleset.
-7. Удалить retired domains после прохождения updated checks.
-8. Сократить `Docs/Technical/*` и убрать повторяющиеся verification/validation documents.
+5. Зафиксировать route обновления already-created product repo со старого service layer на local product `Tools/*` без повторного bootstrap. Статус: выполнено в `PLAN-000082`.
+6. Перенести procedures из `Skills/*` в `Pipeline/*`.
+7. Перенести обязательные norms из `Standards/*` в `Rules/*` и сократить ruleset.
+8. Удалить retired domains после прохождения updated checks.
+9. Сократить `Docs/Technical/*` и убрать повторяющиеся verification/validation documents.
 
 ## Граница документа
 Этот план не является разрешением на массовое удаление файлов. Удаление каждого домена требует отдельного pass, updated checks и фактического log closure.
