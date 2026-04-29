@@ -85,6 +85,12 @@ BASE_PATHS = [
     "Schemas/adr_entry.schema.json",
 ]
 FORBIDDEN_DIRS = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
+PIPELINE_GH_ROUTE = re.compile(r"gh pr create|PR.+через `gh`|через gh", re.IGNORECASE)
+PIPELINE_CHECK_LEVELS = re.compile(r"Структура|Тесты|GUI-запуск|Ручная проверка", re.IGNORECASE)
+AGENTS_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGNORECASE)
+AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фаза:", r"Рабочий поток:", r"Гейт:"]]
+INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
+INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|GUI|tkinter", re.IGNORECASE)
 PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
 CONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Подтверждена$", re.MULTILINE)
@@ -171,6 +177,17 @@ def check(root: Path, mode: str) -> list[str]:
             template_ids[template_id] = path
     if "Tools/.reports/" not in text(root / ".gitignore"):
         errors.append(".gitignore: missing Tools/.reports/ ignore")
+    agents_text = text(root / "AGENTS.md")
+    if not AGENTS_PIPELINE_ROUTE.search(agents_text):
+        errors.append("AGENTS.md: missing Pipeline route")
+    for pattern in AGENTS_START_REPORT:
+        if not pattern.search(agents_text):
+            errors.append("AGENTS.md: missing phase/workflow/gate in startup report")
+    workflows = root / "Pipeline" / "Workflows.md"
+    if not PIPELINE_GH_ROUTE.search(text(workflows)):
+        errors.append("Pipeline/Workflows.md: missing PR route through gh")
+    if not PIPELINE_CHECK_LEVELS.search(text(workflows)):
+        errors.append("Pipeline/Workflows.md: missing check levels")
 
     plan = initial_plan(root)
     if plan is None:
@@ -179,6 +196,10 @@ def check(root: Path, mode: str) -> list[str]:
     if actual_mode == "unknown":
         errors.append("Docs/Discovery/Interview.md: cannot detect current-truth lifecycle state")
     interview = root / "Docs" / "Discovery" / "Interview.md"
+    if not INTERVIEW_NO_GUESSES.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: missing ban on guessed current-truth confirmation")
+    if not INTERVIEW_DEPENDENCIES.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
     if actual_mode == "fresh":
         if not contains(interview, UNCONFIRMED):
             errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
@@ -458,11 +479,15 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. `Docs/Discovery/*` как маршрут текущей истины продукта.\n"
         "3. `Plans/*` как владелец этапа, задачи и прохода.\n"
         "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как слои знания продукта.\n"
-        "5. `Logs/*`, `Pipeline/*`, `Tools/*`, `Templates/*`, `Schemas/*` и `Setup_Guide.md` как поддержка исполнения.\n\n"
+        "5. `Pipeline/*` как владелец рабочего процесса, фаз, workflows и gates.\n"
+        "6. `Logs/*`, `Tools/*`, `Templates/*`, `Schemas/*` и `Setup_Guide.md` как поддержка исполнения.\n\n"
         "## Стартовый отчёт первого ответа\n"
         "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
         "`Приветствие:` короткая рабочая фраза.\n"
         "`Режим запуска:` какой режим запуска используется.\n"
+        "`Фаза:` текущая фаза из `Pipeline/*`.\n"
+        "`Рабочий поток:` текущий workflow из `Pipeline/Workflows.md`.\n"
+        "`Гейт:` ближайший обязательный gate.\n"
         "`Scope:` как понят текущий проход.\n"
         "`Статус ветки:` что обнаружено в Git.\n"
         "`Действие с веткой:` какой стартовый маршрут используется дальше.\n"
@@ -479,13 +504,14 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Start route\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
+        "- Затем прочитать `Pipeline/Workflows.md` и назвать текущие фазу, рабочий поток и гейт.\n"
         "- Первый проход с правками начинать только после открытия task-ветки.\n"
         "- Для structural check использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
         "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
         "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
-        "- этот файл только направляет агента к документам-владельцам продуктового репозитория.\n",
+        "- этот файл только направляет агента к документам-владельцам продуктового репозитория и к `Pipeline/Workflows.md` как владельцу рабочего процесса.\n",
     )
     write(
         target / "Setup_Guide.md",
@@ -523,8 +549,12 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `Interview.md` — текущее интервью продукта.\n\n"
         "## Gate текущей истины\n"
         "- bootstrap-created interview стартует в состоянии `Статус_текущей_истины: Не_подтверждена`;\n"
+        "- начальный запрос пользователя не равен полному подтверждению текущей истины;\n"
         "- пока пользователь не ответил явно, generated repo остаётся только в аналитическом контуре;\n"
+        "- агент не заполняет ответы интервью догадками;\n"
+        "- неявные предположения фиксируются отдельно как гипотезы;\n"
         "- даже в аналитическом контуре первое записываемое действие допускается только после открытия task-ветки;\n"
+        "- блокирующие вопросы задаются пользователю до перехода дальше;\n"
         "- bootstrap-заготовки не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` и предметной реализации.\n\n"
         "## Interview protocol\n"
         "- владелец протокола интервью один: `Interview.md`;\n"
@@ -532,6 +562,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- блокирующие вопросы задаются сразу;\n"
         "- неблокирующие вопросы накапливаются для следующей фазы;\n"
         "- delta-интервью всё равно использует тот же numbered / lettered / recommended format.\n\n"
+        "## Стек и зависимости\n"
+        "- стек и зависимости подтверждаются только явным ответом пользователя, профилем продукта, требованием или отдельным техническим решением;\n"
+        "- стандартная библиотека Python считается зависимостью, если модуль зависит от системной среды;\n"
+        "- GUI-модуль вроде `tkinter` требует проверки доступности и явной фиксации ограничения;\n"
+        "- если GUI-запуск нельзя проверить, результат фиксируется как `не проверено`.\n\n"
         "## Границы\n"
         "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
         "- history-fact изменений аналитического слоя закрывается через planning/log contour;\n"
@@ -548,7 +583,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "---\n\n"
         "## Статус текущей истины\n\n"
         "Статус_текущей_истины: Не_подтверждена\n"
+        "Правило: начальный запрос пользователя не равен полному подтверждению текущей истины.\n"
         "Правило: bootstrap-заготовки и пустые ответы не считаются подтверждением текущей истины.\n"
+        "Правило: агент не имеет права заполнять ответы интервью догадками.\n"
+        "Правило: неявные предположения фиксируются отдельно как гипотезы.\n"
         "Правило: первое записываемое действие по этому интервью допускается только после открытия task-ветки.\n"
         "Правило: до явных ответов пользователя это интервью не разрешает изменения вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n\n"
         "---\n\n"
@@ -561,6 +599,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "---\n\n"
         "## Правило переноса вопросов\n\n"
         "Блокирующий вопрос задаётся сразу. Неблокирующий вопрос не раздувает стартовое интервью и переносится в следующую фазу.\n\n"
+        "---\n\n"
+        "## Правило выбора стека и зависимостей\n\n"
+        "Стек, зависимости и системные ограничения не записываются как подтверждённые требования без явного источника. Допустимые источники: явный ответ пользователя, профиль продукта, подтверждённое требование или отдельное техническое решение. Стандартная библиотека Python считается зависимостью, если модуль зависит от системной среды. GUI-модуль вроде `tkinter` требует проверки доступности и явной фиксации ограничения. Если GUI-запуск нельзя проверить, результат фиксируется как `не проверено`, а не как успешная проверка.\n\n"
         "---\n\n"
         "## Правило delta-интервью\n\n"
         "Если для подтверждения текущей истины достаточно уточнить только часть вопросов, допускается узкое delta-интервью вместо полного повторного интервью. Оно всё равно обязано сохранять тот же договор формата: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно.\n\n"
@@ -866,37 +907,86 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Pipeline/README.md",
         "# Pipeline\n\n"
-        "`Pipeline/*` хранит лёгкий локальный процессный контур продукта.\n\n"
+        "`Pipeline/*` хранит лёгкий локальный процессный контур продукта и владеет рабочим процессом агента.\n\n"
         "## Состав\n"
         "- `Phases.md` — минимальные фазы product pass.\n"
-        "- `Workflows.md` — рабочие процедуры первого product-start.\n"
-        "- `Gates.md` — обязательные переходы и проверки.\n",
+        "- `Workflows.md` — основной путь, первый product-start, предметный проход, уровни проверок, журнальное закрытие и PR через `gh`.\n"
+        "- `Gates.md` — обязательные переходы и проверки.\n\n"
+        "## Граница\n"
+        "`AGENTS.md` направляет сюда, но не подменяет этот процессный контур.\n",
     )
     write(
         target / "Pipeline/Phases.md",
         "# Phases\n\n"
-        "1. Discovery confirmation.\n"
-        "2. Planning update.\n"
-        "3. Implementation or documentation pass.\n"
-        "4. Local tools check.\n"
-        "5. Logs closure.\n",
+        "1. `Discovery confirmation` — подтвердить текущую истину явными ответами пользователя.\n"
+        "2. `Planning update` — синхронизировать `ROAD/BACK/PLAN`.\n"
+        "3. `Execution` — выполнить документационный, кодовый или тестовый проход.\n"
+        "4. `Verification` — разделить структуру, тесты, запуск, GUI-запуск и ручную проверку.\n"
+        "5. `Closure` — закрыть журналы, коммиты, push и PR.\n",
     )
     write(
         target / "Pipeline/Workflows.md",
         "# Workflows\n\n"
-        "## First product-start\n"
-        "1. Открыть task-ветку.\n"
-        "2. Подтвердить `Docs/Discovery/Interview.md`.\n"
-        "3. Синхронизировать `Plans/*` и `Logs/*`.\n"
-        "4. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n",
+        "## Основной путь продукта\n"
+        "1. Назвать фазу, рабочий поток и гейт.\n"
+        "2. Открыть task-ветку до первого записываемого действия.\n"
+        "3. Подтвердить `ROAD/BACK/PLAN`.\n"
+        "4. Прочитать документы-владельцы по scope.\n"
+        "5. Зафиксировать противоречия, гипотезы и блокирующие вопросы.\n"
+        "6. Внести минимальные изменения.\n"
+        "7. Выполнить проверки нужного уровня.\n"
+        "8. Закрыть `Logs/*`, сделать смысловые коммиты, один push и PR через `gh`.\n\n"
+        "## Первый product-start\n"
+        "Фаза: `Discovery confirmation`.\n"
+        "Рабочий поток: `First product-start`.\n"
+        "Гейт: `Current truth gate`.\n\n"
+        "1. Не считать начальный запрос пользователя полным подтверждением текущей истины.\n"
+        "2. Не заполнять `Docs/Discovery/Interview.md` догадками агента.\n"
+        "3. Фиксировать неявные предположения отдельно как гипотезы.\n"
+        "4. Задать пользователю блокирующие вопросы.\n"
+        "5. Не записывать стек, зависимости и GUI-ограничения как подтверждённые требования без явного источника.\n"
+        "6. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
+        "7. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
+        "## Предметный проход\n"
+        "Фаза: `Execution`.\n"
+        "Рабочий поток: `Subject pass`.\n"
+        "Гейт: `Implementation gate`.\n\n"
+        "1. Проверить, что текущая истина подтверждена.\n"
+        "2. Подтвердить источник выбора стека: ответ пользователя, профиль продукта, требование или техническое решение.\n"
+        "3. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
+        "4. Если GUI-запуск нельзя проверить, записать `не проверено`.\n"
+        "5. Не открывать новые домены без владельца, потребителя и проверки.\n\n"
+        "## Уровни проверок\n"
+        "- `Структура` — обязательные файлы и запрет удалённых доменов.\n"
+        "- `Тесты` — автоматические тесты кода.\n"
+        "- `Запуск` — фактический CLI, service или smoke route.\n"
+        "- `GUI-запуск` — доступность GUI-модуля и среды.\n"
+        "- `Ручная проверка` — явно записанное действие, которое нельзя честно автоматизировать.\n\n"
+        "## Журнальное закрытие\n"
+        "- `ChangeLog.md` фиксирует факт изменения.\n"
+        "- `QualityLog.md` фиксирует выполненные проверки и непроверенные зоны.\n"
+        "- `ADRlog.md` обновляется для архитектурных, процессных и продуктово-договорных решений.\n\n"
+        "## PR-маршрут\n"
+        "1. Выполнить один final push рабочей ветки.\n"
+        "2. Проверить через `gh`, что для head-ветки нет открытого PR.\n"
+        "3. Создать PR через `gh pr create`.\n"
+        "4. GitHub connector не использовать для создания PR.\n"
+        "5. Если `gh` недоступен, выполнить push и вернуть параметры для ручного PR.\n",
     )
     write(
         target / "Pipeline/Gates.md",
         "# Gates\n\n"
-        "## First-start gate\n"
+        "## Current truth gate\n"
         "- `Статус_текущей_истины: Не_подтверждена` удерживает продукт в аналитическом контуре.\n"
         "- Первое записываемое действие требует task-ветку.\n"
-        "- Fresh state проверяется локальным `Tools/product_check.py`.\n",
+        "- Fresh state проверяется локальным `Tools/product_check.py`.\n\n"
+        "## Dependency gate\n"
+        "- стек и зависимости требуют явного источника;\n"
+        "- GUI-модуль вроде `tkinter` требует проверки доступности;\n"
+        "- непроверенный GUI-запуск фиксируется как `не проверено`.\n\n"
+        "## PR gate\n"
+        "- PR создаётся через `gh` после final push;\n"
+        "- GitHub connector не используется для создания PR.\n",
     )
 
     write(
@@ -1055,7 +1145,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         target / "scripts/README.md",
         "# scripts\n\n"
         "`scripts/*` — переходные shell-оболочки к локальному `Tools/*`.\n\n"
-        "Основной служебный слой продукта — `Tools/*`. Новые сценарии должны вызывать `Tools/product_check.py` и `Tools/product_bootstrap_smoke.py` напрямую.\n",
+        "Основной служебный слой продукта — `Tools/*`. Новые сценарии должны вызывать `Tools/product_check.py` и `Tools/product_bootstrap_smoke.py` напрямую.\n\n"
+        "Срок переходного удаления: после первого service-layer update pass созданного продукта или при следующем major profile package contract, если продукту не нужны shell aliases.\n",
     )
     write_executable(
         target / "scripts/dev-up.sh",
