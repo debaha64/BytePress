@@ -10,11 +10,11 @@ ID: PLAN-000085
 Основание: После удаления преждевременных доменов проверочный контур сохраняет повторяющиеся technical documents и формулировки, которые нужно свести к одному владельцу без ослабления fresh/developed checks.
 Связанные_требования:
 - Docs/Technical/Verification.md
-- Docs/Technical/Verification_Levels.md
-- Docs/Technical/Verification_Evidence.md
-- Docs/Technical/Validation.md
-- Docs/Technical/Validation_Levels.md
-- Docs/Technical/Validation_Evidence.md
+- бывшие Docs/Technical/Verification_Levels.md
+- бывшие Docs/Technical/Verification_Evidence.md
+- бывшие Docs/Technical/Validation.md
+- бывшие Docs/Technical/Validation_Levels.md
+- бывшие Docs/Technical/Validation_Evidence.md
 - Pipeline/Workflows.md
 - Tools/bp_lint.py
 - Tools/bp_bootstrap.py
@@ -37,13 +37,13 @@ ID: PLAN-000085
 - Исторические архивы и журналы не переписываются без необходимости.
 DoD:
 - Один technical document владеет проверочным договором.
-- Дублирующие verification/validation documents удалены или заменены только если нужен короткий указатель.
+- Дублирующие проверочные документы удалены или заменены только если нужен короткий указатель.
 - Прямые ссылки синхронизированы.
 - Tools и generated product wording не ссылаются на старые проверочные документы или удалённые домены.
 - Обязательные проверки пройдены.
 
 ## Шаги
-1. Ревизовать verification/validation documents.
+1. Ревизовать проверочные документы.
    - DoD: найдено фактическое дублирование и выбран владелец договора.
 2. Сократить technical docs и прямые ссылки.
    - DoD: уровни проверок, evidence и связь с `Pipeline/*` сохранены.

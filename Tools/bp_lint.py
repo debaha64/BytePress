@@ -702,7 +702,7 @@ def main() -> int:
             for item in contract_errors:
                 print(f"- {item}")
         return 1
-    print("Структура BytePress, интеграционный и исполнительный контуры выглядят полными.")
+    print("Структура BytePress и контуры Docs, Plans, Logs, Pipeline, Rules, Templates, Schemas и Tools выглядят полными.")
     return 0
 
 

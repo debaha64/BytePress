@@ -30,7 +30,7 @@
 - `Interfaces.md` отвечает за допустимые точки стыка и service interfaces.
 - `Product_Bootstrap_Contract.md` отвечает за то, что именно должен создать bootstrap и где заканчивается его ответственность.
 - `Product_Bootstrap_Domain_Matrix.md` отвечает за top-level replication canon и не подменяет bootstrap obligations по конкретным артефактам.
-- `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за validation-scope, acceptance criteria и подтверждение корректности bootstrap-result.
+- `Product_Bootstrap_Validation.md` отвечает не за обязательства, а за scope проверки, acceptance criteria и подтверждение корректности bootstrap-result.
 
 ## Связь с `Tools/bp_bootstrap.py`
 `Tools/bp_bootstrap.py` является materializer этого контракта.
@@ -335,25 +335,25 @@ Bootstrap outcome обязан иметь канонический cleanup route
 - не создавать `AGENTS.md` или обязательный `Docs/User/*` contour replicated repo;
 - не создавать `Tools/product_check.py`, если bootstrap заявляет self-contained product tools contour;
 - не создавать `Tools/product_bootstrap_smoke.py`, если bootstrap заявляет local smoke route;
-- не выпускать deterministic integration evidence/report artifact, если bootstrap заявляет stage-closing integration contour с evidence handoff;
+- не выпускать детерминированный smoke report, если bootstrap заявляет передачу доказательства в проверочный контур;
 - materialize `Tools/.reports/*` уже в baseline generated repo без фактического smoke run или без явного hygiene-canon;
 - создавать initial plan без внутреннего `ID: PLAN-000001`;
 - оставлять initial stage/task/pass в пассивном или двусмысленном состоянии, если репозиторий заявлен как first-usable;
 - silently подставлять отсутствующий `brand profile` или auto-generate `product-code`;
 - считать bootstrap завершённым, если product repo не проходит базовый structural check или если human/agent entry contour не materialized;
-- переносить в bootstrap contract обязанности validation-layer или последующих предметных passes.
+- переносить в bootstrap contract обязанности проверки результата или последующих предметных passes.
 - после внедрения profile bootstrap оставлять created product repo зависимым от `BYTEPRESS_ROOT` для обычной структурной проверки.
 
-## Связь с validation-layer
+## Связь с проверкой результата
 `Product_Bootstrap_Contract.md` задаёт expected bootstrap obligations.
 
 `Product_Bootstrap_Validation.md`:
-- фиксирует validation-scope и acceptance criteria bootstrap-result;
+- фиксирует scope проверки и acceptance criteria bootstrap-result;
 - разделяет automatic и procedural checks вокруг bootstrap behavior;
 - подтверждает sync между contract и реализованным bootstrap behavior;
 - не заменяет сам contract и не задаёт новые bootstrap obligations.
 
-Если validation document и `bp_bootstrap.py` расходятся, каноническое исправление должно сначала синхронизировать contract или bootstrap behavior, а не подменять contract одним validation result.
+Если документ проверки и `bp_bootstrap.py` расходятся, каноническое исправление должно сначала синхронизировать contract или bootstrap behavior, а не подменять contract одним результатом проверки.
 
 ## Отношение bootstrap-contract к соседним контурам
 ### К `Plans/*`
