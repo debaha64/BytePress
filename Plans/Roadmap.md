@@ -47,8 +47,8 @@
 ## ROAD-000032 — Verification contract reduction and language cleanup
 ID: ROAD-000032
 Этап: Verification contract reduction and language cleanup
-Статус: В_работе
-Связи: BACK-000097, PLAN-000085, ADR-000025
+Статус: Завершено
+Связи: BACK-000097, PLAN-000085, ADR-000025, CHG-000097
 Источник: Запрос владельца от 2026-04-30
 Дата_создания: 2026-04-30
 Дата_изменения: 2026-04-30
@@ -57,7 +57,7 @@ ID: ROAD-000032
 Связанные_backlog: BACK-000097
 
 ### Описание
-Этап открыт узким pass `PLAN-000085`. Scope ограничен документами `Docs/Technical/Verification*`, `Docs/Technical/Validation*`, прямыми ссылками, `Pipeline/Workflows.md`, `Rules/README.md`, `Tools/README.md`, `Tools/bp_lint.py`, при необходимости `Tools/bp_bootstrap.py`, планами и журналами. `Minesweeper`, новые домены, состав создаваемого продукта и широкая языковая чистка вне scope.
+Этап закрыт узким pass `PLAN-000085`. Проверочный договор сокращён до одного владельца `Docs/Technical/Verification.md`; дублирующие документы уровней, доказательств и подтверждения результата удалены; `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py` синхронизированы. `Minesweeper`, новые домены, состав создаваемого продукта и широкая языковая чистка не выполнялись.
 
 ---
 

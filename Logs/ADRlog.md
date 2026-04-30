@@ -1,6 +1,7 @@
 # ADRlog
 
 ## Индекс
+- ADR-000025 — Verification contract consolidated into one owner document
 - ADR-000024 — Rules catalog consolidated and semantic naming rule adopted
 - ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
 - ADR-000022 — Profiled self-contained product skeleton factory adopted
@@ -25,6 +26,27 @@
 - ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
 - ADR-000002 — Развести знание, оперативную среду, планы и журналы
 - ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+
+---
+
+## ADR-000025 — Verification contract consolidated into one owner document
+ID: ADR-000025
+Дата: 2026-04-30
+Статус: Принято
+Связи: ROAD-000032, BACK-000097, PLAN-000085, CHG-000097
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Контекст
+После сокращения доменной модели проверочный контур сохранял шесть документов с повторяющейся структурой: карта проверки, уровни, доказательства, подтверждение результата и связь с гейтами. Это раздувало `Docs/Technical/*` и создавало риск рассинхронизации прямых ссылок.
+
+### Решение
+Сделать `Docs/Technical/Verification.md` единственным владельцем общего проверочного договора. В нём хранить классы проверок, уровни, доказательства, подтверждение результата, владение интерпретацией и связь с `Pipeline/*`. Удалить дублирующие документы `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md`.
+
+### Последствия
+Проверочный договор стал короче и имеет одного владельца. `Product_Bootstrap_Validation.md` остаётся отдельным узким договором проверки bootstrap-result, потому что владеет acceptance criteria начального развёртывания, а не общим проверочным контуром. Fresh/developed checks не ослаблены.
 
 ---
 

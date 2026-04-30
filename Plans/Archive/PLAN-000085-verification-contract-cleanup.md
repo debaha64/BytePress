@@ -2,8 +2,8 @@
 
 ID: PLAN-000085
 Название: Verification contract reduction and language cleanup
-Статус: В_работе
-Связи: ROAD-000032, BACK-000097, ADR-000025
+Статус: Завершено
+Связи: ROAD-000032, BACK-000097, ADR-000025, CHG-000097, QL-000092
 Источник: Запрос владельца от 2026-04-30
 Дата_создания: 2026-04-30
 Дата_изменения: 2026-04-30
@@ -53,4 +53,4 @@ DoD:
    - DoD: checks, logs, archive planning и PR route завершены.
 
 ## Результат
-Не заполнено до завершения прохода.
+Проверочный договор сокращён до одного владельца `Docs/Technical/Verification.md`. Документы `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md` удалены как дублирующие. `Docs/Technical/README.md`, `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py` синхронизированы. Fresh/developed product checks не ослаблены.
