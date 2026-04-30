@@ -52,7 +52,7 @@ Retired domains зафиксированы как неактивные: бывш
 - Runtime smoke reports перенесены из прежнего `Runtime/*` в ignored path продукта, принадлежащий `Tools/*`.
 
 ## Что объединить
-- Повторяющиеся verification/validation/evidence documents объединить в сокращённый technical verification contract.
+- Повторяющиеся документы проверки, подтверждения результата и доказательств объединить в сокращённый technical verification contract.
 - `Docs/Technical/Pipeline.md` оставить только как краткий technical pointer или удалить после усиления `Pipeline/README.md`.
 - Product bootstrap contract и profile package matrix синхронизировать так, чтобы contract описывал artifact obligations, а matrix — package composition.
 - `Rules/*` сократить до проектно-специфичных обязательных правил; meta-rules оставить только если они реально проверяются или нужны агентному gate.
@@ -80,7 +80,7 @@ Retired domains зафиксированы как неактивные: бывш
 5. Перенести procedures в `Pipeline/*`. Статус: выполнено в `PLAN-000082`.
 6. Перенести обязательные norms в предметные файлы `Rules/*` и сократить ruleset. Статус: выполнено в `PLAN-000084`.
 7. Удалить retired domains после прохождения updated checks. Статус: выполнено в `PLAN-000082`.
-8. Сократить `Docs/Technical/*` и убрать повторяющиеся verification/validation documents.
+8. Сократить `Docs/Technical/*` и убрать повторяющиеся проверочные документы. Статус: выполнено в `PLAN-000085`.
 
 ## Граница документа
 Этот план не является разрешением на массовое удаление файлов. Удаление каждого домена требует отдельного pass, updated checks и фактического log closure.

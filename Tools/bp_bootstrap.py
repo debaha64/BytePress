@@ -921,7 +921,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. `Discovery confirmation` — подтвердить текущую истину явными ответами пользователя.\n"
         "2. `Planning update` — синхронизировать `ROAD/BACK/PLAN`.\n"
         "3. `Execution` — выполнить документационный, кодовый или тестовый проход.\n"
-        "4. `Verification` — разделить структуру, тесты, запуск, GUI-запуск и ручную проверку.\n"
+        "4. `Проверка` — разделить структуру, тесты, запуск, GUI-запуск и ручную проверку.\n"
         "5. `Closure` — закрыть журналы, коммиты, push и PR.\n",
     )
     write(

@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000032 — Verification contract reduction and language cleanup
 - ROAD-000031 — Semantic cleanup after retired domain removal
 - ROAD-000030 — Already-created product service update route ID correction
 - ROAD-000029 — Product pipeline control and retired domain cleanup
@@ -40,6 +41,23 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000032 — Verification contract reduction and language cleanup
+ID: ROAD-000032
+Этап: Verification contract reduction and language cleanup
+Статус: Завершено
+Связи: BACK-000097, PLAN-000085, ADR-000025, CHG-000097
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Сократить повторяющиеся technical documents проверочного контура и синхронизировать язык проверок после удаления преждевременных доменов.
+Зависимости: ROAD-000031
+Связанные_backlog: BACK-000097
+
+### Описание
+Этап закрыт узким pass `PLAN-000085`. Проверочный договор сокращён до одного владельца `Docs/Technical/Verification.md`; дублирующие документы уровней, доказательств и подтверждения результата удалены; `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py` синхронизированы. `Minesweeper`, новые домены, состав создаваемого продукта и широкая языковая чистка не выполнялись.
 
 ---
 

@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000092
+ID: QL-000092
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000032` / `BACK-000097` / `PLAN-000085` / `ADR-000025` закрыты в одном узком pass; общий проверочный договор сокращён до `Docs/Technical/Verification.md`; дублирующие verification/validation documents удалены; прямые ссылки, `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `Tools/bp_lint.py` и `Tools/bp_bootstrap.py` синхронизированы; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-verification-cleanup-product`, fresh product check, auto mode, local `Tools/product_check.py`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, проверка отсутствия retired domains в generated product, проверка generated `AGENTS.md` и `Pipeline`, modeled developed product, developed product check, repeated auto и сверка `Rules/README.md` с фактическими файлами `Rules/*`; `bp_lint contract affected`.
+Результат: проверочный контур сокращён без изменения `Minesweeper`, без новых доменов, без изменения состава создаваемого продукта и без ослабления fresh/developed product checks.
+
+---
+
 ## QL-000091
 ID: QL-000091
 Дата: 2026-04-30

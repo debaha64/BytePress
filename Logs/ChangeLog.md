@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000097 — Verification contract reduced to one owner document
 - CHG-000096 — Rules catalog and semantic cleanup completed
 - CHG-000095 — Already-created product update route ID corrected
 - CHG-000094 — Product pipeline controls and retired domain cleanup completed
@@ -97,6 +98,23 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000097 — Verification contract reduced to one owner document
+ID: CHG-000097
+Дата: 2026-04-30
+Тип_изменения: Документация
+Источник: PLAN-000085
+Связи: ROAD-000032, BACK-000097, ADR-000025, QL-000092
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`Docs/Technical/Verification.md` стал единственным владельцем общего проверочного договора. В него сведены уровни проверок, evidence, подтверждение результата и связь с `Pipeline/*`. Удалены дублирующие `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md`. Синхронизированы `Docs/Technical/README.md`, `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py`.
+
+### Эффект
+Проверочный контур стал короче и не дублирует один смысл в нескольких technical documents. Сообщение `bp_lint.py` приведено к текущей модели `Docs`, `Plans`, `Logs`, `Pipeline`, `Rules`, `Templates`, `Schemas`, `Tools`. Generated product wording не ссылается на удалённые verification/validation documents. `Minesweeper` не изменялся.
 
 ---
 
