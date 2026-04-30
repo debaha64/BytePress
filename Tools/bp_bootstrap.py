@@ -31,6 +31,7 @@ from __future__ import annotations
 from pathlib import Path
 import argparse
 import re
+import subprocess
 import sys
 
 ROOT_MARKERS = ["README.md", "AGENTS.md", "Setup_Guide.md"]
@@ -92,6 +93,7 @@ AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фа
 INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
 INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|GUI|tkinter", re.IGNORECASE)
 PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
+TASK_BRANCH_NAME = re.compile(r"^(chore|feature|fix|docs)/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
 UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
 CONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Подтверждена$", re.MULTILINE)
 PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено пользователем\.$", re.MULTILINE)
@@ -151,6 +153,20 @@ def detect_mode(root: Path) -> str:
     return "unknown"
 
 
+def git_branch(root: Path) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "branch", "--show-current"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return None
+    branch = result.stdout.strip()
+    return branch or None
+
+
 def check(root: Path, mode: str) -> list[str]:
     errors: list[str] = []
     for item in ROOT_MARKERS + BASE_PATHS:
@@ -182,7 +198,7 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("AGENTS.md: missing Pipeline route")
     for pattern in AGENTS_START_REPORT:
         if not pattern.search(agents_text):
-            errors.append("AGENTS.md: missing phase/workflow/gate in startup report")
+            errors.append("AGENTS.md: в стартовом отчёте нет фазы, рабочего потока или гейта")
     workflows = root / "Pipeline" / "Workflows.md"
     if not PIPELINE_GH_ROUTE.search(text(workflows)):
         errors.append("Pipeline/Workflows.md: missing PR route through gh")
@@ -211,6 +227,9 @@ def check(root: Path, mode: str) -> list[str]:
             errors.append("Plans/Backlog.md: BACK-000001 must be В_работе in fresh state")
         if plan and status_of(plan) != "В_работе":
             errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be В_работе in fresh state")
+        current_branch = git_branch(root)
+        if current_branch and (current_branch in {"develop", "main"} or not TASK_BRANCH_NAME.fullmatch(current_branch)):
+            errors.append("git branch: fresh product-start must use chore/, feature/, fix/ or docs/ task branch")
     elif actual_mode == "developed":
         if contains(interview, UNCONFIRMED) or contains(interview, PLACEHOLDER):
             errors.append("Docs/Discovery/Interview.md: developed state keeps fresh placeholders")
@@ -479,33 +498,33 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. `Docs/Discovery/*` как маршрут текущей истины продукта.\n"
         "3. `Plans/*` как владелец этапа, задачи и прохода.\n"
         "4. `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` как слои знания продукта.\n"
-        "5. `Pipeline/*` как владелец рабочего процесса, фаз, workflows и gates.\n"
+        "5. `Pipeline/*` как владелец рабочего процесса, фаз, рабочих потоков и гейтов.\n"
         "6. `Logs/*`, `Tools/*`, `Templates/*`, `Schemas/*` и `Setup_Guide.md` как поддержка исполнения.\n\n"
         "## Стартовый отчёт первого ответа\n"
         "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
         "`Приветствие:` короткая рабочая фраза.\n"
         "`Режим запуска:` какой режим запуска используется.\n"
         "`Фаза:` текущая фаза из `Pipeline/*`.\n"
-        "`Рабочий поток:` текущий workflow из `Pipeline/Workflows.md`.\n"
-        "`Гейт:` ближайший обязательный gate.\n"
-        "`Scope:` как понят текущий проход.\n"
+        "`Рабочий поток:` текущий рабочий поток из `Pipeline/Workflows.md`.\n"
+        "`Гейт:` ближайший обязательный гейт.\n"
+        "`Область:` как понят текущий проход.\n"
         "`Статус ветки:` что обнаружено в Git.\n"
         "`Действие с веткой:` какой стартовый маршрут используется дальше.\n"
         "`Состояние планирования:` текущие `ROAD/BACK/PLAN` или отсутствие активного этапа.\n"
         "`Первые домены-владельцы:` какие домены читаются первыми.\n"
         "`Первый конкретный шаг:` какое действие выполняется сразу.\n\n"
-        "## Первый стартовый гейт продукта\n"
+        "## Гейт текущей истины\n"
         "- Bootstrap-created repo стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
         "- Пока пользователь не дал явные ответы и текущая истина не подтверждена, агент работает только в аналитическом контуре.\n"
         "- До открытия task-ветки любые записываемые изменения запрещены, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "- В этом гейте допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и маршрут очистки failed pass, но сам проход с правками начинается только после действия с веткой в task-ветку.\n"
         "- В этом гейте bootstrap-заготовки не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации.\n"
         "- Если failed start дал tracked drift вне разрешённого раннего контура, канонический маршрут reset — fresh bootstrap в новый target.\n\n"
-        "## Start route\n"
+        "## Стартовый маршрут\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
         "- Затем прочитать `Pipeline/Workflows.md` и назвать текущие фазу, рабочий поток и гейт.\n"
-        "- Первый проход с правками начинать только после открытия task-ветки.\n"
+        "- Первый проход с правками начинать только после открытия task-ветки с типом `chore/`, `feature/`, `fix/` или `docs/`.\n"
         "- Для structural check использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
         "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
         "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
@@ -522,16 +541,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Python 3.11+\n\n"
         "## Рабочий каталог\n"
         "- Репозиторий продукта располагается отдельно от BytePress.\n\n"
-        "## Git start route\n"
+        "## Стартовый маршрут Git\n"
         "```bash\n"
         "git init -b develop\n"
         "git add .\n"
         "git commit -m \"Bootstrap baseline\"\n"
-        "git checkout -b feat/000001-confirm-current-truth\n"
+        "git checkout -b feature/000001-confirm-current-truth\n"
         "```\n\n"
         "## Проверка\n"
         "- первый product-start pass остаётся только аналитическим, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;\n"
-        "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки;\n"
+        "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки с типом `chore/`, `feature/`, `fix/` или `docs/`;\n"
         "- structural check выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
         "- smoke check выполняется локально: `python3 Tools/product_bootstrap_smoke.py`;\n"
         "- переходные `scripts/*` можно использовать только как оболочки к этим локальным tools;\n"
@@ -592,7 +611,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "---\n\n"
         "## Смысловые классы вопросов\n\n"
         "- `Контекст` — кто, для чего и в каком рабочем моменте ждёт результат.\n"
-        "- `Граница` — что входит в первый scope, а что остаётся вне него.\n"
+        "- `Граница` — что входит в первую область работ, а что остаётся вне неё.\n"
         "- `Ограничение` — какие лимиты и зависимости сдерживают первый pass.\n"
         "- `Владение` — кто утверждает результат и поставляет обязательные входы.\n"
         "- `Переход` — что блокирует следующий шаг, а что можно отложить до следующей фазы.\n\n"
@@ -624,8 +643,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Варианты ответа:\n"
         "- A. Один пользовательский сценарий и один основной результат.\n"
         "- B. Несколько несвязанных сценариев сразу.\n"
-        "- C. Полная release-ready система на первом pass.\n\n"
-        "Рекомендуемый вариант: A — он удерживает первую версию в узком и проверяемом scope.\n\n"
+        "- C. Границу нужно уточнить у пользователя.\n\n"
+        "Рекомендуемый вариант: A — он удерживает первую версию в узкой и проверяемой границе.\n\n"
         "### 4. Что явно остаётся вне границы первой версии?\n"
         "Класс вопроса: Граница\n"
         "Ответ: Не подтверждено пользователем.\n\n"
@@ -633,10 +652,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Класс вопроса: Ограничение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
-        "- A. Ограничение времени и узкого scope.\n"
-        "- B. Обязательная полная автоматизация с первого дня.\n"
-        "- C. Требование открыть сразу все будущие домены.\n\n"
-        "Рекомендуемый вариант: A — ранний product-start contour должен оставаться узким и управляемым.\n\n"
+        "- A. Ограничение уже задано пользователем.\n"
+        "- B. Ограничение нужно уточнить у пользователя.\n"
+        "- C. Блокирующих ограничений пока не выявлено.\n\n"
+        "Рекомендуемый вариант: B — если источник ограничения не подтверждён, его нельзя записывать как требование.\n\n"
         "### 6. Кто утверждает границу первого результата и поставляет обязательные входы?\n"
         "Класс вопроса: Владение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
@@ -647,10 +666,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Класс вопроса: Переход\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
-        "- A. Перенести их в следующую фазу `Discussion`, `Research` или `Requirements`.\n"
-        "- B. Немедленно включить всё в стартовое интервью.\n"
-        "- C. Оставить только в устной договорённости.\n\n"
-        "Рекомендуемый вариант: A — он удерживает интервью коротким и рабочим.\n\n"
+        "- A. Перенести их в следующий явно открытый проход.\n"
+        "- B. Задать только если они блокируют подтверждение текущей истины.\n"
+        "- C. Не фиксировать без владельца и источника.\n\n"
+        "Рекомендуемый вариант: A — он удерживает интервью коротким и не расширяет первую версию без запроса.\n\n"
         "## Связанные артефакты для обязательной проверки\n\n"
         "- `Plans/Roadmap.md`\n"
         "- `Plans/Backlog.md`\n"
@@ -679,7 +698,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Назначение\n"
         "Этот документ фиксирует режим работы человека с продуктом.\n\n"
         "## Базовый режим\n"
-        "- человек формулирует scope и ожидаемый outcome pass;\n"
+        "- человек формулирует область и ожидаемый результат прохода;\n"
         "- агент исполняет pass внутри договоров продукта;\n"
         "- текущие этап, задача и план читаются из `../../Plans/*`.\n\n"
         "## Куда идти дальше\n"
@@ -710,9 +729,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Минимальная форма\n"
         "1. Назвать текущий `ROAD-*` или указать новый pass внутри него.\n"
         "2. Сформулировать узкую цель pass.\n"
-        "3. Перечислить scope и документы-владельцы.\n"
+        "3. Перечислить область и документы-владельцы.\n"
         "4. Перечислить ограничения и допустимые sync-поверхности.\n"
-        "5. Указать ожидаемый outcome и проверки, если они не спорят с договорами репозитория.\n\n"
+        "5. Указать ожидаемый результат и проверки, если они не спорят с договорами репозитория.\n\n"
         "## На что опираться\n"
         "- `../../Plans/*`;\n"
         "- `../../Docs/User/*`, `../../Docs/Product/*`, `../../Docs/Technical/*`;\n"
@@ -910,7 +929,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`Pipeline/*` хранит лёгкий локальный процессный контур продукта и владеет рабочим процессом агента.\n\n"
         "## Состав\n"
         "- `Phases.md` — минимальные фазы product pass.\n"
-        "- `Workflows.md` — основной путь, первый product-start, предметный проход, уровни проверок, журнальное закрытие и PR через `gh`.\n"
+        "- `Workflows.md` — основной путь, первый старт продукта, предметный проход, уровни проверок, журнальное закрытие и PR через `gh`.\n"
         "- `Gates.md` — обязательные переходы и проверки.\n\n"
         "## Граница\n"
         "`AGENTS.md` направляет сюда, но не подменяет этот процессный контур.\n",
@@ -918,11 +937,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Pipeline/Phases.md",
         "# Phases\n\n"
-        "1. `Discovery confirmation` — подтвердить текущую истину явными ответами пользователя.\n"
-        "2. `Planning update` — синхронизировать `ROAD/BACK/PLAN`.\n"
-        "3. `Execution` — выполнить документационный, кодовый или тестовый проход.\n"
+        "1. `Подтверждение текущей истины` — подтвердить текущую истину явными ответами пользователя.\n"
+        "2. `Синхронизация планирования` — синхронизировать `ROAD/BACK/PLAN`.\n"
+        "3. `Реализация` — выполнить документационный, кодовый или тестовый проход.\n"
         "4. `Проверка` — разделить структуру, тесты, запуск, GUI-запуск и ручную проверку.\n"
-        "5. `Closure` — закрыть журналы, коммиты, push и PR.\n",
+        "5. `Закрытие` — закрыть журналы, коммиты, push и PR.\n",
     )
     write(
         target / "Pipeline/Workflows.md",
@@ -931,15 +950,15 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. Назвать фазу, рабочий поток и гейт.\n"
         "2. Открыть task-ветку до первого записываемого действия.\n"
         "3. Подтвердить `ROAD/BACK/PLAN`.\n"
-        "4. Прочитать документы-владельцы по scope.\n"
+        "4. Прочитать документы-владельцы по области прохода.\n"
         "5. Зафиксировать противоречия, гипотезы и блокирующие вопросы.\n"
         "6. Внести минимальные изменения.\n"
         "7. Выполнить проверки нужного уровня.\n"
         "8. Закрыть `Logs/*`, сделать смысловые коммиты, один push и PR через `gh`.\n\n"
-        "## Первый product-start\n"
-        "Фаза: `Discovery confirmation`.\n"
-        "Рабочий поток: `First product-start`.\n"
-        "Гейт: `Current truth gate`.\n\n"
+        "## Первый старт продукта\n"
+        "Фаза: `Подтверждение текущей истины`.\n"
+        "Рабочий поток: `Первый старт продукта`.\n"
+        "Гейт: `Гейт текущей истины`.\n\n"
         "1. Не считать начальный запрос пользователя полным подтверждением текущей истины.\n"
         "2. Не заполнять `Docs/Discovery/Interview.md` догадками агента.\n"
         "3. Фиксировать неявные предположения отдельно как гипотезы.\n"
@@ -948,9 +967,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "6. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
         "7. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
         "## Предметный проход\n"
-        "Фаза: `Execution`.\n"
-        "Рабочий поток: `Subject pass`.\n"
-        "Гейт: `Implementation gate`.\n\n"
+        "Фаза: `Реализация`.\n"
+        "Рабочий поток: `Предметный проход`.\n"
+        "Гейт: `Гейт реализации`.\n\n"
         "1. Проверить, что текущая истина подтверждена.\n"
         "2. Подтвердить источник выбора стека: ответ пользователя, профиль продукта, требование или техническое решение.\n"
         "3. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
@@ -967,8 +986,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `QualityLog.md` фиксирует выполненные проверки и непроверенные зоны.\n"
         "- `ADRlog.md` обновляется для архитектурных, процессных и продуктово-договорных решений.\n\n"
         "## PR-маршрут\n"
-        "1. Выполнить один final push рабочей ветки.\n"
-        "2. Проверить через `gh`, что для head-ветки нет открытого PR.\n"
+        "1. Выполнить одну финальную отправку рабочей ветки.\n"
+        "2. Проверить через `gh`, что для рабочей ветки нет открытого PR.\n"
         "3. Создать PR через `gh pr create`.\n"
         "4. GitHub connector не использовать для создания PR.\n"
         "5. Если `gh` недоступен, выполнить push и вернуть параметры для ручного PR.\n",
@@ -976,16 +995,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "Pipeline/Gates.md",
         "# Gates\n\n"
-        "## Current truth gate\n"
+        "## Гейт текущей истины\n"
         "- `Статус_текущей_истины: Не_подтверждена` удерживает продукт в аналитическом контуре.\n"
         "- Первое записываемое действие требует task-ветку.\n"
-        "- Fresh state проверяется локальным `Tools/product_check.py`.\n\n"
-        "## Dependency gate\n"
+        "- Свежее состояние проверяется локальным `Tools/product_check.py`.\n\n"
+        "## Гейт зависимостей\n"
         "- стек и зависимости требуют явного источника;\n"
         "- GUI-модуль вроде `tkinter` требует проверки доступности;\n"
         "- непроверенный GUI-запуск фиксируется как `не проверено`.\n\n"
-        "## PR gate\n"
-        "- PR создаётся через `gh` после final push;\n"
+        "## Гейт запроса на слияние\n"
+        "- PR создаётся через `gh` после финальной отправки ветки;\n"
         "- GitHub connector не используется для создания PR.\n",
     )
 
@@ -1117,16 +1136,16 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Связанные_backlog: BACK-000001\n"
         "Связанные_ADR:\n\n"
         "## Шаги\n"
-        "1. Открыть task-ветку до первого записываемого действия, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
+        "1. Открыть task-ветку с типом `chore/`, `feature/`, `fix/` или `docs/` до первого записываемого действия, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "   - DoD: первый product-start pass не идёт из `develop` или `main`.\n"
         "2. Подтвердить текущую истину в `Docs/Discovery/Interview.md` явными ответами пользователя или узким delta-интервью в том же нумерованном / буквенном / рекомендательном формате.\n"
         "   - DoD: статус текущей истины больше не остаётся bootstrap-заготовкой, а свободноформатная замена структурированного выбора не используется.\n"
         "3. Синхронизировать аналитический контур с `Plans/*` и `Logs/*`.\n"
         "   - DoD: planning/log route отражает подтверждённую текущую истину без выхода в product docs или implementation.\n"
         "4. Открыть следующий предметный pass только после подтверждённой текущей истины.\n"
-        "   - DoD: следующий scope сформулирован отдельно и не смешан с bootstrap-заготовками.\n\n"
+        "   - DoD: следующая область сформулирована отдельно и не смешана с bootstrap-заготовками.\n\n"
         "## Риски\n"
-        "- bootstrap-заготовки могут быть ошибочно приняты за утверждённый scope;\n"
+        "- bootstrap-заготовки могут быть ошибочно приняты за утверждённую область;\n"
         "- отсутствие явных ответов пользователя заблокирует предметный pass.\n\n"
         "## Артефакты\n"
         "- AGENTS.md\n- Docs/*\n- Pipeline/*\n- Plans/*\n- Logs/*\n- Tools/*\n- Templates/*\n- Schemas/*\n\n"
