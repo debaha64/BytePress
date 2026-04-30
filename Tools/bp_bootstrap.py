@@ -88,12 +88,23 @@ BASE_PATHS = [
 FORBIDDEN_DIRS = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
 PIPELINE_GH_ROUTE = re.compile(r"gh pr create|PR.+через `gh`|через gh", re.IGNORECASE)
 PIPELINE_CHECK_LEVELS = re.compile(r"Структура|Тесты|GUI-запуск|Ручная проверка", re.IGNORECASE)
+PIPELINE_ENGLISH_NAMES = re.compile(r"Discovery confirmation|First product-start|Current truth gate|Execution|Subject pass|Implementation gate")
+PIPELINE_RUSSIAN_NAMES = [
+    "Подтверждение текущей истины",
+    "Первый старт продукта",
+    "Гейт текущей истины",
+    "Реализация",
+    "Предметный проход",
+    "Гейт реализации",
+]
 AGENTS_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGNORECASE)
 AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фаза:", r"Рабочий поток:", r"Гейт:"]]
 INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
 INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|GUI|tkinter", re.IGNORECASE)
+INTERVIEW_NO_TIMER_SCOPE = re.compile(r"таймер|timer", re.IGNORECASE)
 PLAN_FILE = re.compile(r"^[A-Z]{2,3}-000001-product-initialization\.md$")
 TASK_BRANCH_NAME = re.compile(r"^(chore|feature|fix|docs)/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
+FIRST_ANALYTIC_BRANCH = re.compile(r"^chore/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
 UNCONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Не_подтверждена$", re.MULTILINE)
 CONFIRMED = re.compile(r"^Статус_текущей_истины:\s+Подтверждена$", re.MULTILINE)
 PLACEHOLDER = re.compile(r"^Ответ:\s+Не подтверждено пользователем\.$", re.MULTILINE)
@@ -204,6 +215,12 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("Pipeline/Workflows.md: missing PR route through gh")
     if not PIPELINE_CHECK_LEVELS.search(text(workflows)):
         errors.append("Pipeline/Workflows.md: missing check levels")
+    pipeline_text = text(root / "Pipeline" / "Workflows.md") + "\n" + text(root / "Pipeline" / "Phases.md") + "\n" + text(root / "Pipeline" / "Gates.md")
+    if PIPELINE_ENGLISH_NAMES.search(pipeline_text):
+        errors.append("Pipeline/*: phase, workflow and gate names must use Russian canonical names")
+    for marker in PIPELINE_RUSSIAN_NAMES:
+        if marker not in pipeline_text:
+            errors.append(f"Pipeline/*: missing Russian marker `{marker}`")
 
     plan = initial_plan(root)
     if plan is None:
@@ -216,6 +233,8 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("Docs/Discovery/Interview.md: missing ban on guessed current-truth confirmation")
     if not INTERVIEW_DEPENDENCIES.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
+    if INTERVIEW_NO_TIMER_SCOPE.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: must not suggest timer or unrequested first-version expansion")
     if actual_mode == "fresh":
         if not contains(interview, UNCONFIRMED):
             errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
@@ -228,8 +247,8 @@ def check(root: Path, mode: str) -> list[str]:
         if plan and status_of(plan) != "В_работе":
             errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be В_работе in fresh state")
         current_branch = git_branch(root)
-        if current_branch and (current_branch in {"develop", "main"} or not TASK_BRANCH_NAME.fullmatch(current_branch)):
-            errors.append("git branch: fresh product-start must use chore/, feature/, fix/ or docs/ task branch")
+        if current_branch and (current_branch in {"develop", "main"} or not FIRST_ANALYTIC_BRANCH.fullmatch(current_branch)):
+            errors.append("git branch: first analytical product-start must use a chore/ task branch")
     elif actual_mode == "developed":
         if contains(interview, UNCONFIRMED) or contains(interview, PLACEHOLDER):
             errors.append("Docs/Discovery/Interview.md: developed state keeps fresh placeholders")
@@ -524,7 +543,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
         "- Затем прочитать `Pipeline/Workflows.md` и назвать текущие фазу, рабочий поток и гейт.\n"
-        "- Первый проход с правками начинать только после открытия task-ветки с типом `chore/`, `feature/`, `fix/` или `docs/`.\n"
+        "- Первый аналитический проход с правками начинать только после открытия task-ветки с типом `chore/`.\n"
+        "- `docs/` использовать только для обычных документационных проходов после снятия стартового гейта.\n"
         "- Для structural check использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
         "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
         "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
@@ -546,11 +566,12 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "git init -b develop\n"
         "git add .\n"
         "git commit -m \"Bootstrap baseline\"\n"
-        "git checkout -b feature/000001-confirm-current-truth\n"
+        "git checkout -b chore/000001-confirm-current-truth\n"
         "```\n\n"
         "## Проверка\n"
         "- первый product-start pass остаётся только аналитическим, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;\n"
-        "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки с типом `chore/`, `feature/`, `fix/` или `docs/`;\n"
+        "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия task-ветки с типом `chore/`;\n"
+        "- `docs/` используется только для обычных документационных проходов после снятия стартового гейта;\n"
         "- structural check выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
         "- smoke check выполняется локально: `python3 Tools/product_bootstrap_smoke.py`;\n"
         "- переходные `scripts/*` можно использовать только как оболочки к этим локальным tools;\n"
@@ -581,11 +602,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- блокирующие вопросы задаются сразу;\n"
         "- неблокирующие вопросы накапливаются для следующей фазы;\n"
         "- delta-интервью всё равно использует тот же numbered / lettered / recommended format.\n\n"
-        "## Стек и зависимости\n"
+        "## Ограничения, стек и зависимости\n"
+        "- ограничения первого прохода фиксируются отдельно от выбора стека;\n"
         "- стек и зависимости подтверждаются только явным ответом пользователя, профилем продукта, требованием или отдельным техническим решением;\n"
         "- стандартная библиотека Python считается зависимостью, если модуль зависит от системной среды;\n"
-        "- GUI-модуль вроде `tkinter` требует проверки доступности и явной фиксации ограничения;\n"
-        "- если GUI-запуск нельзя проверить, результат фиксируется как `не проверено`.\n\n"
+        "- если запуск нельзя проверить, результат фиксируется как `не проверено`.\n\n"
         "## Границы\n"
         "- этот слой не дублирует `Plans/*` и `Logs/*`;\n"
         "- history-fact изменений аналитического слоя закрывается через planning/log contour;\n"
@@ -620,7 +641,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Блокирующий вопрос задаётся сразу. Неблокирующий вопрос не раздувает стартовое интервью и переносится в следующую фазу.\n\n"
         "---\n\n"
         "## Правило выбора стека и зависимостей\n\n"
-        "Стек, зависимости и системные ограничения не записываются как подтверждённые требования без явного источника. Допустимые источники: явный ответ пользователя, профиль продукта, подтверждённое требование или отдельное техническое решение. Стандартная библиотека Python считается зависимостью, если модуль зависит от системной среды. GUI-модуль вроде `tkinter` требует проверки доступности и явной фиксации ограничения. Если GUI-запуск нельзя проверить, результат фиксируется как `не проверено`, а не как успешная проверка.\n\n"
+        "Ограничения первого прохода фиксируются отдельно от выбора стека. Стек и зависимости не записываются как подтверждённые требования без явного источника. Допустимые источники: явный ответ пользователя, профиль продукта, подтверждённое требование или отдельное техническое решение. Если запуск нельзя проверить в текущей среде, результат фиксируется как `не проверено`, а не как успешная проверка.\n\n"
         "---\n\n"
         "## Правило delta-интервью\n\n"
         "Если для подтверждения текущей истины достаточно уточнить только часть вопросов, допускается узкое delta-интервью вместо полного повторного интервью. Оно всё равно обязано сохранять тот же договор формата: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно.\n\n"
@@ -631,7 +652,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
         "- A. Один основной пользователь или заказчик.\n"
-        "- B. Сразу несколько разнотипных аудиторий.\n"
+        "- B. Пользователь или заказчик должен быть уточнён отдельно.\n"
         "- C. Пользователь пока не определён.\n\n"
         "Рекомендуемый вариант: A — он быстрее всего даёт опорную текущую истину для следующего предметного pass.\n\n"
         "### 2. Какой наблюдаемый результат должен дать первый pass продукта?\n"
@@ -642,7 +663,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
         "- A. Один пользовательский сценарий и один основной результат.\n"
-        "- B. Несколько несвязанных сценариев сразу.\n"
+        "- B. Только уже запрошенный минимальный результат.\n"
         "- C. Границу нужно уточнить у пользователя.\n\n"
         "Рекомендуемый вариант: A — он удерживает первую версию в узкой и проверяемой границе.\n\n"
         "### 4. Что явно остаётся вне границы первой версии?\n"
@@ -656,13 +677,21 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- B. Ограничение нужно уточнить у пользователя.\n"
         "- C. Блокирующих ограничений пока не выявлено.\n\n"
         "Рекомендуемый вариант: B — если источник ограничения не подтверждён, его нельзя записывать как требование.\n\n"
-        "### 6. Кто утверждает границу первого результата и поставляет обязательные входы?\n"
+        "### 6. Какой источник подтверждает выбор стека первого pass?\n"
+        "Класс вопроса: Ограничение\n"
+        "Ответ: Не подтверждено пользователем.\n\n"
+        "Варианты ответа:\n"
+        "- A. Явный ответ пользователя.\n"
+        "- B. Профиль продукта или подтверждённое требование.\n"
+        "- C. Источник выбора стека пока не подтверждён.\n\n"
+        "Рекомендуемый вариант: C — стек не записывается как требование без явного источника.\n\n"
+        "### 7. Кто утверждает границу первого результата и поставляет обязательные входы?\n"
         "Класс вопроса: Владение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
-        "### 7. Какой вопрос нужно задать немедленно, если он блокирует следующий шаг?\n"
+        "### 8. Какой вопрос нужно задать немедленно, если он блокирует следующий шаг?\n"
         "Класс вопроса: Переход\n"
         "Ответ: Не подтверждено пользователем.\n\n"
-        "### 8. Какие вопросы можно перенести в следующую фазу без блокировки старта?\n"
+        "### 9. Какие вопросы можно перенести в следующую фазу без блокировки старта?\n"
         "Класс вопроса: Переход\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
@@ -963,18 +992,20 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. Не заполнять `Docs/Discovery/Interview.md` догадками агента.\n"
         "3. Фиксировать неявные предположения отдельно как гипотезы.\n"
         "4. Задать пользователю блокирующие вопросы.\n"
-        "5. Не записывать стек, зависимости и GUI-ограничения как подтверждённые требования без явного источника.\n"
-        "6. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
-        "7. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
+        "5. Не записывать ограничения первого прохода как подтверждённые требования без явного источника.\n"
+        "6. Не записывать стек и зависимости как подтверждённые требования без явного источника.\n"
+        "7. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
+        "8. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
         "## Предметный проход\n"
         "Фаза: `Реализация`.\n"
         "Рабочий поток: `Предметный проход`.\n"
         "Гейт: `Гейт реализации`.\n\n"
         "1. Проверить, что текущая истина подтверждена.\n"
-        "2. Подтвердить источник выбора стека: ответ пользователя, профиль продукта, требование или техническое решение.\n"
-        "3. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
-        "4. Если GUI-запуск нельзя проверить, записать `не проверено`.\n"
-        "5. Не открывать новые домены без владельца, потребителя и проверки.\n\n"
+        "2. Подтвердить ограничения первого прохода.\n"
+        "3. Подтвердить источник выбора стека: ответ пользователя, профиль продукта, требование или техническое решение.\n"
+        "4. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
+        "5. Если запуск нельзя проверить, записать `не проверено`.\n"
+        "6. Не открывать новые домены без владельца, потребителя и проверки.\n\n"
         "## Уровни проверок\n"
         "- `Структура` — обязательные файлы и запрет удалённых доменов.\n"
         "- `Тесты` — автоматические тесты кода.\n"
@@ -1001,8 +1032,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Свежее состояние проверяется локальным `Tools/product_check.py`.\n\n"
         "## Гейт зависимостей\n"
         "- стек и зависимости требуют явного источника;\n"
-        "- GUI-модуль вроде `tkinter` требует проверки доступности;\n"
-        "- непроверенный GUI-запуск фиксируется как `не проверено`.\n\n"
+        "- ограничения первого прохода фиксируются отдельно от выбора стека;\n"
+        "- непроверенный запуск фиксируется как `не проверено`.\n\n"
         "## Гейт запроса на слияние\n"
         "- PR создаётся через `gh` после финальной отправки ветки;\n"
         "- GitHub connector не используется для создания PR.\n",
@@ -1136,7 +1167,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Связанные_backlog: BACK-000001\n"
         "Связанные_ADR:\n\n"
         "## Шаги\n"
-        "1. Открыть task-ветку с типом `chore/`, `feature/`, `fix/` или `docs/` до первого записываемого действия, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
+        "1. Открыть task-ветку с типом `chore/` до первого аналитического записываемого действия, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "   - DoD: первый product-start pass не идёт из `develop` или `main`.\n"
         "2. Подтвердить текущую истину в `Docs/Discovery/Interview.md` явными ответами пользователя или узким delta-интервью в том же нумерованном / буквенном / рекомендательном формате.\n"
         "   - DoD: статус текущей истины больше не остаётся bootstrap-заготовкой, а свободноформатная замена структурированного выбора не используется.\n"
