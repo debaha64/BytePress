@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000094
+ID: QL-000094
+Дата: 2026-05-01
+Статус: пройдено
+Проверка: `ROAD-000034` / `BACK-000099` / `PLAN-000087` закрыты в одном узком исправляющем pass; первый аналитический product-start закреплён за `chore/`; `docs/` оставлен для обычных документационных проходов после снятия стартового гейта; generated Pipeline проверяется на русские названия фаз, рабочих потоков и гейтов; generated Interview разделяет ограничение первого прохода и выбор стека, не предлагает таймер и не подсказывает расширение первой версии; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-field-fix-product-2`, fresh product check, auto mode, local `Tools/product_check.py`, проверка отказа `docs/` для первого аналитического прохода, проверка `chore/` для первого аналитического прохода, проверка русских generated Pipeline markers, проверка отсутствия old English markers и расширяющих подсказок в generated Interview, modeled developed product, developed product check и repeated auto.
+Результат: исправления закрыты без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов; `bp_lint contract affected`.
+
+---
+
 ## QL-000093
 ID: QL-000093
 Дата: 2026-04-30
