@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000098 — Исправления Pipeline после полевого теста продукта
 - CHG-000097 — Verification contract reduced to one owner document
 - CHG-000096 — Rules catalog and semantic cleanup completed
 - CHG-000095 — Already-created product update route ID corrected
@@ -100,6 +101,21 @@
 - CHG-000001 — Создан первичный каркас BytePress v1
 
 ---
+
+## CHG-000098 — Исправления Pipeline после полевого теста продукта
+ID: CHG-000098
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000086
+Связи: ROAD-000033, BACK-000098, ADR-000026, QL-000093
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`AGENTS.md`, `Rules/Git.md`, `Rules/README.md`, `Docs/Terms/TERM-000021-task-branch.md`, `Pipeline/*`, `Docs/Discovery/Interview.md`, bootstrap contracts, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после полевого теста продукта. Разрешённые типы рабочих веток ограничены `chore/`, `feature/`, `fix/`, `docs/`; `product/` не является рекомендуемым или допустимым типом. Generated `AGENTS.md` и `Pipeline/*` перешли на русские названия фаз, рабочих потоков и гейтов. Стартовое интервью больше не подсказывает расширение первой версии без запроса пользователя.
+
+### Эффект
+Повторный field test должен стартовать с безопасной рабочей ветки и русским generated Pipeline. `Minesweeper`, состав создаваемого продукта и доменная модель не изменялись.
 
 ## CHG-000097 — Verification contract reduced to one owner document
 ID: CHG-000097

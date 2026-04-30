@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000093
+ID: QL-000093
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000033` / `BACK-000098` / `PLAN-000086` / `ADR-000026` закрыты в одном узком исправляющем pass; безопасные типы рабочих веток ограничены `chore/`, `feature/`, `fix/`, `docs/`; generated `AGENTS.md` и `Pipeline/*` переведены на русские названия фаз, рабочих потоков и гейтов; стартовое интервью очищено от расширяющих подсказок первой версии; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh product check, auto mode, modeled developed product, developed product check, повторный auto, проверка generated `AGENTS.md` и `Pipeline`, проверка generated `Interview.md`, проверка отсутствия рекомендации `product/` в branch guidance; `bp_lint contract affected`.
+Результат: исправления закрыты без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов.
+
+---
+
 ## QL-000092
 ID: QL-000092
 Дата: 2026-04-30
