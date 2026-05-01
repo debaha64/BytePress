@@ -201,5 +201,5 @@ gh pr create --base develop --head docs/000080-sync-develop-after-release-0.2.0
 
 Фактическая запись о выпуске выполняется только после подтверждённых merge/tag facts.
 
-- Если tag/history уже подтверждают release event, следующий узкий sync-pass в `develop` добавляет фактическую запись в `Logs/ReleaseLog.md`.
+- Если tag/history уже подтверждают release event, следующий узкий sync-проход в `develop` добавляет фактическую запись в `Logs/ReleaseLog.md`.
 - `ReleaseLog.md` не хранит release candidate, прогноз или намерение; там живут только фактически состоявшиеся release events.

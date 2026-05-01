@@ -25,7 +25,7 @@
 | `Пакет основания` | `Основание` | утверждённые требования | стартовый набор `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` | `Docs/*` |
 | `Roadmap` | `Основание` | пакет основания и stage-level решения | этапы и их статусы | `Plans/Roadmap.md` |
 | `Backlog` | `Основание` | активный stage и его границы | задачи текущего этапа | `Plans/Backlog.md` |
-| `План` | `Основание` | backlog-задача, требования и при необходимости ADR | один текущий pass | active `Plans/*` |
+| `План` | `Основание` | backlog-задача, требования и при необходимости ADR | один текущий проход | active `Plans/*` |
 | `Реализация` | `Исполнение` | current `Plan` | изменённые owner-artifacts и временный контекст исполнения | owner-domain + ignored tool-output paths |
 | `Проверка` | `Исполнение` | результат реализации и checks | verdict и evidence | `Logs/QualityLog.md`, при необходимости ignored tool-output paths |
 | `Выпуск` | `Исполнение` | проверенный результат | change/release fact | `Logs/ChangeLog.md`, `Logs/ReleaseLog.md` |
