@@ -51,7 +51,7 @@ PRODUCT_PR_GH_ROUTE = re.compile(r"gh pr create|PR.+через `gh`|через g
 PRODUCT_START_GATE_DISCOVERY_ONLY = re.compile(r"discovery-only|только аналитическ|аналитическ(ий|ом) контур", re.IGNORECASE)
 PRODUCT_START_GATE_TOOLS = re.compile(r"Tools/product_check\.py|Tools/\*", re.IGNORECASE)
 PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена", re.IGNORECASE)
-PRODUCT_START_GATE_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
+PRODUCT_START_GATE_TASK_BRANCH = re.compile(r"task-ветк|task branch|рабоч(ая|ую)\s+ветк", re.IGNORECASE)
 PRODUCT_START_GATE_CHORE_BRANCH = re.compile(r"chore/", re.IGNORECASE)
 PRODUCT_START_GATE_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action|записываем\S* (действи\S*|изменени\S*)|правки запрещены|первый проход с правками", re.IGNORECASE)
 PRODUCT_PIPELINE_ENGLISH_NAMES = re.compile(
@@ -65,10 +65,13 @@ PRODUCT_PIPELINE_RUSSIAN_NAMES = [
     "Предметный проход",
     "Гейт реализации",
 ]
-INTERVIEW_NO_TIMER_SCOPE = re.compile(r"таймер|timer", re.IGNORECASE)
+INTERVIEW_UNCONFIRMED_EXPANSION = re.compile(
+    r"таймер|timer|сч[её]тчик|counter|рекорд|record|настройк|settings|сохранени|save|установщик|installer",
+    re.IGNORECASE,
+)
 PRODUCT_PLAN_DISCOVERY_ONLY = re.compile(r"discovery-only|только аналитическ|аналитическ(ий|ом) контур", re.IGNORECASE)
 PRODUCT_PLAN_CURRENT_TRUTH = re.compile(r"current truth|текущ(ая|ей) истин", re.IGNORECASE)
-PRODUCT_PLAN_TASK_BRANCH = re.compile(r"task-ветк|task branch", re.IGNORECASE)
+PRODUCT_PLAN_TASK_BRANCH = re.compile(r"task-ветк|task branch|рабоч(ая|ую)\s+ветк", re.IGNORECASE)
 PRODUCT_PLAN_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action|записываем\S* (действи\S*|изменени\S*)|правки запрещены|первый проход с правками", re.IGNORECASE)
 BYTEPRESS_PRODUCT_GATE = re.compile(r"первый product-start pass обязан оставаться (discovery-only|только аналитическим)", re.IGNORECASE)
 BYTEPRESS_DISCOVERY_GATE = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена|generated repo остаётся (в discovery-only contour|только в аналитическом контуре)", re.IGNORECASE)
@@ -235,8 +238,8 @@ def has_interview_contract(path: Path) -> list[str]:
         errors.append("missing ban on guessed current-truth confirmation")
     if not contains_pattern(path, INTERVIEW_DEPENDENCY_SOURCE):
         errors.append("missing stack/dependency source discipline")
-    if contains_pattern(path, INTERVIEW_NO_TIMER_SCOPE):
-        errors.append("must not suggest timer or unrequested first-version expansion")
+    if contains_pattern(path, INTERVIEW_UNCONFIRMED_EXPANSION):
+        errors.append("must not suggest unconfirmed first-version expansion examples")
     return errors
 
 
