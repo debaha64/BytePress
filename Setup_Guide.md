@@ -187,7 +187,7 @@ git branch -d release/000020-0.2.0-rc1
 git push origin --delete release/000020-0.2.0-rc1
 ```
 
-После этого синхронизировать `develop` от подтверждённого `main` только через отдельную task-ветку и PR в `develop`:
+После этого синхронизировать `develop` от подтверждённого `main` только через отдельную рабочую ветку и PR в `develop`:
 
 ```bash
 git checkout develop

@@ -16,7 +16,7 @@ Route применяется к product repo, который уже создан
 Route не является product-start reset, fresh bootstrap или предметной миграцией продукта. Он обновляет только service layer и minimal process/check contour, нужный для текущей профильной модели.
 
 ## Канонический маршрут
-1. Открыть task-ветку внутри product repo.
+1. Открыть рабочую ветку внутри product repo.
 2. Создать временный product repo актуальным `Tools/bp_bootstrap.py` с тем же или эквивалентным `product-code` и brand profile.
 3. Сравнить временный baseline с текущим product repo и выделить только service delta.
 4. Перенести add/replace/delete наборы ниже вручную или детерминированным product-side patch.
