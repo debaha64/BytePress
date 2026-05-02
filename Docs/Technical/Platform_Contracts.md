@@ -59,7 +59,7 @@
 - archive artifacts остаются history/reference layer и не становятся active source of truth.
 
 ### Controlled execution contract
-- активная работа идёт только через task-ветку от `develop`;
+- активная работа идёт только через рабочую ветку от `develop`;
 - локальные коммиты и self-check выполняются до final push;
 - `main` и `develop` не редактируются напрямую;
 - PR в `develop` остаётся каноническим delivery interface для task work.

@@ -79,7 +79,7 @@ QUESTION_HEADING = re.compile(r"^###\s+\d+\.", re.MULTILINE)
 INTERVIEW_OPTIONS_BLOCK = re.compile(r"Варианты ответа:")
 INTERVIEW_RECOMMENDED_BLOCK = re.compile(r"Рекомендуемый вариант:")
 INTERVIEW_OWNER_CURRENT_TRUTH = re.compile(r"Docs/Discovery/Interview\.md[\s\S]{0,120}(owner|владел|current truth|текущ)", re.IGNORECASE)
-INTERVIEW_DELTA_BLOCK = re.compile(r"delta-интервью|delta interview", re.IGNORECASE)
+INTERVIEW_DELTA_BLOCK = re.compile(r"узкое интервью|delta-интервью|delta interview", re.IGNORECASE)
 INTERVIEW_CLASS_CONTEXT = re.compile(r"Класс вопроса:\s+Контекст", re.IGNORECASE)
 INTERVIEW_CLASS_BOUNDARY = re.compile(r"Класс вопроса:\s+Граница", re.IGNORECASE)
 INTERVIEW_CLASS_CONSTRAINT = re.compile(r"Класс вопроса:\s+Ограничение", re.IGNORECASE)
@@ -566,7 +566,7 @@ def check_product_repo(root: Path, mode: str) -> int:
     if mode == "product-fresh" and current_branch and contains_pattern(interview_path, PRODUCT_INTERVIEW_UNCONFIRMED):
         if current_branch in {"develop", "main"} or not PRODUCT_FIRST_ANALYTIC_BRANCH.fullmatch(current_branch):
             errors.append(
-                "git branch: first analytical product-start with unconfirmed current truth must use a chore/ task branch before any writable changes"
+                "git branch: first analytical product-start with unconfirmed current truth must use a chore/ working branch before any writable changes"
             )
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
         path = root / rel

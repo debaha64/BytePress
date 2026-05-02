@@ -161,7 +161,7 @@ Supporting contract layer поставляет form/validation interfaces для
 - системное состояние читается из репозитория, а не из отдельного сервиса.
 
 ### Git и PR contour
-Внешний delivery interface системы проходит через task-ветки, push и PR в `develop`.
+Внешний delivery interface системы проходит через рабочие ветки, push и PR в `develop`.
 
 Стабильный contract:
 - work moves through git branch and PR workflow;
