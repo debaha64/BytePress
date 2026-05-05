@@ -135,6 +135,10 @@ def status_of(path: Path) -> str | None:
     return match.group(1) if match else None
 
 
+def is_executable(path: Path) -> bool:
+    return path.exists() and bool(path.stat().st_mode & 0o111)
+
+
 def section_status(path: Path, artifact_id: str) -> str | None:
     lines = text(path).splitlines()
     for index, line in enumerate(lines):
@@ -238,6 +242,12 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
     if INTERVIEW_UNCONFIRMED_EXPANSION.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: must not suggest unconfirmed first-version expansion examples")
+    for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
+        if not is_executable(root / rel):
+            errors.append(f"{rel}: служебный файл не исполняемый")
+    for path in sorted((root / "scripts").glob("*.sh")):
+        if not is_executable(path):
+            errors.append(f"{path.relative_to(root)}: переходный скрипт не исполняемый")
     if actual_mode == "fresh":
         if not contains(interview, UNCONFIRMED):
             errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
@@ -535,6 +545,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`Состояние планирования:` текущие `ROAD/BACK/PLAN` или отсутствие активного этапа.\n"
         "`Первые домены-владельцы:` какие домены читаются первыми.\n"
         "`Первый конкретный шаг:` какое действие выполняется сразу.\n\n"
+        "## Язык пользовательского вывода\n"
+        "Агент отвечает пользователю и пишет в артефакты продукта на русском языке. Английский допускается только для имён собственных, путей, команд, веток, ID и технически неизбежных мест.\n\n"
         "## Гейт текущей истины\n"
         "- Созданный начальным развёртыванием репозиторий стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
         "- Пока пользователь не дал явные ответы и текущая истина не подтверждена, агент работает только в аналитическом контуре.\n"

@@ -54,6 +54,8 @@ PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_ист
 PRODUCT_START_GATE_TASK_BRANCH = re.compile(r"task-ветк|task branch|рабоч(ая|ую)\s+ветк", re.IGNORECASE)
 PRODUCT_START_GATE_CHORE_BRANCH = re.compile(r"chore/", re.IGNORECASE)
 PRODUCT_START_GATE_WRITABLE = re.compile(r"writable (action|changes)|writable changes|writable action|записываем\S* (действи\S*|изменени\S*)|правки запрещены|первый проход с правками", re.IGNORECASE)
+PRODUCT_AGENT_RUSSIAN_OUTPUT = re.compile(r"русск\S* язык|на русском языке", re.IGNORECASE)
+PRODUCT_AGENT_ENGLISH_LIMIT = re.compile(r"Английский допускается только", re.IGNORECASE)
 PRODUCT_PIPELINE_ENGLISH_NAMES = re.compile(
     r"Discovery confirmation|First product-start|Current truth gate|Execution|Subject pass|Implementation gate"
 )
@@ -101,6 +103,13 @@ TASK_BRANCH_NAME = re.compile(r"^(chore|feature|fix|docs)/[0-9]{6}-[a-z0-9]+(?:-
 PRODUCT_FIRST_ANALYTIC_BRANCH = re.compile(r"^chore/[0-9]{6}-[a-z0-9]+(?:-[a-z0-9]+)*$")
 PRODUCT_PLAN_ID = re.compile(r"^ID:\s+PLAN-([0-9]{6})$", re.MULTILINE)
 PRODUCT_STATUS_LINE = re.compile(r"^Статус:\s+(\S+)$", re.MULTILINE)
+BYTEPRESS_ROAD_000036_DONE = re.compile(r"ID:\s+ROAD-000036[\s\S]{0,240}Статус:\s+Завершено")
+BYTEPRESS_BACKLOG_000101_ACTIVE = re.compile(r"### Активные[\s\S]*?ID:\s+BACK-000101")
+BYTEPRESS_BACKLOG_000101_ARCHIVED_DONE = re.compile(r"ID:\s+BACK-000101[\s\S]{0,240}Статус:\s+Завершено")
+BYTEPRESS_PLAN_000090_DONE = re.compile(r"ID:\s+PLAN-000090[\s\S]{0,240}Статус:\s+Завершено")
+BYTEPRESS_REPORTS_PLAN_000090_CLOSED = re.compile(r"ROAD-000036`?\s*/\s*`?BACK-000101`?\s*/\s*`?PLAN-000090`?\s+закрыт", re.IGNORECASE)
+BYTEPRESS_WORKFLOW_FACT_RULE = re.compile(r"фактические файлы `Plans/Roadmap\.md`, `Plans/Backlog\.md` и архивированный `Plan` должны подтверждать статус `Завершено`")
+BYTEPRESS_RULE_RUSSIAN_OUTPUT = re.compile(r"RULE-000017[\s\S]{0,500}Все записи агента[\s\S]{0,200}на русском языке")
 INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
 INTERVIEW_SKILL_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
 INTERVIEW_SKILL_OWNER = re.compile(r"owner|владел", re.IGNORECASE)
@@ -277,6 +286,8 @@ def has_product_start_gate(path: Path) -> list[str]:
         PRODUCT_START_GATE_TASK_BRANCH,
         PRODUCT_START_GATE_CHORE_BRANCH,
         PRODUCT_START_GATE_WRITABLE,
+        PRODUCT_AGENT_RUSSIAN_OUTPUT,
+        PRODUCT_AGENT_ENGLISH_LIMIT,
         PRODUCT_PIPELINE_ROUTE,
     ]
     errors: list[str] = []
@@ -381,6 +392,23 @@ def is_executable(path: Path) -> bool:
     if not path.exists():
         return False
     return bool(path.stat().st_mode & 0o111)
+
+
+def check_reported_plan_closure(root: Path) -> list[str]:
+    errors: list[str] = []
+    if not contains_pattern(root / "Logs" / "QualityLog.md", BYTEPRESS_REPORTS_PLAN_000090_CLOSED):
+        return errors
+    if not contains_pattern(root / "Plans" / "Roadmap.md", BYTEPRESS_ROAD_000036_DONE):
+        errors.append("Plans/Roadmap.md: журнал сообщает о закрытии ROAD-000036, но ROAD-000036 не имеет статус `Завершено`")
+    if contains_pattern(root / "Plans" / "Backlog.md", BYTEPRESS_BACKLOG_000101_ACTIVE):
+        errors.append("Plans/Backlog.md: журнал сообщает о закрытии BACK-000101, но BACK-000101 остаётся активным")
+    if not contains_pattern(root / "Plans" / "Archive" / "Backlog" / "ROAD-000036.md", BYTEPRESS_BACKLOG_000101_ARCHIVED_DONE):
+        errors.append("Plans/Archive/Backlog/ROAD-000036.md: нет завершённого BACK-000101")
+    if (root / "Plans" / "PLAN-000090-pre-release-cleanup-pass.md").exists():
+        errors.append("Plans/PLAN-000090-pre-release-cleanup-pass.md: закрытый PLAN-000090 должен быть в архиве")
+    if not contains_pattern(root / "Plans" / "Archive" / "PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE):
+        errors.append("Plans/Archive/PLAN-000090-pre-release-cleanup-pass.md: нет завершённого PLAN-000090")
+    return errors
 
 
 def check_profile_reference_lists(path: Path) -> list[str]:
@@ -683,6 +711,14 @@ def main() -> int:
         contract_errors.append("AGENTS.md: missing workflow in startup report")
     if not contains_pattern(root / "AGENTS.md", PRODUCT_START_REPORT_GATE):
         contract_errors.append("AGENTS.md: missing gate in startup report")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_AGENT_RUSSIAN_OUTPUT):
+        contract_errors.append("AGENTS.md: нет правила русского пользовательского вывода")
+    if not contains_pattern(root / "AGENTS.md", PRODUCT_AGENT_ENGLISH_LIMIT):
+        contract_errors.append("AGENTS.md: нет границы исключений для английского в пользовательском выводе")
+    if not contains_pattern(root / "Rules" / "Workflow.md", BYTEPRESS_RULE_RUSSIAN_OUTPUT):
+        contract_errors.append("Rules/Workflow.md: нет RULE-000017 о русском пользовательском выводе")
+    if not contains_pattern(root / "Pipeline" / "Workflows.md", BYTEPRESS_WORKFLOW_FACT_RULE):
+        contract_errors.append("Pipeline/Workflows.md: нет правила сверки отчёта о закрытии ROAD/BACK/PLAN с фактом")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", PRODUCT_PR_GH_ROUTE):
         contract_errors.append("Pipeline/Workflows.md: missing PR route through gh")
     for item in has_interview_contract(root / "Docs" / "Discovery" / "Interview.md"):
@@ -727,6 +763,12 @@ def main() -> int:
             print("Ошибки контрактов активного слоя:")
             for item in contract_errors:
                 print(f"- {item}")
+        return 1
+    plan_closure_errors = check_reported_plan_closure(root)
+    if plan_closure_errors:
+        print("Ошибки сверки отчёта и факта планового контура:")
+        for item in plan_closure_errors:
+            print(f"- {item}")
         return 1
     print("Структура BytePress и контуры Docs, Plans, Logs, Pipeline, Rules, Templates, Schemas и Tools выглядят полными.")
     return 0
