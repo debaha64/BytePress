@@ -1,8 +1,7 @@
 # Backlog
 
 ## Индекс
-- BACK-000101 — Предрелизная чистка создаваемого слоя
-- нет активного этапа; backlog `ROAD-000035` выведен в `Plans/Archive/Backlog/ROAD-000035.md`
+- нет активного этапа; backlog `ROAD-000036` выведен в `Plans/Archive/Backlog/ROAD-000036.md`
 
 ## Легенда типов
 - Система
@@ -35,15 +34,10 @@ Historical backlog завершённых этапов хранится в `Plan
 
 ### Активные
 
-#### BACK-000101
-ID: BACK-000101
-Задача: Предрелизная чистка создаваемого слоя
-Статус: В_работе
-Связи: ROAD-000036, PLAN-000090, CHG-000101, QL-000096
-Описание: Убрать расширяющие подсказки интервью, разделить ограничение и стек, довести русский язык, определить судьбу scripts/*, зафиксировать Tools/* как главный служебный вход, обновить проверки, рекомендовать 0.3.0.
+Активных задач нет.
 
 ---
 
-Активный этап: `ROAD-000036`.
+Активный этап: отсутствует.
 
-`ROAD-000035`, `ROAD-000034`, `ROAD-000033`, `ROAD-000032`, `ROAD-000031`, `ROAD-000030` и `ROAD-000029` завершены и выведены в `Plans/Archive/Backlog/ROAD-000035.md`, `Plans/Archive/Backlog/ROAD-000034.md`, `Plans/Archive/Backlog/ROAD-000033.md`, `Plans/Archive/Backlog/ROAD-000032.md`, `Plans/Archive/Backlog/ROAD-000031.md`, `Plans/Archive/Backlog/ROAD-000030.md` и `Plans/Archive/Backlog/ROAD-000029.md`.
+`ROAD-000036`, `ROAD-000035`, `ROAD-000034`, `ROAD-000033`, `ROAD-000032`, `ROAD-000031`, `ROAD-000030` и `ROAD-000029` завершены и выведены в `Plans/Archive/Backlog/ROAD-000036.md`, `Plans/Archive/Backlog/ROAD-000035.md`, `Plans/Archive/Backlog/ROAD-000034.md`, `Plans/Archive/Backlog/ROAD-000033.md`, `Plans/Archive/Backlog/ROAD-000032.md`, `Plans/Archive/Backlog/ROAD-000031.md`, `Plans/Archive/Backlog/ROAD-000030.md` и `Plans/Archive/Backlog/ROAD-000029.md`.
