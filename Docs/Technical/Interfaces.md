@@ -160,12 +160,12 @@ Supporting contract layer поставляет form/validation interfaces для
 - домены взаимодействуют через файлы, каталоги, path-contracts и canonical IDs;
 - системное состояние читается из репозитория, а не из отдельного сервиса.
 
-### Git и PR contour
-Внешний delivery interface системы проходит через рабочие ветки, push и PR в `develop`.
+### Git и контур запроса на слияние
+Внешний delivery interface системы проходит через рабочие ветки, отправку ветки и запрос на слияние в `develop`.
 
 Стабильный contract:
-- work moves through git branch and PR workflow;
-- merge завершает pass на уровне репозитория, но не меняет ownership доменных source-of-truth.
+- работа проходит через Git-ветку и запрос на слияние;
+- merge завершает проход на уровне репозитория, но не меняет владение доменными source-of-truth.
 
 ### Product-local tools contour
 Целевой generated product repo получает local `Tools/*` вместо зависимости от `BYTEPRESS_ROOT` и product `scripts/*`.

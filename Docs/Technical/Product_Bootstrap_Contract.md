@@ -199,9 +199,9 @@ Generated `Pipeline/*` обязан описывать:
 - рабочий поток первого `product-start`;
 - рабочий поток предметного прохода;
 - гейты;
-- уровни проверок: структура, тесты, запуск, GUI-запуск и ручная проверка;
+- уровни проверок: структура, тесты, запуск, запуск графического интерфейса и ручная проверка;
 - журнальное закрытие;
-- PR-маршрут через `gh`.
+- маршрут запроса на слияние через `gh`.
 
 ### Product-local Tools layer
 Bootstrap обязан создать:
@@ -320,7 +320,7 @@ Bootstrap outcome обязан иметь канонический cleanup route
 - materialize product repo с minimal human/agent entry contour вместо полного governance copy;
 - materialize стартовые заготовки для `Docs/Product/*` и `Docs/Technical/*` при условии, что hard first product-start gate не разрешает трактовать их как approval для немедленной реализации;
 - materialize product repo с local smoke route вместо реальных внешних connectors;
-- держать `Tools/.reports/*` вне bootstrap baseline commit и materialize его только при фактическом smoke run;
+- держать `Tools/.reports/*` вне baseline-фиксации начального развёртывания и materialize его только при фактическом smoke run;
 - ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
 - создавать logs как пустые или почти пустые singleton containers.
 - держать generated `scripts/*` только как transition wrappers к product-local `Tools/*`.

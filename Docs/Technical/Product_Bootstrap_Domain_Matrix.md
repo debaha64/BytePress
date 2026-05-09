@@ -37,7 +37,7 @@
 | Terms | `Core` | стартовый словарь продукта | `Docs/Terms/README.md`, `Base_Terms.md` | продукт получает минимальный язык, но не копию полного словаря фабрики |
 | Plans | `Core` | локальный planning contour | `Plans/README.md`, `Roadmap.md`, `Backlog.md`, initial plan | продукт сам владеет stage/task/pass после создания |
 | Logs | `Core` | локальные fact logs | `Logs/README.md`, `ChangeLog.md`, `ADRlog.md`, `QualityLog.md`, `ReleaseLog.md`, `SupportLog.md` | продукт фиксирует свои факты независимо от `BytePress` |
-| Pipeline | `Core` | лёгкий локальный process contour | `Pipeline/README.md`, `Phases.md`, `Workflows.md`, `Gates.md` | каждый продукт получает основной путь, workflows, gates, уровни проверок, журнальное закрытие и PR-маршрут через `gh` без полного pipeline BytePress |
+| Pipeline | `Core` | лёгкий локальный process contour | `Pipeline/README.md`, `Phases.md`, `Workflows.md`, `Gates.md` | каждый продукт получает основной путь, workflows, gates, уровни проверок, журнальное закрытие и маршрут запроса на слияние через `gh` без полного pipeline BytePress |
 | Tools | `Core` | локальные product tools | `Tools/README.md`, `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py` или profile-equivalent scripts | проверки и служебные маршруты должны быть независимыми после создания |
 | Rules | `Profile` | только проектно-специфичные обязательные правила | `Rules/README.md` и выбранные `RULE-*` | правила нужны только там, где профиль вводит реальные обязательства продукта |
 | Templates | `Profile` | только шаблоны артефактов, materialized в каркасе | `Templates/README.md` и template files для включённых артефактов | продукт не получает шаблоны сущностей, которых у него нет |

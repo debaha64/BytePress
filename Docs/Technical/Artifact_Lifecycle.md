@@ -90,7 +90,7 @@ Bootstrap note:
 
 Источник истины:
 - execution context не является source-of-truth слоем.
-- `Tools/.reports/product_bootstrap_smoke.json` не входит в bootstrap baseline commit по умолчанию и не становится canonical evidence сам по себе; если отдельный pass явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
+- `Tools/.reports/product_bootstrap_smoke.json` не входит в baseline-фиксацию начального развёртывания по умолчанию и не становится canonical evidence сам по себе; если отдельный проход явно сохраняет этот artifact в Git, такое решение должно быть зафиксировано current `Plan` и итоговым отчётом.
 
 ### Fact records
 - `Logs/ADRlog.md`
@@ -218,7 +218,7 @@ Bootstrap note:
 
 Недопустимо:
 - execution context считается самодостаточным фактом без log fixation.
-- baseline generated product repo коммитится с уже materialized `Tools/.reports/product_bootstrap_smoke.json` без отдельного evidence-preservation решения.
+- baseline generated product repo фиксируется с уже materialized `Tools/.reports/product_bootstrap_smoke.json` без отдельного evidence-preservation решения.
 - failed early product-start silently salvage'ится как новый baseline при tracked drift вне `Docs/Discovery/*`, `Plans/*`, `Logs/*`.
 
 ### Archive -> Active
