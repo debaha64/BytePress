@@ -86,8 +86,8 @@ BASE_PATHS = [
     "Schemas/adr_entry.schema.json",
 ]
 FORBIDDEN_DIRS = ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"]
-PIPELINE_GH_ROUTE = re.compile(r"gh pr create|PR.+через `gh`|через gh", re.IGNORECASE)
-PIPELINE_CHECK_LEVELS = re.compile(r"Структура|Тесты|GUI-запуск|Ручная проверка", re.IGNORECASE)
+PIPELINE_GH_ROUTE = re.compile(r"gh pr create|запрос на слияние.+через `gh`|через gh", re.IGNORECASE)
+PIPELINE_CHECK_LEVELS = re.compile(r"Структура|Тесты|Запуск графического интерфейса|Ручная проверка", re.IGNORECASE)
 PIPELINE_ENGLISH_NAMES = re.compile(r"Discovery confirmation|First product-start|Current truth gate|Execution|Subject pass|Implementation gate")
 PIPELINE_RUSSIAN_NAMES = [
     "Подтверждение текущей истины",
@@ -100,7 +100,9 @@ PIPELINE_RUSSIAN_NAMES = [
 AGENTS_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGNORECASE)
 AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фаза:", r"Рабочий поток:", r"Гейт:"]]
 INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
-INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|GUI|tkinter", re.IGNORECASE)
+INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|графическ|tkinter", re.IGNORECASE)
+FORBIDDEN_GUI_TEXT = re.compile(r"\bGUI\b|GUI-", re.IGNORECASE)
+FORBIDDEN_ENGLISH_GIT_PR_RULE = re.compile(r"commit message|PR title|PR body|оформля\w+\s+на английском", re.IGNORECASE)
 INTERVIEW_UNCONFIRMED_EXPANSION = re.compile(
     r"таймер|timer|сч[её]тчик|counter|рекорд|record|настройк|settings|сохранени|save|установщик|installer",
     re.IGNORECASE,
@@ -137,6 +139,21 @@ def status_of(path: Path) -> str | None:
 
 def is_executable(path: Path) -> bool:
     return path.exists() and bool(path.stat().st_mode & 0o111)
+
+
+def forbidden_gui_text_paths(root: Path) -> list[Path]:
+    scan_paths = [
+        root / "AGENTS.md",
+        root / "Docs" / "Discovery" / "Interview.md",
+        root / "Pipeline" / "Workflows.md",
+        root / "Pipeline" / "Phases.md",
+        root / "Pipeline" / "Gates.md",
+    ]
+    return [path for path in scan_paths if path.exists() and FORBIDDEN_GUI_TEXT.search(text(path))]
+
+
+def has_forbidden_english_git_pr_rule(root: Path) -> bool:
+    return bool(FORBIDDEN_ENGLISH_GIT_PR_RULE.search(text(root / "AGENTS.md")))
 
 
 def section_status(path: Path, artifact_id: str) -> str | None:
@@ -214,12 +231,14 @@ def check(root: Path, mode: str) -> list[str]:
     agents_text = text(root / "AGENTS.md")
     if not AGENTS_PIPELINE_ROUTE.search(agents_text):
         errors.append("AGENTS.md: missing Pipeline route")
+    if has_forbidden_english_git_pr_rule(root):
+        errors.append("AGENTS.md: сообщение фиксации и запрос на слияние не должны требовать английский язык")
     for pattern in AGENTS_START_REPORT:
         if not pattern.search(agents_text):
             errors.append("AGENTS.md: в стартовом отчёте нет фазы, рабочего потока или гейта")
     workflows = root / "Pipeline" / "Workflows.md"
     if not PIPELINE_GH_ROUTE.search(text(workflows)):
-        errors.append("Pipeline/Workflows.md: missing PR route through gh")
+        errors.append("Pipeline/Workflows.md: нет маршрута запроса на слияние через gh")
     if not PIPELINE_CHECK_LEVELS.search(text(workflows)):
         errors.append("Pipeline/Workflows.md: missing check levels")
     pipeline_text = text(root / "Pipeline" / "Workflows.md") + "\n" + text(root / "Pipeline" / "Phases.md") + "\n" + text(root / "Pipeline" / "Gates.md")
@@ -240,6 +259,8 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("Docs/Discovery/Interview.md: missing ban on guessed current-truth confirmation")
     if not INTERVIEW_DEPENDENCIES.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
+    for path in forbidden_gui_text_paths(root):
+        errors.append(f"{path.relative_to(root)}: используйте `графический интерфейс` вместо `GUI` в пользовательском тексте")
     if INTERVIEW_UNCONFIRMED_EXPANSION.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: must not suggest unconfirmed first-version expansion examples")
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
@@ -524,7 +545,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Что делает агент\n"
         "- человек направляет, агент исполняет;\n"
         "- агент работает внутри договоров продуктового репозитория;\n"
-        "- каждое изменение проходит через рабочую ветку, локальные проверки и PR.\n\n"
+        "- каждое изменение проходит через рабочую ветку, локальные проверки и запрос на слияние.\n\n"
         "## Как читать истину\n"
         "1. Текущий источник задачи от пользователя.\n"
         "2. `Docs/Discovery/*` как маршрут текущей истины продукта.\n"
@@ -534,19 +555,21 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "6. `Logs/*`, `Tools/*`, `Templates/*`, `Schemas/*` и `Setup_Guide.md` как поддержка исполнения.\n\n"
         "## Стартовый отчёт первого ответа\n"
         "Первый содержательный ответ до исследования или правок должен быть коротким стартовым отчётом.\n\n"
-        "`Приветствие:` короткая рабочая фраза.\n"
-        "`Режим запуска:` какой режим запуска используется.\n"
-        "`Фаза:` текущая фаза из `Pipeline/*`.\n"
-        "`Рабочий поток:` текущий рабочий поток из `Pipeline/Workflows.md`.\n"
-        "`Гейт:` ближайший обязательный гейт.\n"
-        "`Область:` как понят текущий проход.\n"
-        "`Статус ветки:` что обнаружено в Git.\n"
-        "`Действие с веткой:` какой стартовый маршрут используется дальше.\n"
-        "`Состояние планирования:` текущие `ROAD/BACK/PLAN` или отсутствие активного этапа.\n"
-        "`Первые домены-владельцы:` какие домены читаются первыми.\n"
-        "`Первый конкретный шаг:` какое действие выполняется сразу.\n\n"
+        "`Приветствие:` рабочая фраза.\n"
+        "`Режим запуска:` режим запуска.\n"
+        "`Фаза:` фаза из `Pipeline/*`.\n"
+        "`Рабочий поток:` поток из `Pipeline/Workflows.md`.\n"
+        "`Гейт:` ближайший гейт.\n"
+        "`Область:` область прохода.\n"
+        "`Статус ветки:` состояние Git.\n"
+        "`Действие с веткой:` стартовый маршрут.\n"
+        "`Состояние планирования:` `ROAD/BACK/PLAN` или отсутствие активного этапа.\n"
+        "`Первые домены-владельцы:` первые документы-владельцы.\n"
+        "`Первый конкретный шаг:` ближайшее действие.\n\n"
         "## Язык пользовательского вывода\n"
         "Агент отвечает пользователю и пишет в артефакты продукта на русском языке. Английский допускается только для имён собственных, путей, команд, веток, ID и технически неизбежных мест.\n\n"
+        "## Язык Git и запроса на слияние\n"
+        "Сообщение фиксации, заголовок и описание запроса на слияние оформляются на русском языке. Английский допускается только для имён собственных, путей, команд, веток, ID и технически неизбежных мест.\n\n"
         "## Гейт текущей истины\n"
         "- Созданный начальным развёртыванием репозиторий стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
         "- Пока пользователь не дал явные ответы и текущая истина не подтверждена, агент работает только в аналитическом контуре.\n"
@@ -590,7 +613,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- structural check выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
         "- smoke check выполняется локально: `python3 Tools/product_bootstrap_smoke.py`;\n"
         "- переходные `scripts/*` можно использовать только как оболочки к локальным `Tools/*`; после обновления служебного слоя `scripts/*` можно удалить;\n"
-        "- report artifacts пишутся в `Tools/.reports/` и не входят в baseline commit.\n",
+        "- report artifacts пишутся в `Tools/.reports/` и не входят в baseline-фиксацию.\n",
     )
 
     write(
@@ -693,13 +716,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- B. Ограничение нужно уточнить у пользователя.\n"
         "- C. Блокирующих ограничений пока не выявлено.\n\n"
         "Рекомендуемый вариант: B — если источник ограничения не подтверждён, его нельзя записывать как требование.\n\n"
-        "### 6. Какой источник подтверждает выбор стека первого прохода?\n"
+        "### 6. Какой источник подтверждает стек первого прохода?\n"
         "Класс вопроса: Ограничение\n"
         "Ответ: Не подтверждено пользователем.\n\n"
         "Варианты ответа:\n"
         "- A. Явный ответ пользователя.\n"
-        "- B. Профиль продукта или подтверждённое требование.\n"
-        "- C. Источник выбора стека пока не подтверждён.\n\n"
+        "- B. Профиль, требование или техническое решение.\n"
+        "- C. Источник пока не подтверждён.\n\n"
         "Рекомендуемый вариант: C — стек не записывается как требование без явного источника.\n\n"
         "### 7. Кто утверждает границу первого результата и поставляет обязательные входы?\n"
         "Класс вопроса: Владение\n"
@@ -974,7 +997,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "`Pipeline/*` хранит лёгкий локальный процессный контур продукта и владеет рабочим процессом агента.\n\n"
         "## Состав\n"
         "- `Phases.md` — минимальные фазы продуктового прохода.\n"
-        "- `Workflows.md` — основной путь, первый старт продукта, предметный проход, уровни проверок, журнальное закрытие и PR через `gh`.\n"
+        "- `Workflows.md` — основной путь, первый старт продукта, предметный проход, уровни проверок, журнальное закрытие и запрос на слияние через `gh`.\n"
         "- `Gates.md` — обязательные переходы и проверки.\n\n"
         "## Граница\n"
         "`AGENTS.md` направляет сюда, но не подменяет этот процессный контур.\n",
@@ -985,8 +1008,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. `Подтверждение текущей истины` — подтвердить текущую истину явными ответами пользователя.\n"
         "2. `Синхронизация планирования` — синхронизировать `ROAD/BACK/PLAN`.\n"
         "3. `Реализация` — выполнить документационный, кодовый или тестовый проход.\n"
-        "4. `Проверка` — разделить структуру, тесты, запуск, GUI-запуск и ручную проверку.\n"
-        "5. `Закрытие` — закрыть журналы, коммиты, push и PR.\n",
+        "4. `Проверка` — разделить структуру, тесты, запуск, запуск графического интерфейса и ручную проверку.\n"
+        "5. `Закрытие` — закрыть журналы, фиксации, отправку ветки и запрос на слияние.\n",
     )
     write(
         target / "Pipeline/Workflows.md",
@@ -999,7 +1022,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "5. Зафиксировать противоречия, гипотезы и блокирующие вопросы.\n"
         "6. Внести минимальные изменения.\n"
         "7. Выполнить проверки нужного уровня.\n"
-        "8. Закрыть `Logs/*`, сделать смысловые коммиты, один push и PR через `gh`.\n\n"
+        "8. Закрыть `Logs/*`, сделать смысловые фиксации, одну отправку ветки и запрос на слияние через `gh`.\n\n"
         "## Первый старт продукта\n"
         "Фаза: `Подтверждение текущей истины`.\n"
         "Рабочий поток: `Первый старт продукта`.\n"
@@ -1026,18 +1049,18 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `Структура` — обязательные файлы и запрет удалённых доменов.\n"
         "- `Тесты` — автоматические тесты кода.\n"
         "- `Запуск` — фактический CLI, service или smoke route.\n"
-        "- `GUI-запуск` — доступность GUI-модуля и среды.\n"
+        "- `Запуск графического интерфейса` — доступность модуля графического интерфейса и среды.\n"
         "- `Ручная проверка` — явно записанное действие, которое нельзя честно автоматизировать.\n\n"
         "## Журнальное закрытие\n"
         "- `ChangeLog.md` фиксирует факт изменения.\n"
         "- `QualityLog.md` фиксирует выполненные проверки и непроверенные зоны.\n"
         "- `ADRlog.md` обновляется для архитектурных, процессных и продуктово-договорных решений.\n\n"
-        "## PR-маршрут\n"
+        "## Маршрут запроса на слияние\n"
         "1. Выполнить одну финальную отправку рабочей ветки.\n"
-        "2. Проверить через `gh`, что для рабочей ветки нет открытого PR.\n"
-        "3. Создать PR через `gh pr create`.\n"
-        "4. GitHub connector не использовать для создания PR.\n"
-        "5. Если `gh` недоступен, выполнить push и вернуть параметры для ручного PR.\n",
+        "2. Проверить через `gh`, что для рабочей ветки нет открытого запроса на слияние.\n"
+        "3. Создать запрос на слияние через `gh pr create`.\n"
+        "4. GitHub connector не использовать для создания запроса на слияние.\n"
+        "5. Если `gh` недоступен, выполнить отправку ветки и вернуть параметры для ручного запроса на слияние.\n",
     )
     write(
         target / "Pipeline/Gates.md",
@@ -1051,8 +1074,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- ограничения первого прохода фиксируются отдельно от выбора стека;\n"
         "- непроверенный запуск фиксируется как `не проверено`.\n\n"
         "## Гейт запроса на слияние\n"
-        "- PR создаётся через `gh` после финальной отправки ветки;\n"
-        "- GitHub connector не используется для создания PR.\n",
+        "- запрос на слияние создаётся через `gh` после финальной отправки ветки;\n"
+        "- GitHub connector не используется для создания запроса на слияние.\n",
     )
 
     write(

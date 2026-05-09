@@ -254,7 +254,7 @@
 - `Artifact_Lifecycle.md` удерживает source-of-truth map, sync-loop и closure rules.
 - `Rules/*` закрепляют запреты и нормы представления.
 - `bp_lint.py` проверяет минимальные structural contracts active layer.
-- governance-сверка перед commit и push подтверждает, что planning-contour не спорит сам с собой.
+- governance-сверка перед фиксацией и отправкой ветки подтверждает, что planning-contour не спорит сам с собой.
 
 ## Граница документа
 `System_Invariants.md` не является:

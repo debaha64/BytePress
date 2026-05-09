@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000098
+ID: QL-000098
+Дата: 2026-05-10
+Статус: пройдено
+Проверка: `ROAD-000037` / `BACK-000102` / `PLAN-000091` закрыты одним узким предрелизным проходом; выполнены `python3 -m py_compile Tools/bp_lint.py Tools/bp_bootstrap.py`, `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-pre-release-field-test-product`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия требования английского языка в generated `AGENTS.md`, проверка отсутствия `GUI` в generated `Interview.md`, проверка безопасного вопроса выбора стека, проверка прав исполняемых файлов и отрицательный сценарий возврата `GUI` для `bp_lint.py` и generated `product_check.py`.
+Результат: русский язык Git и запроса на слияние, замена `GUI`, вопрос источника стека, компактный стартовый отчёт и проверки возврата `GUI` синхронизированы; `Minesweeper`, состав создаваемого продукта и домены не изменялись; ADR не добавлялся.
+
+---
+
 ## QL-000097
 ID: QL-000097
 Дата: 2026-05-05

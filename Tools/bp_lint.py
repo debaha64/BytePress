@@ -47,7 +47,7 @@ PRODUCT_START_REPORT_PHASE = re.compile(r"Фаза:", re.IGNORECASE)
 PRODUCT_START_REPORT_WORKFLOW = re.compile(r"Рабочий поток:", re.IGNORECASE)
 PRODUCT_START_REPORT_GATE = re.compile(r"Гейт:", re.IGNORECASE)
 PRODUCT_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGNORECASE)
-PRODUCT_PR_GH_ROUTE = re.compile(r"gh pr create|PR.+через `gh`|через gh", re.IGNORECASE)
+PRODUCT_PR_GH_ROUTE = re.compile(r"gh pr create|запрос на слияние.+через `gh`|через gh", re.IGNORECASE)
 PRODUCT_START_GATE_DISCOVERY_ONLY = re.compile(r"discovery-only|только аналитическ|аналитическ(ий|ом) контур", re.IGNORECASE)
 PRODUCT_START_GATE_TOOLS = re.compile(r"Tools/product_check\.py|Tools/\*", re.IGNORECASE)
 PRODUCT_START_GATE_UNCONFIRMED = re.compile(r"Статус_текущей_истины:\s+Не_подтверждена", re.IGNORECASE)
@@ -89,7 +89,9 @@ INTERVIEW_CLASS_OWNERSHIP = re.compile(r"Класс вопроса:\s+Владе
 INTERVIEW_CLASS_TRANSITION = re.compile(r"Класс вопроса:\s+Переход", re.IGNORECASE)
 INTERVIEW_TRANSFER_RULE = re.compile(r"блокирующ|неблокирующ", re.IGNORECASE)
 INTERVIEW_NO_GUESSED_CONFIRMATION = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
-INTERVIEW_DEPENDENCY_SOURCE = re.compile(r"стек|зависимост|GUI|tkinter", re.IGNORECASE)
+INTERVIEW_DEPENDENCY_SOURCE = re.compile(r"стек|зависимост|графическ|tkinter", re.IGNORECASE)
+FORBIDDEN_GUI_TEXT = re.compile(r"\bGUI\b|GUI-", re.IGNORECASE)
+FORBIDDEN_ENGLISH_GIT_PR_RULE = re.compile(r"commit message|PR title|PR body|оформля\w+\s+на английском", re.IGNORECASE)
 STARTUP_HANDSHAKE_SECTION = re.compile(r"^## (Startup-handshake первого ответа|Стартовый отчёт первого ответа)$", re.MULTILINE)
 STARTUP_HANDSHAKE_GREETING = re.compile(r"приветств", re.IGNORECASE)
 STARTUP_HANDSHAKE_MODE = re.compile(r"startup mode|режим", re.IGNORECASE)
@@ -182,6 +184,19 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def forbidden_gui_text_paths(root: Path, rel_paths: list[str]) -> list[str]:
+    errors: list[str] = []
+    for rel in rel_paths:
+        path = root / rel
+        if path.exists() and FORBIDDEN_GUI_TEXT.search(read_text(path)):
+            errors.append(f"{rel}: используйте `графический интерфейс` вместо `GUI` в пользовательском тексте")
+    return errors
+
+
+def has_forbidden_english_git_pr_rule(root: Path) -> bool:
+    return bool(FORBIDDEN_ENGLISH_GIT_PR_RULE.search(read_text(root / "AGENTS.md")))
+
+
 def extract_status(text: str) -> str | None:
     match = PRODUCT_STATUS_LINE.search(text)
     return match.group(1) if match else None
@@ -247,6 +262,7 @@ def has_interview_contract(path: Path) -> list[str]:
         errors.append("missing ban on guessed current-truth confirmation")
     if not contains_pattern(path, INTERVIEW_DEPENDENCY_SOURCE):
         errors.append("missing stack/dependency source discipline")
+    errors.extend(forbidden_gui_text_paths(path.parent.parent.parent, ["Docs/Discovery/Interview.md"]))
     if contains_pattern(path, INTERVIEW_UNCONFIRMED_EXPANSION):
         errors.append("must not suggest unconfirmed first-version expansion examples")
     return errors
@@ -546,8 +562,22 @@ def check_product_repo(root: Path, mode: str) -> int:
         errors.append("AGENTS.md: missing `Docs/Discovery/*` route")
     if not contains_pattern(root / "AGENTS.md", PRODUCT_PIPELINE_ROUTE):
         errors.append("AGENTS.md: missing generated Pipeline route")
+    if has_forbidden_english_git_pr_rule(root):
+        errors.append("AGENTS.md: сообщение фиксации и запрос на слияние не должны требовать английский язык")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", PRODUCT_PR_GH_ROUTE):
-        errors.append("Pipeline/Workflows.md: missing PR route through gh")
+        errors.append("Pipeline/Workflows.md: нет маршрута запроса на слияние через gh")
+    errors.extend(
+        forbidden_gui_text_paths(
+            root,
+            [
+                "AGENTS.md",
+                "Docs/Discovery/Interview.md",
+                "Pipeline/Workflows.md",
+                "Pipeline/Phases.md",
+                "Pipeline/Gates.md",
+            ],
+        )
+    )
     pipeline_text = read_text(root / "Pipeline" / "Workflows.md") + "\n" + read_text(root / "Pipeline" / "Phases.md") + "\n" + read_text(root / "Pipeline" / "Gates.md")
     if PRODUCT_PIPELINE_ENGLISH_NAMES.search(pipeline_text):
         errors.append("Pipeline/*: generated phase, workflow and gate names must use Russian canonical names")
@@ -703,6 +733,8 @@ def main() -> int:
     contract_errors: list[str] = []
     if not has_startup_handshake_contract(root / "AGENTS.md"):
         contract_errors.append("AGENTS.md: missing observable startup-handshake contract")
+    if has_forbidden_english_git_pr_rule(root):
+        contract_errors.append("AGENTS.md: сообщение фиксации и запрос на слияние не должны требовать английский язык")
     if not contains_pattern(root / "AGENTS.md", BYTEPRESS_PRODUCT_GATE):
         contract_errors.append("AGENTS.md: missing bootstrap-created product discovery-only gate note")
     if not contains_pattern(root / "AGENTS.md", PRODUCT_START_REPORT_PHASE):
@@ -720,7 +752,21 @@ def main() -> int:
     if not contains_pattern(root / "Pipeline" / "Workflows.md", BYTEPRESS_WORKFLOW_FACT_RULE):
         contract_errors.append("Pipeline/Workflows.md: нет правила сверки отчёта о закрытии ROAD/BACK/PLAN с фактом")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", PRODUCT_PR_GH_ROUTE):
-        contract_errors.append("Pipeline/Workflows.md: missing PR route through gh")
+        contract_errors.append("Pipeline/Workflows.md: нет маршрута запроса на слияние через gh")
+    contract_errors.extend(
+        forbidden_gui_text_paths(
+            root,
+            [
+                "AGENTS.md",
+                "Pipeline/Workflows.md",
+                "Pipeline/Phase_Gates.md",
+                "Rules/Dependencies.md",
+                "Docs/Discovery/Interview.md",
+                "Docs/Technical/Platform_Contracts.md",
+                "Docs/Technical/Product_Bootstrap_Contract.md",
+            ],
+        )
+    )
     for item in has_interview_contract(root / "Docs" / "Discovery" / "Interview.md"):
         contract_errors.append(f"Docs/Discovery/Interview.md: {item}")
     if not contains_pattern(root / "Docs" / "Discovery" / "README.md", BYTEPRESS_DISCOVERY_GATE):
