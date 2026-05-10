@@ -17,7 +17,7 @@ STARTER_TERM_IDS = [
     "TERM-000009",
 ]
 STARTER_TERM_PURPOSES = {
-    "TERM-000019": "Объясняет, какой минимальный каркас bootstrap создаёт по умолчанию.",
+    "TERM-000019": "Объясняет, какой минимальный каркас начальное развёртывание создаёт по умолчанию.",
     "TERM-000020": "Удерживает аналитический гейт до явных ответов пользователя.",
     "TERM-000021": "Фиксирует, что проход с правками начинается только из рабочей ветки.",
     "TERM-000007": "Помогает читать планирование этапов продукта.",
@@ -101,7 +101,16 @@ AGENTS_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGN
 AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фаза:", r"Рабочий поток:", r"Гейт:"]]
 INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
 INTERVIEW_DEPENDENCIES = re.compile(r"стек|зависимост|графическ|tkinter", re.IGNORECASE)
+INTERVIEW_WAIT_FOR_USER = re.compile(r"останов.*ждать ответа|жд[её]т ответа пользователя|до ответа пользователя", re.IGNORECASE)
+INTERVIEW_NO_PRODUCT_REQUEST_CONFIRMATION = re.compile(r"хочу сделать продукт|общий запрос", re.IGNORECASE)
+TKINTER_EXPLICIT_SOURCE = re.compile(r"tkinter[\s\S]{0,180}(явн|профил|требован|техническ)", re.IGNORECASE)
+SYSTEM_PACKAGE_COMMAND = re.compile(r"\b(?:sudo\s+)?apt(?:-get)?\b", re.IGNORECASE)
+FIRST_PASS_EXPANSION = re.compile(
+    r"уровн[и-я]*\s+сложност|\bтаймер|\bрекорд|сохранени|\bтем[аы]\b|установщик|упаковк|многопользовательск",
+    re.IGNORECASE,
+)
 FORBIDDEN_GUI_TEXT = re.compile(r"\bGUI\b|GUI-", re.IGNORECASE)
+FORBIDDEN_USER_TEXT_TERMS = re.compile(r"\bGUI\b|product pass|\bpass\b|\bbootstrap\b", re.IGNORECASE)
 FORBIDDEN_ENGLISH_GIT_PR_RULE = re.compile(r"commit message|PR title|PR body|оформля\w+\s+на английском", re.IGNORECASE)
 INTERVIEW_UNCONFIRMED_EXPANSION = re.compile(
     r"таймер|timer|сч[её]тчик|counter|рекорд|record|настройк|settings|сохранени|save|установщик|installer",
@@ -150,6 +159,51 @@ def forbidden_gui_text_paths(root: Path) -> list[Path]:
         root / "Pipeline" / "Gates.md",
     ]
     return [path for path in scan_paths if path.exists() and FORBIDDEN_GUI_TEXT.search(text(path))]
+
+
+def user_text_paths(root: Path) -> list[Path]:
+    candidates = [
+        root / "README.md",
+        root / "AGENTS.md",
+        root / "Setup_Guide.md",
+        root / "Docs" / "Discovery" / "README.md",
+        root / "Docs" / "Discovery" / "Interview.md",
+        root / "Docs" / "User" / "README.md",
+        root / "Docs" / "User" / "First_Start.md",
+        root / "Docs" / "User" / "Operating_Mode.md",
+        root / "Docs" / "User" / "Pass_Request.md",
+        root / "Docs" / "User" / "Usage_Scenarios.md",
+        root / "Docs" / "Product" / "README.md",
+        root / "Docs" / "Product" / "Product_Passport.md",
+        root / "Docs" / "Product" / "JTBD.md",
+        root / "Docs" / "Product" / "PRD.md",
+        root / "Docs" / "Product" / "Delivery.md",
+        root / "Docs" / "Terms" / "README.md",
+        root / "Docs" / "Terms" / "Base_Terms.md",
+        root / "Pipeline" / "Phases.md",
+        root / "Pipeline" / "Workflows.md",
+        root / "Pipeline" / "Gates.md",
+        root / "Plans" / "Roadmap.md",
+        root / "Plans" / "Backlog.md",
+    ]
+    candidates.extend(sorted((root / "Plans").glob("*.md")))
+    return [path for path in candidates if path.exists()]
+
+
+def forbidden_user_text_errors(root: Path) -> list[str]:
+    errors: list[str] = []
+    for path in user_text_paths(root):
+        for line_number, line in enumerate(text(path).splitlines(), start=1):
+            line_without_paths = re.sub(r"`[^`]*product_bootstrap_smoke\.py[^`]*`", "", line)
+            if FORBIDDEN_USER_TEXT_TERMS.search(line_without_paths):
+                errors.append(f"{path.relative_to(root)}:{line_number}: пользовательский текст должен использовать русский эквивалент вместо `GUI`, `product pass`, `pass` или `bootstrap`")
+            if SYSTEM_PACKAGE_COMMAND.search(line):
+                errors.append(f"{path.relative_to(root)}:{line_number}: системная установка требует отдельного решения пользователя")
+            if "tkinter" in line.lower() and not re.search(r"явн|профил|требован|техническ|допускается|требует", line, re.IGNORECASE):
+                errors.append(f"{path.relative_to(root)}:{line_number}: `tkinter` требует явного источника")
+            if FIRST_PASS_EXPANSION.search(line) and not re.search(r"без явн|не вход|не долж|запрещ", line, re.IGNORECASE):
+                errors.append(f"{path.relative_to(root)}:{line_number}: расширяющая функция первого прохода требует явного ответа пользователя")
+    return errors
 
 
 def has_forbidden_english_git_pr_rule(root: Path) -> bool:
@@ -257,10 +311,17 @@ def check(root: Path, mode: str) -> list[str]:
     interview = root / "Docs" / "Discovery" / "Interview.md"
     if not INTERVIEW_NO_GUESSES.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: missing ban on guessed current-truth confirmation")
+    if not INTERVIEW_WAIT_FOR_USER.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: missing stop-and-wait rule after blocking interview questions")
+    if not INTERVIEW_NO_PRODUCT_REQUEST_CONFIRMATION.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: missing ban on confirming current truth from a general product request")
     if not INTERVIEW_DEPENDENCIES.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
+    if "tkinter" in text(interview) and not TKINTER_EXPLICIT_SOURCE.search(text(interview)):
+        errors.append("Docs/Discovery/Interview.md: tkinter requires an explicit source")
     for path in forbidden_gui_text_paths(root):
         errors.append(f"{path.relative_to(root)}: используйте `графический интерфейс` вместо `GUI` в пользовательском тексте")
+    errors.extend(forbidden_user_text_errors(root))
     if INTERVIEW_UNCONFIRMED_EXPANSION.search(text(interview)):
         errors.append("Docs/Discovery/Interview.md: must not suggest unconfirmed first-version expansion examples")
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
@@ -346,7 +407,7 @@ def main() -> int:
         "stderr": result.stderr.strip(),
     }
     (report_dir / "product_bootstrap_smoke.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Product bootstrap smoke report written to: {report_dir / 'product_bootstrap_smoke.json'}")
+    print(f"Отчёт локального smoke-маршрута записан: {report_dir / 'product_bootstrap_smoke.json'}")
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:
@@ -453,12 +514,18 @@ def render_starter_terms(terms: tuple[StarterTerm, ...]) -> str:
         lines.append(f"- {term.term_id} — {term.title}")
     lines.extend(["", "## Стартовый пакет терминов"])
     for term in terms:
+        definition = (
+            term.definition
+            .replace("bootstrap materialize", "начальное развёртывание создаёт")
+            .replace("product-start", "первого старта продукта")
+            .replace("bounded", "ограниченный")
+        )
         lines.extend(
             [
                 "",
                 f"### {term.term_id} — {term.title}",
-                f"Определение: {term.definition}",
-                f"Зачем нужен на старте: {term.purpose}",
+                f"Определение: {definition}",
+                f"Зачем нужен на старте: {term.purpose.replace('bootstrap', 'начальное развёртывание')}",
             ]
         )
     lines.append("")
@@ -513,7 +580,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(
         target / "README.md",
         f"# {ctx.name}\n\n"
-        f"{ctx.name} — первый пригодный к работе продуктовый репозиторий, созданный `BytePress` bootstrap.\n\n"
+        f"{ctx.name} — первый пригодный к работе продуктовый репозиторий, созданный начальным развёртыванием `BytePress`.\n\n"
         "`README.md` — карта для человека.\n"
         "`AGENTS.md` — карта для агента.\n\n"
         "## Стартовый маршрут\n"
@@ -572,18 +639,27 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Сообщение фиксации, заголовок и описание запроса на слияние оформляются на русском языке. Английский допускается только для имён собственных, путей, команд, веток, ID и технически неизбежных мест.\n\n"
         "## Гейт текущей истины\n"
         "- Созданный начальным развёртыванием репозиторий стартует с `Docs/Discovery/Interview.md` в состоянии `Статус_текущей_истины: Не_подтверждена`.\n"
+        "- Начальный запрос пользователя и общий запрос вида «хочу сделать продукт» не подтверждают текущую истину.\n"
         "- Пока пользователь не дал явные ответы и текущая истина не подтверждена, агент работает только в аналитическом контуре.\n"
+        "- Если агент задал блокирующие вопросы интервью, он останавливается и ждёт ответа пользователя.\n"
+        "- До ответа пользователя агент не заполняет ответы вместо пользователя и не меняет `Docs/Discovery/Interview.md`, `Plans/*` или `Logs/*`.\n"
+        "- Первый записываемый проход начинается только после фактического ответа пользователя; исключение допустимо только при явных структурированных ответах в первом сообщении.\n"
         "- До открытия рабочей ветки любые записываемые изменения запрещены, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "- В этом гейте допускаются только `Docs/Discovery/*`, `Plans/*`, `Logs/*` и маршрут очистки неудачного прохода, но сам проход с правками начинается только после действия с рабочей веткой.\n"
-        "- В этом гейте bootstrap-заготовки не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации.\n"
-        "- Если failed start дал tracked drift вне разрешённого раннего контура, канонический маршрут reset — fresh bootstrap в новый target.\n\n"
+        "- В этом гейте стартовые заготовки не считаются разрешением на изменения в `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации.\n"
+        "- Если неудачный старт дал отслеживаемое расхождение вне разрешённого раннего контура, канонический маршрут очистки — новый целевой каталог.\n\n"
+        "## Гейт зависимостей и среды\n"
+        "- Агент не выбирает библиотеку графического интерфейса сам.\n"
+        "- `tkinter` допускается только после явного ответа пользователя, профиля, требования или отдельного утверждённого технического решения.\n"
+        "- Отсутствие внешних Python-пакетов не означает автоматическое разрешение на системный модуль.\n"
+        "- Если модуль отсутствует, агент фиксирует ограничение среды и просит пользователя принять отдельное решение.\n\n"
         "## Стартовый маршрут\n"
         "- Сначала прочитать `Plans/Roadmap.md`, `Plans/Backlog.md` и current `Plan`.\n"
         "- Затем прочитать `Docs/Terms/Base_Terms.md` и `Docs/Discovery/Interview.md`.\n"
         "- Затем прочитать `Pipeline/Workflows.md` и назвать текущие фазу, рабочий поток и гейт.\n"
         "- Первый аналитический проход с правками начинать только после открытия рабочей ветки с типом `chore/`.\n"
         "- `docs/` использовать только для обычных документационных проходов после снятия стартового гейта.\n"
-        "- Для structural check использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
+        "- Для структурной проверки использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
         "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
         "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
         "## Границы\n"
@@ -603,17 +679,17 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "```bash\n"
         "git init -b develop\n"
         "git add .\n"
-        "git commit -m \"Bootstrap baseline\"\n"
+        "git commit -m \"Стартовый каркас\"\n"
         "git checkout -b chore/000001-confirm-current-truth\n"
         "```\n\n"
         "## Проверка\n"
         "- первый стартовый проход продукта остаётся только аналитическим, пока пользователь не подтвердил `Docs/Discovery/Interview.md`;\n"
         "- первое записываемое действие, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`, допускается только после открытия рабочей ветки с типом `chore/`;\n"
         "- `docs/` используется только для обычных документационных проходов после снятия стартового гейта;\n"
-        "- structural check выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
-        "- smoke check выполняется локально: `python3 Tools/product_bootstrap_smoke.py`;\n"
+        "- структурная проверка выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
+        "- локальный smoke-маршрут выполняется командой: `python3 Tools/product_bootstrap_smoke.py`;\n"
         "- переходные `scripts/*` можно использовать только как оболочки к локальным `Tools/*`; после обновления служебного слоя `scripts/*` можно удалить;\n"
-        "- report artifacts пишутся в `Tools/.reports/` и не входят в baseline-фиксацию.\n",
+        "- отчёты инструментов пишутся в `Tools/.reports/` и не входят в стартовую фиксацию.\n",
     )
 
     write(
@@ -633,7 +709,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- неявные предположения фиксируются отдельно как гипотезы;\n"
         "- даже в аналитическом контуре первое записываемое действие допускается только после открытия рабочей ветки;\n"
         "- блокирующие вопросы задаются пользователю до перехода дальше;\n"
-        "- bootstrap-заготовки не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` и предметной реализации.\n\n"
+        "- стартовые заготовки не разрешают переход к `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` и предметной реализации.\n\n"
         "## Interview protocol\n"
         "- владелец протокола интервью один: `Interview.md`;\n"
         "- вопросы первого прохода собираются по классам `Контекст`, `Граница`, `Ограничение`, `Владение`, `Переход`;\n"
@@ -662,9 +738,12 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Статус текущей истины\n\n"
         "Статус_текущей_истины: Не_подтверждена\n"
         "Правило: начальный запрос пользователя не равен полному подтверждению текущей истины.\n"
-        "Правило: bootstrap-заготовки и пустые ответы не считаются подтверждением текущей истины.\n"
+        "Правило: общий запрос вида «хочу сделать продукт» не становится подтверждённой текущей истиной без ответов пользователя.\n"
+        "Правило: стартовые заготовки и пустые ответы не считаются подтверждением текущей истины.\n"
         "Правило: агент не имеет права заполнять ответы интервью догадками.\n"
         "Правило: неявные предположения фиксируются отдельно как гипотезы.\n"
+        "Правило: если агент задал блокирующие вопросы, он обязан остановиться и ждать ответа пользователя.\n"
+        "Правило: до ответа пользователя агент не меняет `Docs/Discovery/Interview.md`, `Plans/*` и `Logs/*`; исключение допустимо только при явных структурированных ответах в первом сообщении.\n"
         "Правило: первое записываемое действие по этому интервью допускается только после открытия рабочей ветки.\n"
         "Правило: до явных ответов пользователя это интервью не разрешает изменения вне `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n\n"
         "Правило: стартовое интервью не приводит примеры функций, которых нет в запросе пользователя или подтверждённых требованиях.\n\n"
@@ -680,7 +759,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Блокирующий вопрос задаётся сразу. Неблокирующий вопрос не раздувает стартовое интервью и переносится в следующую фазу.\n\n"
         "---\n\n"
         "## Правило выбора стека и зависимостей\n\n"
-        "Ограничения первого прохода фиксируются отдельно от выбора стека. Стек и зависимости не записываются как подтверждённые требования без явного источника. Допустимые источники: явный ответ пользователя, профиль продукта, подтверждённое требование или отдельное техническое решение. Если запуск нельзя проверить в текущей среде, результат фиксируется как `не проверено`, а не как успешная проверка.\n\n"
+        "Ограничения первого прохода фиксируются отдельно от выбора стека. Стек и зависимости не записываются как подтверждённые требования без явного источника. Допустимые источники: явный ответ пользователя, профиль продукта, подтверждённое требование или отдельное техническое решение. Агент не выбирает библиотеку графического интерфейса сам. `tkinter` допускается только после явного ответа пользователя, профиля, требования или отдельного утверждённого технического решения. Отсутствие внешних Python-пакетов не означает автоматическое разрешение на системный модуль. Если модуль отсутствует, агент фиксирует ограничение среды и не пытается установить системный пакет. Если запуск нельзя проверить в текущей среде, результат фиксируется как `не проверено`, а не как успешная проверка.\n\n"
         "---\n\n"
         "## Правило узкого интервью\n\n"
         "Если для подтверждения текущей истины достаточно уточнить только часть вопросов, допускается узкое интервью вместо полного повторного интервью. Оно всё равно обязано сохранять тот же договор формата: нумерованные вопросы, буквенные варианты там, где выбор ограничен, и рекомендуемый вариант там, где это уместно.\n\n"
@@ -791,7 +870,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     )
     write(
         target / "Docs/User/Pass_Request.md",
-        "# Pass Request\n\n"
+        "# Запрос прохода\n\n"
         "## Назначение\n"
         "Этот документ объясняет, как человеку формулировать проход для агента внутри продуктового репозитория.\n\n"
         "## Минимальная форма\n"
@@ -835,7 +914,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     )
     write(
         target / "Docs/Product/Product_Passport.md",
-        f"# Product Passport — {ctx.name}\n\n"
+        f"# Паспорт продукта — {ctx.name}\n\n"
         "## Назначение\n\n"
         "Паспорт фиксирует минимальные параметры созданного каркаса без возвращения домена `Profiles/*` в продукт.\n\n"
         "---\n\n"
@@ -851,7 +930,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Tools\n"
         "- Templates\n"
         "- Schemas\n"
-        "- scripts compatibility wrappers\n",
+        "- переходные оболочки scripts\n",
     )
     write(
         target / "Docs/Product/JTBD.md",
@@ -979,7 +1058,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Инварианты\n"
         "- продукт остаётся отдельным репозиторием вне дерева `BytePress`;\n"
         "- human/agent entry contour не спорит с planning contour;\n"
-        "- незаполненный discovery bootstrap не считается разрешением на изменение `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации;\n"
+        "- незаполненный аналитический слой не считается разрешением на изменение `Docs/Product/*`, `Docs/Technical/*`, `Tools/*`, `Pipeline/*` или предметной реализации;\n"
         "- product repo не превращается в полную копию `BytePress`.\n",
     )
     write(
@@ -1028,13 +1107,17 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Рабочий поток: `Первый старт продукта`.\n"
         "Гейт: `Гейт текущей истины`.\n\n"
         "1. Не считать начальный запрос пользователя полным подтверждением текущей истины.\n"
-        "2. Не заполнять `Docs/Discovery/Interview.md` догадками агента.\n"
-        "3. Фиксировать неявные предположения отдельно как гипотезы.\n"
-        "4. Задать пользователю блокирующие вопросы.\n"
-        "5. Не записывать ограничения первого прохода как подтверждённые требования без явного источника.\n"
-        "6. Не записывать стек и зависимости как подтверждённые требования без явного источника.\n"
-        "7. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
-        "8. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
+        "2. Не превращать общий запрос вида «хочу сделать продукт» в подтверждённую текущую истину.\n"
+        "3. Не заполнять `Docs/Discovery/Interview.md` догадками агента.\n"
+        "4. Фиксировать неявные предположения отдельно как гипотезы.\n"
+        "5. Задать пользователю блокирующие вопросы.\n"
+        "6. После вопросов остановиться и ждать ответа пользователя.\n"
+        "7. До ответа пользователя не менять `Docs/Discovery/Interview.md`, `Plans/*` и `Logs/*`.\n"
+        "8. Не записывать ограничения первого прохода как подтверждённые требования без явного источника.\n"
+        "9. Не записывать стек и зависимости как подтверждённые требования без явного источника.\n"
+        "10. Не выбирать библиотеку графического интерфейса за пользователя.\n"
+        "11. После явных ответов синхронизировать `Plans/*` и `Logs/*`.\n"
+        "12. Запустить `python3 Tools/product_check.py --repo . --mode auto`.\n\n"
         "## Предметный проход\n"
         "Фаза: `Реализация`.\n"
         "Рабочий поток: `Предметный проход`.\n"
@@ -1072,6 +1155,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Гейт зависимостей\n"
         "- стек и зависимости требуют явного источника;\n"
         "- ограничения первого прохода фиксируются отдельно от выбора стека;\n"
+        "- `tkinter` требует явного ответа пользователя, профиля, требования или технического решения;\n"
+        "- отсутствующий модуль фиксируется как ограничение среды, а не как повод менять среду в обычном первом проходе;\n"
         "- непроверенный запуск фиксируется как `не проверено`.\n\n"
         "## Гейт запроса на слияние\n"
         "- запрос на слияние создаётся через `gh` после финальной отправки ветки;\n"
@@ -1086,7 +1171,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `product_check.py` — структурная проверка fresh/developed product state.\n"
         "- `product_bootstrap_smoke.py` — локальный smoke route с отчётом в `Tools/.reports/`.\n\n"
         "## Граница\n"
-        "Продукт не зависит от `BYTEPRESS_ROOT` для обычной проверки после bootstrap.\n",
+        "Продукт не зависит от `BYTEPRESS_ROOT` для обычной проверки после начального развёртывания.\n",
     )
     write_executable(target / "Tools/product_check.py", PRODUCT_TOOL_CHECK)
     write_executable(target / "Tools/product_bootstrap_smoke.py", PRODUCT_BOOTSTRAP_SMOKE)
@@ -1193,9 +1278,9 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     )
     write(
         target / "Plans" / plan_filename,
-        "# PLAN-000001 — Product initialization\n\n"
+        "# PLAN-000001 — Инициализация продукта\n\n"
         "ID: PLAN-000001\n"
-        "Название: Product initialization\n"
+        "Название: Инициализация продукта\n"
         "Статус: В_работе\n"
         "Связи: BACK-000001\n"
         "Источник: Первый текущий проход продуктового репозитория\n"
@@ -1209,13 +1294,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. Открыть рабочую ветку с типом `chore/` до первого аналитического записываемого действия, включая `Docs/Discovery/*`, `Plans/*` и `Logs/*`.\n"
         "   - DoD: первый стартовый проход продукта не идёт из `develop` или `main`.\n"
         "2. Подтвердить текущую истину в `Docs/Discovery/Interview.md` явными ответами пользователя или узким интервью в том же нумерованном / буквенном / рекомендательном формате.\n"
-        "   - DoD: статус текущей истины больше не остаётся bootstrap-заготовкой, а свободноформатная замена структурированного выбора не используется.\n"
+        "   - DoD: статус текущей истины больше не остаётся стартовой заготовкой, а свободноформатная замена структурированного выбора не используется.\n"
         "3. Синхронизировать аналитический контур с `Plans/*` и `Logs/*`.\n"
         "   - DoD: плановый и журнальный маршрут отражает подтверждённую текущую истину без выхода в продуктовые документы или реализацию.\n"
         "4. Открыть следующий предметный проход только после подтверждённой текущей истины.\n"
-        "   - DoD: следующая область сформулирована отдельно и не смешана с bootstrap-заготовками.\n\n"
+        "   - DoD: следующая область сформулирована отдельно и не смешана со стартовыми заготовками.\n\n"
         "## Риски\n"
-        "- bootstrap-заготовки могут быть ошибочно приняты за утверждённую область;\n"
+        "- стартовые заготовки могут быть ошибочно приняты за утверждённую область;\n"
         "- отсутствие явных ответов пользователя заблокирует предметный проход.\n\n"
         "## Артефакты\n"
         "- AGENTS.md\n- Docs/*\n- Pipeline/*\n- Plans/*\n- Logs/*\n- Tools/*\n- Templates/*\n- Schemas/*\n\n"
@@ -1291,7 +1376,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "if [[ -n \"$OUT_OF_GATE\" ]]; then\n"
         "  echo \"Tracked or untracked drift exists outside the early analytical contour:\"\n"
         "  printf '%s\n' \"$OUT_OF_GATE\"\n"
-        "  echo \"Canonical reset route: discard this repo and materialize a fresh target with BytePress bootstrap.\"\n"
+        "  echo \"Канонический маршрут очистки: оставить этот репозиторий и создать новый целевой каталог через начальное развёртывание BytePress.\"\n"
         "  exit 1\n"
         "fi\n\n"
         "echo \"Remaining drift is limited to Docs/Discovery, Plans, or Logs. Review those edits explicitly before continuing.\"\n",
