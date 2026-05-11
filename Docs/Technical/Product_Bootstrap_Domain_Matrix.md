@@ -31,7 +31,7 @@
 | --- | --- | --- | --- | --- |
 | Repository entry | `Core` | root entry files | `README.md`, `AGENTS.md`, `Setup_Guide.md`, `.gitignore` | продукт должен иметь human/agent entry без чтения фабрики |
 | Discovery | `Core` | минимальный current-truth route | `Docs/Discovery/README.md`, `Docs/Discovery/Interview.md` | первый product-start остаётся аналитическим до подтверждения текущей истины |
-| Product knowledge | `Core` | стартовые product docs | `Docs/Product/README.md`, `Product_Passport.md`, `JTBD.md`, `PRD.md`, `Delivery.md` | продукт получает место для собственной продуктовой истины и паспорт созданного каркаса без домена `Profiles/*` |
+| Product knowledge | `Core` | стартовые product docs | `Docs/Product/README.md`, `Product_Passport.md`, `JTBD.md`, `PRD.md`, `Delivery.md` | продукт получает место для собственной продуктовой истины и живой паспорт продукта без домена `Profiles/*` |
 | User docs | `Core` | краткий пользовательский контур | `Docs/User/README.md`, `First_Start.md`, `Operating_Mode.md`, `Pass_Request.md`, `Usage_Scenarios.md` | человек должен понимать запуск и формат pass request внутри продукта |
 | Technical docs | `Core` | сокращённый technical subset продукта | `Docs/Technical/README.md`, `Architecture.md`, `Interfaces.md`, `System_Invariants.md` | продукту нужен локальный минимальный technical contract без полного `BytePress` core |
 | Terms | `Core` | стартовый словарь продукта | `Docs/Terms/README.md`, `Base_Terms.md` | продукт получает минимальный язык, но не копию полного словаря фабрики |

@@ -168,7 +168,7 @@ Supporting contract layer поставляет form/validation interfaces для
 - merge завершает проход на уровне репозитория, но не меняет владение доменными source-of-truth.
 
 ### Product-local tools contour
-Целевой generated product repo получает local `Tools/*` вместо зависимости от `BYTEPRESS_ROOT` и product `scripts/*`.
+Целевой generated product repo получает local `Tools/*` как единственный служебный вход без зависимости от `BYTEPRESS_ROOT`.
 
 Служебный contract:
 - `BytePress` materialize локальные product tools из profile package contract;

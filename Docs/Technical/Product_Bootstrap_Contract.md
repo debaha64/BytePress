@@ -146,9 +146,9 @@ Bootstrap обязан создать:
 - `Docs/Product/PRD.md`
 - `Docs/Product/Delivery.md`
 
-Эти документы создаются как first-usable startup contour и content skeleton, а не как полностью предметно заполненный product package.
+Эти документы создаются как first-usable startup contour, готовый к дальнейшей предметной жизни продукта, а не как полностью предметно заполненный product package.
 
-`Docs/Product/Product_Passport.md` фиксирует минимальный паспорт созданного каркаса без materialization домена `Profiles/*` внутри продукта.
+`Docs/Product/Product_Passport.md` стартует как паспорт созданного каркаса без materialization домена `Profiles/*` внутри продукта. После первого предметного прохода он фиксирует тип продукта, основной запуск, подтверждённый стек, предметные пакеты и ограничения среды.
 
 ### Technical layer продукта
 Bootstrap обязан создать:
