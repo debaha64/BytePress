@@ -687,14 +687,12 @@ def check_product_repo(root: Path, mode: str) -> int:
             errors.append(
                 "git branch: first analytical product-start with unconfirmed current truth must use a chore/ working branch before any writable changes"
             )
+    if mode == "product-fresh" and (root / "scripts").exists():
+        errors.append("scripts/*: устаревший переходный слой не создаётся в новом каркасе; используйте Tools/*")
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
         path = root / rel
         if path.exists() and not is_executable(path):
             errors.append(f"{rel}: tool is not executable")
-    for rel in ["scripts/dev-up.sh", "scripts/dev-down.sh", "scripts/dev-test.sh", "scripts/integration-smoke.sh", "scripts/reset-product-start.sh"]:
-        path = root / rel
-        if path.exists() and not is_executable(path):
-            errors.append(f"{rel}: compatibility script is not executable")
     for path in sorted((root / "Schemas").glob("*.json")):
         if check_schema_artifact_id(path):
             errors.append(f"{path.relative_to(root)}: missing schema ID")

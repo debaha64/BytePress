@@ -46,13 +46,13 @@
 
 Целевое состояние:
 - продукт всегда получает лёгкий локальный `Pipeline/*`;
-- продукт получает локальный `Tools/*`, а прежние generated `scripts/*` переносятся в product tools или остаются только тонкими aliases;
+- продукт получает локальный `Tools/*` как единственный служебный вход нового каркаса;
 - продукт получает `Templates/*` только для артефактов, которые есть в каркасе;
 - продукт получает `Schemas/*` только для артефактов, которые local product tools реально проверяют;
 - retired domains не входят в product baseline;
 - `Rules/*` в продукте допускается только как сокращённый профильный пакет обязательных project-specific rules.
 
-Текущий `bp_bootstrap.py` начал переходную реализацию этой модели: новый продукт получает local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, а legacy `scripts/*` остаётся только совместимой оболочкой.
+Текущий `bp_bootstrap.py` завершает переходную реализацию этой модели: новый продукт получает local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`; `scripts/*` больше не создаётся в новом каркасе.
 
 ## CLI contract bootstrap
 ### Обязательные параметры
@@ -80,7 +80,7 @@ Current implemented bootstrap default materialize только тот domain sub
 Outcome включает:
 - отдельный target-репозиторий продукта вне дерева самого `BytePress`;
 - top-level human/agent entry files `README.md`, `AGENTS.md`, `Setup_Guide.md`, `.gitignore`;
-- базовую структуру каталогов `Docs/`, `Plans/`, `Logs/`, `Pipeline/`, `Tools/`, `Templates/`, `Schemas/` и совместимый `scripts/` layer;
+- базовую структуру каталогов `Docs/`, `Plans/`, `Logs/`, `Pipeline/`, `Tools/`, `Templates/` и `Schemas/`;
 - минимальный `Docs/Discovery/*` contour для first current-truth route;
 - hard first product-start gate, который удерживает initial pass только в аналитическом контуре до ответов пользователя;
 - hard first product-start gate, который после выдачи блокирующих вопросов требует остановиться и ждать ответа пользователя;
@@ -89,7 +89,6 @@ Outcome включает:
 - минимальный technical-layer продукта только в объёме стартовых singleton docs;
 - initial planning contour продукта в состоянии first current stage/task/pass;
 - базовые logs и локальный product `Tools/*`;
-- совместимые shell wrappers в `scripts/*`, которые вызывают локальный `Tools/*`;
 - local smoke route без зависимости от `BYTEPRESS_ROOT`.
 
 Bootstrap не обязан делать product repo предметно завершённым; он обязан сделать его first-usable, согласованным и пригодным к следующему управляемому pass без ручной пересборки entry contour.
@@ -224,6 +223,8 @@ Bootstrap обязан создать:
 
 Product-local `Tools/*` является основной служебной точкой продукта. `product_check.py` проверяет fresh/developed lifecycle state без `BYTEPRESS_ROOT`, а `product_bootstrap_smoke.py` выпускает deterministic report в ignored `Tools/.reports/`.
 
+Новый каркас не materialize `scripts/*`. Если `scripts/*` найден в fresh product repo нового образца, это считается возвратом устаревшего переходного слоя и должно быть остановлено проверкой.
+
 ### Bounded Templates and Schemas layer
 Bootstrap обязан создать `Templates/*` только для materialized artifacts продукта и `Schemas/*` только для artifacts, которые проверяются local `Tools/*`.
 
@@ -231,29 +232,16 @@ Bootstrap обязан создать `Templates/*` только для material
 - `Templates/Interview.md`, `Roadmap.md`, `Backlog.md`, `Plan.md`, `ChangeLog.md`, `ADRlog.md`, `QualityLog.md`;
 - `Schemas/roadmap_item.schema.json`, `backlog_item.schema.json`, `plan.schema.json`, `changelog_entry.schema.json`, `adr_entry.schema.json`.
 
-### Project entry scripts
-Bootstrap обязан создать:
-- `scripts/README.md`
-- `scripts/dev-up.sh`
-- `scripts/dev-down.sh`
-- `scripts/dev-test.sh`
-- `scripts/integration-smoke.sh`
-- `scripts/reset-product-start.sh`
-
-Project scripts являются переходным совместимым слоем. Основной служебный вход — `Tools/*`. `dev-test.sh` вызывает `Tools/product_check.py`, `integration-smoke.sh` вызывает `Tools/product_bootstrap_smoke.py`, а `reset-product-start.sh` очищает `Tools/.reports/` и показывает drift report. `scripts/*` можно удалить после первого прохода обновления служебного слоя или когда продукту больше не нужны shell-оболочки.
-
-`scripts/*` не является основным служебным слоем продукта. Generated `scripts/README.md` обязан явно фиксировать переходный статус и условие удаления: после обновления служебного слоя созданного продукта, если продукту не нужны shell-оболочки. Главный служебный вход — локальный `Tools/*`.
-
 ### Обновление служебных файлов уже созданного product repo
 Если product repo уже создан и прошёл первый product-start pass, canonical route обновления служебного слоя — точечный product-side pass, а не повторный bootstrap.
 
-Канонический маршрут описан в `Docs/Technical/Product_Service_Update_Route.md`. Минимальный путь для local `Tools/*` и совместимых `scripts/*`:
+Канонический маршрут описан в `Docs/Technical/Product_Service_Update_Route.md`. Минимальный путь для local `Tools/*` и наследия `scripts/*` старых продуктов:
 1. взять основание из текущего `BytePress` contract и фактического generated skeleton;
 2. открыть рабочую ветку внутри product repo;
-3. перенести только служебный delta в `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*` и thin wrappers `scripts/*`;
+3. перенести только служебный delta в `Tools/*`, lightweight `Pipeline/*` и bounded `Templates/*`/`Schemas/*`; `scripts/*` переносить только как наследие уже созданного старого продукта, если продукту нужен совместимый shell-вход на время миграции;
 4. удалить только placeholder legacy service domains старого каркаса, если они не содержат предметного смысла продукта;
 5. не пересоздавать product repo и не переписывать `Docs/Product/*`, `Docs/Discovery/*`, `Plans/*`, `Logs/*` или предметный код вне прямой необходимости pass;
-6. проверить product repo через `python3 Tools/product_check.py --repo . --mode auto`, `scripts/dev-test.sh` и `python3 <BytePress>/Tools/bp_lint.py --repo <product-repo> --mode auto`;
+6. проверить product repo через `python3 Tools/product_check.py --repo . --mode auto`, `python3 Tools/product_bootstrap_smoke.py` и `python3 <BytePress>/Tools/bp_lint.py --repo <product-repo> --mode auto`; для старого продукта с сохранёнными совместимыми shell-оболочками дополнительно допустимо проверить их вызов;
 7. зафиксировать product-side planning/log closure.
 
 Короткий канонический пример developed product state после первого прохода:
@@ -279,8 +267,7 @@ Bootstrap создаёт каркас, но не завершённое соде
 - `Logs/*` — только empty or near-empty fact containers;
 - `Pipeline/*` — только lightweight local process contour;
 - `Tools/*` — только local service layer продукта;
-- `Templates/*` и `Schemas/*` — только bounded subset для materialized/checkable artifacts;
-- `scripts/*` — только transition wrappers к `Tools/*`.
+- `Templates/*` и `Schemas/*` — только bounded subset для materialized/checkable artifacts.
 
 ## Что bootstrap сознательно не обязан делать
 Bootstrap не обязан:
@@ -294,7 +281,7 @@ Bootstrap не обязан:
 - автоматически генерировать `product-code`, brand inheritance beyond allowed fields или скрытые external integrations;
 - превращать product repo в копию operational/governance contour самого `BytePress`.
 
-Lightweight `Pipeline/*`, bounded `Templates/*`, bounded `Schemas/*` и local `Tools/*` являются allowed product packages текущего переходного bootstrap.
+Lightweight `Pipeline/*`, bounded `Templates/*`, bounded `Schemas/*` и local `Tools/*` являются allowed product packages текущего bootstrap.
 
 ## Bootstrap boundaries
 ### Граница ответственности
@@ -322,8 +309,8 @@ Bootstrap предполагает, что:
 
 ## Failed first-start reset/cleanup route
 Bootstrap outcome обязан иметь канонический cleanup route для failed early product-start:
-1. generated repo удаляет local tool reports через `scripts/reset-product-start.sh`;
-2. script явно показывает, есть ли tracked drift вне разрешённого раннего contour `Docs/Discovery/*`, `Plans/*`, `Logs/*`;
+1. generated repo удаляет local tool reports через очистку `Tools/.reports/`;
+2. проверяющая сторона явно смотрит, есть ли tracked drift вне разрешённого раннего contour `Docs/Discovery/*`, `Plans/*`, `Logs/*`;
 3. если out-of-gate drift подтверждён, canonical reset route — fresh bootstrap в новый target, а не salvage текущего baseline.
 
 ## Допустимые и недопустимые упрощения
@@ -337,7 +324,6 @@ Bootstrap outcome обязан иметь канонический cleanup route
 - держать `Tools/.reports/*` вне baseline-фиксации начального развёртывания и materialize его только при фактическом smoke run;
 - ограничивать brand inheritance полями `Брендовый_профиль` и `Язык_взаимодействия`;
 - создавать logs как пустые или почти пустые singleton containers.
-- держать generated `scripts/*` только как transition wrappers к product-local `Tools/*`.
 
 ### Недопустимые упрощения и пропуски
 - не создавать один из обязательных singleton artifacts минимального outcome;

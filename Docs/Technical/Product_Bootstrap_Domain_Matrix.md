@@ -38,7 +38,7 @@
 | Plans | `Core` | локальный planning contour | `Plans/README.md`, `Roadmap.md`, `Backlog.md`, initial plan | продукт сам владеет stage/task/pass после создания |
 | Logs | `Core` | локальные fact logs | `Logs/README.md`, `ChangeLog.md`, `ADRlog.md`, `QualityLog.md`, `ReleaseLog.md`, `SupportLog.md` | продукт фиксирует свои факты независимо от `BytePress` |
 | Pipeline | `Core` | лёгкий локальный process contour | `Pipeline/README.md`, `Phases.md`, `Workflows.md`, `Gates.md` | каждый продукт получает основной путь, workflows, gates, уровни проверок, журнальное закрытие и маршрут запроса на слияние через `gh` без полного pipeline BytePress |
-| Tools | `Core` | локальные product tools | `Tools/README.md`, `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py` или profile-equivalent scripts | проверки и служебные маршруты должны быть независимыми после создания |
+| Tools | `Core` | локальные product tools | `Tools/README.md`, `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py` или профильный эквивалент внутри `Tools/*` | проверки и служебные маршруты должны быть независимыми после создания |
 | Rules | `Profile` | только проектно-специфичные обязательные правила | `Rules/README.md` и выбранные `RULE-*` | правила нужны только там, где профиль вводит реальные обязательства продукта |
 | Templates | `Profile` | только шаблоны артефактов, materialized в каркасе | `Templates/README.md` и template files для включённых артефактов | продукт не получает шаблоны сущностей, которых у него нет |
 | Schemas | `Profile` | только схемы проверяемых артефактов | `Schemas/README.md` и schema files для реально проверяемых артефактов | schema-layer не должен быть декоративным |
@@ -62,13 +62,15 @@
 Профиль не может включить `Adapters`, `Memory`, `MCP`, `Runtime` или `Roles` как placeholder. Эти домены возвращаются только после отдельного ADR, владельца механизма, tool support и проверочного договора.
 
 ## Модель независимого product Tools
-Целевой продукт получает локальный `Tools/*`, а прежние `scripts/*` переносятся в этот домен или становятся тонкими shell aliases к `Tools/*` внутри продукта.
+Новый целевой продукт получает локальный `Tools/*` как единственный служебный вход. Прежние `scripts/*` считаются наследием уже созданных старых продуктов и не materialize в новом каркасе.
 
 Целевой локальный `Tools/*` продукта обязан:
 - запускать structural check продукта без `BYTEPRESS_ROOT`;
 - проверять только те schemas и packages, которые есть в профиле;
 - хранить deterministic smoke/check reports только в ignored tool-output path;
 - не обращаться к `BytePress` после bootstrap как к runtime dependency.
+
+Если старый продукт уже содержит `scripts/*`, миграция описывается отдельным route в `Product_Service_Update_Route.md`: shell-оболочки можно сохранить только как совместимое наследие на время обновления, но новый baseline их не создаёт.
 
 ## Early product-start gate и матрица
 Переход к профильной фабрике не отменяет first-start gate:
@@ -78,7 +80,7 @@
 - локальные `Tools/*` проверяют этот gate внутри продукта.
 
 ## Миграционная граница
-В этом pass домены не удаляются и инструменты не переписываются. Целевая матрица требует отдельного refactoring sequence:
+Целевая матрица требует осторожной последовательности:
 1. обновить `bp_bootstrap.py` под profile packages и локальный product `Tools/*`;
 2. обновить `bp_lint.py`, чтобы проверять новую модель продукта и сохранить проверку текущего BytePress до удаления доменов;
 3. процедуры перенесены в `Pipeline/Workflows.md`;

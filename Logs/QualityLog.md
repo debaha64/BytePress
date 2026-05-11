@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000100
+ID: QL-000100
+Дата: 2026-05-11
+Статус: пройдено
+Проверка: `ROAD-000039` / `BACK-000104` / `PLAN-000093` закрыты одним узким предрелизным проходом; выполнены `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-tools-only-product-000039`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*` в новом продукте, проверка отсутствия ссылок на `scripts/*` в generated `README.md`, `AGENTS.md`, `Setup_Guide.md` и `Docs/Product/Product_Passport.md`, отрицательный сценарий возврата `scripts/*` для `bp_lint.py` и generated `product_check.py`, bootstrap developed-сценария `/tmp/bytepress-tools-only-developed-000039`, explicit `product-developed`, repeated `auto` и generated developed `product_check.py`.
+Результат: новый продуктовый каркас создаётся без `scripts/*`, служебные команды нового продукта идут через `Tools/*`, свежий продукт с возвращённым `scripts/*` отклоняется, а маршрут старых продуктов сохраняет миграцию наследия `scripts/*`; ADR не добавлялся.
+
+---
+
 ## QL-000099
 ID: QL-000099
 Дата: 2026-05-10

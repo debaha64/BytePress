@@ -41,7 +41,9 @@
 `bp_bootstrap.py` materialize generated product repo с локальным `Tools/*`:
 - `Tools/product_check.py` — основной structural check продукта без `BYTEPRESS_ROOT`;
 - `Tools/product_bootstrap_smoke.py` — локальный smoke route с отчётом в `Tools/.reports/`;
-- переходные `scripts/*` остаются оболочками к локальному `Tools/*` и могут быть удалены после обновления служебного слоя.
+- `Tools/*` является единственным служебным входом нового каркаса.
+
+`scripts/*` — наследие старых уже созданных продуктов. Новый каркас его не создаёт; миграция старых продуктов описана в `Docs/Technical/Product_Service_Update_Route.md`.
 
 ## Будущий периметр
 - `bp_check` может стать единым входом автоматических проверок только после отдельного договора.

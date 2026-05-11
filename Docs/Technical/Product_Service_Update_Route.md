@@ -13,6 +13,8 @@
 ## Scope
 Route применяется к product repo, который уже создан и может содержать старый служебный слой: `Runtime/*`, `Adapters/*`, `Profiles/Product.md`, прежние `scripts/*` и зависимость проверок от `BYTEPRESS_ROOT`.
 
+Новый продуктовый каркас больше не создаёт `scripts/*`. Этот route сохраняет описание `scripts/*` только как наследия старых продуктов и как временной совместимой поверхности при их миграции к локальному `Tools/*`.
+
 Route не является product-start reset, fresh bootstrap или предметной миграцией продукта. Он обновляет только service layer и minimal process/check contour, нужный для текущей профильной модели.
 
 ## Канонический маршрут
@@ -40,7 +42,7 @@ Route не является product-start reset, fresh bootstrap или пред
 `Docs/Product/Product_Passport.md` добавляется как skeleton metadata. Он не должен заменить `Docs/Product/JTBD.md`, `PRD.md`, `Delivery.md` или фактическую product truth.
 
 ## Replace Set
-Заменять можно только служебные wrappers и карты service layer:
+Заменять можно только служебные wrappers старых продуктов и карты service layer:
 - `scripts/README.md`;
 - `scripts/dev-test.sh`;
 - `scripts/integration-smoke.sh`;
@@ -48,14 +50,14 @@ Route не является product-start reset, fresh bootstrap или пред
 - `.gitignore` только в части ignored tool reports, если `Tools/.reports/` ещё не исключён;
 - `Setup_Guide.md` только в точечных строках запуска проверок, если он всё ещё требует primary `BYTEPRESS_ROOT` route.
 
-Wrappers должны вызывать local `Tools/*`. `BYTEPRESS_ROOT` допустим только для внешней проверки `BytePress` tooling, а не как обычная product-local dependency.
+Wrappers старого продукта должны вызывать local `Tools/*`. `BYTEPRESS_ROOT` допустим только для внешней проверки `BytePress` tooling, а не как обычная product-local dependency. Для нового каркаса wrappers не создаются.
 
 ## Delete Set
 После успешного переноса local `Tools/*` допускается удалить только placeholder service domains старого каркаса:
 - `Runtime/*`, если он содержит только bootstrap smoke reports или временный service output;
 - `Adapters/*`, если это placeholder domain без реального adapter mechanism продукта;
 - `Profiles/Product.md`, если его единственная роль — старый bootstrap passport, заменённый на `Docs/Product/Product_Passport.md`;
-- устаревшие generated scripts, если они не являются transition wrappers к local `Tools/*`.
+- устаревшие generated scripts, если они не являются временными compatibility wrappers к local `Tools/*`.
 
 Нельзя удалять эти пути механически, если продукт уже наполнил их предметным смыслом. В таком случае нужен отдельный product-side decision и отдельная миграция содержимого.
 
@@ -70,16 +72,16 @@ Route не должен переписывать:
 ## Verification Route
 Минимальная проверка migrated product repo:
 - `python3 Tools/product_check.py --repo . --mode auto` внутри product repo;
-- `scripts/dev-test.sh` внутри product repo как compatibility wrapper;
+- `python3 Tools/product_bootstrap_smoke.py` внутри product repo;
 - `python3 <BytePress>/Tools/bp_lint.py --repo <product-repo> --mode auto` из `BytePress`;
 - если product repo уже developed, explicit `--mode product-developed` должен проходить, а `product-fresh` может падать на expected fresh markers;
-- `scripts/integration-smoke.sh` должен выпускать report в ignored `Tools/.reports/`, а не в `Runtime/*`.
+- для старого продукта, где временно сохранены compatibility wrappers, `scripts/dev-test.sh` и `scripts/integration-smoke.sh` должны вызывать local `Tools/*`, а smoke report должен выпускаться в ignored `Tools/.reports/`, а не в `Runtime/*`.
 
 ## Migration Smoke Scenario
 Для проверки route без изменения реального продукта используется временный сценарий:
 1. bootstrap fresh product актуальным `Tools/bp_bootstrap.py`;
 2. смоделировать старый product repo: убрать local `Tools/*`, вернуть placeholder `Runtime/*`, `Adapters/*`, `Profiles/Product.md` и legacy `scripts/*`;
-3. применить service update route: добавить local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*`, заменить wrappers и удалить placeholder legacy domains;
+3. применить service update route: добавить local `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*`/`Schemas/*`, заменить или удалить wrappers старого продукта и удалить placeholder legacy domains;
 4. смоделировать developed state: подтвердить `Docs/Discovery/Interview.md`, закрыть `ROAD-000001`, `BACK-000001`, `PLAN-000001`, добавить следующий plan и closure facts в `Logs/*`;
 5. подтвердить checks из раздела `Verification Route`.
 
