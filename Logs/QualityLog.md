@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000101
+ID: QL-000101
+Дата: 2026-05-11
+Статус: пройдено
+Проверка: `ROAD-000040` / `BACK-000105` / `PLAN-000094` закрыты широким исправляющим проходом; выполнены `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-field-fixes-product-000094b`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*` в новом продукте, проверка отсутствия `scripts/*` в generated `Base_Terms.md` и generated user/product/domain maps, проверка живого `Product_Passport.md`, проверка generated `AGENTS.md` и `Pipeline/Workflows.md` на связанных владельцев смысла, проверка явного списка исключений из первой версии, bootstrap временного продукта `/tmp/bytepress-field-fixes-product-000094c` и developed-сценарий со статусом `Готово_к_утверждению`.
+Результат: новый продуктовый каркас готов к следующему финальному полевому тесту без возврата `scripts/*`, без внесения данных конкретного тестового продукта, с живым паспортом продукта, с проверкой связанных документов-владельцев и с корректным статусом при ограничении среды; ADR не добавлялся.
+
+---
+
 ## QL-000100
 ID: QL-000100
 Дата: 2026-05-11
