@@ -327,9 +327,8 @@ def check(root: Path, mode: str) -> list[str]:
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
         if not is_executable(root / rel):
             errors.append(f"{rel}: служебный файл не исполняемый")
-    for path in sorted((root / "scripts").glob("*.sh")):
-        if not is_executable(path):
-            errors.append(f"{path.relative_to(root)}: переходный скрипт не исполняемый")
+    if actual_mode == "fresh" and (root / "scripts").exists():
+        errors.append("scripts/*: устаревший переходный слой не создаётся в новом каркасе; используйте Tools/*")
     if actual_mode == "fresh":
         if not contains(interview, UNCONFIRMED):
             errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
@@ -569,7 +568,6 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "Tools",
         "Templates",
         "Schemas",
-        "scripts",
     ]:
         (target / path).mkdir(parents=True, exist_ok=True)
 
@@ -591,7 +589,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "5. Проверить текущие этап, задачу и план в `Plans/*`.\n"
         "6. Использовать `Tools/product_check.py`, если нужна структурная проверка продукта.\n"
         "7. Использовать `Tools/product_bootstrap_smoke.py`, если нужен локальный smoke-маршрут.\n"
-        "8. Использовать `scripts/*` только как переходные оболочки к локальному `Tools/*`; после первого обновления служебного слоя `scripts/*` можно удалить.\n\n"
+        "8. Использовать `Tools/*` как единственный служебный вход продукта.\n\n"
         "## Доменная карта\n"
         "- `Docs/Discovery/*` — текущая истина и интервью продукта.\n"
         "- `Docs/User/*` — пользовательский слой продукта.\n"
@@ -603,7 +601,6 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `Tools/*` — локальные проверки и служебные команды продукта.\n"
         "- `Templates/*` — шаблоны только для созданных артефактов.\n"
         "- `Schemas/*` — схемы только для проверяемых артефактов.\n"
-        "- `scripts/*` — переходные shell-оболочки к `Tools/*`; после обновления служебного слоя можно удалить, главный вход — `Tools/*`.\n",
     )
     write(
         target / "AGENTS.md",
@@ -661,7 +658,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `docs/` использовать только для обычных документационных проходов после снятия стартового гейта.\n"
         "- Для структурной проверки использовать `python3 Tools/product_check.py --repo . --mode auto`.\n"
         "- Для локального smoke использовать `python3 Tools/product_bootstrap_smoke.py`.\n"
-        "- `scripts/*` остаются только переходными оболочками к локальному `Tools/*`.\n\n"
+        "- `Tools/*` является единственным служебным входом нового каркаса.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
         "- этот файл только направляет агента к документам-владельцам продуктового репозитория и к `Pipeline/Workflows.md` как владельцу рабочего процесса.\n",
@@ -688,7 +685,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `docs/` используется только для обычных документационных проходов после снятия стартового гейта;\n"
         "- структурная проверка выполняется локально: `python3 Tools/product_check.py --repo . --mode auto`;\n"
         "- локальный smoke-маршрут выполняется командой: `python3 Tools/product_bootstrap_smoke.py`;\n"
-        "- переходные `scripts/*` можно использовать только как оболочки к локальным `Tools/*`; после обновления служебного слоя `scripts/*` можно удалить;\n"
+        "- служебные команды выполняются через локальный `Tools/*`;\n"
         "- отчёты инструментов пишутся в `Tools/.reports/` и не входят в стартовую фиксацию.\n",
     )
 
@@ -930,7 +927,6 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Tools\n"
         "- Templates\n"
         "- Schemas\n"
-        "- переходные оболочки scripts\n",
     )
     write(
         target / "Docs/Product/JTBD.md",
@@ -1314,73 +1310,6 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
     write(target / "Logs/QualityLog.md", "# QualityLog\n")
     write(target / "Logs/ReleaseLog.md", "# ReleaseLog\n")
     write(target / "Logs/SupportLog.md", "# SupportLog\n")
-
-    write(
-        target / "scripts/README.md",
-        "# scripts\n\n"
-        "`scripts/*` — переходные shell-оболочки к локальному `Tools/*`.\n\n"
-        "Основной служебный слой продукта — `Tools/*`. Новые сценарии должны вызывать `Tools/product_check.py` и `Tools/product_bootstrap_smoke.py` напрямую.\n\n"
-        "Срок переходного удаления: после первого прохода обновления служебного слоя созданного продукта или при следующем большом договоре профильного пакета, если продукту не нужны shell-оболочки.\n",
-    )
-    write_executable(
-        target / "scripts/dev-up.sh",
-        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No local runtime services are required by this product skeleton.\"\n",
-    )
-    write_executable(
-        target / "scripts/dev-down.sh",
-        "#!/usr/bin/env bash\nset -euo pipefail\necho \"No local runtime services are managed by this product skeleton.\"\n",
-    )
-    write_executable(
-        target / "scripts/dev-test.sh",
-        "#!/usr/bin/env bash\n"
-        "set -euo pipefail\n\n"
-        "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "exec python3 \"$ROOT_DIR/Tools/product_check.py\" --repo \"$ROOT_DIR\" --mode auto\n",
-    )
-    write_executable(
-        target / "scripts/integration-smoke.sh",
-        "#!/usr/bin/env bash\n"
-        "set -euo pipefail\n\n"
-        "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "exec python3 \"$ROOT_DIR/Tools/product_bootstrap_smoke.py\"\n",
-    )
-    write_executable(
-        target / "scripts/reset-product-start.sh",
-        "#!/usr/bin/env bash\n"
-        "set -euo pipefail\n\n"
-        "ROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\n"
-        "REPORT_DIR=\"$ROOT_DIR/Tools/.reports\"\n"
-        "if [[ -d \"$REPORT_DIR\" ]]; then\n"
-        "  rm -rf \"$REPORT_DIR\"\n"
-        "  echo \"Removed local tool reports: $REPORT_DIR\"\n"
-        "else\n"
-        "  echo \"No local tool reports to remove.\"\n"
-        "fi\n\n"
-        "if ! command -v git >/dev/null 2>&1; then\n"
-        "  echo \"Git is not available; runtime cleanup completed, but tracked drift was not inspected.\"\n"
-        "  exit 0\n"
-        "fi\n\n"
-        "cd \"$ROOT_DIR\"\n"
-        "if ! git rev-parse --show-toplevel >/dev/null 2>&1; then\n"
-        "  echo \"Tool report cleanup completed. Git repository is not initialized yet, so tracked drift was not inspected.\"\n"
-        "  exit 0\n"
-        "fi\n\n"
-        "STATUS_OUTPUT=\"$(git status --short)\"\n"
-        "if [[ -z \"$STATUS_OUTPUT\" ]]; then\n"
-        "  echo \"Working tree is clean after runtime cleanup.\"\n"
-        "  exit 0\n"
-        "fi\n\n"
-        "echo \"Current git status after runtime cleanup:\"\n"
-        "printf '%s\n' \"$STATUS_OUTPUT\"\n\n"
-        "OUT_OF_GATE=\"$(printf '%s\n' \"$STATUS_OUTPUT\" | awk '{print $2}' | grep -Ev '^(Docs/Discovery/|Plans/|Logs/)' || true)\"\n"
-        "if [[ -n \"$OUT_OF_GATE\" ]]; then\n"
-        "  echo \"Tracked or untracked drift exists outside the early analytical contour:\"\n"
-        "  printf '%s\n' \"$OUT_OF_GATE\"\n"
-        "  echo \"Канонический маршрут очистки: оставить этот репозиторий и создать новый целевой каталог через начальное развёртывание BytePress.\"\n"
-        "  exit 1\n"
-        "fi\n\n"
-        "echo \"Remaining drift is limited to Docs/Discovery, Plans, or Logs. Review those edits explicitly before continuing.\"\n",
-    )
 
 
 def main() -> int:
