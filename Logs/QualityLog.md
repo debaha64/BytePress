@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000102
+ID: QL-000102
+Дата: 2026-05-13
+Статус: пройдено
+Проверка: `ROAD-000041` / `BACK-000106` / `PLAN-000095` закрыты выпускным release-readiness pass; выполнены `git diff --check`, `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-release-0-3-0-readiness-product`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*`, проверка generated интервью, источника стека, статуса `Готово_к_утверждению`, живого `Product_Passport.md`, PR-маршрута через `gh` и developed-сценария со статусом `Готово_к_утверждению`.
+Результат: готовность BytePress `0.3.0` подтверждена без добавления доменов, без внесения данных конкретного тестового продукта, без возврата `scripts/*` и без нового ADR; фактический внешний выпуск, merge в `main` и tag в этом проходе не выполнялись.
+
+---
+
 ## QL-000101
 ID: QL-000101
 Дата: 2026-05-11
