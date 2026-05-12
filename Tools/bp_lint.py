@@ -67,6 +67,23 @@ PRODUCT_PIPELINE_RUSSIAN_NAMES = [
     "Предметный проход",
     "Гейт реализации",
 ]
+PRODUCT_SUBJECT_OWNER_SYNC_MARKERS = [
+    "Docs/Product/Product_Passport.md",
+    "Docs/Product/PRD.md",
+    "Docs/Product/JTBD.md",
+    "Docs/Product/Delivery.md",
+    "Docs/User/*",
+    "Docs/Technical/*",
+    "Plans/*",
+    "Logs/*",
+]
+PRODUCT_PASSPORT_LIVE_FIELDS = [
+    "Тип_продукта:",
+    "Основной_запуск:",
+    "Подтверждённый_стек:",
+    "Предметные_пакеты:",
+    "Ограничения_среды:",
+]
 INTERVIEW_UNCONFIRMED_EXPANSION = re.compile(
     r"таймер|timer|сч[её]тчик|counter|рекорд|record|настройк|settings|сохранени|save|установщик|installer",
     re.IGNORECASE,
@@ -98,6 +115,8 @@ FIRST_PASS_EXPANSION = re.compile(
     r"уровн[и-я]*\s+сложност|\bтаймер|\bрекорд|сохранени|\bтем[аы]\b|установщик|упаковк|многопользовательск",
     re.IGNORECASE,
 )
+FIRST_PASS_SCOPE_SOURCE = re.compile(r"явн|источник|ответ|требован|подтвержд|пользовател", re.IGNORECASE)
+FIRST_PASS_EXCLUSION = re.compile(r"исключ|вне границ|вне области|не вход|не входит|остается вне|остаётся вне", re.IGNORECASE)
 FORBIDDEN_GUI_TEXT = re.compile(r"\bGUI\b|GUI-", re.IGNORECASE)
 FORBIDDEN_USER_TEXT_TERMS = re.compile(r"\bGUI\b|product pass|\bpass\b|\bbootstrap\b", re.IGNORECASE)
 FORBIDDEN_ENGLISH_GIT_PR_RULE = re.compile(r"commit message|PR title|PR body|оформля\w+\s+на английском", re.IGNORECASE)
@@ -121,6 +140,8 @@ BYTEPRESS_PLAN_000090_DONE = re.compile(r"ID:\s+PLAN-000090[\s\S]{0,240}Стат
 BYTEPRESS_REPORTS_PLAN_000090_CLOSED = re.compile(r"ROAD-000036`?\s*/\s*`?BACK-000101`?\s*/\s*`?PLAN-000090`?\s+закрыт", re.IGNORECASE)
 BYTEPRESS_WORKFLOW_FACT_RULE = re.compile(r"фактические файлы `Plans/Roadmap\.md`, `Plans/Backlog\.md` и архивированный `Plan` должны подтверждать статус `Завершено`")
 BYTEPRESS_RULE_RUSSIAN_OUTPUT = re.compile(r"RULE-000017[\s\S]{0,500}Все записи агента[\s\S]{0,200}на русском языке")
+BYTEPRESS_RULE_OWNER_SYNC = re.compile(r"RULE-000019[\s\S]{0,800}Docs/Product/Product_Passport\.md[\s\S]{0,400}Logs/\*")
+BYTEPRESS_RULE_RUSSIAN_CODE_TEXT = re.compile(r"RULE-000020[\s\S]{0,500}Пользовательские сообщения[\s\S]{0,250}на русском языке")
 INTERVIEW_SKILL_NUMBERED = re.compile(r"нумер", re.IGNORECASE)
 INTERVIEW_SKILL_QUESTION_COUNT = re.compile(r"8.?10", re.IGNORECASE)
 INTERVIEW_SKILL_OWNER = re.compile(r"owner|владел", re.IGNORECASE)
@@ -234,7 +255,8 @@ def product_user_text_paths(root: Path) -> list[Path]:
 def forbidden_product_user_text_errors(root: Path) -> list[str]:
     errors: list[str] = []
     for path in product_user_text_paths(root):
-        for line_number, line in enumerate(read_text(path).splitlines(), start=1):
+        lines = read_text(path).splitlines()
+        for line_number, line in enumerate(lines, start=1):
             line_without_paths = re.sub(r"`[^`]*product_bootstrap_smoke\.py[^`]*`", "", line)
             if FORBIDDEN_USER_TEXT_TERMS.search(line_without_paths):
                 errors.append(f"{path.relative_to(root)}:{line_number}: пользовательский текст должен использовать русский эквивалент вместо `GUI`, `product pass`, `pass` или `bootstrap`")
@@ -242,8 +264,27 @@ def forbidden_product_user_text_errors(root: Path) -> list[str]:
                 errors.append(f"{path.relative_to(root)}:{line_number}: системная установка требует отдельного решения пользователя")
             if "tkinter" in line.lower() and not re.search(r"явн|профил|требован|техническ|допускается|требует", line, re.IGNORECASE):
                 errors.append(f"{path.relative_to(root)}:{line_number}: `tkinter` требует явного источника")
-            if FIRST_PASS_EXPANSION.search(line) and not re.search(r"без явн|не вход|не долж|запрещ", line, re.IGNORECASE):
+            context = "\n".join(lines[max(0, line_number - 8):line_number])
+            if (
+                FIRST_PASS_EXPANSION.search(line)
+                and not FIRST_PASS_SCOPE_SOURCE.search(line)
+                and not FIRST_PASS_EXCLUSION.search(context)
+            ):
                 errors.append(f"{path.relative_to(root)}:{line_number}: расширяющая функция первого прохода требует явного ответа пользователя")
+    return errors
+
+
+def unconfirmed_expansion_errors(path: Path) -> list[str]:
+    errors: list[str] = []
+    lines = read_text(path).splitlines()
+    for line_number, line in enumerate(lines, start=1):
+        if not FIRST_PASS_EXPANSION.search(line):
+            continue
+        context = "\n".join(lines[max(0, line_number - 8):line_number])
+        if FIRST_PASS_SCOPE_SOURCE.search(line) or FIRST_PASS_EXCLUSION.search(context):
+            continue
+        errors.append("нельзя подсказывать неподтверждённые расширения первой версии")
+        break
     return errors
 
 
@@ -288,19 +329,19 @@ def has_startup_handshake_contract(path: Path) -> bool:
 
 def has_interview_contract(path: Path) -> list[str]:
     if not path.exists():
-        return ["missing interview file"]
+        return ["нет файла интервью"]
     errors: list[str] = []
     question_count = count_matches(path, QUESTION_HEADING)
     if not 8 <= question_count <= 10:
-        errors.append("must contain 8-10 numbered questions")
+        errors.append("должно быть 8-10 нумерованных вопросов")
     if not contains_pattern(path, INTERVIEW_OPTIONS_BLOCK):
-        errors.append("missing lettered options block")
+        errors.append("нет блока буквенных вариантов")
     if not contains_pattern(path, INTERVIEW_RECOMMENDED_BLOCK):
-        errors.append("missing recommended option block")
+        errors.append("нет блока рекомендуемого варианта")
     if not contains_pattern(path, INTERVIEW_OWNER_CURRENT_TRUTH):
-        errors.append("missing current-truth owner statement")
+        errors.append("нет указания владельца текущей истины")
     if not contains_pattern(path, INTERVIEW_DELTA_BLOCK):
-        errors.append("missing delta-interview format contract")
+        errors.append("нет договора формата узкого интервью")
     for pattern, label in [
         (INTERVIEW_CLASS_CONTEXT, "Контекст"),
         (INTERVIEW_CLASS_BOUNDARY, "Граница"),
@@ -309,31 +350,30 @@ def has_interview_contract(path: Path) -> list[str]:
         (INTERVIEW_CLASS_TRANSITION, "Переход"),
     ]:
         if not contains_pattern(path, pattern):
-            errors.append(f"missing question class `{label}`")
+            errors.append(f"нет класса вопроса `{label}`")
     if not contains_pattern(path, INTERVIEW_TRANSFER_RULE):
-        errors.append("missing blocking/nonblocking transfer rule")
+        errors.append("нет правила переноса блокирующих и неблокирующих вопросов")
     if not contains_pattern(path, INTERVIEW_NO_GUESSED_CONFIRMATION):
-        errors.append("missing ban on guessed current-truth confirmation")
+        errors.append("нет запрета подтверждать текущую истину догадкой")
     if not contains_pattern(path, INTERVIEW_WAIT_FOR_USER):
-        errors.append("missing stop-and-wait rule after blocking interview questions")
+        errors.append("нет правила остановки и ожидания ответа после блокирующих вопросов")
     if not contains_pattern(path, INTERVIEW_NO_PRODUCT_REQUEST_CONFIRMATION):
-        errors.append("missing ban on confirming current truth from a general product request")
+        errors.append("нет запрета подтверждать текущую истину общим запросом о продукте")
     if not contains_pattern(path, INTERVIEW_DEPENDENCY_SOURCE):
-        errors.append("missing stack/dependency source discipline")
+        errors.append("нет правила источника стека и зависимостей")
     if "tkinter" in read_text(path) and not contains_pattern(path, TKINTER_EXPLICIT_SOURCE):
-        errors.append("tkinter requires an explicit source")
+        errors.append("`tkinter` требует явного источника")
     errors.extend(forbidden_gui_text_paths(path.parent.parent.parent, ["Docs/Discovery/Interview.md"]))
-    if contains_pattern(path, INTERVIEW_UNCONFIRMED_EXPANSION):
-        errors.append("must not suggest unconfirmed first-version expansion examples")
+    errors.extend(unconfirmed_expansion_errors(path))
     return errors
 
 
 def has_product_base_terms(path: Path) -> list[str]:
     if not path.exists():
-        return ["missing terms file"]
+        return ["нет файла терминов"]
     errors: list[str] = []
     if not contains_pattern(path, PRODUCT_BASE_TERMS_SECTION):
-        errors.append("missing starter terms section")
+        errors.append("нет секции стартового пакета терминов")
     for term_id, title in [
         ("TERM-000019", "Каркас репозитория"),
         ("TERM-000020", "Текущая истина"),
@@ -343,13 +383,37 @@ def has_product_base_terms(path: Path) -> list[str]:
         ("TERM-000009", "План"),
     ]:
         if f"{term_id} — {title}" not in path.read_text(encoding="utf-8"):
-            errors.append(f"missing starter term `{term_id} — {title}`")
+            errors.append(f"нет стартового термина `{term_id} — {title}`")
+    return errors
+
+
+def has_product_subject_owner_sync(path: Path) -> list[str]:
+    if not path.exists():
+        return ["нет Pipeline/Workflows.md"]
+    text = path.read_text(encoding="utf-8")
+    errors: list[str] = []
+    for marker in PRODUCT_SUBJECT_OWNER_SYNC_MARKERS:
+        if marker not in text:
+            errors.append(f"нет обязательной проверки владельца смысла `{marker}`")
+    return errors
+
+
+def has_live_product_passport(path: Path) -> list[str]:
+    if not path.exists():
+        return ["нет Product_Passport.md"]
+    text = path.read_text(encoding="utf-8")
+    errors: list[str] = []
+    for marker in PRODUCT_PASSPORT_LIVE_FIELDS:
+        if marker not in text:
+            errors.append(f"нет поля живого паспорта `{marker}`")
+    if "Profiles/*" in text and not re.search(r"не возвращ|без возвращ", text, re.IGNORECASE):
+        errors.append("паспорт продукта не должен возвращать домен `Profiles/*`")
     return errors
 
 
 def has_product_start_gate(path: Path) -> list[str]:
     if not path.exists():
-        return ["missing AGENTS.md"]
+        return ["нет AGENTS.md"]
     text = path.read_text(encoding="utf-8")
     required = [
         PRODUCT_START_GATE_SECTION,
@@ -368,20 +432,20 @@ def has_product_start_gate(path: Path) -> list[str]:
     ]
     errors: list[str] = []
     if not all(pattern.search(text) for pattern in required):
-        errors.append("missing hard first product-start gate")
+        errors.append("нет жёсткого гейта первого старта продукта")
     return errors
 
 
 def has_product_interview_gate(path: Path) -> list[str]:
     if not path.exists():
-        return ["missing interview file"]
+        return ["нет файла интервью"]
     errors: list[str] = []
     if not contains_pattern(path, PRODUCT_INTERVIEW_UNCONFIRMED):
-        errors.append("missing `Статус_текущей_истины: Не_подтверждена`")
+        errors.append("нет `Статус_текущей_истины: Не_подтверждена`")
     if not contains_pattern(path, PRODUCT_INTERVIEW_PLACEHOLDER):
-        errors.append("missing placeholder answers that require user confirmation")
+        errors.append("нет placeholder-ответов, требующих подтверждения пользователя")
     if not contains_pattern(path, PRODUCT_INTERVIEW_GATE):
-        errors.append("missing discovery-only gate note")
+        errors.append("нет указания гейта аналитического контура")
     return errors
 
 
@@ -409,7 +473,7 @@ def has_later_active_or_completed_plan(root: Path) -> bool:
             continue
         number = int(plan_id.removeprefix("PLAN-"))
         status = extract_status(text)
-        if number > 1 and status in {"В_работе", "Завершено"}:
+        if number > 1 and status in {"В_работе", "Готово_к_утверждению", "Завершено"}:
             return True
     return False
 
@@ -428,39 +492,57 @@ def product_section_has_status(path: Path, artifact_id: str, status: str) -> boo
     return False
 
 
+def product_section_status(path: Path, artifact_id: str) -> str | None:
+    text = read_text(path)
+    if not text:
+        return None
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if line == f"ID: {artifact_id}":
+            for candidate in lines[index + 1:index + 12]:
+                if candidate.startswith("Статус: "):
+                    return candidate.removeprefix("Статус: ")
+            return None
+    return None
+
+
+def status_allows_ready_for_approval(status: str | None) -> bool:
+    return status in {"Готово_к_утверждению", "Завершено"}
+
+
 def has_product_developed_consistency(root: Path, plan_path: Path | None) -> list[str]:
     errors: list[str] = []
     interview_path = root / "Docs" / "Discovery" / "Interview.md"
     if not contains_pattern(interview_path, PRODUCT_INTERVIEW_CONFIRMED):
-        errors.append("Docs/Discovery/Interview.md: current truth is not `Подтверждена`")
+        errors.append("Docs/Discovery/Interview.md: текущая истина не имеет статус `Подтверждена`")
     if contains_pattern(interview_path, PRODUCT_INTERVIEW_PLACEHOLDER):
-        errors.append("Docs/Discovery/Interview.md: placeholder answers remain after current truth confirmation")
+        errors.append("Docs/Discovery/Interview.md: после подтверждения текущей истины остались placeholder-ответы")
 
     roadmap_path = root / "Plans" / "Roadmap.md"
     backlog_path = root / "Plans" / "Backlog.md"
-    if not product_section_has_status(roadmap_path, "ROAD-000001", "Завершено"):
-        errors.append("Plans/Roadmap.md: ROAD-000001 must be `Завершено` after the first closed product-start pass")
-    if not product_section_has_status(backlog_path, "BACK-000001", "Завершено"):
-        errors.append("Plans/Backlog.md: BACK-000001 must be `Завершено` after the first closed product-start pass")
+    if not status_allows_ready_for_approval(product_section_status(roadmap_path, "ROAD-000001")):
+        errors.append("Plans/Roadmap.md: ROAD-000001 должен быть `Завершено` или `Готово_к_утверждению` после первого product-start pass")
+    if not status_allows_ready_for_approval(product_section_status(backlog_path, "BACK-000001")):
+        errors.append("Plans/Backlog.md: BACK-000001 должен быть `Завершено` или `Готово_к_утверждению` после первого product-start pass")
 
     if plan_path is None:
-        errors.append("Plans/<PRODUCT_CODE>-000001-product-initialization.md: missing initial product plan")
+        errors.append("Plans/<PRODUCT_CODE>-000001-product-initialization.md: нет начального плана продукта")
     else:
         plan_text = read_text(plan_path)
         if extract_plan_id(plan_text) != "PLAN-000001":
-            errors.append(f"{plan_path}: initial product plan ID must remain `PLAN-000001`")
-        if extract_status(plan_text) != "Завершено":
-            errors.append(f"{plan_path}: PLAN-000001 must be `Завершено` after the first closed product-start pass")
+            errors.append(f"{plan_path}: ID начального плана продукта должен оставаться `PLAN-000001`")
+        if not status_allows_ready_for_approval(extract_status(plan_text)):
+            errors.append(f"{plan_path}: PLAN-000001 должен быть `Завершено` или `Готово_к_утверждению` после первого product-start pass")
 
     if not has_later_active_or_completed_plan(root):
-        errors.append("Plans/*: developing product repo must contain a later active or completed plan after PLAN-000001")
+        errors.append("Plans/*: developed product repo должен содержать следующий активный, готовый к утверждению или завершённый план после PLAN-000001")
 
     changelog_text = read_text(root / "Logs" / "ChangeLog.md")
     quality_text = read_text(root / "Logs" / "QualityLog.md")
     if "PLAN-000001" not in changelog_text or "BACK-000001" not in changelog_text:
-        errors.append("Logs/ChangeLog.md: missing first pass closure links to PLAN-000001 and BACK-000001")
+        errors.append("Logs/ChangeLog.md: нет ссылок закрытия первого прохода на PLAN-000001 и BACK-000001")
     if "PLAN-000001" not in quality_text:
-        errors.append("Logs/QualityLog.md: missing first pass check record linked to PLAN-000001")
+        errors.append("Logs/QualityLog.md: нет записи проверки первого прохода со ссылкой на PLAN-000001")
     return errors
 
 
@@ -626,6 +708,8 @@ def check_product_repo(root: Path, mode: str) -> int:
         errors.append("AGENTS.md: сообщение фиксации и запрос на слияние не должны требовать английский язык")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", PRODUCT_PR_GH_ROUTE):
         errors.append("Pipeline/Workflows.md: нет маршрута запроса на слияние через gh")
+    for item in has_product_subject_owner_sync(root / "Pipeline" / "Workflows.md"):
+        errors.append(f"Pipeline/Workflows.md: {item}")
     errors.extend(
         forbidden_gui_text_paths(
             root,
@@ -660,6 +744,8 @@ def check_product_repo(root: Path, mode: str) -> int:
             errors.append("Docs/Discovery/Interview.md: developing product repo cannot keep unconfirmed current truth")
     for item in has_product_base_terms(root / "Docs" / "Terms" / "Base_Terms.md"):
         errors.append(f"Docs/Terms/Base_Terms.md: {item}")
+    for item in has_live_product_passport(root / "Docs" / "Product" / "Product_Passport.md"):
+        errors.append(f"Docs/Product/Product_Passport.md: {item}")
     roadmap_path = root / "Plans" / "Roadmap.md"
     if mode == "product-fresh" and roadmap_path.exists() and not contains_pattern(roadmap_path, PRODUCT_ROADMAP_IN_PROGRESS):
         errors.append("Plans/Roadmap.md: initial stage is not `В_работе`")
@@ -808,6 +894,10 @@ def main() -> int:
         contract_errors.append("AGENTS.md: нет границы исключений для английского в пользовательском выводе")
     if not contains_pattern(root / "Rules" / "Workflow.md", BYTEPRESS_RULE_RUSSIAN_OUTPUT):
         contract_errors.append("Rules/Workflow.md: нет RULE-000017 о русском пользовательском выводе")
+    if not contains_pattern(root / "Rules" / "Workflow.md", BYTEPRESS_RULE_OWNER_SYNC):
+        contract_errors.append("Rules/Workflow.md: нет RULE-000019 о сверке владельцев смысла")
+    if not contains_pattern(root / "Rules" / "Workflow.md", BYTEPRESS_RULE_RUSSIAN_CODE_TEXT):
+        contract_errors.append("Rules/Workflow.md: нет RULE-000020 о русских пользовательских строках в коде продукта")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", BYTEPRESS_WORKFLOW_FACT_RULE):
         contract_errors.append("Pipeline/Workflows.md: нет правила сверки отчёта о закрытии ROAD/BACK/PLAN с фактом")
     if not contains_pattern(root / "Pipeline" / "Workflows.md", PRODUCT_PR_GH_ROUTE):

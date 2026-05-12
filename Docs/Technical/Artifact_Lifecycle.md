@@ -185,9 +185,8 @@ Bootstrap note:
 ### Active -> Execution context
 Допустимо:
 - active `Plan` порождает временный execution context во время исполнения.
-- generated product repo может использовать `scripts/reset-product-start.sh`, чтобы удалить tool-local smoke artifact и зафиксировать drift report после failed early product-start.
-- generated product repo может использовать generated `scripts/dev-test.sh` как automatic structural check route; script запускает `bp_lint.py --mode auto`, чтобы fresh bootstrap и developed product lifecycle проверялись разными gates.
-- generated product repo после первого pass может обновлять служебные файлы `scripts/*` отдельным product-side pass без fresh bootstrap reset, если planning/log closure и product-developed check сохраняют подтверждённую текущую истину и предметные артефакты.
+- generated product repo использует local `Tools/product_check.py` как automatic structural check route, чтобы fresh bootstrap и developed product lifecycle проверялись разными gates.
+- generated product repo после первого pass может обновлять служебные файлы `Tools/*` отдельным product-side pass без fresh bootstrap reset, если planning/log closure и product-developed check сохраняют подтверждённую текущую истину и предметные артефакты.
 
 Недопустимо:
 - execution context становится каноническим планом;

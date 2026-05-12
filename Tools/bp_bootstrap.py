@@ -17,7 +17,7 @@ STARTER_TERM_IDS = [
     "TERM-000009",
 ]
 STARTER_TERM_PURPOSES = {
-    "TERM-000019": "Объясняет, какой минимальный каркас начальное развёртывание создаёт по умолчанию.",
+    "TERM-000019": "Объясняет, какой стартовый каркас начальное развёртывание создаёт для дальнейшей предметной жизни продукта.",
     "TERM-000020": "Удерживает аналитический гейт до явных ответов пользователя.",
     "TERM-000021": "Фиксирует, что проход с правками начинается только из рабочей ветки.",
     "TERM-000007": "Помогает читать планирование этапов продукта.",
@@ -97,6 +97,23 @@ PIPELINE_RUSSIAN_NAMES = [
     "Предметный проход",
     "Гейт реализации",
 ]
+SUBJECT_OWNER_SYNC_MARKERS = [
+    "Docs/Product/Product_Passport.md",
+    "Docs/Product/PRD.md",
+    "Docs/Product/JTBD.md",
+    "Docs/Product/Delivery.md",
+    "Docs/User/*",
+    "Docs/Technical/*",
+    "Plans/*",
+    "Logs/*",
+]
+PASSPORT_LIVE_FIELDS = [
+    "Тип_продукта:",
+    "Основной_запуск:",
+    "Подтверждённый_стек:",
+    "Предметные_пакеты:",
+    "Ограничения_среды:",
+]
 AGENTS_PIPELINE_ROUTE = re.compile(r"Pipeline/Workflows\.md|Pipeline/\*", re.IGNORECASE)
 AGENTS_START_REPORT = [re.compile(pattern, re.IGNORECASE) for pattern in [r"Фаза:", r"Рабочий поток:", r"Гейт:"]]
 INTERVIEW_NO_GUESSES = re.compile(r"не равен.*подтвержден|не считается.*подтвержден|догадк|гипотез", re.IGNORECASE)
@@ -109,6 +126,8 @@ FIRST_PASS_EXPANSION = re.compile(
     r"уровн[и-я]*\s+сложност|\bтаймер|\bрекорд|сохранени|\bтем[аы]\b|установщик|упаковк|многопользовательск",
     re.IGNORECASE,
 )
+FIRST_PASS_SCOPE_SOURCE = re.compile(r"явн|источник|ответ|требован|подтвержд|пользовател", re.IGNORECASE)
+FIRST_PASS_EXCLUSION = re.compile(r"исключ|вне границ|вне области|не вход|не входит|остается вне|остаётся вне", re.IGNORECASE)
 FORBIDDEN_GUI_TEXT = re.compile(r"\bGUI\b|GUI-", re.IGNORECASE)
 FORBIDDEN_USER_TEXT_TERMS = re.compile(r"\bGUI\b|product pass|\bpass\b|\bbootstrap\b", re.IGNORECASE)
 FORBIDDEN_ENGLISH_GIT_PR_RULE = re.compile(r"commit message|PR title|PR body|оформля\w+\s+на английском", re.IGNORECASE)
@@ -161,6 +180,30 @@ def forbidden_gui_text_paths(root: Path) -> list[Path]:
     return [path for path in scan_paths if path.exists() and FORBIDDEN_GUI_TEXT.search(text(path))]
 
 
+def subject_owner_sync_errors(path: Path) -> list[str]:
+    if not path.exists():
+        return ["Pipeline/Workflows.md: отсутствует"]
+    content = text(path)
+    errors: list[str] = []
+    for marker in SUBJECT_OWNER_SYNC_MARKERS:
+        if marker not in content:
+            errors.append(f"Pipeline/Workflows.md: нет обязательной проверки владельца смысла `{marker}`")
+    return errors
+
+
+def live_product_passport_errors(path: Path) -> list[str]:
+    if not path.exists():
+        return ["Docs/Product/Product_Passport.md: отсутствует"]
+    content = text(path)
+    errors: list[str] = []
+    for marker in PASSPORT_LIVE_FIELDS:
+        if marker not in content:
+            errors.append(f"Docs/Product/Product_Passport.md: нет поля живого паспорта `{marker}`")
+    if "Profiles/*" in content and not re.search(r"не возвращ|без возвращ", content, re.IGNORECASE):
+        errors.append("Docs/Product/Product_Passport.md: паспорт не должен возвращать домен `Profiles/*`")
+    return errors
+
+
 def user_text_paths(root: Path) -> list[Path]:
     candidates = [
         root / "README.md",
@@ -193,7 +236,8 @@ def user_text_paths(root: Path) -> list[Path]:
 def forbidden_user_text_errors(root: Path) -> list[str]:
     errors: list[str] = []
     for path in user_text_paths(root):
-        for line_number, line in enumerate(text(path).splitlines(), start=1):
+        lines = text(path).splitlines()
+        for line_number, line in enumerate(lines, start=1):
             line_without_paths = re.sub(r"`[^`]*product_bootstrap_smoke\.py[^`]*`", "", line)
             if FORBIDDEN_USER_TEXT_TERMS.search(line_without_paths):
                 errors.append(f"{path.relative_to(root)}:{line_number}: пользовательский текст должен использовать русский эквивалент вместо `GUI`, `product pass`, `pass` или `bootstrap`")
@@ -201,8 +245,27 @@ def forbidden_user_text_errors(root: Path) -> list[str]:
                 errors.append(f"{path.relative_to(root)}:{line_number}: системная установка требует отдельного решения пользователя")
             if "tkinter" in line.lower() and not re.search(r"явн|профил|требован|техническ|допускается|требует", line, re.IGNORECASE):
                 errors.append(f"{path.relative_to(root)}:{line_number}: `tkinter` требует явного источника")
-            if FIRST_PASS_EXPANSION.search(line) and not re.search(r"без явн|не вход|не долж|запрещ", line, re.IGNORECASE):
+            context = "\n".join(lines[max(0, line_number - 8):line_number])
+            if (
+                FIRST_PASS_EXPANSION.search(line)
+                and not FIRST_PASS_SCOPE_SOURCE.search(line)
+                and not FIRST_PASS_EXCLUSION.search(context)
+            ):
                 errors.append(f"{path.relative_to(root)}:{line_number}: расширяющая функция первого прохода требует явного ответа пользователя")
+    return errors
+
+
+def unconfirmed_expansion_errors(path: Path) -> list[str]:
+    errors: list[str] = []
+    lines = text(path).splitlines()
+    for line_number, line in enumerate(lines, start=1):
+        if not FIRST_PASS_EXPANSION.search(line):
+            continue
+        context = "\n".join(lines[max(0, line_number - 8):line_number])
+        if FIRST_PASS_SCOPE_SOURCE.search(line) or FIRST_PASS_EXCLUSION.search(context):
+            continue
+        errors.append("нельзя подсказывать неподтверждённые расширения первой версии")
+        break
     return errors
 
 
@@ -228,9 +291,13 @@ def has_later_plan(root: Path) -> bool:
         match = PLAN_ID.search(plan_text)
         if not match:
             continue
-        if int(match.group(1)) > 1 and status_of(path) in {"В_работе", "Завершено"}:
+        if int(match.group(1)) > 1 and status_of(path) in {"В_работе", "Готово_к_утверждению", "Завершено"}:
             return True
     return False
+
+
+def status_allows_ready_for_approval(status: str | None) -> bool:
+    return status in {"Готово_к_утверждению", "Завершено"}
 
 
 def detect_mode(root: Path) -> str:
@@ -260,31 +327,31 @@ def check(root: Path, mode: str) -> list[str]:
     errors: list[str] = []
     for item in ROOT_MARKERS + BASE_PATHS:
         if not (root / item).exists():
-            errors.append(f"missing {item}")
+            errors.append(f"отсутствует {item}")
     for item in FORBIDDEN_DIRS:
         if (root / item).exists():
-            errors.append(f"forbidden placeholder domain present: {item}")
+            errors.append(f"запрещён placeholder-домен: {item}")
     for path in sorted((root / "Schemas").glob("*.json")):
         if not contains(path, SCHEMA_ID):
-            errors.append(f"{path.relative_to(root)}: missing schema ID")
+            errors.append(f"{path.relative_to(root)}: нет ID схемы")
     template_ids: dict[str, Path] = {}
     for path in sorted((root / "Templates").glob("*.md")):
         if path.name == "README.md":
             continue
         match = TEMPLATE_ID.search(text(path))
         if not match:
-            errors.append(f"{path.relative_to(root)}: missing template ID")
+            errors.append(f"{path.relative_to(root)}: нет ID шаблона")
             continue
         template_id = match.group(1)
         if template_id in template_ids:
-            errors.append(f"{path.relative_to(root)}: duplicate template ID {template_id}")
+            errors.append(f"{path.relative_to(root)}: повтор ID шаблона {template_id}")
         else:
             template_ids[template_id] = path
     if "Tools/.reports/" not in text(root / ".gitignore"):
-        errors.append(".gitignore: missing Tools/.reports/ ignore")
+        errors.append(".gitignore: нет исключения Tools/.reports/")
     agents_text = text(root / "AGENTS.md")
     if not AGENTS_PIPELINE_ROUTE.search(agents_text):
-        errors.append("AGENTS.md: missing Pipeline route")
+        errors.append("AGENTS.md: нет маршрута в Pipeline")
     if has_forbidden_english_git_pr_rule(root):
         errors.append("AGENTS.md: сообщение фиксации и запрос на слияние не должны требовать английский язык")
     for pattern in AGENTS_START_REPORT:
@@ -294,36 +361,38 @@ def check(root: Path, mode: str) -> list[str]:
     if not PIPELINE_GH_ROUTE.search(text(workflows)):
         errors.append("Pipeline/Workflows.md: нет маршрута запроса на слияние через gh")
     if not PIPELINE_CHECK_LEVELS.search(text(workflows)):
-        errors.append("Pipeline/Workflows.md: missing check levels")
+        errors.append("Pipeline/Workflows.md: нет уровней проверок")
+    errors.extend(subject_owner_sync_errors(workflows))
     pipeline_text = text(root / "Pipeline" / "Workflows.md") + "\n" + text(root / "Pipeline" / "Phases.md") + "\n" + text(root / "Pipeline" / "Gates.md")
     if PIPELINE_ENGLISH_NAMES.search(pipeline_text):
-        errors.append("Pipeline/*: phase, workflow and gate names must use Russian canonical names")
+        errors.append("Pipeline/*: названия фаз, рабочих потоков и гейтов должны использовать русский канон")
     for marker in PIPELINE_RUSSIAN_NAMES:
         if marker not in pipeline_text:
-            errors.append(f"Pipeline/*: missing Russian marker `{marker}`")
+            errors.append(f"Pipeline/*: нет русского маркера `{marker}`")
 
     plan = initial_plan(root)
     if plan is None:
-        errors.append("missing Plans/<PRODUCT_CODE>-000001-product-initialization.md")
+        errors.append("нет Plans/<PRODUCT_CODE>-000001-product-initialization.md")
     actual_mode = detect_mode(root) if mode == "auto" else mode
     if actual_mode == "unknown":
-        errors.append("Docs/Discovery/Interview.md: cannot detect current-truth lifecycle state")
+        errors.append("Docs/Discovery/Interview.md: нельзя определить состояние жизненного цикла текущей истины")
     interview = root / "Docs" / "Discovery" / "Interview.md"
     if not INTERVIEW_NO_GUESSES.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: missing ban on guessed current-truth confirmation")
+        errors.append("Docs/Discovery/Interview.md: нет запрета подтверждать текущую истину догадкой")
     if not INTERVIEW_WAIT_FOR_USER.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: missing stop-and-wait rule after blocking interview questions")
+        errors.append("Docs/Discovery/Interview.md: нет правила остановки и ожидания ответа после блокирующих вопросов")
     if not INTERVIEW_NO_PRODUCT_REQUEST_CONFIRMATION.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: missing ban on confirming current truth from a general product request")
+        errors.append("Docs/Discovery/Interview.md: нет запрета подтверждать текущую истину общим запросом о продукте")
     if not INTERVIEW_DEPENDENCIES.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: missing stack/dependency source discipline")
+        errors.append("Docs/Discovery/Interview.md: нет правила источника стека и зависимостей")
     if "tkinter" in text(interview) and not TKINTER_EXPLICIT_SOURCE.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: tkinter requires an explicit source")
+        errors.append("Docs/Discovery/Interview.md: `tkinter` требует явного источника")
     for path in forbidden_gui_text_paths(root):
         errors.append(f"{path.relative_to(root)}: используйте `графический интерфейс` вместо `GUI` в пользовательском тексте")
+    errors.extend(live_product_passport_errors(root / "Docs" / "Product" / "Product_Passport.md"))
     errors.extend(forbidden_user_text_errors(root))
-    if INTERVIEW_UNCONFIRMED_EXPANSION.search(text(interview)):
-        errors.append("Docs/Discovery/Interview.md: must not suggest unconfirmed first-version expansion examples")
+    for item in unconfirmed_expansion_errors(interview):
+        errors.append(f"Docs/Discovery/Interview.md: {item}")
     for rel in ["Tools/product_check.py", "Tools/product_bootstrap_smoke.py"]:
         if not is_executable(root / rel):
             errors.append(f"{rel}: служебный файл не исполняемый")
@@ -331,33 +400,33 @@ def check(root: Path, mode: str) -> list[str]:
         errors.append("scripts/*: устаревший переходный слой не создаётся в новом каркасе; используйте Tools/*")
     if actual_mode == "fresh":
         if not contains(interview, UNCONFIRMED):
-            errors.append("Docs/Discovery/Interview.md: missing unconfirmed current truth")
+            errors.append("Docs/Discovery/Interview.md: нет неподтверждённой текущей истины")
         if not contains(interview, PLACEHOLDER):
-            errors.append("Docs/Discovery/Interview.md: missing placeholder answers")
+            errors.append("Docs/Discovery/Interview.md: нет placeholder-ответов")
         if section_status(root / "Plans" / "Roadmap.md", "ROAD-000001") != "В_работе":
-            errors.append("Plans/Roadmap.md: ROAD-000001 must be В_работе in fresh state")
+            errors.append("Plans/Roadmap.md: ROAD-000001 должен быть `В_работе` в fresh-состоянии")
         if section_status(root / "Plans" / "Backlog.md", "BACK-000001") != "В_работе":
-            errors.append("Plans/Backlog.md: BACK-000001 must be В_работе in fresh state")
+            errors.append("Plans/Backlog.md: BACK-000001 должен быть `В_работе` в fresh-состоянии")
         if plan and status_of(plan) != "В_работе":
-            errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be В_работе in fresh state")
+            errors.append(f"{plan.relative_to(root)}: PLAN-000001 должен быть `В_работе` в fresh-состоянии")
         current_branch = git_branch(root)
         if current_branch and (current_branch in {"develop", "main"} or not FIRST_ANALYTIC_BRANCH.fullmatch(current_branch)):
-            errors.append("git branch: first analytical product-start must use a chore/ working branch")
+            errors.append("git branch: первый аналитический product-start должен идти из рабочей ветки `chore/`")
     elif actual_mode == "developed":
         if contains(interview, UNCONFIRMED) or contains(interview, PLACEHOLDER):
-            errors.append("Docs/Discovery/Interview.md: developed state keeps fresh placeholders")
-        if section_status(root / "Plans" / "Roadmap.md", "ROAD-000001") != "Завершено":
-            errors.append("Plans/Roadmap.md: ROAD-000001 must be Завершено in developed state")
-        if section_status(root / "Plans" / "Backlog.md", "BACK-000001") != "Завершено":
-            errors.append("Plans/Backlog.md: BACK-000001 must be Завершено in developed state")
-        if plan and status_of(plan) != "Завершено":
-            errors.append(f"{plan.relative_to(root)}: PLAN-000001 must be Завершено in developed state")
+            errors.append("Docs/Discovery/Interview.md: developed-состояние сохраняет fresh-placeholder")
+        if not status_allows_ready_for_approval(section_status(root / "Plans" / "Roadmap.md", "ROAD-000001")):
+            errors.append("Plans/Roadmap.md: ROAD-000001 должен быть `Завершено` или `Готово_к_утверждению` в developed-состоянии")
+        if not status_allows_ready_for_approval(section_status(root / "Plans" / "Backlog.md", "BACK-000001")):
+            errors.append("Plans/Backlog.md: BACK-000001 должен быть `Завершено` или `Готово_к_утверждению` в developed-состоянии")
+        if plan and not status_allows_ready_for_approval(status_of(plan)):
+            errors.append(f"{plan.relative_to(root)}: PLAN-000001 должен быть `Завершено` или `Готово_к_утверждению` в developed-состоянии")
         if not has_later_plan(root):
-            errors.append("Plans/*: developed state needs a later active or completed plan")
+            errors.append("Plans/*: developed-состоянию нужен следующий активный, готовый к утверждению или завершённый план")
         if "PLAN-000001" not in text(root / "Logs" / "ChangeLog.md"):
-            errors.append("Logs/ChangeLog.md: missing PLAN-000001 closure link")
+            errors.append("Logs/ChangeLog.md: нет ссылки на закрытие PLAN-000001")
         if "PLAN-000001" not in text(root / "Logs" / "QualityLog.md"):
-            errors.append("Logs/QualityLog.md: missing PLAN-000001 check link")
+            errors.append("Logs/QualityLog.md: нет записи проверки PLAN-000001")
     return errors
 
 
@@ -461,22 +530,22 @@ def write_executable(path: Path, content: str) -> None:
 def load_brand_profile(repo_root: Path, profile_name: str) -> BrandProfile:
     profile_path = repo_root / "Profiles" / f"{profile_name}.md"
     if not profile_path.exists():
-        raise ValueError(f"Brand profile not found in BytePress: {profile_name}")
+        raise ValueError(f"Брендовый профиль не найден в BytePress: {profile_name}")
 
     text = profile_path.read_text(encoding="utf-8")
     profile_type = extract_value(text, "Тип_профиля")
     interaction_language = extract_value(text, "Язык_взаимодействия")
     if profile_type != "brand":
-        raise ValueError(f"Profile is not a brand profile: {profile_name}")
+        raise ValueError(f"Профиль не является брендовым профилем: {profile_name}")
     if not interaction_language:
-        raise ValueError(f"Brand profile does not define Язык_взаимодействия: {profile_name}")
+        raise ValueError(f"В брендовом профиле не указан `Язык_взаимодействия`: {profile_name}")
     return BrandProfile(name=profile_name, interaction_language=interaction_language)
 
 
 def load_starter_term(repo_root: Path, term_id: str) -> StarterTerm:
     matches = sorted((repo_root / "Docs" / "Terms").glob(f"{term_id}-*.md"))
     if len(matches) != 1:
-        raise ValueError(f"Starter term not found or ambiguous in BytePress: {term_id}")
+        raise ValueError(f"Стартовый термин не найден или неоднозначен в BytePress: {term_id}")
     text = matches[0].read_text(encoding="utf-8")
     title = text.splitlines()[0].lstrip("#").strip()
     definition = ""
@@ -486,7 +555,7 @@ def load_starter_term(repo_root: Path, term_id: str) -> StarterTerm:
             definition = lines[index + 1].strip()
             break
     if not definition:
-        raise ValueError(f"Starter term does not define `## Определение`: {term_id}")
+        raise ValueError(f"Стартовый термин не содержит `## Определение`: {term_id}")
     return StarterTerm(
         term_id=term_id,
         title=title,
@@ -536,11 +605,11 @@ def build_context(args: argparse.Namespace, repo_root: Path) -> ProductContext:
     product_code = args.product_code.strip()
     brand_profile_name = args.brand_profile.strip()
     if not name:
-        raise ValueError("--name must not be empty")
+        raise ValueError("--name не должен быть пустым")
     if not PRODUCT_CODE_RE.fullmatch(product_code):
-        raise ValueError("--product-code must contain 2-3 uppercase Latin letters")
+        raise ValueError("--product-code должен содержать 2-3 латинские буквы верхнего регистра")
     if not brand_profile_name:
-        raise ValueError("--brand-profile must not be empty")
+        raise ValueError("--brand-profile не должен быть пустым")
 
     brand_profile = load_brand_profile(repo_root, brand_profile_name)
     starter_terms = load_starter_terms(repo_root)
@@ -661,7 +730,8 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `Tools/*` является единственным служебным входом нового каркаса.\n\n"
         "## Границы\n"
         "- этот файл не подменяет `Docs/Discovery/*`, `Docs/User/*`, `Docs/Product/*`, `Docs/Technical/*`, `Docs/Terms/*` и `Plans/*`;\n"
-        "- этот файл только направляет агента к документам-владельцам продуктового репозитория и к `Pipeline/Workflows.md` как владельцу рабочего процесса.\n",
+        "- этот файл только направляет агента к документам-владельцам продуктового репозитория и к `Pipeline/Workflows.md` как владельцу рабочего процесса;\n"
+        "- если предметный проход меняет смысл продукта, агент явно проверяет `README.md`, `Docs/Product/Product_Passport.md`, `Docs/Product/PRD.md`, `Docs/Product/JTBD.md`, `Docs/Product/Delivery.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*` и `Logs/*`; согласованные документы не переписываются без необходимости.\n",
     )
     write(
         target / "Setup_Guide.md",
@@ -904,7 +974,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "## Назначение\n"
         "Слой `Docs/Product/` описывает продукт в прикладных терминах первой версии.\n\n"
         "## Состав слоя\n"
-        "- `Product_Passport.md` — паспорт созданного каркаса без домена `Profiles/*`.\n"
+        "- `Product_Passport.md` — живой паспорт продукта без домена `Profiles/*`.\n"
         "- `JTBD.md` — пользовательские задачи и ценный результат.\n"
         "- `PRD.md` — продуктовые требования первой версии.\n"
         "- `Delivery.md` — краткая модель поставки продукта.\n",
@@ -913,7 +983,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         target / "Docs/Product/Product_Passport.md",
         f"# Паспорт продукта — {ctx.name}\n\n"
         "## Назначение\n\n"
-        "Паспорт фиксирует минимальные параметры созданного каркаса без возвращения домена `Profiles/*` в продукт.\n\n"
+        "Паспорт стартует как паспорт созданного каркаса и после первого предметного прохода фиксирует подтверждённые параметры продукта без возвращения домена `Profiles/*`.\n\n"
         "---\n\n"
         f"Название: {ctx.name}\n"
         f"Код_продукта: {ctx.product_code}\n"
@@ -927,6 +997,13 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- Tools\n"
         "- Templates\n"
         "- Schemas\n"
+        "Тип_продукта: Не_подтверждено\n"
+        "Основной_запуск: Не_подтверждено\n"
+        "Подтверждённый_стек: Не_подтверждено\n"
+        "Предметные_пакеты: Не_подтверждено\n"
+        "Ограничения_среды: Не_подтверждено\n\n"
+        "## Правило обновления\n"
+        "После первого предметного прохода паспорт обновляется только по подтверждённым источникам: ответ пользователя, требование, техническое решение, факт реализации или проверка среды.\n"
     )
     write(
         target / "Docs/Product/JTBD.md",
@@ -954,10 +1031,10 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         target / "Docs/Product/PRD.md",
         f"# Product Requirements Document — {ctx.name}\n\n"
         "## 1. Обзор продукта\n\n"
-        f"{ctx.name} поставляется как минимальный цифровой продуктовый каркас для дальнейшего предметного развития.\n\n"
+        f"{ctx.name} поставляется как стартовый цифровой продуктовый контур для дальнейшего предметного развития.\n\n"
         "---\n\n"
         "## 2. Проблема\n\n"
-        "Без минимального согласованного каркаса продукт трудно быстро запустить и удерживать в проверяемом состоянии.\n\n"
+        "Без согласованного стартового контура продукт трудно быстро запустить и удерживать в проверяемом состоянии.\n\n"
         "---\n\n"
         "## 3. Цель продукта\n\n"
         "Первая версия должна дать устойчивую отправную точку для дальнейшей предметной разработки.\n\n"
@@ -970,7 +1047,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "2. Удерживать базовый контур продукта согласованным.\n\n"
         "---\n\n"
         "## 6. Основной сценарий\n\n"
-        "1. Пользователь получает минимальный каркас продукта.\n"
+        "1. Пользователь получает стартовый контур продукта.\n"
         "2. Пользователь уточняет предметное содержимое.\n"
         "3. Продукт развивается внутри управляемого репозиторного контура.\n\n"
         "---\n\n"
@@ -995,7 +1072,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- расширенная многоагентная оркестрация.\n\n"
         "---\n\n"
         "## 11. Критерии успеха\n\n"
-        "1. Продукт можно быстро запустить на минимальном каркасе.\n"
+        "1. Продукт можно быстро запустить на стартовом контуре.\n"
         "2. Базовые документы остаются согласованными.\n"
         "3. Следующий проход может опираться на уже подготовленный контур.\n\n"
         "---\n",
@@ -1004,7 +1081,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         target / "Docs/Product/Delivery.md",
         "# Delivery\n\n"
         "## Назначение\n\n"
-        "Продукт поставляется как репозиторий с минимальным согласованным каркасом.\n\n"
+        "Продукт поставляется как репозиторий с согласованным стартовым контуром.\n\n"
         "---\n\n"
         "## Модель передачи\n\n"
         "1. Репозиторий передаётся как единый файловый контур.\n"
@@ -1017,7 +1094,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- журналы и управляемые точки входа проекта.\n\n"
         "---\n\n"
         "## Ограничения поставки\n\n"
-        "- поставка задаёт только минимальный стартовый каркас;\n"
+        "- поставка задаёт стартовый контур, готовый к предметному уточнению;\n"
         "- предметное наполнение продукта выполняется отдельным следующим проходом.\n\n"
         "---\n",
     )
@@ -1121,9 +1198,11 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "1. Проверить, что текущая истина подтверждена.\n"
         "2. Подтвердить ограничения первого прохода.\n"
         "3. Подтвердить источник выбора стека: ответ пользователя, профиль продукта, требование или техническое решение.\n"
-        "4. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
-        "5. Если запуск нельзя проверить, записать `не проверено`.\n"
-        "6. Не открывать новые домены без владельца, потребителя и проверки.\n\n"
+        "4. Если проход меняет смысл продукта, явно проверить связанных владельцев смысла: `README.md`, `Docs/Product/Product_Passport.md`, `Docs/Product/PRD.md`, `Docs/Product/JTBD.md`, `Docs/Product/Delivery.md`, `Docs/User/*`, `Docs/Technical/*`, `Plans/*` и `Logs/*`.\n"
+        "5. Не переписывать документ только ради касания, если он уже согласован с изменением.\n"
+        "6. Разделить документацию, код, тесты, проверки и журнальное закрытие.\n"
+        "7. Если запуск нельзя проверить, записать `не проверено`.\n"
+        "8. Не открывать новые домены без владельца, потребителя и проверки.\n\n"
         "## Уровни проверок\n"
         "- `Структура` — обязательные файлы и запрет удалённых доменов.\n"
         "- `Тесты` — автоматические тесты кода.\n"
@@ -1134,6 +1213,7 @@ def bootstrap_product(target: Path, ctx: ProductContext) -> None:
         "- `ChangeLog.md` фиксирует факт изменения.\n"
         "- `QualityLog.md` фиксирует выполненные проверки и непроверенные зоны.\n"
         "- `ADRlog.md` обновляется для архитектурных, процессных и продуктово-договорных решений.\n\n"
+        "Если код, документы и автоматические проверки готовы, но пользовательский результат нельзя проверить из-за ограничения среды, `ROAD/BACK/PLAN` допускается оставить в статусе `Готово_к_утверждению`. `Завершено` ставится после фактически проверенного результата или явного решения владельца.\n\n"
         "## Маршрут запроса на слияние\n"
         "1. Выполнить одну финальную отправку рабочей ветки.\n"
         "2. Проверить через `gh`, что для рабочей ветки нет открытого запроса на слияние.\n"
