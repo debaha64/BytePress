@@ -1,6 +1,34 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000107 — Готовность выпуска BytePress 0.3.0 зафиксирована
+- CHG-000106 — Исправления product-start перед финальным полевым тестом закрыты
+- CHG-000105 — Новый продуктовый каркас переведён на Tools/* без scripts/*
+- CHG-000104 — Защита первого старта после полевого теста Minesweeper усилена
+- CHG-000103 — Предрелизные исправления языка Git и графического интерфейса закрыты
+- CHG-000102 — Плановый контур предрелизного прохода синхронизирован с журналами
+- CHG-000101 — Предрелизная чистка создаваемого слоя и рекомендация выпуска 0.3.0
+- CHG-000100 — Стартовое интервью сужено без расширяющих подсказок
+- CHG-000099 — Уточнение веток и стартового интервью после полевого теста
+- CHG-000098 — Исправления Pipeline после полевого теста продукта
+- CHG-000097 — Verification contract reduced to one owner document
+- CHG-000096 — Rules catalog and semantic cleanup completed
+- CHG-000095 — Already-created product update route ID corrected
+- CHG-000094 — Product pipeline controls and retired domain cleanup completed
+- CHG-000093 — Product skeleton terms and lint corrections synchronized
+- CHG-000092 — Product bootstrap creates local tools skeleton
+- CHG-000091 — Profiled product factory target domain model documented
+- CHG-000090 — Russian lint markers accepted in active and generated layers
+- CHG-000089 — Domain map and ADR decision contracts formalized
+- CHG-000088 — Language and domain maps cleaned up
+- CHG-000087 — Product service update path documented
+- CHG-000086 — Product lint lifecycle modes separated
+- CHG-000085 — Start contour semantics synchronized before the next field test
+- CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
+- CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
+- CHG-000082 — Product-start corrective contour synchronized after first field test
+- CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
+- CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
 - CHG-000079 — Release workflow canon completed and missing history-facts closed for ROAD-000015
 - CHG-000078 — Close ROAD-000014 integration evidence
 - CHG-000077 — Activate ROAD-000014 integration contour
@@ -80,6 +108,493 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000107 — Готовность выпуска BytePress 0.3.0 зафиксирована
+ID: CHG-000107
+Дата: 2026-05-13
+Тип_изменения: Система
+Источник: PLAN-000095
+Связи: ROAD-000041, BACK-000106, QL-000102, RL-000008
+Дата_создания: 2026-05-13
+Дата_изменения: 2026-05-13
+
+### Описание
+`ROAD-000041`, `BACK-000106` и `PLAN-000095` открыты и закрыты как выпускной release-readiness pass для BytePress `0.3.0`. Подтверждено, что активный product-start каркас создаётся без `scripts/*`, использует `Tools/*`, требует интервью, не выбирает стек без явного источника, допускает `Готово_к_утверждению` при непроверенном пользовательском результате, создаёт живой `Docs/Product/Product_Passport.md` и требует PR через `gh`.
+
+`Logs/ReleaseLog.md` получил запись `RL-000008` о готовности выпуска. `README.md` и `Setup_Guide.md` не менялись: минимальный выпускной маршрут уже описан, а новых архитектурных решений в проходе не принято.
+
+### Эффект
+BytePress готов к подготовке выпуска `0.3.0` отдельным release-маршрутом. Данные конкретного тестового продукта не внесены, новые домены не добавлены, `scripts/*` не возвращён, ADR не добавлялся.
+
+---
+
+## CHG-000106 — Исправления product-start перед финальным полевым тестом закрыты
+ID: CHG-000106
+Дата: 2026-05-11
+Тип_изменения: Система
+Источник: PLAN-000094
+Связи: ROAD-000040, BACK-000105, QL-000101
+Дата_создания: 2026-05-11
+Дата_изменения: 2026-05-11
+
+### Описание
+`Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `AGENTS.md`, `Pipeline/Workflows.md`, `Rules/Git.md`, `Rules/Workflow.md`, `Setup_Guide.md`, `Docs/Discovery/Interview.md`, `Docs/Terms/*` и технические bootstrap-договоры синхронизированы перед следующим финальным полевым тестом созданного продукта.
+
+Новый generated product не описывает `scripts/*` как текущий или переходный слой. `Product_Passport.md` стартует как паспорт созданного каркаса и содержит поля для предметного обновления: тип продукта, основной запуск, подтверждённый стек, предметные пакеты и ограничения среды. Generated `Pipeline/Workflows.md` и `AGENTS.md` требуют проверки связанных документов-владельцев при предметном изменении смысла продукта.
+
+`bp_lint.py` и generated `Tools/product_check.py` уважают явный список исключений из первой версии, не требуют `scripts/*`, принимают `Готово_к_утверждению` для developed-состояния при непроверенном пользовательском результате и проверяют новые ключевые договоры без тяжёлого языкового линтера.
+
+### Эффект
+Следующий полевой тест может проверять product-start без возврата старого служебного слоя, без внесения данных конкретного тестового продукта в BytePress и без принуждения агента ставить `Завершено`, когда часть DoD честно не проверена из-за ограничения среды. ADR не добавлялся: проход уточняет уже принятую модель.
+
+---
+
+## CHG-000105 — Новый продуктовый каркас переведён на Tools/* без scripts/*
+ID: CHG-000105
+Дата: 2026-05-11
+Тип_изменения: Система
+Источник: PLAN-000093
+Связи: ROAD-000039, BACK-000104, QL-000100
+Дата_создания: 2026-05-11
+Дата_изменения: 2026-05-11
+
+### Описание
+`Tools/bp_bootstrap.py` больше не создаёт `scripts/*` в новом продуктовом каркасе. Generated `README.md`, `AGENTS.md`, `Setup_Guide.md` и `Docs/Product/Product_Passport.md` не описывают `scripts/*` как текущий слой; служебные команды нового продукта идут через `Tools/product_check.py` и `Tools/product_bootstrap_smoke.py`.
+
+`Tools/bp_lint.py` и generated `Tools/product_check.py` больше не требуют `scripts/*` и останавливают fresh repo нового образца, если в нём появился устаревший переходный слой `scripts/*`. `Docs/Technical/Product_Bootstrap_Contract.md`, `Product_Bootstrap_Domain_Matrix.md`, `Product_Bootstrap_Validation.md`, `Product_Service_Update_Route.md` и `Tools/README.md` синхронизированы с этим правилом.
+
+### Эффект
+Новый создаваемый продукт имеет один служебный вход `Tools/*`. `Product_Service_Update_Route.md` сохраняет route миграции для старых уже созданных продуктов, где `scripts/*` может быть только наследием и временной совместимой поверхностью. ADR не добавлялся: проход завершает уже принятое решение `ADR-000027`.
+
+---
+
+## CHG-000104 — Защита первого старта после полевого теста Minesweeper усилена
+ID: CHG-000104
+Дата: 2026-05-10
+Тип_изменения: Система
+Источник: PLAN-000092
+Связи: ROAD-000038, BACK-000103, QL-000099
+Дата_создания: 2026-05-10
+Дата_изменения: 2026-05-10
+
+### Описание
+`AGENTS.md`, `Rules/Workflow.md`, `Rules/Dependencies.md`, `Pipeline/Workflows.md`, `Docs/Discovery/Interview.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Verification.md`, `Tools/README.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после свежего полевого теста Minesweeper.
+
+Закреплены остановка после блокирующего интервью, запрет заполнять ответы вместо пользователя, запрет подтверждать текущую истину общим запросом, запрет самовольного выбора `tkinter`, запрет системной установки без отдельного решения и запрет расширения первой версии без явного ответа пользователя.
+
+### Эффект
+Первый старт создаваемого продукта остаётся аналитическим до фактического ответа пользователя. Проверки ловят возврат проблемного поведения в создаваемом слое. Minesweeper, состав создаваемого продукта и новые домены не изменялись.
+
+---
+
+## CHG-000103 — Предрелизные исправления языка Git и графического интерфейса закрыты
+ID: CHG-000103
+Дата: 2026-05-10
+Тип_изменения: Система
+Источник: PLAN-000091
+Связи: ROAD-000037, BACK-000102, QL-000098
+Дата_создания: 2026-05-10
+Дата_изменения: 2026-05-10
+
+### Описание
+`AGENTS.md`, `Rules/Git.md`, `Rules/Dependencies.md`, `Pipeline/*`, `Docs/Discovery/Interview.md`, `Docs/Technical/*`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после свежего полевого теста Minesweeper. Требование английского языка для сообщения фиксации, заголовка и описания запроса на слияние заменено русским оформлением с исключениями только для имён собственных, путей, команд, веток, ID и технически неизбежных мест. Пользовательские тексты используют «графический интерфейс» вместо `GUI`. Generated вопрос стека теперь спрашивает только об источнике подтверждения и не даёт агенту свободно выбрать библиотеку. Generated стартовый отчёт сокращён без удаления обязательных полей. `bp_lint.py` и generated `product_check.py` ловят возврат `GUI` в пользовательские тексты.
+
+### Эффект
+Предрелизный создаваемый слой стал строже по русскому языку и источнику стека без изменения `Minesweeper`, без изменения состава создаваемого продукта и без новых доменов.
+
+---
+
+## CHG-000102 — Плановый контур предрелизного прохода синхронизирован с журналами
+ID: CHG-000102
+Дата: 2026-05-05
+Тип_изменения: Система
+Источник: Исправляющий проход по фактическому расхождению после `PLAN-000090`
+Связи: ROAD-000036, BACK-000101, PLAN-000090, CHG-000101, QL-000096, QL-000097
+Дата_создания: 2026-05-05
+Дата_изменения: 2026-05-05
+
+### Описание
+Фактическое расхождение закрыто: `Plans/Roadmap.md` перевёл `ROAD-000036` в `Завершено`, `Plans/Backlog.md` убрал `BACK-000101` из активных, `Plans/Archive/Backlog/ROAD-000036.md` зафиксировал завершённый `BACK-000101`, а `PLAN-000090` перенесён в `Plans/Archive/`.
+
+Дополнительно закреплено правило русского пользовательского вывода агента в `Rules/Workflow.md` с короткой ссылкой из `AGENTS.md`; `Pipeline/Workflows.md` зафиксировал сверку отчёта о закрытии `ROAD/BACK/PLAN` с фактическими файлами `Plans/*`; `bp_lint.py` и создаваемый `product_check.py` проверяют права исполняемых файлов продукта.
+
+### Эффект
+Журнальный факт `CHG-000101` и проверка `QL-000096` больше не расходятся с активным плановым контуром. Создаваемый продукт проверяет исполняемые права `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py` и переходных `scripts/*.sh`. `Minesweeper`, состав создаваемого продукта и новые домены не изменялись.
+
+---
+
+## CHG-000101 — Предрелизная чистка создаваемого слоя и рекомендация выпуска 0.3.0
+ID: CHG-000101
+Дата: 2026-05-02
+Тип_изменения: Система
+Источник: PLAN-000090
+Связи: ROAD-000036, BACK-000101, QL-000096
+Дата_создания: 2026-05-02
+Дата_изменения: 2026-05-02
+
+### Описание
+`Docs/Discovery/Interview.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/User/Operating_Mode.md`, `Docs/Technical/Product_Service_Update_Route.md`, `Docs/Technical/Platform_Contracts.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Interfaces.md`, `Docs/Technical/Verification.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Tools/README.md`, `Templates/Interview.md`, `Pipeline/Workflows.md`, `Pipeline/Phase_Gates.md` синхронизированы вокруг чистого русского языка создаваемого слоя: «delta-интервью» заменено на «узкое интервью», «task-ветка» на «рабочая ветка», «pass» на «проход» в контекстных местах. Создаваемое интервью разделяет ограничение первого прохода и выбор стека как отдельные вопросы. Переходные `scripts/*` зафиксированы как оболочки к `Tools/*` с условием удаления после обновления служебного слоя; `Tools/*` зафиксирован как главный служебный вход.
+
+### Эффект
+Создаваемый продуктовый каркас использует чистый русский язык без языковой смеси, интервью не расширяет первую версию без запроса, ограничение и стек разделены, `Tools/*` — главный служебный вход, `scripts/*` — переходный слой с условием удаления. Следующий выпуск после успешного финального теста рекомендуется как 0.3.0. `Minesweeper` не затронут.
+
+---
+
+## CHG-000100 — Стартовое интервью сужено без расширяющих подсказок
+ID: CHG-000100
+Дата: 2026-05-01
+Тип_изменения: Система
+Источник: PLAN-000088
+Связи: ROAD-000035, BACK-000100, QL-000095
+Дата_создания: 2026-05-01
+Дата_изменения: 2026-05-01
+
+### Описание
+`Docs/Discovery/Interview.md`, `Docs/Terms/TERM-000009-plan.md`, `Docs/Terms/TERM-000021-task-branch.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг запрета расширяющих подсказок стартового интервью. Создаваемый `Interview.md` теперь прямо запрещает примеры функций вне запроса пользователя или подтверждённых требований; вопрос о наблюдаемом результате просит подтвердить или уточнить результат; ограничение первого прохода отделено от типа продукта и стека.
+
+### Эффект
+Fresh-режим старта продукта больше не подталкивает первую версию к таймеру, счётчику, рекордам, настройкам, сохранениям, установщику или аналогичным неподтверждённым расширениям. Проверки создаваемого продукта ловят эти слова в стартовом интервью без изменения `Minesweeper`, без изменения состава создаваемого продукта и без новых доменов.
+
+---
+
+## CHG-000099 — Уточнение веток и стартового интервью после полевого теста
+ID: CHG-000099
+Дата: 2026-05-01
+Тип_изменения: Система
+Источник: PLAN-000087
+Связи: ROAD-000034, BACK-000099, QL-000094
+Дата_создания: 2026-05-01
+Дата_изменения: 2026-05-01
+
+### Описание
+`AGENTS.md`, `Pipeline/*`, `Rules/Git.md`, `Docs/Terms/TERM-000021-task-branch.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после свежего полевого теста. Первый аналитический проход bootstrap-created продукта закреплён за рекомендуемым типом `chore/`; `docs/` оставлен только для обычных документационных проходов после снятия стартового гейта. Generated Pipeline проверяется на русские названия фаз, рабочих потоков и гейтов. Generated Interview разделяет ограничение первого прохода и выбор стека, не предлагает таймер и не подсказывает расширение первой версии.
+
+### Эффект
+Fresh product-start стал строже по ветке и чище по интервью без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов.
+
+---
+
+## CHG-000098 — Исправления Pipeline после полевого теста продукта
+ID: CHG-000098
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000086
+Связи: ROAD-000033, BACK-000098, ADR-000026, QL-000093
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`AGENTS.md`, `Rules/Git.md`, `Rules/README.md`, `Docs/Terms/TERM-000021-task-branch.md`, `Pipeline/*`, `Docs/Discovery/Interview.md`, bootstrap contracts, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после полевого теста продукта. Разрешённые типы рабочих веток ограничены `chore/`, `feature/`, `fix/`, `docs/`; `product/` не является рекомендуемым или допустимым типом. Generated `AGENTS.md` и `Pipeline/*` перешли на русские названия фаз, рабочих потоков и гейтов. Стартовое интервью больше не подсказывает расширение первой версии без запроса пользователя.
+
+### Эффект
+Повторный field test должен стартовать с безопасной рабочей ветки и русским generated Pipeline. `Minesweeper`, состав создаваемого продукта и доменная модель не изменялись.
+
+## CHG-000097 — Verification contract reduced to one owner document
+ID: CHG-000097
+Дата: 2026-04-30
+Тип_изменения: Документация
+Источник: PLAN-000085
+Связи: ROAD-000032, BACK-000097, ADR-000025, QL-000092
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`Docs/Technical/Verification.md` стал единственным владельцем общего проверочного договора. В него сведены уровни проверок, evidence, подтверждение результата и связь с `Pipeline/*`. Удалены дублирующие `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md`. Синхронизированы `Docs/Technical/README.md`, `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py`.
+
+### Эффект
+Проверочный контур стал короче и не дублирует один смысл в нескольких technical documents. Сообщение `bp_lint.py` приведено к текущей модели `Docs`, `Plans`, `Logs`, `Pipeline`, `Rules`, `Templates`, `Schemas`, `Tools`. Generated product wording не ссылается на удалённые verification/validation documents. `Minesweeper` не изменялся.
+
+---
+
+## CHG-000096 — Rules catalog and semantic cleanup completed
+ID: CHG-000096
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000084
+Связи: ROAD-000031, BACK-000096, ADR-000024, QL-000091
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+`Rules/*` объединён в предметные файлы `Source.md`, `Security.md`, `Domains.md`, `Workflow.md`, `Git.md`, `Logs.md`, `Dependencies.md`, `Terms.md` и `Naming.md`; обязательные условия и `RULE-*` ID сохранены. `Rules/Naming.md` закрепляет semantic path/file naming. Active docs, terms, Pipeline, Plans и technical contracts синхронизированы после удаления retired domains. `Tools/bp_lint.py` проверяет новый набор rule-файлов и соответствие `Rules/README.md`.
+
+### Эффект
+Активный слой больше не зависит от старых rule filenames и не направляет агента в удалённые домены как в действующих владельцев смысла. Generated product skeleton сохраняет fresh/auto/developed checks и не получает retired domains. `Minesweeper` не изменялся.
+
+---
+
+## CHG-000095 — Already-created product update route ID corrected
+ID: CHG-000095
+Дата: 2026-04-30
+Тип_изменения: Система
+Источник: PLAN-000083
+Связи: ROAD-000030, BACK-000095, QL-000090
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Описание
+Архивный план route обновления already-created product repo на local tools baseline выделен из ошибочного дублирования `PLAN-000082`: файл переименован в `Plans/Archive/PLAN-000083-created-product-update-route.md`, внутренний ID изменён на `PLAN-000083`, а связи заменены на `ROAD-000030 / BACK-000095 / CHG-000095 / QL-000090`.
+
+### Эффект
+`PLAN-000082` снова однозначно относится к product pipeline control and retired domain cleanup. Исторический смысл route обновления already-created product repo не переписан; исправлена только идентификационная ошибка и прямые ссылки планового и журнального контура.
+
+---
+
+## CHG-000094 — Product pipeline controls and retired domain cleanup completed
+ID: CHG-000094
+Дата: 2026-04-29
+Тип_изменения: Система
+Источник: PLAN-000082
+Связи: ROAD-000029, BACK-000094, ADR-000023, QL-000089
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+
+### Описание
+`Pipeline/Workflows.md` добавлен как владелец процедур прежнего `Skills/*`: основной путь продукта, первый `product-start`, предметный проход, gates, уровни проверок, журнальное закрытие, PR через `gh` и смысловые коммиты. В `Rules/*` добавлены правила выбора стека и зависимостей, PR-маршрута через `gh` и смысловых коммитов. Retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` удалены из active layer.
+
+### Эффект
+Generated product skeleton получает усиленный local `Pipeline/*`, `AGENTS.md` направляет в generated Pipeline, `Interview.md` запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`. `Minesweeper` не изменялся.
+
+---
+
+## CHG-000093 — Product skeleton terms and lint corrections synchronized
+ID: CHG-000093
+Дата: 2026-04-28
+Тип_изменения: Инструмент
+Источник: PLAN-000081
+Связи: ROAD-000028, BACK-000093, QL-000088
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+Термины `Каркас репозитория` и `Профиль продукта`, active `Docs/Discovery/Interview.md`, bootstrap contracts и generated product artifacts синхронизированы с новым product skeleton. `Docs/Product/Product_Passport.md` выбран как минимальное место паспорта созданного каркаса без возврата домена `Profiles/*` в продукт. `bp_lint.py` исправлен так, чтобы forbidden product domains давали нормальную ошибку проверки, а generated `Templates/*` получают уникальные `TPL-*` IDs.
+
+### Эффект
+Новый product skeleton больше не описывается через `Runtime/*`, `Profiles/Product.md` и `Adapters/*`; negative product lint проверка для запрещённого домена работает без traceback. `Skills/*` не переносились, legacy domains `BytePress` не удалялись, `Minesweeper` не изменялся.
+
+---
+
+## CHG-000092 — Product bootstrap creates local tools skeleton
+ID: CHG-000092
+Дата: 2026-04-28
+Тип_изменения: Инструмент
+Источник: PLAN-000080
+Связи: ROAD-000027, BACK-000092, QL-000087
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+`Tools/bp_bootstrap.py` обновлён для переходной профильной модели: generated product repo получает local `Tools/product_check.py`, `Tools/product_bootstrap_smoke.py`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`; `scripts/*` остаются только transition wrappers. `Tools/bp_lint.py` сохраняет legacy checks самого `BytePress`, но проверяет новый product skeleton без обязательных `Runtime/*`, `Adapters/*`, `Profiles/*` и primary `scripts/*` domains.
+
+### Эффект
+Новый продуктовый каркас становится самодостаточным для базовых structural/smoke checks после bootstrap и не получает premature domains `Adapters`, `Memory`, `MCP`, `Runtime`, `Roles`, `Skills`, `Standards`. Старые домены `BytePress`, `Minesweeper` и уже созданные продукты не изменялись.
+
+---
+
+## CHG-000091 — Profiled product factory target domain model documented
+ID: CHG-000091
+Дата: 2026-04-28
+Тип_изменения: Документация
+Источник: PLAN-000079
+Связи: ROAD-000026, BACK-000091, ADR-000022, QL-000086
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Описание
+Зафиксирована целевая архитектурная модель `BytePress` как профильной фабрики самодостаточных продуктовых каркасов. `Product_Bootstrap_Domain_Matrix.md` переписан как матрица profile packages; добавлен `Domain_Model_Migration_Plan.md`; добавлено правило `Premature_Domains_Are_Removed`; синхронизированы architecture/model/interfaces/system invariants, bootstrap contract, technical/rules/standards/pipeline/tools maps и планово-журнальный контур.
+
+### Эффект
+Будущая миграция получила безопасный порядок: сначала profile packages, local product `Tools/*`, transitional checks и перенос procedures/norms, затем удаление retired domains. В этом pass не удалялись домены, не менялись `Minesweeper`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py`.
+
+---
+
+## CHG-000090 — Russian lint markers accepted in active and generated layers
+ID: CHG-000090
+Дата: 2026-04-27
+Тип_изменения: Инструмент
+Источник: PLAN-000078
+Связи: ROAD-000025, BACK-000090, ADR-000021, QL-000085
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`Tools/bp_lint.py` обновлён так, чтобы принимать русские эквиваленты проверочных маркеров для стартового отчёта первого ответа, аналитического контура, текущей истины, документов-владельцев, доменов-владельцев и записываемых действий. Active docs и generated strings в `Tools/bp_bootstrap.py` переведены на безопасные русские формулировки там, где это не затрагивает имена файлов, команды, ID, ветки и CLI modes.
+
+### Эффект
+Проверочный договор больше не требует англоязычные текстовые маркеры без технической необходимости, но сохраняет прежние structural gates fresh/developed product repo, first product-start gate и startup report.
+
+---
+
+## CHG-000089 — Domain map and ADR decision contracts formalized
+ID: CHG-000089
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: PLAN-000077
+Связи: ROAD-000024, BACK-000089, ADR-000018, ADR-000019, ADR-000020, QL-000084
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+Добавлен шаблон `Templates/Domain_README.md`, `Standards/Documentation.md` закрепил `README.md` домена как краткую карту домена, а `Rules/Logs_Record_Facts_Only.md` и `Logs/README.md` уточнили обязательность `Logs/ADRlog.md` для значимых архитектурных, процессных и продуктово-договорных решений. В `Logs/ADRlog.md` добавлены ретро-ADR по стартовому product-start contour, fresh/developed product checks, картам доменов и service-layer update route already-created product repo.
+
+### Эффект
+README.md домена теперь имеет явную шаблонную форму и не должен подменять owner-documents. Журнал решений закрывает доказанный пропуск ADR по уже принятым договорам без изменения `Minesweeper`, без расширения bootstrap-доменов создаваемого продукта и без изменения `bp_lint.py`.
+
+---
+
+## CHG-000088 — Language and domain maps cleaned up
+ID: CHG-000088
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: PLAN-000076
+Связи: ROAD-000023, BACK-000088, QL-000083
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`AGENTS.md`, корневой `README.md`, `Setup_Guide.md`, карты доменов `README.md`, `Tools/README.md` и текстовый слой `Tools/bp_bootstrap.py` приведены к краткому русскому инженерному формату. Карты доменов теперь описывают назначение, границы, карту артефактов и дальнейшую навигацию, не перенося внутрь README подробные правила владельцев доменов.
+
+### Эффект
+Активный слой и создаваемый product repo читаются через один навигационный формат. Случайная англо-русская смесь снижена без изменения предметного смысла `BytePress`, состава создаваемых доменов, branch gate, fresh/developed product checks и договора `bp_lint.py`.
+
+---
+
+## CHG-000087 — Product service update path documented
+ID: CHG-000087
+Дата: 2026-04-27
+Тип_изменения: Документация
+Источник: Corrective pass after developed product service-layer update need
+Связи: PLAN-000075, BACK-000087, QL-000082
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Verification.md`, `Tools/README.md` и generated `scripts/README.md` синхронизированы вокруг canonical update path для служебных файлов уже созданного product repo. На примере `scripts/dev-test.sh` и `scripts/README.md` зафиксирован product-side pass: взять delta из актуального `BytePress`, перенести только service files, не пересоздавать product repo и подтвердить developed state через `scripts/dev-test.sh` / `bp_lint.py --mode auto`.
+
+### Эффект
+Развивающийся product repo может получить обновление служебного слоя без fresh bootstrap reset, без потери confirmed current truth и без затрагивания предметных артефактов. Commit discipline уточнён: основание, документы, код или generated service files, checks/evidence и log closure лучше фиксировать отдельными смысловыми commits.
+
+---
+
+## CHG-000086 — Product lint lifecycle modes separated
+ID: CHG-000086
+Дата: 2026-04-26
+Тип_изменения: Инструмент
+Источник: Corrective pass after first evolving product repository check
+Связи: PLAN-000074, BACK-000086, QL-000081
+Дата_создания: 2026-04-26
+Дата_изменения: 2026-04-26
+
+### Описание
+`Tools/bp_lint.py` разделён на fresh bootstrap check и developed product check для generated product repo. Fresh mode сохраняет строгие expectations исходного bootstrap state, а developed mode принимает confirmed current truth только при согласованном closure `Docs/Discovery/Interview.md`, `Plans/*` и `Logs/*`. `Tools/bp_bootstrap.py` теперь materialize generated `scripts/dev-test.sh`, который запускает `bp_lint.py --mode auto`.
+
+### Эффект
+`scripts/dev-test.sh` больше не падает на нормальном lifecycle transition после первого product-start pass, но продолжает падать на реальном contradiction: например, confirmed current truth при незакрытом `PLAN-000001` или без следующего active/completed plan.
+
+---
+
+## CHG-000085 — Start contour semantics synchronized before the next field test
+ID: CHG-000085
+Дата: 2026-04-24
+Тип_изменения: Документация
+Источник: Corrective pass after repeated `Minesweeper` field test
+Связи: PLAN-000073, BACK-000085, QL-000080
+Дата_создания: 2026-04-24
+Дата_изменения: 2026-04-24
+
+### Описание
+`AGENTS.md`, active discovery-layer, term-layer, bootstrap/validation contracts, `Pipeline/Inputs_Outputs.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг одного стартового смыслового контура. Термин `Каркас репозитория` теперь совпадает с bootstrap-default matrix, generated product repo materialize реальный стартовый пакет терминов в `Docs/Terms/Base_Terms.md`, стартовый отчёт агента оформлен коротким блоком с приветствием и семью полями, а протокол интервью сосредоточен в одном owner-document с пятью смысловыми классами вопросов и правилом `блокирующее сразу / неблокирующее в следующую фазу`.
+
+### Эффект
+Перед следующим полевым тестом ранний product-start перестал расходиться между owner-documents, generated repo и checks. Bootstrap создаёт только согласованный каркас, не копирует весь `BytePress` в продукт и не оставляет смысловой двусмысленности вокруг branch gate, интервью, терминов и lifecycle handoff.
+
+---
+
+## CHG-000084 — Branch gate and live interview discipline synchronized for generated product-start
+ID: CHG-000084
+Дата: 2026-04-22
+Тип_изменения: Документация
+Источник: Corrective pass after blind field test of generated product repo
+Связи: PLAN-000072, BACK-000084, QL-000079
+Дата_создания: 2026-04-22
+Дата_изменения: 2026-04-22
+
+### Описание
+Core `AGENTS.md`, active discovery-layer, `Product_Bootstrap_Contract.md`, `Product_Bootstrap_Validation.md`, `Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг live execution discipline generated product-start. Generated repo теперь требует task-ветку до любого writable action, включая discovery/planning/log closure; startup-handshake сообщает branch status и branch action; full interview и допустимый delta-интервью одинаково удерживают numbered / lettered / recommended format.
+
+### Эффект
+Ранний product-start contour generated repo больше не оставляет свободы для первых правок в `develop` или для свободноформатного delta-интервью при ограниченном наборе вариантов. Bootstrap, generated repo, docs и lint ведут себя одинаково без открытия нового roadmap-stage или decorative telemetry.
+
+---
+
+## CHG-000083 — Domain bootstrap matrix and early product-start gate synchronized
+ID: CHG-000083
+Дата: 2026-04-21
+Тип_изменения: Документация
+Источник: Corrective pass after repeated `Minesweeper` field test
+Связи: PLAN-000071, BACK-000083, QL-000078
+Дата_создания: 2026-04-21
+Дата_изменения: 2026-04-21
+
+### Описание
+`Docs/Technical/Product_Bootstrap_Domain_Matrix.md` добавлен как канонический supporting document для классификации всех top-level доменов `BytePress` по replication matrix `Default / Later product-pass / BytePress-only` без optional profile. Одновременно core `AGENTS.md`, active discovery-layer, bootstrap/validation contracts, `Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы так, чтобы generated product repo оставался в discovery-only contour до ответов пользователя и получал canonical failed-start reset route `scripts/reset-product-start.sh`.
+
+### Эффект
+Ранний product-start contour generated repo стал управляемым end-to-end: bootstrap materialize только утверждённый subset доменов, незаполненный discovery больше не трактуется как implicit approval для implementation, а failed start имеет проверяемый cleanup route вместо silent salvage.
+
+---
+
+## CHG-000082 — Product-start corrective contour synchronized after first field test
+ID: CHG-000082
+Дата: 2026-04-20
+Тип_изменения: Документация
+Источник: Corrective pass after `Minesweeper` field test
+Связи: PLAN-000070, BACK-000082, QL-000077
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+
+### Описание
+Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы после полевого теста `Minesweeper`. Generated product repo теперь materialize observable startup-handshake contract первого ответа, 10-вопросный `Docs/Discovery/Interview.md` как owner current truth и `.gitignore`, который удерживает `Runtime/Integration_Smoke_Report.json` вне baseline commit по умолчанию.
+
+### Эффект
+Ранний product-start contour первого запуска generated repo стал наблюдаемым, проверяемым и согласованным end-to-end без открытия нового release contour или предметной разработки `Minesweeper`.
+
+---
+
+
+## CHG-000081 — Bootstrap discovery minimum and agent startup attestation synchronized
+ID: CHG-000081
+Дата: 2026-04-19
+Тип_изменения: Документация
+Источник: Corrective pass after first field test of generated product repo
+Связи: PLAN-000069, BACK-000081, QL-000076
+Дата_создания: 2026-04-19
+Дата_изменения: 2026-04-19
+
+### Описание
+`AGENTS.md`, bootstrap/validation contracts, `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer и tooling синхронизированы после первого полевого запуска generated product repo. Bootstrap теперь materialize minimal `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, generated product `AGENTS.md` маршрутизирует discovery-layer явно, а startup mode агента в `BytePress` фиксируется через observable startup-handshake первого ответа.
+
+### Эффект
+Ранние control gaps первого bootstrap-run закрыты без изменения release contour, integration contour или открытия нового широкого roadmap-stage.
+
+---
+
+## CHG-000080 — Post-release sync completed and factual `0.2.0` release logged
+ID: CHG-000080
+Дата: 2026-04-15
+Тип_изменения: Документация
+Источник: Post-release sync pass after merged `0.2.0`
+Связи: PLAN-000068, BACK-000080, QL-000075, RL-000007
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+
+### Описание
+После подтверждённого merge `PR #77` и annotated tag `0.2.0` выполнен минимальный post-release sync-pass в `develop`: local/remote release-ветка снята из operational contour, `ReleaseLog.md` получил factual запись `RL-000007`, а planning-layer зафиксировал отдельный operational stage `ROAD-000016` только для этого closure. Сравнение `origin/main` и `origin/develop` не подтвердило release-only tree fixes для back-sync, поэтому sync-pass не вносил новых product-development changes beyond factual release logging и minimal planning/log closure.
+
+### Эффект
+Post-release contour `0.2.0` закрыт в `develop` как history-fact без открытия нового широкого roadmap-stage.
 
 ---
 

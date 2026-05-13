@@ -1,6 +1,28 @@
 # Roadmap
 
 ## Индекс
+- ROAD-000041 — Готовность выпуска BytePress 0.3.0
+- ROAD-000040 — Исправляющий проход перед финальным полевым тестом
+- ROAD-000039 — Удаление scripts/* из нового продуктового каркаса
+- ROAD-000038 — Защита первого старта после полевого теста Minesweeper
+- ROAD-000037 — Предрелизные исправления после полевого теста Minesweeper
+- ROAD-000036 — Предрелизная чистка создаваемого слоя и рекомендация выпуска 0.3.0
+- ROAD-000035 — Сужение стартового интервью без расширяющих подсказок
+- ROAD-000034 — Уточнение веток и стартового интервью после полевого теста
+- ROAD-000033 — Исправления Pipeline после полевого теста продукта
+- ROAD-000032 — Verification contract reduction and language cleanup
+- ROAD-000031 — Semantic cleanup after retired domain removal
+- ROAD-000030 — Already-created product service update route ID correction
+- ROAD-000029 — Product pipeline control and retired domain cleanup
+- ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
+- ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
+- ROAD-000026 — Профильная фабрика продуктовых каркасов и сокращение доменной модели
+- ROAD-000025 — Русские проверочные маркеры lint-договора
+- ROAD-000024 — Договор карт доменов и ADR-журнала
+- ROAD-000023 — Языковая и картографическая чистка активного и создаваемого слоя
+- ROAD-000022 — Канонический путь обновления service-layer created product repo
+- ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
+- ROAD-000020 — Семантическая чистка стартового контура после повторного полевого теста
 - ROAD-000001 — Каркас репозитория и доменная структура (Repository Scaffold and Domain Structure)
 - ROAD-000002 — Термины, идентификаторы и шаблоны (Terms, IDs, and Templates)
 - ROAD-000003 — Инструменты и baseline `0.1.0` (Tools and Baseline `0.1.0`)
@@ -16,6 +38,10 @@
 - ROAD-000013 — Тиражирование product repo и baseline `0.2.0` (Product Repository Replication and Baseline `0.2.0`)
 - ROAD-000014 — Интеграционный контур и будущие расширения (Integration Layer and Future Extensions)
 - ROAD-000015 — Release readiness и factual log closure (Release Readiness and Factual Log Closure)
+- ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+- ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+- ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+- ROAD-000019 — Domain bootstrap strategy and early product-start gate
 
 ## Легенда статусов
 - Черновик
@@ -24,6 +50,396 @@
 - В_работе
 - Завершено
 - Отменено
+
+---
+
+## ROAD-000041 — Готовность выпуска BytePress 0.3.0
+ID: ROAD-000041
+Этап: Готовность выпуска BytePress 0.3.0
+Статус: Завершено
+Связи: BACK-000106, PLAN-000095, CHG-000107, QL-000102, RL-000008
+Источник: Запрос владельца от 2026-05-13
+Дата_создания: 2026-05-13
+Дата_изменения: 2026-05-13
+Цель: Зафиксировать release readiness `0.3.0` после успешного полевого теста нового product-start без добавления доменов и без внесения данных конкретного тестового продукта в BytePress.
+Зависимости: ROAD-000040
+Связанные_backlog: BACK-000106
+
+### Описание
+Выпускной проход подтвердил, что новый product-start остаётся в договорённом контуре: активный каркас создаётся без `scripts/*`, служебные команды идут через `Tools/*`, generated первый старт требует интервью, не выбирает стек без явного источника, допускает `Готово_к_утверждению` при непроверенном пользовательском результате, создаёт живой `Product_Passport.md` и требует PR через `gh`.
+
+### Закрытие
+Этап завершён в `PLAN-000095`. Задача `BACK-000106` архивирована в `Plans/Archive/Backlog/ROAD-000041.md`. Готовность выпуска `0.3.0` зафиксирована в `RL-000008`; фактический внешний выпуск, merge в `main` и tag остаются отдельными событиями.
+
+---
+
+## ROAD-000040 — Исправляющий проход перед финальным полевым тестом
+ID: ROAD-000040
+Этап: Исправляющий проход перед финальным полевым тестом
+Статус: Завершено
+Связи: BACK-000105, PLAN-000094, CHG-000106, QL-000101
+Источник: Запрос владельца от 2026-05-11
+Дата_создания: 2026-05-11
+Дата_изменения: 2026-05-11
+Цель: Закрыть дефекты свежего product-start полевого теста созданного продукта без переноса данных тестового продукта в BytePress.
+Зависимости: ROAD-000039
+Связанные_backlog: BACK-000105
+
+### Описание
+Широкий исправляющий проход синхронизирует создаваемый продуктовый каркас, проверки, статус результата, живой паспорт продукта, русскоязычные пользовательские строки и правило проверки связанных документов-владельцев при предметном проходе. Предметные продукты и новые домены не меняются.
+
+### Закрытие
+Этап завершён в `PLAN-000094`. Задача `BACK-000105` архивирована в `Plans/Archive/Backlog/ROAD-000040.md`.
+
+---
+
+## ROAD-000039 — Удаление scripts/* из нового продуктового каркаса
+ID: ROAD-000039
+Этап: Удаление scripts/* из нового продуктового каркаса
+Статус: Завершено
+Связи: BACK-000104, PLAN-000093, CHG-000105, QL-000100
+Источник: Запрос владельца от 2026-05-11
+Дата_создания: 2026-05-11
+Дата_изменения: 2026-05-11
+Цель: Завершить уже принятый переход к `Tools/*`: новый продуктовый каркас больше не создаёт `scripts/*`, а служебные команды нового продукта идут через `Tools/*`.
+Зависимости: ROAD-000036
+Связанные_backlog: BACK-000104
+
+### Описание
+Узкий предрелизный проход синхронизирует генератор, проверки, технические договоры, маршрут обновления старых продуктов, плановый контур и журналы вокруг правила: `scripts/*` является только наследием старых уже созданных продуктов и не создаётся в новом каркасе.
+
+### Закрытие
+Этап завершён в `PLAN-000093`. Задача `BACK-000104` архивирована в `Plans/Archive/Backlog/ROAD-000039.md`.
+
+---
+
+## ROAD-000038 — Защита первого старта после полевого теста Minesweeper
+ID: ROAD-000038
+Этап: Защита первого старта после полевого теста Minesweeper
+Статус: Завершено
+Связи: BACK-000103, PLAN-000092, CHG-000104, QL-000099
+Источник: Запрос владельца от 2026-05-10
+Дата_создания: 2026-05-10
+Дата_изменения: 2026-05-10
+Цель: Усилить правила и проверки так, чтобы первый старт продукта не подтверждал текущую истину самовольно, не выбирал стек и системные зависимости без явного источника, не предлагал системную установку и не расширял первую версию без ответа пользователя.
+Зависимости: ROAD-000037
+Связанные_backlog: BACK-000103
+
+### Описание
+Исправляющий проход после свежего полевого теста Minesweeper синхронизирует `AGENTS.md`, `Rules/*`, `Pipeline/*`, `Docs/Discovery/*`, `Docs/Technical/*`, `Tools/*`, `Templates/Interview.md`, `Plans/*` и `Logs/*`. Minesweeper, состав создаваемого продукта и новые домены не меняются.
+
+### Закрытие
+Этап завершён в `PLAN-000092`. Задача `BACK-000103` архивирована в `Plans/Archive/Backlog/ROAD-000038.md`.
+
+---
+
+## ROAD-000037 — Предрелизные исправления после полевого теста Minesweeper
+ID: ROAD-000037
+Этап: Предрелизные исправления после полевого теста Minesweeper
+Статус: Завершено
+Связи: BACK-000102, PLAN-000091, CHG-000103, QL-000098
+Источник: Запрос владельца от 2026-05-10
+Дата_создания: 2026-05-10
+Дата_изменения: 2026-05-10
+Цель: Закрыть последние дефекты свежего полевого теста Minesweeper: русский язык Git и запроса на слияние, замену `GUI` на «графический интерфейс», безопасную формулировку выбора стека и компактность стартового отчёта создаваемого продукта.
+Зависимости: ROAD-000036
+Связанные_backlog: BACK-000102
+
+### Описание
+Узкий предрелизный проход активного и создаваемого слоя закрыт без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов. `AGENTS.md` и generated `AGENTS.md` переведены на русское оформление сообщения фиксации и запроса на слияние. Пользовательские тексты используют «графический интерфейс» вместо `GUI`, вопрос стека ограничен явным источником, стартовый отчёт создаваемого продукта сокращён, а `bp_lint.py` и generated `product_check.py` ловят возврат `GUI`.
+
+### Закрытие
+Этап завершён в `PLAN-000091`. Задача `BACK-000102` архивирована в `Plans/Archive/Backlog/ROAD-000037.md`.
+
+---
+
+## ROAD-000036 — Предрелизная чистка создаваемого слоя и рекомендация выпуска 0.3.0
+ID: ROAD-000036
+Этап: Предрелизная чистка создаваемого слоя и рекомендация выпуска 0.3.0
+Статус: Завершено
+Связи: BACK-000101, PLAN-000090, ADR-000027, CHG-000101, QL-000096
+Источник: Запрос владельца от 2026-05-02
+Дата_создания: 2026-05-02
+Дата_изменения: 2026-05-05
+Цель: Дочистить создаваемый продуктовый каркас после тестов Minesweeper: убрать расширяющие подсказки интервью, разделить ограничение и стек, довести русский язык создаваемого слоя, определить судьбу переходного scripts/*, зафиксировать Tools/* как главный служебный вход и рекомендовать выпуск 0.3.0.
+Зависимости: ROAD-000035
+Связанные_backlog: BACK-000101
+
+### Описание
+Широкий завершающий проход перед финальным полевым тестом. Создаваемое интервью очищено от расширяющих подсказок таймера, счётчика, сложных режимов и необязательных функций. Ограничение первого прохода отделено от выбора стека и зависимостей. Русский язык создаваемого слоя доведён: «delta-интервью» заменено на «узкое интервью», «task-ветка» на «рабочая ветка», «pass» на «проход» в контекстных местах. Переходный scripts/* явно зафиксирован как оболочки к Tools/* с условием удаления после обновления служебного слоя; Tools/* зафиксирован как главный служебный вход. Рекомендация: следующий выпуск после успешного финального теста должен быть 0.3.0, а не 0.2.1. Minesweeper не затронут.
+
+### Закрытие
+Этап завершён в `PLAN-000090`. Фактический статус планового контура синхронизирован с `CHG-000101` и `QL-000096` отдельной коррекцией без переписывания исторического смысла.
+
+---
+
+## ROAD-000035 — Сужение стартового интервью без расширяющих подсказок
+ID: ROAD-000035
+Этап: Сужение стартового интервью без расширяющих подсказок
+Статус: Завершено
+Связи: BACK-000100, PLAN-000088, CHG-000100, QL-000095
+Источник: Запрос владельца от 2026-05-01
+Дата_создания: 2026-05-01
+Дата_изменения: 2026-05-01
+Цель: Убрать из стартового интервью и стартового маршрута создаваемого продукта любые подсказки, которые могут расширить первую версию без явного запроса пользователя.
+Зависимости: ROAD-000034
+Связанные_backlog: BACK-000100
+
+### Описание
+Этап закрыт одним узким исправляющим проходом `PLAN-000088`. Стартовое интервью активного и создаваемого слоя запрещает примеры функций вне запроса пользователя или подтверждённых требований; вопрос о наблюдаемом результате просит подтвердить или уточнить результат; ограничение первого прохода отделено от типа продукта и стека. Создаваемый `product_check.py` и `bp_lint.py` ловят неподтверждённые расширяющие примеры. `Minesweeper`, состав создаваемого продукта и новые домены не изменялись.
+
+---
+
+## ROAD-000034 — Уточнение веток и стартового интервью после полевого теста
+ID: ROAD-000034
+Этап: Уточнение веток и стартового интервью после полевого теста
+Статус: Завершено
+Связи: BACK-000099, PLAN-000087, CHG-000099, QL-000094
+Источник: Запрос владельца от 2026-05-01
+Дата_создания: 2026-05-01
+Дата_изменения: 2026-05-01
+Цель: Закрыть оставшиеся дефекты свежего полевого теста: первый аналитический проход рекомендует `chore/`, `docs/` остаётся для обычных документационных проходов после стартового гейта, generated Pipeline и интервью проверяются по русскому канону и разделяют ограничение первого прохода от выбора стека.
+Зависимости: ROAD-000033
+Связанные_backlog: BACK-000099
+
+### Описание
+Этап закрыт одним узким исправляющим проходом `PLAN-000087`. Первый аналитический проход bootstrap-created продукта теперь рекомендует `chore/`; `docs/` описан только для обычных документационных проходов после снятия стартового гейта. Generated `AGENTS.md`, `Pipeline/*`, `Interview.md`, `product_check.py` и `bp_lint.py` синхронизированы вокруг русских маркеров, разделения ограничения первого прохода и выбора стека, а также запрета расширяющих подсказок стартового интервью.
+
+---
+
+## ROAD-000033 — Исправления Pipeline после полевого теста продукта
+ID: ROAD-000033
+Этап: Исправления Pipeline после полевого теста продукта
+Статус: Завершено
+Связи: BACK-000098, PLAN-000086, ADR-000026, CHG-000098
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Устранить проблемы свежего полевого теста продукта после усиления Pipeline: убрать `product/` из веточного канона, закрепить безопасные типы рабочих веток, перевести generated Pipeline на русские названия и сузить стартовое интервью.
+Зависимости: ROAD-000032
+Связанные_backlog: BACK-000098
+
+### Описание
+Этап закрыт узким исправляющим pass `PLAN-000086`. Безопасные типы рабочих веток закреплены как `chore/`, `feature/`, `fix/`, `docs/`; `product/` прямо запрещён как рекомендуемый или допустимый тип. Generated `AGENTS.md` и `Pipeline/*` в `bp_bootstrap.py` переведены на русский канон фаз, рабочих потоков и гейтов. Стартовое интервью больше не подсказывает расширение первой версии без запроса пользователя. `Minesweeper`, состав создаваемого продукта и новые домены не изменялись.
+
+## ROAD-000032 — Verification contract reduction and language cleanup
+ID: ROAD-000032
+Этап: Verification contract reduction and language cleanup
+Статус: Завершено
+Связи: BACK-000097, PLAN-000085, ADR-000025, CHG-000097
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Сократить повторяющиеся technical documents проверочного контура и синхронизировать язык проверок после удаления преждевременных доменов.
+Зависимости: ROAD-000031
+Связанные_backlog: BACK-000097
+
+### Описание
+Этап закрыт узким pass `PLAN-000085`. Проверочный договор сокращён до одного владельца `Docs/Technical/Verification.md`; дублирующие документы уровней, доказательств и подтверждения результата удалены; `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `bp_lint.py` и `bp_bootstrap.py` синхронизированы. `Minesweeper`, новые домены, состав создаваемого продукта и широкая языковая чистка не выполнялись.
+
+---
+
+## ROAD-000031 — Semantic cleanup after retired domain removal
+ID: ROAD-000031
+Этап: Semantic cleanup after retired domain removal
+Статус: Завершено
+Связи: BACK-000096, PLAN-000084, ADR-000024, CHG-000096
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+Цель: Навести семантический порядок после удаления преждевременных доменов: исправить остатки retired domains, упорядочить `Rules/*`, закрепить правило именования путей и файлов, устранить дубли планового контура и синхронизировать tools/checks.
+Зависимости: ROAD-000029, ROAD-000030
+Связанные_backlog: BACK-000096
+
+### Описание
+Этап закрыт одним широким системным pass `PLAN-000084`. Дублирование `PLAN-000082` исправлено через отдельный исторический контур `PLAN-000083`; `Rules/*` сгруппирован по предметным областям; semantic path/file naming закреплён в `Rules/Naming.md`; active references на retired domains заменены owner-доменами или оставлены только как forbidden/history context; `bp_lint.py` синхронизирован с новым ruleset. `Minesweeper`, новые домены и полная языковая чистка архивов не выполнялись.
+
+---
+
+## ROAD-000030 — Already-created product service update route ID correction
+ID: ROAD-000030
+Этап: Already-created product service update route ID correction
+Статус: Завершено
+Связи: BACK-000095, PLAN-000083, CHG-000095, QL-000090
+Источник: Идентификационная коррекция архива от 2026-04-30
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-30
+Цель: Выделить архивный проход про маршрут обновления already-created product repo на local tools baseline из ошибочного дублирования `PLAN-000082`.
+Зависимости: ROAD-000027, ROAD-000028
+Связанные_backlog: BACK-000095
+
+### Описание
+Исторический смысл прохода сохранён: он описывает service update route для уже созданного product repo после перехода product skeleton на local `Tools/*`. Исправлена только идентификация: архивный план получает `PLAN-000083`, собственные `ROAD/BACK/CHG/QL` связи и перестаёт ссылаться на `ROAD-000029 / BACK-000094 / CHG-000094 / QL-000089`, которые принадлежат product pipeline cleanup.
+
+---
+
+## ROAD-000029 — Product pipeline control and retired domain cleanup
+ID: ROAD-000029
+Этап: Product pipeline control and retired domain cleanup
+Статус: Завершено
+Связи: BACK-000094, PLAN-000082, ADR-000023, CHG-000094
+Источник: Запрос владельца от 2026-04-29
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+Цель: Закрыть проблемы нового полевого теста `Minesweeper`, усилить создаваемый product Pipeline и завершить удаление retired domains `BytePress` после переноса полезного смысла.
+Зависимости: ROAD-000028
+Связанные_backlog: BACK-000094
+
+### Описание
+Этап закрыт одним широким корректирующим pass `PLAN-000082`. Рабочие процедуры перенесены в `Pipeline/Workflows.md`, обязательные нормы перенесены в `Rules/*`, retired domains удалены из active layer. `bp_bootstrap.py` создаёт усиленный `Pipeline/*`, `AGENTS.md` направляет агента в generated Pipeline, interview protocol запрещает подтверждать текущую истину догадками, а `bp_lint.py` больше не требует удалённые домены в самом `BytePress`.
+
+---
+
+## ROAD-000028 — Синхронизация терминов и проверок нового product skeleton
+ID: ROAD-000028
+Этап: Синхронизация терминов и проверок нового product skeleton
+Статус: Завершено
+Связи: BACK-000093, PLAN-000081, CHG-000093
+Источник: Запрос владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+Цель: Исправить противоречия после перехода к local product `Tools/*`: термины, интервью, паспорт каркаса, template IDs и forbidden-domain error path.
+Зависимости: ROAD-000027
+Связанные_backlog: BACK-000093
+
+### Описание
+Этап закрыт одним корректирующим pass `PLAN-000081`. Термины `Каркас репозитория` и `Профиль продукта`, active interview, bootstrap/validation matrix и generated product skeleton синхронизированы с моделью `Docs`, `Plans`, `Logs`, `Pipeline`, `Tools`, `Templates`, `Schemas` и transition `scripts/*`. `bp_lint.py` теперь возвращает нормальную ошибку для forbidden product domains, а generated `Templates/*` получают уникальные `TPL-*` IDs.
+
+---
+
+## ROAD-000027 — Локальный Tools создаваемого продукта и переходный product lint
+ID: ROAD-000027
+Этап: Локальный Tools создаваемого продукта и переходный product lint
+Статус: Завершено
+Связи: BACK-000092, PLAN-000080, CHG-000092
+Источник: Запрос владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+Цель: Начать инструментальную реализацию профильного самодостаточного product skeleton: local product `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, без удаления legacy domains `BytePress`.
+Зависимости: ROAD-000026
+Связанные_backlog: BACK-000092
+
+### Описание
+Этап закрыт одним pass `PLAN-000080`. `bp_bootstrap.py` теперь materialize product-local `Tools/*` как основной service layer, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`, не создаёт retired domains в новом продукте, а `scripts/*` оставляет transition wrappers. `bp_lint.py` проверяет новый product skeleton через local tools contract.
+
+---
+
+## ROAD-000026 — Профильная фабрика продуктовых каркасов и сокращение доменной модели
+ID: ROAD-000026
+Этап: Профильная фабрика продуктовых каркасов и сокращение доменной модели
+Статус: Завершено
+Связи: BACK-000091, PLAN-000079, ADR-000022, CHG-000091
+Источник: Решение владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+Цель: Зафиксировать переход `BytePress` от разросшейся доменной модели к профильной фабрике самодостаточных продуктовых каркасов и подготовить безопасный план рефакторинга без массового удаления файлов.
+Зависимости: ROAD-000025
+Связанные_backlog: BACK-000091
+
+### Описание
+Этап закрыт одним архитектурным pass `PLAN-000079`. Добавлены `ADR-000022`, целевая профильная матрица пакетов продукта, migration plan сокращения доменной модели и правило удаления преждевременных доменов. Документы-владельцы синхронизированы вокруг решения: продукт зависит от профиля, получает lightweight `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` и `Schemas/*`, а retired domains выводятся в миграционный контур без удаления в этом pass.
+
+---
+
+## ROAD-000025 — Русские проверочные маркеры lint-договора
+ID: ROAD-000025
+Этап: Русские проверочные маркеры lint-договора
+Статус: Завершено
+Связи: BACK-000090, PLAN-000078, ADR-000021, CHG-000090
+Источник: Запрос владельца от 2026-04-27
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+Цель: Обновить `bp_lint.py`, чтобы активный и создаваемый слой могли использовать русские проверочные маркеры без обязательной англоязычной формы и без ослабления структурных проверок.
+Зависимости: ROAD-000024
+Связанные_backlog: BACK-000090
+
+### Описание
+Этап закрыт одним узким проходом `PLAN-000078`. `bp_lint.py` теперь принимает русские эквиваленты проверочных маркеров для стартового отчёта, аналитического гейта, текущей истины, документов-владельцев, доменов-владельцев и записываемых действий. Active/generated layer синхронизирован без изменения `Minesweeper`, без новых доменов создаваемого продукта и без широкой языковой чистки архивов.
+
+---
+
+## ROAD-000024 — Договор карт доменов и ADR-журнала
+ID: ROAD-000024
+Этап: Договор карт доменов и ADR-журнала
+Статус: Завершено
+Связи: BACK-000089, PLAN-000077, ADR-000018, ADR-000019, ADR-000020, CHG-000089
+Источник: Запрос владельца от 2026-04-27
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+Цель: Закрепить краткий README.md домена как карту домена и закрыть доказанный пропуск ADR для значимых архитектурных, процессных и продуктово-договорных решений последних product-start проходов.
+Зависимости: ROAD-000023
+Связанные_backlog: BACK-000089
+
+### Описание
+Этап закрыт одним узким проходом `PLAN-000077`. Добавлен шаблон карты домена, стандарт документации закрепил `README.md` домена как краткую карту, правило ADR уточнено для значимых архитектурных, процессных и продуктово-договорных решений, а `Logs/ADRlog.md` закрывает три ретро-решения по product-start contour, fresh/developed checks, картам доменов и service-layer update route. Проверки repo/product lifecycle пройдены без изменения `Minesweeper`, без новых доменов создаваемого продукта и без изменения `bp_lint.py`.
+
+---
+
+## ROAD-000023 — Языковая и картографическая чистка активного и создаваемого слоя
+ID: ROAD-000023
+Этап: Языковая и картографическая чистка активного и создаваемого слоя
+Статус: Завершено
+Связи: BACK-000088, PLAN-000076
+Источник: Запрос владельца от 2026-04-27
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+Цель: Привести активные артефакты `BytePress` и создаваемый продуктовый слой к чистому русскому языку, единой инженерной стилистике, установленной терминологии и единому формату карт доменов без изменения предметного смысла и bootstrap-гейтов.
+Зависимости: ROAD-000022
+Связанные_backlog: BACK-000088
+
+### Описание
+Этап закрыт одним широким проходом `PLAN-000076`. Активные карты доменов, README доменов, `AGENTS.md`, `Setup_Guide.md`, `Tools/README.md` и текстовый слой `Tools/bp_bootstrap.py` приведены к краткому русскому инженерному формату. `bp_lint.py` не изменялся: проверочный договор сохранён, а требуемые repo/product checks подтвердили fresh, auto и developed lifecycle created product repo.
+
+---
+
+## ROAD-000022 — Канонический путь обновления service-layer created product repo
+ID: ROAD-000022
+Этап: Канонический путь обновления service-layer created product repo
+Статус: Завершено
+Связи: BACK-000087, PLAN-000075
+Источник: Corrective pass after developed product service-layer update need
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+Цель: Зафиксировать минимальный путь обновления служебных файлов уже созданного product repo без пересоздания продукта, потери предметных артефактов, расширения bootstrap-доменов или ослабления fresh/developed product checks.
+Зависимости: ROAD-000021
+Связанные_backlog: BACK-000087
+
+### Описание
+Этап закрыт одним узким pass `PLAN-000075`. Bootstrap contract, validation contract, lifecycle, verification и tooling map теперь фиксируют canonical product-side route обновления `scripts/dev-test.sh` и `scripts/README.md` в уже созданном product repo: точечный service-layer delta, без fresh bootstrap reset, без переписывания предметных артефактов и с подтверждением через `scripts/dev-test.sh` / `bp_lint.py --mode auto`. Временный product repo подтвердил fresh state, generated service guidance и modeled developed state.
+
+---
+
+## ROAD-000021 — Разделить product lint для свежего bootstrap и развивающегося продукта
+ID: ROAD-000021
+Этап: Разделить product lint для свежего bootstrap и развивающегося продукта
+Статус: Завершено
+Связи: BACK-000086, PLAN-000074
+Источник: Corrective pass after first evolving product repository check
+Дата_создания: 2026-04-26
+Дата_изменения: 2026-04-26
+Цель: Развести automatic check свежего bootstrap-состояния и развивающегося product repo после подтверждения current truth, чтобы `bp_lint.py` выявлял реальные contradictions lifecycle, а не нормальный переход после первого прохода.
+Зависимости: ROAD-000020
+Связанные_backlog: BACK-000086
+
+### Описание
+Этап закрыт одним corrective pass `PLAN-000074`. `bp_lint.py` теперь различает fresh bootstrap product repo и developed product repo после подтверждения current truth; generated `scripts/dev-test.sh` запускает explicit `--mode auto`; technical contracts и tooling map синхронизированы с двумя structural gates. Проверки на временном generated product repo подтвердили fresh pass, developed pass и expected fail для contradiction scenario.
+
+---
+
+## ROAD-000020 — Семантическая чистка стартового контура после повторного полевого теста
+ID: ROAD-000020
+Этап: Семантическая чистка стартового контура после повторного полевого теста
+Статус: Завершено
+Связи: BACK-000085, PLAN-000073, CHG-000085
+Источник: Corrective pass after repeated `Minesweeper` field test
+Дата_создания: 2026-04-24
+Дата_изменения: 2026-04-24
+Цель: Снять остаточные смысловые противоречия стартового контура `BytePress` между терминологией, матрицей начального развёртывания, интервью, агентной картой, картой жизненного цикла, bootstrap и lint перед следующим полевым тестом.
+Зависимости: ROAD-000019
+Связанные_backlog: BACK-000085
+
+### Описание
+Этап закрыт одним corrective pass `PLAN-000073`. Термин `Каркас репозитория`, матрица начального развёртывания и фактический `bp_bootstrap.py` теперь одинаково разводят bootstrap-default, будущие product-side расширения и BytePress-only domains. Generated product repo получает минимальный стартовый пакет терминов, `AGENTS.md` снова стал короткой картой входа, интервью сосредоточено в одном owner-document с пятью смысловыми классами вопросов, а compact lifecycle/handoff map закреплена в `Pipeline/Inputs_Outputs.md`. Финальный repo lint, bootstrap smoke, generated repo lint на `develop` и task-ветке, а также product-side script checks не подтвердили residual contradiction в scope этапа.
 
 ---
 
@@ -278,4 +694,70 @@ ID: ROAD-000015
 Связанные_backlog: BACK-000079
 
 ### Описание
-Этап закрыт одним corrective pass: `Setup_Guide.md`, `Standards/Release.md`, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
+Этап закрыт одним corrective pass: `Setup_Guide.md`, release workflow contract, `Artifact_Lifecycle.md`, evidence contracts и `Logs/*` теперь согласованно фиксируют полный release workflow `release/* -> main -> tag -> cleanup -> develop sync -> factual release logging` без подмены release event gate-approval или прогнозом. Одновременно `ChangeLog.md` и `QualityLog.md` дозаполнены для ранее завершённых pass, а `ReleaseLog.md` получил factual запись о release event `0.1.0`, подтверждённом tag/history. Финальный audit не подтвердил residual release-blocker для подготовки `0.2.0`, поэтому `ROAD-000015` закрыт и не активирует новый `ROAD-*` автоматически.
+
+---
+
+## ROAD-000016 — Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+ID: ROAD-000016
+Этап: Post-release sync после `0.2.0` (Post-release Sync After `0.2.0`)
+Статус: Завершено
+Связи: BACK-000080, PLAN-000068, CHG-000080
+Источник: PLAN-000068
+Дата_создания: 2026-04-15
+Дата_изменения: 2026-04-15
+Цель: Завершить post-release closure после merge/tag `0.2.0`: зафиксировать factual release event в `ReleaseLog.md`, подтвердить отсутствие release-only back-sync fixes и закрыть минимальный planning/log contour в `develop`.
+Зависимости: ROAD-000015
+Связанные_backlog: BACK-000080
+
+### Описание
+Этап закрыт одним узким operational sync-pass после подтверждённого merge `PR #77` и annotated tag `0.2.0` на commit `68824d0646fc3e68992bbd1d6a3e6b7f5dcf3b83` в `main`. Remote release-ветка уже отсутствовала, local release-ветка удалена, factual запись о выпуске `0.2.0` добавлена в `ReleaseLog.md`, а сравнение `origin/main` и `origin/develop` не подтвердило release-only tree fixes для back-sync. Минимальный planning/log closure завершён без открытия нового product-development scope.
+
+## ROAD-000017 — Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+ID: ROAD-000017
+Этап: Discovery minimum bootstrap и startup-handshake агента (Bootstrap Discovery Minimum and Agent Startup Handshake)
+Статус: Завершено
+Связи: BACK-000081, PLAN-000069, CHG-000081
+Источник: PLAN-000069
+Дата_создания: 2026-04-19
+Дата_изменения: 2026-04-19
+Цель: Закрыть ранние control gaps после первого полевого запуска generated product repo: materialize minimal discovery-layer, сделать startup mode агента наблюдаемым и закрепить канонический interview format без открытия нового широкого stage.
+Зависимости: ROAD-000016
+Связанные_backlog: BACK-000081
+
+### Описание
+Этап закрыт одним corrective pass: generated product repo теперь materialize `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, product `AGENTS.md` явно включает discovery-layer в source-of-truth hierarchy и routing, а `AGENTS.md` самого `BytePress` фиксирует observable startup-handshake первого ответа. Одновременно `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer, bootstrap/validation contracts и `bp_lint.py` синхронизированы вокруг канонического interview format и нового bootstrap minimum. Smoke bootstrap и lint generated repo подтвердили отсутствие residual contradiction в этом scope.
+
+---
+
+## ROAD-000018 — Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+ID: ROAD-000018
+Этап: Product-start control gaps after first field test (Product-Start Control Gaps After First Field Test)
+Статус: Завершено
+Связи: BACK-000082, PLAN-000070, CHG-000082
+Источник: PLAN-000070
+Дата_создания: 2026-04-20
+Дата_изменения: 2026-04-20
+Цель: Полностью закрыть end-to-end gaps раннего product-start contour после теста `Minesweeper`: довести startup-handshake, interview current-truth, discovery minimum и runtime artifact hygiene до согласованного поведения между core contracts, bootstrap, generated product repo и lint без открытия release contour.
+Зависимости: ROAD-000017
+Связанные_backlog: BACK-000082
+
+### Описание
+Этап закрыт одним corrective pass после фактического smoke bootstrap во временный target path вне дерева `BytePress`. Core `AGENTS.md`, bootstrap/validation contracts, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` теперь одинаково требуют observable startup-handshake первого ответа, исполнимый first interview из 8–10 ключевых вопросов и явный current-truth ownership `Docs/Discovery/Interview.md`. Одновременно принят канон runtime artifact hygiene: `Runtime/Integration_Smoke_Report.json` не входит в bootstrap baseline commit, materialize только после фактического smoke run и остаётся runtime-local artifact по умолчанию. Smoke bootstrap, generated repo lint и smoke report hygiene не подтвердили residual contradiction в этом scope.
+
+---
+
+## ROAD-000019 — Domain bootstrap strategy and early product-start gate
+ID: ROAD-000019
+Этап: Domain bootstrap strategy and early product-start gate
+Статус: Завершено
+Связи: BACK-000083, BACK-000084, PLAN-000071, PLAN-000072, CHG-000083, CHG-000084
+Источник: PLAN-000071, PLAN-000072
+Дата_создания: 2026-04-21
+Дата_изменения: 2026-04-22
+Цель: Закрыть системные разрывы раннего product-start contour после полевых тестов `Minesweeper`: сначала классифицировать top-level домены `BytePress` для product bootstrap и ввести canonical reset/cleanup route, затем довести live execution discipline branch gate и structured interview format до согласованного поведения bootstrap, generated repo и lint.
+Зависимости: ROAD-000018
+Связанные_backlog: BACK-000083, BACK-000084
+
+### Описание
+Этап закрыт двумя узкими corrective passes после повторных полевых тестов `Minesweeper`. Первый pass `PLAN-000071` зафиксировал каноническую replication matrix top-level доменов, удержал generated repo в discovery-only contour до ответов пользователя и оформил canonical reset/cleanup route `scripts/reset-product-start.sh`. Второй pass `PLAN-000072` довёл live execution discipline до наблюдаемого branch gate и жёсткого structured interview contract: generated repo теперь требует task-ветку до любого writable action, startup-handshake сообщает branch status и branch action, а full interview и допустимый delta-интервью одинаково удерживают numbered / lettered / recommended format. Финальный repo lint, smoke bootstrap, generated repo lint на `develop` и task-ветке, а также negative smoke свободноформатного delta-интервью не подтвердили residual contradiction между core contracts, bootstrap, generated repo и lint.

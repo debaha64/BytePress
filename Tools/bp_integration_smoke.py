@@ -7,11 +7,9 @@ import argparse
 
 
 REQUIRED_PRODUCT_PATHS = [
-    "Adapters/README.md",
-    "Adapters/Policy.md",
-    "Adapters/Registry.md",
     "Docs/Technical/Interfaces.md",
-    "scripts/integration-smoke.sh",
+    "Tools/product_bootstrap_smoke.py",
+    "Tools/product_check.py",
 ]
 
 
@@ -33,8 +31,8 @@ def main() -> int:
         return 1
 
     missing = [rel for rel in REQUIRED_PRODUCT_PATHS if not (root / rel).exists()]
-    mcp_materialized = (root / "MCP").exists()
-    verdict = "passed" if not missing and not mcp_materialized else "failed"
+    forbidden = [name for name in ["Adapters", "Memory", "MCP", "Runtime", "Roles", "Skills", "Standards"] if (root / name).exists()]
+    verdict = "passed" if not missing and not forbidden else "failed"
     report = {
         "artifact": "Integration_Smoke_Report",
         "version": 1,
@@ -50,9 +48,9 @@ def main() -> int:
             },
             {
                 "id": "INT-002",
-                "name": "mcp_not_materialized",
-                "verdict": "failed" if mcp_materialized else "passed",
-                "path": "MCP",
+                "name": "retired_domains_not_materialized",
+                "verdict": "failed" if forbidden else "passed",
+                "paths": forbidden,
             },
         ],
     }
@@ -65,13 +63,15 @@ def main() -> int:
             encoding="utf-8",
         )
 
-    if missing or mcp_materialized:
+    if missing or forbidden:
         if missing:
             print("Отсутствуют обязательные пути integration smoke contour:")
             for rel in missing:
                 print(f"- {rel}")
-        if mcp_materialized:
-            print("Generated product repo must not materialize MCP/ in the minimal integration smoke contour.")
+        if forbidden:
+            print("Generated product repo must not materialize retired domains:")
+            for rel in forbidden:
+                print(f"- {rel}")
         return 1
 
     print("Controlled integration smoke contour looks consistent.")

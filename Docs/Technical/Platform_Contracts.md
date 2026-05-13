@@ -47,7 +47,7 @@
 
 ### Минимальные средовые допущения
 - доступна файловая система с обычными path operations;
-- доступен Git-контур веток, коммитов, diff и PR-подготовки;
+- доступен Git-контур веток, фиксаций, diff и подготовки запроса на слияние;
 - доступен `python3` для запуска project tooling;
 - доступен shell уровня `bash` или совместимого Linux-shell;
 - UTF-8 текст и line-based diff считаются нормой для активных артефактов.
@@ -59,10 +59,10 @@
 - archive artifacts остаются history/reference layer и не становятся active source of truth.
 
 ### Controlled execution contract
-- активная работа идёт только через task-ветку от `develop`;
-- локальные коммиты и self-check выполняются до final push;
+- активная работа идёт только через рабочую ветку от `develop`;
+- локальные фиксации и self-check выполняются до финальной отправки ветки;
 - `main` и `develop` не редактируются напрямую;
-- PR в `develop` остаётся каноническим delivery interface для task work.
+- запрос на слияние в `develop` остаётся каноническим delivery interface для task work.
 
 ### Tooling-follows-documents contract
 - инструменты используют уже утверждённые documents и contracts;
@@ -70,8 +70,8 @@
 - ad hoc local scripts вне `Tools/*` не становятся частью supported platform perimeter только по факту использования.
 
 ### External isolation contract
-- продуктовые репозитории и их runtime не являются execution substrate самого `BytePress`;
-- model adapters, memory и MCP остаются отдельными extension domains и не подменяют ядро знания и governance;
+- продуктовые репозитории и их execution context не являются execution substrate самого `BytePress`;
+- внешние connectors, model adapters и memory mechanisms не подменяют ядро знания и governance без отдельного mechanism contract;
 - secrets, credentials и внешние service tokens не попадают в Git и не становятся частью canonical platform state.
 
 ## Supported tool perimeter
@@ -87,12 +87,12 @@
 - `Tools/bp_normalize_terms.py` — нормализация карточек терминов и пересборка индекса терминов.
 
 ### Поддерживаемые служебные инструменты
-- `gh` — допустимый service interface для проверки existing PR и создания нового PR, если доступен и авторизован;
+- `gh` — допустимый service interface для проверки существующего запроса на слияние и создания нового запроса на слияние, если доступен и авторизован;
 - `rg`, `sed`, `find` и совместимые shell utilities — допустимые inspection helpers для локальной навигации и чтения active layer;
 - стандартные Git subcommands — допустимый operational interface для branch lifecycle и review prep.
 
 ### Что не входит в supported perimeter
-- произвольные GUI-only workflows как обязательный execution path;
+- произвольные workflows только через графический интерфейс как обязательный execution path;
 - tool-specific hidden state вне репозитория как единственный носитель contract;
 - Windows-native shell path как primary active platform;
 - случайные одноразовые scripts вне `Tools/*` как часть канонического platform contract.
@@ -100,7 +100,7 @@
 ## Роль ключевых инструментов
 ### `git`
 Роль:
-- держит task-branch workflow, diff, commit history, push и merge contour.
+- держит task-branch workflow, diff, историю фиксаций, отправку ветки и merge contour.
 
 Не роль:
 - не владеет доменным source of truth вместо документов репозитория.
@@ -141,11 +141,12 @@
 Не роль:
 - не открывает реальные внешние подключения;
 - не становится vendor runtime engine;
-- не подменяет `bp_lint.py`, `MCP/*` или procedural audit integration-layer.
+- не подменяет `bp_lint.py`, process workflow или procedural audit integration-layer.
 
 ### `gh`
 Роль:
-- автоматизирует PR contour после final push, если среда и аутентификация это позволяют.
+- автоматизирует контур запроса на слияние после финальной отправки ветки, если среда и аутентификация это позволяют;
+- является единственным основным маршрутом создания запроса на слияние в `develop`.
 
 Не роль:
 - не является обязательным execution substrate для локальной подготовки pass;
@@ -157,7 +158,9 @@
 - выполнять project tooling через `python3 Tools/...`;
 - выполнять integration smoke только через repo-native tool route, а не через прямые внешние connector calls;
 - использовать shell utilities для чтения, diff и навигации по active layer;
-- использовать `gh` только после final push и после проверки отсутствия existing PR для head-ветки;
+- использовать `gh` только после финальной отправки ветки и после проверки отсутствия существующего запроса на слияние для head-ветки;
+- не использовать GitHub connector для создания запроса на слияние;
+- если `gh` недоступен или не авторизован, выполнить отправку ветки и вернуть ссылку или точные параметры для ручного запроса на слияние;
 - хранить runtime context только как временный execution helper, не превращая его в source of truth.
 
 ## Недопустимые отклонения и anti-patterns
@@ -165,7 +168,7 @@
 - менять active system contract только через tooling behavior без документной синхронизации;
 - выполнять active work напрямую в `develop`, `main` или повторно использовать уже merged head-ветку;
 - считать Windows-native execution без Linux/WSL равноправным каноническим режимом;
-- использовать `Runtime/*` как substitute для planning-state, archive или facts;
+- использовать ignored tool-output paths как substitute для planning-state, archive или facts;
 - использовать `Pipeline/*` как justification для переписывания platform constraints, ownership или planning rules;
 - вносить secrets в Git или считать внешние сервисы частью обязательного execution substrate;
 - подменять supported tool perimeter случайными локальными скриптами, о которых не знает active documentation.
@@ -174,8 +177,8 @@
 ### К `Plans/*`
 `Plans/*` задаёт stage/task/pass и branch-delivery contour. `Platform_Contracts.md` фиксирует, в какой среде и какими инструментами этот contour поддерживается, но не владеет planning-state.
 
-### К `Runtime/*`
-`Runtime/*` остаётся временным execution context. `Platform_Contracts.md` задаёт ограничения среды, в которой runtime допускается, но не делает runtime источником истины.
+### К ignored tool-output paths
+ignored tool-output paths остаётся временным execution context. `Platform_Contracts.md` задаёт ограничения среды, в которой runtime допускается, но не делает runtime источником истины.
 
 ### К `Tools/*`
 `Tools/*` являются materialization and check perimeter текущей платформы. `Platform_Contracts.md` фиксирует их роли и границы, но не переносит в них ownership системных contracts.

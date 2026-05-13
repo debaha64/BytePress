@@ -40,7 +40,7 @@
 - целостное состояние системы не принадлежит одному файлу; оно складывается из канонических source-of-truth доменов.
 
 ### Domain
-Верхнеуровневая зона ответственности в репозитории: `Docs/*`, `Pipeline/*`, `Plans/*`, `Runtime/*`, `Logs/*`, `Rules/*`, `Standards/*`, `Profiles/*`, `Schemas/*`, `Templates/*`, `Tools/*` и соседние домены.
+Верхнеуровневая зона ответственности в репозитории: `Docs/*`, `Pipeline/*`, `Plans/*`, `Logs/*` и ignored tool-output paths, `Rules/*`, `Rules/*`, `Profiles/*`, `Schemas/*`, `Templates/*`, `Tools/*` и соседние домены.
 
 Роль:
 - хранить только свой тип состояния;
@@ -99,15 +99,16 @@
 Владелец состояния:
 - активный `Plans/PLAN-<NNNNNN>-<slug>.md`.
 
-### Runtime context
-Временное рабочее состояние во время исполнения pass.
+### Product profile
+Профиль продуктового каркаса.
 
 Роль:
-- держать промежуточный контекст исполнения;
-- не становиться источником истины и не архивировать planning-state.
+- выбирать package set создаваемого продукта;
+- определять, какие `Templates/*`, `Schemas/*`, `Rules/*`, `Pipeline/*` и `Tools/*` materialize;
+- не копировать фабричные или преждевременные домены без механизма.
 
 Владелец состояния:
-- `Runtime/*`.
+- `Profiles/*` и `Docs/Technical/Product_Bootstrap_Domain_Matrix.md` до введения отдельного profile package contract.
 
 ### Fact record
 Подтверждённая запись о решении, изменении, качестве, выпуске или поддержке.
@@ -129,16 +130,6 @@
 Владелец состояния:
 - `Profiles/*`.
 
-### Role
-Поведенческая точка сборки.
-
-Роль:
-- определять, как действует определённая функция внутри системы;
-- не подменять правила и стандарты.
-
-Владелец состояния:
-- `Roles/*`.
-
 ### Rule
 Обязательное ограничение или запрет.
 
@@ -157,7 +148,7 @@
 - не подменять обязательный запрет уровня rule.
 
 Владелец состояния:
-- `Standards/*`.
+- legacy `Rules/*` до миграции; целевое обязательное состояние переносится в `Rules/*`.
 
 ### Schema
 Формальный data contract.
@@ -187,7 +178,19 @@
 - не владеть доменным содержанием вместо канонических документов.
 
 Владелец состояния:
-- `Tools/*`.
+- `Tools/*` фабрики для `BytePress`;
+- локальный `Tools/*` продукта после bootstrap.
+
+### Premature domain
+Домен, созданный до появления реального механизма.
+
+Роль:
+- быть выявленным и удалённым или перенесённым;
+- не materialize в создаваемый продукт;
+- не становиться обязательным для проверок после migration pass.
+
+Владелец состояния:
+- `Docs/Technical/Domain_Model_Migration_Plan.md` и `Rules/Domains.md` до удаления.
 
 ## Ownership состояния
 ### Канонические владельцы
@@ -195,12 +198,10 @@
 - `Backlog` владеет состоянием `task` текущего этапа.
 - active `Plan` владеет состоянием текущего `pass`.
 - `Pipeline/*` владеет состоянием process model.
-- `Runtime/*` владеет только временным runtime context.
 - `Logs/*` владеют fact records.
 - `Docs/Technical/*` владеет technical contracts.
 - `Profiles/*` владеют operating profile.
 - `Rules/*` владеют обязательными ограничениями.
-- `Standards/*` владеют нормативами качества и представления.
 - `Schemas/*` владеют формальными data contracts.
 - `Templates/*` владеют reusable human-facing forms.
 - `Tools/*` владеют tooling behavior, но не содержательным состоянием сущностей.
@@ -208,9 +209,9 @@
 ### Что ownership не означает
 - `Pipeline/*` не владеет stage/task/pass.
 - `Plans/*` не владеет process-canon.
-- `Runtime/*` не владеет утверждённым планом и не владеет фактами.
 - `Logs/*` не владеют будущим scope работ.
 - `Docs/Technical/*` не владеет текущим planning-state и не владеет runtime-state.
+- Product profile не владеет содержимым продукта после создания; продукт получает локальные owners.
 
 ## Основные связи между сущностями
 - `System` состоит из доменов, собранных в слои.
@@ -218,10 +219,11 @@
 - `Process model` задаёт рамку, в которой `stage`, `task` и `pass` движутся по фазам.
 - `Stage` порождает `task` текущего этапа.
 - `Task` порождает один конкретный active `pass`.
-- `Pass` использует `runtime context` во время исполнения.
+- `Pass` использует local tools и временные tool outputs во время исполнения.
 - `Pass` производит `fact records` после завершения и проверки результата.
-- `Profile` активирует `role`, `rule` и `standard`.
-- `Rule` и `standard` ограничивают, как сущности могут быть изменены и представлены.
+- `Product profile` выбирает package set создаваемого продукта.
+- `Profile` активирует rules и package composition.
+- `Rule` ограничивает, как сущности могут быть изменены и представлены.
 - `Schema` и `template` поддерживают создание и проверку нормируемых сущностей.
 - `Tool` materialize и проверяет contracts, уже закреплённые документным слоем.
 
@@ -230,7 +232,7 @@
 - `Model.md` может ссылаться на `Artifact_Lifecycle.md`, чтобы не дублировать lifecycle и sync-order.
 - `Plans/*` могут ссылаться на `Docs/Technical/*` как на contracts, нужные для текущего pass.
 - `Logs/*` могут ссылаться на `Plans/*` и `Docs/Technical/*`, когда фиксируют факт изменения конкретной сущности или контракта.
-- `Tools/*` могут опираться на `Docs/Technical/*`, `Rules/*`, `Standards/*`, `Schemas/*` и `Templates/*`, когда materialize или проверяют контракт.
+- `Tools/*` могут опираться на `Docs/Technical/*`, `Rules/*`, `Rules/*`, `Schemas/*` и `Templates/*`, когда materialize или проверяют контракт.
 
 ## Недопустимые подмены и смешения ответственности
 - `Model.md` не подменяет `Architecture.md` как карту доменов и слоёв.
@@ -238,17 +240,17 @@
 - `Model.md` не подменяет `Pipeline/*` как process-canon.
 - `Pipeline/*` не подменяет ownership-модель `Roadmap`, `Backlog` и `Plan`.
 - `Plans/*` не подменяют `Logs/*` как fact-layer.
-- `Runtime/*` не подменяет `Plans/*`, `Docs/*` и `Logs/*`.
-- `Rules/*` и `Standards/*` не подменяют друг друга.
+- `Rules/*` не хранит необязательные рекомендации.
 - `Schemas/*` и `Templates/*` не подменяют source-of-truth сущности.
 - `Tools/*` не подменяют канонические contracts документного слоя.
+- Retired domains не возвращаются как placeholders.
 
-## Отношение модели к planning, runtime, facts и process
+## Отношение модели к planning, tools, facts и process
 ### К `Plans/*`
 `Plans/*` входят в модель как сущности `stage`, `task` и `pass` со строго разведённым ownership состояния.
 
-### К `Runtime/*`
-`Runtime/*` входит в модель только как временный runtime context, а не как source-of-truth entity registry.
+### К `Tools/*`
+`Tools/*` входит в модель как deterministic service layer. Созданный продукт получает локальный `Tools/*`, чтобы не зависеть от фабрики после bootstrap.
 
 ### К `Logs/*`
 `Logs/*` входят в модель как fact-layer, который получает результат после pass и проверки, но не владеет будущим намерением.
@@ -272,4 +274,3 @@
 - `TERM-000003`
 - `TERM-000004`
 - `TERM-000005`
-- `STD-000003`

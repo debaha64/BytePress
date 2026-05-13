@@ -1,5 +1,257 @@
 # QualityLog
 
+## QL-000102
+ID: QL-000102
+Дата: 2026-05-13
+Статус: пройдено
+Проверка: `ROAD-000041` / `BACK-000106` / `PLAN-000095` закрыты выпускным release-readiness pass; выполнены `git diff --check`, `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-release-0-3-0-readiness-product`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*`, проверка generated интервью, источника стека, статуса `Готово_к_утверждению`, живого `Product_Passport.md`, PR-маршрута через `gh` и developed-сценария со статусом `Готово_к_утверждению`.
+Результат: готовность BytePress `0.3.0` подтверждена без добавления доменов, без внесения данных конкретного тестового продукта, без возврата `scripts/*` и без нового ADR; фактический внешний выпуск, merge в `main` и tag в этом проходе не выполнялись.
+
+---
+
+## QL-000101
+ID: QL-000101
+Дата: 2026-05-11
+Статус: пройдено
+Проверка: `ROAD-000040` / `BACK-000105` / `PLAN-000094` закрыты широким исправляющим проходом; выполнены `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-field-fixes-product-000094b`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*` в новом продукте, проверка отсутствия `scripts/*` в generated `Base_Terms.md` и generated user/product/domain maps, проверка живого `Product_Passport.md`, проверка generated `AGENTS.md` и `Pipeline/Workflows.md` на связанных владельцев смысла, проверка явного списка исключений из первой версии, bootstrap временного продукта `/tmp/bytepress-field-fixes-product-000094c` и developed-сценарий со статусом `Готово_к_утверждению`.
+Результат: новый продуктовый каркас готов к следующему финальному полевому тесту без возврата `scripts/*`, без внесения данных конкретного тестового продукта, с живым паспортом продукта, с проверкой связанных документов-владельцев и с корректным статусом при ограничении среды; ADR не добавлялся.
+
+---
+
+## QL-000100
+ID: QL-000100
+Дата: 2026-05-11
+Статус: пройдено
+Проверка: `ROAD-000039` / `BACK-000104` / `PLAN-000093` закрыты одним узким предрелизным проходом; выполнены `python3 -m py_compile Tools/bp_bootstrap.py Tools/bp_lint.py`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-tools-only-product-000039`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия `scripts/*` в новом продукте, проверка отсутствия ссылок на `scripts/*` в generated `README.md`, `AGENTS.md`, `Setup_Guide.md` и `Docs/Product/Product_Passport.md`, отрицательный сценарий возврата `scripts/*` для `bp_lint.py` и generated `product_check.py`, bootstrap developed-сценария `/tmp/bytepress-tools-only-developed-000039`, explicit `product-developed`, repeated `auto` и generated developed `product_check.py`.
+Результат: новый продуктовый каркас создаётся без `scripts/*`, служебные команды нового продукта идут через `Tools/*`, свежий продукт с возвращённым `scripts/*` отклоняется, а маршрут старых продуктов сохраняет миграцию наследия `scripts/*`; ADR не добавлялся.
+
+---
+
+## QL-000099
+ID: QL-000099
+Дата: 2026-05-10
+Статус: пройдено
+Проверка: `ROAD-000038` / `BACK-000103` / `PLAN-000092` закрыты одним исправляющим проходом; выполнены `python3 -m py_compile Tools/bp_lint.py Tools/bp_bootstrap.py`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-field-guard-product`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка generated `AGENTS.md` на остановку после интервью, проверка generated `Interview.md` на запрет заполнения ответов без ответа пользователя, проверка generated текстов на запрет самовольного `tkinter`, проверка отсутствия `GUI`, `product pass`, `pass` и `bootstrap` в пользовательских текстах создаваемого слоя, отрицательный сценарий `sudo apt-get`, отрицательный сценарий уровней сложности и отрицательный сценарий самовольного `tkinter`.
+Результат: защита первого старта усилена без изменения Minesweeper, без изменения состава создаваемого продукта и без новых доменов; ADR не добавлялся.
+
+---
+
+## QL-000098
+ID: QL-000098
+Дата: 2026-05-10
+Статус: пройдено
+Проверка: `ROAD-000037` / `BACK-000102` / `PLAN-000091` закрыты одним узким предрелизным проходом; выполнены `python3 -m py_compile Tools/bp_lint.py Tools/bp_bootstrap.py`, `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-pre-release-field-test-product`, fresh check, auto check, generated `Tools/product_check.py`, generated `Tools/product_bootstrap_smoke.py`, проверка отсутствия требования английского языка в generated `AGENTS.md`, проверка отсутствия `GUI` в generated `Interview.md`, проверка безопасного вопроса выбора стека, проверка прав исполняемых файлов и отрицательный сценарий возврата `GUI` для `bp_lint.py` и generated `product_check.py`.
+Результат: русский язык Git и запроса на слияние, замена `GUI`, вопрос источника стека, компактный стартовый отчёт и проверки возврата `GUI` синхронизированы; `Minesweeper`, состав создаваемого продукта и домены не изменялись; ADR не добавлялся.
+
+---
+
+## QL-000097
+ID: QL-000097
+Дата: 2026-05-05
+Статус: пройдено
+Проверка: фактическая коррекция `ROAD-000036` / `BACK-000101` / `PLAN-000090` сверяет журнальный отчёт `CHG-000101` / `QL-000096` с плановыми файлами; `ROAD-000036` имеет статус `Завершено`, `BACK-000101` отсутствует в активном `Plans/Backlog.md` и перенесён в `Plans/Archive/Backlog/ROAD-000036.md` со статусом `Завершено`, `PLAN-000090` перенесён в `Plans/Archive/` со статусом `Завершено`. Проверены правило русского пользовательского вывода агента, наличие маршрута этого правила в создаваемом `AGENTS.md`, права исполняемых файлов создаваемого продукта и компактное правило сверки отчёта о закрытии `ROAD/BACK/PLAN` с фактическим состоянием `Plans/*`.
+Результат: расхождение после предрелизного прохода закрыто без переписывания исторического смысла `CHG-000101` / `QL-000096`, без изменения `Minesweeper`, без изменения состава создаваемого продукта и без новых доменов; договор `bp_lint.py` затронут.
+
+---
+
+## QL-000096
+ID: QL-000096
+Дата: 2026-05-02
+Статус: пройдено
+Проверка: `ROAD-000036` / `BACK-000101` / `PLAN-000090` закрыты в одном широком завершающем проходе; создаваемое интервью очищено от расширяющих подсказок, ограничение первого прохода отделено от выбора стека, русский язык создаваемого слоя доведён («delta-интервью» → «узкое интервью», «task-ветка» → «рабочая ветка», «pass» → «проход» в контекстных местах), переходные `scripts/*` зафиксированы как оболочки к `Tools/*` с условием удаления, `Tools/*` зафиксирован как главный служебный вход, `bp_lint.py` и `bp_bootstrap.py` обновлены, рекомендация выпуска 0.3.0 зафиксирована; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh product check, auto mode, local `Tools/product_check.py`, local `Tools/product_bootstrap_smoke.py`, проверка создаваемого Interview на отсутствие расширяющих слов, проверка отделения вопроса об ограничении от вопроса о стеке, проверка отсутствия смешанной терминологии в создаваемых текстах, моделирование developed product, developed check, повторный auto.
+Результат: предрелизная чистка закрыта без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов; `bp_lint contract affected`.
+
+---
+
+## QL-000095
+ID: QL-000095
+Дата: 2026-05-01
+Статус: пройдено
+Проверка: `ROAD-000035` / `BACK-000100` / `PLAN-000088` закрыты в одном узком исправляющем проходе; стартовое интервью активного и создаваемого слоя запрещает примеры функций вне запроса пользователя или подтверждённых требований; вопрос о наблюдаемом результате просит подтвердить или уточнить результат без добавления функций; вопрос об ограничении первого прохода отделён от вопроса о стеке; создаваемый `product_check.py` и `bp_lint.py` ловят неподтверждённые расширяющие подсказки. Выполнены `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-scope-test`, fresh product check, auto mode, local `Tools/product_bootstrap_smoke.py`, проверка создаваемого Interview на отсутствие расширяющих слов, проверка отделения вопроса об ограничении от вопроса о стеке, проверка отсутствия прежней смешанной лексики в создаваемых текстах, моделирование developed product и developed product check.
+Результат: исправления закрыты без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов; `bp_lint contract affected`.
+
+---
+
+## QL-000094
+ID: QL-000094
+Дата: 2026-05-01
+Статус: пройдено
+Проверка: `ROAD-000034` / `BACK-000099` / `PLAN-000087` закрыты в одном узком исправляющем pass; первый аналитический product-start закреплён за `chore/`; `docs/` оставлен для обычных документационных проходов после снятия стартового гейта; generated Pipeline проверяется на русские названия фаз, рабочих потоков и гейтов; generated Interview разделяет ограничение первого прохода и выбор стека, не предлагает таймер и не подсказывает расширение первой версии; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-field-fix-product-2`, fresh product check, auto mode, local `Tools/product_check.py`, проверка отказа `docs/` для первого аналитического прохода, проверка `chore/` для первого аналитического прохода, проверка русских generated Pipeline markers, проверка отсутствия old English markers и расширяющих подсказок в generated Interview, modeled developed product, developed product check и repeated auto.
+Результат: исправления закрыты без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов; `bp_lint contract affected`.
+
+---
+
+## QL-000093
+ID: QL-000093
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000033` / `BACK-000098` / `PLAN-000086` / `ADR-000026` закрыты в одном узком исправляющем pass; безопасные типы рабочих веток ограничены `chore/`, `feature/`, `fix/`, `docs/`; generated `AGENTS.md` и `Pipeline/*` переведены на русские названия фаз, рабочих потоков и гейтов; стартовое интервью очищено от расширяющих подсказок первой версии; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh product check, auto mode, modeled developed product, developed product check, повторный auto, проверка generated `AGENTS.md` и `Pipeline`, проверка generated `Interview.md`, проверка отсутствия рекомендации `product/` в branch guidance; `bp_lint contract affected`.
+Результат: исправления закрыты без изменения `Minesweeper`, без изменения состава создаваемого продукта и без добавления новых доменов.
+
+---
+
+## QL-000092
+ID: QL-000092
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000032` / `BACK-000097` / `PLAN-000085` / `ADR-000025` закрыты в одном узком pass; общий проверочный договор сокращён до `Docs/Technical/Verification.md`; дублирующие verification/validation documents удалены; прямые ссылки, `Pipeline/*`, `Rules/README.md`, `Tools/README.md`, `Tools/bp_lint.py` и `Tools/bp_bootstrap.py` синхронизированы; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-verification-cleanup-product`, fresh product check, auto mode, local `Tools/product_check.py`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, проверка отсутствия retired domains в generated product, проверка generated `AGENTS.md` и `Pipeline`, modeled developed product, developed product check, repeated auto и сверка `Rules/README.md` с фактическими файлами `Rules/*`; `bp_lint contract affected`.
+Результат: проверочный контур сокращён без изменения `Minesweeper`, без новых доменов, без изменения состава создаваемого продукта и без ослабления fresh/developed product checks.
+
+---
+
+## QL-000091
+ID: QL-000091
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: `ROAD-000031` / `BACK-000096` / `PLAN-000084` / `ADR-000024` закрыты в одном системном pass; исправлен дубль `PLAN-000082`; `Rules/*`, active docs, terms, Pipeline, Plans, `Tools/bp_lint.py` и generated product skeleton синхронизированы; выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-semantic-check-product`, fresh product check, auto mode, local `Tools/product_check.py`, проверка отсутствия retired domains в generated product, проверка generated `AGENTS.md` и `Pipeline`, modeled developed product, developed product check, repeated auto и сверка `Rules/README.md` с фактическими файлами `Rules/*`; `bp_lint contract affected`.
+Результат: semantic cleanup завершён без изменения `Minesweeper`, без новых доменов и без ослабления fresh/developed product checks.
+
+---
+
+## QL-000090
+ID: QL-000090
+Дата: 2026-04-30
+Статус: пройдено
+Проверка: Ошибочный дубль `PLAN-000082-created-product-update-route.md` найден и исправлен: архивный проход про route обновления already-created product repo получил `PLAN-000083`, `ROAD-000030`, `BACK-000095`, `CHG-000095`; `Plans/Roadmap.md`, `Plans/Archive/Backlog/ROAD-000030.md`, `Logs/ChangeLog.md` и прямые ссылки синхронизированы; исторический смысл прохода не изменялся.
+Результат: `PLAN-000082` остаётся только у `Plans/Archive/PLAN-000082-product-pipeline-domain-cleanup.md`.
+
+---
+
+## QL-000089
+ID: QL-000089
+Дата: 2026-04-29
+Статус: пройдено
+Проверка: `ROAD-000029` / `BACK-000094` / `PLAN-000082` / `ADR-000023` открыты и закрыты в одном широком corrective pass; `Pipeline/*`, `Rules/*`, `AGENTS.md`, `Docs/Discovery/*`, bootstrap contracts, domain migration plan, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Tools/bp_integration_smoke.py`, `Plans/*` и `Logs/*` синхронизированы вокруг усиленного product Pipeline, запрета guessed current truth, dependency gate, PR через `gh`, смысловых коммитов и удаления retired domains; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, local `Tools/product_check.py`, `product-fresh`, `auto`, отсутствие retired domains в generated product, modeled developed product, `product-developed`, проверка PR-маршрута в документации, проверка generated `AGENTS.md`, проверка generated `Interview.md` и negative forbidden-domain check выполнены; `bp_lint contract affected`.
+Результат: product-start control усилен, retired domains удалены из active layer, generated product skeleton остаётся самодостаточным и не получает удалённые домены; `Minesweeper` не изменялся.
+
+---
+
+## QL-000088
+ID: QL-000088
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000028` / `BACK-000093` / `PLAN-000081` открыты и закрыты в одном корректирующем pass; термины `TERM-000019` и `TERM-000018`, `Docs/Discovery/Interview.md`, bootstrap contracts, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Plans/*` и `Logs/*` синхронизированы вокруг нового product skeleton и паспорта `Docs/Product/Product_Passport.md`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, fresh product check, auto mode, negative forbidden-domain check, modeled developed product, developed product check и local product `Tools/*` пройдены; `bp_lint contract affected`.
+Результат: product skeleton terms/checks больше не требуют `Runtime/*`, `Profiles/Product.md` или `Adapters/*`; forbidden product domain даёт нормальную lint error; generated templates имеют уникальные `TPL-*` IDs; `Skills/*`, legacy domains `BytePress` и `Minesweeper` не изменялись.
+
+---
+
+## QL-000087
+ID: QL-000087
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000027` / `BACK-000092` / `PLAN-000080` открыты и закрыты в одном pass; `Tools/bp_bootstrap.py`, `Tools/bp_lint.py`, `Tools/README.md`, bootstrap/validation/lifecycle/evidence contracts, migration plan, `Plans/*` и `Logs/*` синхронизированы вокруг local product `Tools/*`, lightweight `Pipeline/*`, bounded `Templates/*` и `Schemas/*`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, `product-fresh`, `auto`, local `Tools/product_check.py`, local `Tools/product_bootstrap_smoke.py`, моделирование developed state и `product-developed` пройдены; `bp_lint contract affected`.
+Результат: новый generated product skeleton проверяется как самодостаточный локальный продукт без `Runtime/*`, `Adapters/*`, `Memory/*`, `MCP/*`, `Roles/*`, `Skills/*`, `Standards/*` и без primary `BYTEPRESS_ROOT` route; legacy domains `BytePress` и `Minesweeper` не изменялись.
+
+---
+
+## QL-000086
+ID: QL-000086
+Дата: 2026-04-28
+Статус: пройдено
+Проверка: `ROAD-000026` / `BACK-000091` / `PLAN-000079` открыты и закрыты в одном архитектурном pass; `ADR-000022`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Domain_Model_Migration_Plan.md`, `Docs/Technical/Architecture.md`, `Docs/Technical/Model.md`, `Docs/Technical/Interfaces.md`, `Docs/Technical/System_Invariants.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Rules/*`, `Standards/README.md`, `Pipeline/README.md`, `Tools/README.md`, `Plans/*` и `Logs/*` синхронизированы вокруг профильной фабрики самодостаточных продуктовых каркасов; `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract intentionally unaffected`.
+Результат: целевая доменная модель и migration plan зафиксированы без массового удаления файлов, без изменения `Minesweeper`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py`; known implementation gap перенесён в следующий tool-migration pass.
+
+---
+
+## QL-000085
+ID: QL-000085
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000025` / `BACK-000090` / `PLAN-000078` открыты и затем закрыты в одном pass; `Tools/bp_lint.py`, `Tools/bp_bootstrap.py`, `Tools/README.md`, `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Skills/Interview.md` и `Templates/Interview.md` синхронизированы вокруг русских проверочных маркеров; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта, `product-fresh`, `auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed product, `product-developed`, repeated auto и repeated generated `scripts/dev-test.sh` пройдены; `bp_lint contract affected`.
+Результат: active и generated layer используют русские маркеры для аналитического гейта, текущей истины, стартового отчёта, документов-владельцев и записываемых действий без изменения `Minesweeper`, без новых доменов создаваемого продукта и без широкой языковой чистки архива.
+
+---
+
+## QL-000084
+ID: QL-000084
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000024` / `BACK-000089` / `PLAN-000077` открыты и затем закрыты в одном pass; `Templates/Domain_README.md`, `Templates/README.md`, `Standards/Documentation.md`, `Rules/Logs_Record_Facts_Only.md`, `Logs/README.md` и `Logs/ADRlog.md` синхронизированы вокруг договора карт доменов и ADR; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-domain-adr-0fJZkG/product`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode product-fresh`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode auto`, generated `scripts/dev-test.sh`, modeled developed product, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-adr-0fJZkG/product --mode product-developed`, повторный auto и repeated generated `scripts/dev-test.sh` пройдены; `bp_lint contract unaffected`.
+Результат: договор README.md домена и обязательность ADR для значимых решений закреплены без изменения `Minesweeper`, без новых доменов создаваемого продукта, без широкой языковой чистки и без изменения `Tools/bp_lint.py`.
+
+---
+
+## QL-000083
+ID: QL-000083
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000023` / `BACK-000088` / `PLAN-000076` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000023.md` и `Plans/Archive/PLAN-000076-language-domain-map-cleanup.md` оформлены; активные карты доменов `README.md`, `AGENTS.md`, `Setup_Guide.md`, `Tools/README.md` и generated text в `Tools/bp_bootstrap.py` синхронизированы вокруг краткого русского инженерного формата; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-language-cleanup-SSAUbQ/product`, `python3 Tools/bp_lint.py --repo <product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <product> --mode auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed product, `python3 Tools/bp_lint.py --repo <product> --mode product-developed`, повторный auto и repeated generated scripts пройдены; `bp_lint contract unaffected`.
+Результат: языковая и картографическая чистка закрыта без изменения `Minesweeper`, без изменения предметного смысла `BytePress`, без изменения состава доменов создаваемого продукта и без ослабления branch/fresh/developed product gates.
+
+---
+
+## QL-000082
+ID: QL-000082
+Дата: 2026-04-27
+Статус: пройдено
+Проверка: `ROAD-000022` / `BACK-000087` / `PLAN-000075` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000022.md` и `Plans/Archive/PLAN-000075-product-service-update-path.md` оформлены; `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Verification.md`, `Tools/README.md` и `Tools/bp_bootstrap.py` синхронизированы вокруг canonical service-layer update path для `scripts/dev-test.sh` и `scripts/README.md`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap fresh продукта `/tmp/bytepress-service-update-fresh-Q9Dh3o/product`, `python3 Tools/bp_lint.py --repo <fresh-product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <fresh-product> --mode auto`, generated fresh `scripts/dev-test.sh`, modeled developed product `/tmp/bytepress-service-update-YpTbG9/product`, `python3 Tools/bp_lint.py --repo <developed-product> --mode product-developed` и generated developed `scripts/dev-test.sh` выполнены; запуск `product-fresh` на уже смоделированном developed product дал ожидаемый fail fresh markers; `bp_lint contract unaffected`.
+Результат: corrective pass `PLAN-000075` зафиксировал служебный update route для already-created product repo без повторного bootstrap, без изменения `Minesweeper`, без новых bootstrap domains и без ослабления fresh/developed product gates.
+
+---
+
+## QL-000081
+ID: QL-000081
+Дата: 2026-04-26
+Статус: пройдено
+Проверка: `ROAD-000021` / `BACK-000086` / `PLAN-000074` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000021.md` и `Plans/Archive/PLAN-000074-product-lint-lifecycle-modes.md` оформлены; `Tools/bp_lint.py`, `Tools/bp_bootstrap.py`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md` и `Tools/README.md` синхронизированы вокруг `product-fresh`, `product-developed` и `auto` modes; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, bootstrap временного продукта `/tmp/bytepress-lint-lifecycle-q7DZ8V/product`, `python3 Tools/bp_lint.py --repo <product> --mode product-fresh`, `python3 Tools/bp_lint.py --repo <product> --mode auto`, generated `scripts/dev-test.sh`, generated `scripts/integration-smoke.sh`, modeled developed check и negative contradiction scenario выполнены; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000074` разделил fresh bootstrap и developed product structural checks без ослабления first product-start gate и без изменения `Minesweeper`.
+
+---
+
+## QL-000080
+ID: QL-000080
+Дата: 2026-04-24
+Статус: пройдено
+Проверка: `ROAD-000020` / `BACK-000085` / `PLAN-000073` открыты и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000020.md` и `Plans/Archive/PLAN-000073-start-contour-semantic-cleanup.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Terms/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Docs/Technical/Pipeline.md`, `Pipeline/Inputs_Outputs.md`, `Tools/README.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг bootstrap-default scaffold, стартового пакета терминов, короткого стартового отчёта агента, owner-протокола интервью и compact lifecycle/handoff map; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-start-contour-LMin3q/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-start-contour-LMin3q/repo`, `git init -b develop`, `git add .`, повторный `python3 /home/dmin/code/BytePress/Tools/bp_lint.py --repo /tmp/bytepress-start-contour-LMin3q/repo` с ожидаемым fail на `develop`, `git commit -m "Bootstrap baseline"`, `git checkout -b feat/000001-confirm-current-truth`, `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/dev-test.sh` и `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/integration-smoke.sh` выполнены; generated `Docs/Terms/Base_Terms.md` подтверждён как реальный стартовый пакет терминов; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000073` закрыл подтверждённые semantic gaps стартового контура без доказанного residual contradiction между term-layer, bootstrap matrix, generated repo, interview protocol, lifecycle handoff map и lint.
+
+---
+
+## QL-000079
+ID: QL-000079
+Дата: 2026-04-22
+Статус: пройдено
+Проверка: `ROAD-000019` / `BACK-000084` / `PLAN-000072` повторно активированы и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000019.md` и `Plans/Archive/PLAN-000072-enforce-branch-gate-and-live-interview.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг task-branch gate, startup-handshake branch status/action и structured delta-интервью; `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-branch-gate-dyeQlM/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-branch-gate-dyeQlM/repo`, `git init -b develop`, baseline commit, повторный `python3 Tools/bp_lint.py --repo /tmp/bytepress-branch-gate-dyeQlM/repo` с ожидаемым fail на `develop`, `git checkout -b feat/000001-confirm-current-truth` и повторный lint с pass-verdct, а также negative smoke свободноформатного delta-интервью с ожидаемым fail `missing delta-interview format contract` выполнены; `bp_lint contract affected`.
+Результат: corrective pass `PLAN-000072` закрыл подтверждённые live control gaps branch discipline и interview discipline без доказанного residual contradiction между bootstrap, generated repo, docs и lint.
+
+---
+
+## QL-000078
+ID: QL-000078
+Дата: 2026-04-21
+Статус: пройдено
+Проверка: `ROAD-000019` / `BACK-000083` / `PLAN-000071` активированы и затем закрыты в одном pass; `Plans/Backlog.md` очищен, `Plans/Archive/Backlog/ROAD-000019.md` и `Plans/Archive/PLAN-000071-domain-bootstrap-strategy-and-interview-gate.md` оформлены; `AGENTS.md`, `Docs/Discovery/*`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Domain_Matrix.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, `README.md`, `Setup_Guide.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг top-level domain matrix, hard discovery-only gate и failed-start reset route; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-domain-bootstrap-qTYUiZ/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-domain-bootstrap-qTYUiZ/repo`, `BYTEPRESS_ROOT=/home/dmin/code/BytePress scripts/integration-smoke.sh`, `scripts/reset-product-start.sh` на clean repo и `scripts/reset-product-start.sh` на out-of-gate drift `Docs/Product/PRD.md` пройдены с ожидаемым verdict; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000019` закрыт как согласованный history-fact без подтверждённого residual contradiction между matrix, bootstrap, generated repo, lint и cleanup route раннего product-start contour.
+
+---
+
+## QL-000077
+ID: QL-000077
+Дата: 2026-04-20
+Статус: пройдено
+Проверка: `PLAN-000069` выведен в archive-layer, corrective stage `ROAD-000018` / `BACK-000082` / `PLAN-000070` оформлен и затем закрыт в одном pass; `AGENTS.md`, `Docs/Technical/Product_Bootstrap_Contract.md`, `Docs/Technical/Product_Bootstrap_Validation.md`, `Docs/Technical/Artifact_Lifecycle.md`, active discovery-layer, `Skills/Interview.md`, `Templates/Interview.md`, `Tools/bp_bootstrap.py` и `Tools/bp_lint.py` синхронизированы вокруг observable startup-handshake, first interview из 8–10 вопросов и runtime hygiene `Runtime/Integration_Smoke_Report.json`; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_bootstrap.py --name Minesweeper --product-code MS --brand-profile Speculorg --target /tmp/bytepress-product-start-1okrN3/repo`, `python3 Tools/bp_lint.py --repo /tmp/bytepress-product-start-1okrN3/repo` и `BYTEPRESS_ROOT=/home/dmin/code/BytePress /tmp/bytepress-product-start-1okrN3/repo/scripts/integration-smoke.sh` пройдены; baseline smoke report отсутствовал до запуска и после запуска был ignored-by-default как `!! Runtime/Integration_Smoke_Report.json`; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000018` закрыт как согласованный end-to-end history-fact без доказанного residual contradiction между core contracts, bootstrap tool, generated repo и validation.
+
+---
+
+## QL-000076
+ID: QL-000076
+Дата: 2026-04-19
+Статус: пройдено
+Проверка: `Tools/bp_bootstrap.py` materialize minimal `Docs/Discovery/README.md` и `Docs/Discovery/Interview.md`, generated product `AGENTS.md` включает discovery-layer в source-of-truth hierarchy и task entry route, `AGENTS.md` самого `BytePress` содержит observable startup-handshake contract, а `Skills/Interview.md`, `Templates/Interview.md`, active discovery-layer, bootstrap/validation contracts и `Tools/bp_lint.py` согласованы по interview format; `git diff --check`, `python3 Tools/bp_lint.py --repo .`, smoke bootstrap и `python3 Tools/bp_lint.py --repo <generated-product-repo>` пройдены; `bp_lint contract affected`.
+Результат: corrective pass `ROAD-000017` закрыт как согласованный history-fact без доказанного residual contradiction в bootstrap discovery и startup-handshake contour.
+
+---
+
+## QL-000075
+ID: QL-000075
+Дата: 2026-04-15
+Статус: пройдено
+Проверка: подтверждены merged state `PR #77`, постановка annotated tag `0.2.0` на commit `68824d0646fc3e68992bbd1d6a3e6b7f5dcf3b83` в `main`, отсутствие remote release-ветки и удаление local release-ветки; сравнение `origin/main` и `origin/develop` не выявило release-only tree fixes для back-sync; в `develop` добавлены только factual `ReleaseLog` entry `RL-000007` и minimal planning/log closure `ROAD-000016` / `BACK-000080` / `PLAN-000068`; `git diff --check` и `python3 Tools/bp_lint.py --repo .` пройдены; `bp_lint contract unaffected`.
+Результат: post-release sync после `0.2.0` закрыт как согласованный factual/log/planning completion без нового product-development scope.
+
+---
+
 ## QL-000074
 ID: QL-000074
 Дата: 2026-04-15

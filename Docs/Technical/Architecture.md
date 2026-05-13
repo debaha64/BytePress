@@ -19,15 +19,23 @@
 - не дублировать `Docs/Technical/README.md`, `Docs/Technical/Pipeline.md` и `Pipeline/*`, а связывать их в одну системную карту.
 
 ## Архитектурный принцип BytePress
+`BytePress` переходит к модели профильной фабрики самодостаточных продуктовых каркасов.
+
+Целевой принцип:
+- `BytePress` хранит contracts, profiles, package matrix, tools и process фабрики;
+- создаваемый продукт получает профильный локальный каркас и после создания не зависит от `BytePress` как runtime/tool dependency;
+- домены без реального механизма, владельца смысла, потребителя и проверки удаляются или не materialize.
+
+Retired domains остаются только историческим фактом в архивах и журналах. Active layer не должен возвращать их без нового ADR, владельца механизма, потребителя и проверки.
+
 `BytePress` построен как файловая система доменов, где каждый активный домен хранит только свой тип состояния:
 - знание хранится в `Docs/*`;
 - технические системные контракты хранятся в `Docs/Technical/*`;
 - движение работы моделируется в `Pipeline/*`;
 - утверждённое намерение и статус этапа хранятся в `Plans/*`;
-- временный рабочий контекст живёт в `Runtime/*`;
 - подтверждённые факты хранятся в `Logs/*`;
-- ограничения и нормативы вынесены в `Rules/*` и `Standards/*`;
-- формальные и шаблонные supporting contracts вынесены в `Schemas/*` и `Templates/*`.
+- обязательные ограничения живут в сокращённом `Rules/*`;
+- формальные и шаблонные supporting contracts живут в `Schemas/*` и `Templates/*` только там, где они реально проверяются или materialize.
 
 Архитектура считается корректной только пока эти типы состояния не начинают подменять друг друга.
 
@@ -45,26 +53,17 @@
 - `Pipeline/` — process-domain модели движения работы.
 - `Plans/` — planning/governance domain со stage, task и pass.
 
-### Execution and fact domains
-- `Runtime/` — временный контекст исполнения.
+### Fact domains
 - `Logs/` — журналы фактов, проверок и решений.
 
 ### Governance domains
 - `Profiles/` — режимы системы и состав активного рабочего контура.
-- `Roles/` — поведенческие точки сборки.
-- `Rules/` — обязательные запреты и ограничения.
-- `Standards/` — нормативы качества и представления.
+- `Rules/` — сокращённые проектно-специфичные обязательные запреты и ограничения.
 
 ### Supporting contract domains
 - `Schemas/` — формальные контракты данных.
 - `Templates/` — шаблоны повторяющихся артефактов.
 - `Tools/` — детерминированные инструменты materialization и checks.
-- `Skills/` — процедурные способности и операционные инструкции.
-
-### Extension domains
-- `Adapters/` — каркас подключения моделей и движков.
-- `Memory/` — каркас будущей долговременной памяти.
-- `MCP/` — каркас подключений и интеграционной политики.
 
 ## Карта слоёв
 ### Knowledge layer
@@ -90,11 +89,6 @@
 
 Роль слоя: хранить утверждённые stage, task и pass, а также archive planning-history.
 
-### Execution layer
-- `Runtime/`
-
-Роль слоя: держать только временный рабочий контекст между утверждённым `Plan` и фиксацией результата.
-
 ### Fact layer
 - `Logs/`
 
@@ -102,58 +96,46 @@
 
 ### Governance layer
 - `Profiles/`
-- `Roles/`
 - `Rules/`
-- `Standards/`
 
-Роль слоя: ограничивать и направлять поведение системы, но не подменять знание, планирование или журналы фактов.
+Роль слоя: выбирать профиль фабрики и фиксировать только обязательные правила, не подменяя знание, планирование или журналы фактов.
 
 ### Supporting contract layer
 - `Schemas/`
 - `Templates/`
 - `Tools/`
-- `Skills/`
 
 Роль слоя: материализовать, проверять и поддерживать contracts активных доменов.
-
-### Extension layer
-- `Adapters/`
-- `Memory/`
-- `MCP/`
-
-Роль слоя: удерживать controlled integration contour и границы будущих расширений, не подменяя active core системы в `0.2.0`.
 
 ## Границы ответственности по ключевым доменам
 - `Docs/Technical/*` отвечает за архитектурную и контрактную карту системы, но не за process-canon, planning-state, runtime-state или факт выполнения.
 - `Pipeline/*` отвечает за process-canon, но не владеет stage/task/pass и не хранит фактическое состояние конкретной работы.
 - `Plans/*` отвечает за утверждённое намерение и статусы planning-contour, но не заменяет knowledge-layer и не превращается в журнал фактов.
-- `Runtime/*` отвечает только за временный контекст исполнения и не становится источником истины.
 - `Logs/*` отвечают только за факты и результаты проверок, а не за планирование будущей работы.
+- `Tools/*` фабрики создаёт product-local `Tools/*`, но не должно оставаться runtime dependency созданного продукта.
 
 ## Допустимые направления связей
-- `Docs/Technical/*` может ссылаться на `Pipeline/*`, `Plans/*`, `Runtime/*`, `Logs/*`, чтобы описывать архитектурные границы между ними.
+- `Docs/Technical/*` может ссылаться на `Pipeline/*`, `Plans/*`, `Logs/*` и ignored tool-output paths, чтобы описывать архитектурные границы между ними.
 - `Pipeline/*` может определять, какие домены участвуют в фазах и переходах, но не забирает у них владение состоянием.
-- `Plans/*` может ссылаться на `Docs/Technical/*`, `Logs/*`, `Rules/*` и `Standards/*` как на contracts и факты, нужные для текущего pass.
-- `Runtime/*` может опираться на active `Plan`, но после завершения pass не становится архивом знания или фактов.
+- `Plans/*` может ссылаться на `Docs/Technical/*`, `Logs/*`, `Rules/*` как на contracts и факты, нужные для текущего pass.
 - `Logs/*` могут ссылаться на `Plans/*` и `Docs/Technical/*`, чтобы фиксировать факт изменения и проверки конкретного контракта.
 
 Допустимая общая схема направления такова:
-`Docs/*` и `Docs/Technical/*` задают знание и contracts -> `Pipeline/*` задаёт процессную рамку -> `Plans/*` задаёт утверждённый pass -> `Runtime/*` даёт временный контекст исполнения -> `Logs/*` фиксируют факт результата.
+`Docs/*` и `Docs/Technical/*` задают знание и contracts -> `Pipeline/*` задаёт процессную рамку и workflows -> `Plans/*` задаёт утверждённый pass -> `Tools/*` выполняет deterministic checks/materialization -> `Logs/*` фиксируют факт результата.
 
 ## Недопустимые подмены и пересечения
 - `Docs/Technical/*` не подменяет `Pipeline/*` как process-canon.
 - `Docs/Technical/*` не подменяет `Plans/*` как active planning-state.
-- `Docs/Technical/*` не подменяет `Runtime/*` как место текущего исполнения.
 - `Docs/Technical/*` не подменяет `Logs/*` как слой подтверждённых фактов.
 - `Pipeline/*` не подменяет `Plans/*` как источник утверждённого stage/task/pass.
 - `Pipeline/*` не подменяет `Docs/Technical/*` как архитектурную карту системы.
 - `Plans/*` не подменяет `Logs/*` и не хранит факт вместо журнала.
-- `Runtime/*` не подменяет `Plans/*`, `Docs/*` и `Logs/*`.
-- `Rules/*` не подменяют `Standards/*`, а `Standards/*` не подменяют `Rules/*`.
+- `Rules/*` не становится свалкой рекомендаций; в нём остаются только обязательные проектно-специфичные правила.
 - `Schemas/*` не подменяют `Templates/*`, а `Templates/*` не подменяют канонические документы доменов.
 - `Tools/*` не подменяют source-of-truth документы, а materialize и проверяют их contracts.
+- retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` не должны возвращаться или копироваться в продукт как placeholder domains.
 
-## Отношение technical-layer к process, planning, runtime и facts
+## Отношение technical-layer к process, planning, tools и facts
 ### К `Pipeline/*`
 `Pipeline/*` — отдельный process-layer. `Architecture.md` фиксирует только его архитектурное место в системе и границы относительно соседних доменов.
 
@@ -166,8 +148,8 @@
 ### К `Plans/*`
 `Plans/*` — отдельный planning/governance contour. `Architecture.md` фиксирует, что именно там хранятся stage, task и pass, а не переносит их в technical-layer.
 
-### К `Runtime/*`
-`Runtime/*` — execution-layer. `Architecture.md` фиксирует его как временный контекст и не даёт читать runtime как source of truth.
+### К `Tools/*`
+`Tools/*` — service-layer фабрики. `Architecture.md` фиксирует, что фабрика должна materialize local product `Tools/*`, а не держать созданный продукт зависимым от `BytePress`.
 
 ### К `Logs/*`
 `Logs/*` — fact-layer. `Architecture.md` фиксирует, что архитектурные изменения подтверждаются журналами, но не делает сами журналы частью technical-layer.
@@ -193,5 +175,7 @@
 - `ADR-000001`
 - `ADR-000002`
 - `ADR-000005`
+- `ADR-000022`
 - `RULE-000003`
 - `RULE-000007`
+- `RULE-000011`
