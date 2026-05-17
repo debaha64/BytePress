@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000103
+ID: QL-000103
+Дата: 2026-05-18
+Статус: пройдено
+Проверка: `ROAD-000042` / `BACK-000107` / `PLAN-000096` закрыты узким post-release проходом; подтверждены Git-факты `0.3.0`: `origin/main` = `56767aaa8208ebfb125afd00ac0b6d57e0fa0a98`, `origin/develop` = `c5a6c25317816490625ae45b0eb43838ce13aee1`, tag `0.3.0` указывает на `56767aaa8208ebfb125afd00ac0b6d57e0fa0a98`, тип tag object по `git cat-file -t 0.3.0` = `commit`, деревья `origin/main` и `origin/develop` совпадают, ancestry-отношение между ними не подтверждено ни в одну сторону. Выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`.
+Результат: фактический внешний выпуск BytePress `0.3.0` зафиксирован в `RL-000009`; release-readiness `RL-000008` сохранён отдельно; release/post-release route уточнён без требования ancestry после squash merge, без force-push, без нового release, без product bootstrap changes и без нового ADR.
+
+---
+
 ## QL-000102
 ID: QL-000102
 Дата: 2026-05-13
