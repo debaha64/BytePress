@@ -1,6 +1,7 @@
 # ReleaseLog
 
 ## Индекс
+- RL-000009 — Подтверждён factual release event `0.3.0` по merge/tag
 - RL-000008 — Подтверждена готовность выпуска `0.3.0`
 - RL-000007 — Подтверждён factual release event `0.2.0` по merge/tag
 - RL-000006 — Подтверждён factual release event `0.1.0` по tag/history
@@ -9,6 +10,14 @@
 - RL-000003 — Сформирован артефакт с усиленным техническим слоем и контуром правил
 - RL-000002 — Сформирован артефакт с согласованными схемами, шаблонами и рабочими журналами
 - RL-000001 — Сформирован первый архив каркаса BytePress
+
+---
+
+## RL-000009
+ID: RL-000009
+Дата: 2026-05-18
+Статус: внешний выпуск
+Событие: factual release event `0.3.0` подтверждён merge `PR #108` в `main`, tag `0.3.0` на commit `56767aaa8208ebfb125afd00ac0b6d57e0fa0a98` и post-release sync `PR #109` в `develop`. `git cat-file -t 0.3.0` подтвердил тип `commit`, поэтому запись не утверждает annotated tag. `origin/main` и `origin/develop` совпадают по дереву; различие истории после squash/post-release sync не считается дефектом текущего договора.
 
 ---
 

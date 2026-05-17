@@ -150,22 +150,22 @@ python3 Tools/bp_lint.py --repo .
 git checkout develop
 git fetch --prune origin
 git pull --ff-only origin develop
-git checkout -b release/000020-0.2.0-rc1
-git push -u origin release/000020-0.2.0-rc1
+git checkout -b release/000096-0.3.0
+git push -u origin release/000096-0.3.0
 ```
 
 Открыть PR из `release/*` только в `main`:
 
 ```bash
-gh pr create --base main --head release/000020-0.2.0-rc1
+gh pr create --base main --head release/000096-0.3.0
 ```
 
 Перед merge в `main` повторно выполнить финальную локальную проверку release-candidate:
 
 ```bash
-git checkout release/000020-0.2.0-rc1
+git checkout release/000096-0.3.0
 git fetch --prune origin
-git pull --ff-only origin release/000020-0.2.0-rc1
+git pull --ff-only origin release/000096-0.3.0
 git diff --check
 python3 Tools/bp_lint.py --repo .
 ```
@@ -176,30 +176,34 @@ python3 Tools/bp_lint.py --repo .
 git checkout main
 git fetch --prune origin
 git pull --ff-only origin main
-git tag -a 0.2.0 -m "Release BytePress 0.2.0"
-git push origin 0.2.0
+git tag -a <version> -m "Release BytePress <version>"
+git push origin <version>
 ```
 
 После merge и отправки tag удалить release-ветку:
 
 ```bash
-git branch -d release/000020-0.2.0-rc1
-git push origin --delete release/000020-0.2.0-rc1
+git branch -d release/000096-0.3.0
+git push origin --delete release/000096-0.3.0
 ```
 
-После этого синхронизировать `develop` от подтверждённого `main` только через отдельную рабочую ветку и PR в `develop`:
+После этого синхронизировать `develop` с содержимым подтверждённого `main`.
+
+Если force-push в защищённый `develop` запрещён, использовать отдельную рабочую ветку и PR в `develop`:
 
 ```bash
 git checkout develop
 git fetch --prune origin
 git pull --ff-only origin develop
-git checkout -b docs/000080-sync-develop-after-release-0.2.0
+git checkout -b docs/000096-sync-develop-after-release-0.3.0
 git merge --no-ff origin/main
-git push -u origin docs/000080-sync-develop-after-release-0.2.0
-gh pr create --base develop --head docs/000080-sync-develop-after-release-0.2.0
+git push -u origin docs/000096-sync-develop-after-release-0.3.0
+gh pr create --base develop --head docs/000096-sync-develop-after-release-0.3.0
 ```
 
 Фактическая запись о выпуске выполняется только после подтверждённых merge/tag facts.
 
 - Если tag/history уже подтверждают release event, следующий узкий sync-pass в `develop` добавляет фактическую запись в `Logs/ReleaseLog.md`.
 - `ReleaseLog.md` не хранит release candidate, прогноз или намерение; там живут только фактически состоявшиеся release events.
+- После squash merge `main` и `develop` могут совпадать по дереву, но отличаться по истории; это не дефект, если договор требует sync содержимого выпуска, а не ancestry.
+- Требование ancestry между `main` и `develop` вводится только отдельным решением о merge strategy.
