@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000106
+ID: QL-000106
+Дата: 2026-05-21
+Статус: пройдено
+Проверка: `BACK-000110` и `PLAN-000099` закрыты завершающим проходом `ROAD-000043`; `Plans/README.md` закрепляет роли Roadmap, Backlog и Plan; `Plans/Roadmap.md` перевёл `ROAD-000043` в статус `Завершено`; `Plans/Backlog.md` фиксирует отсутствие активного этапа, ожидающий отдельного открытия `ROAD-000044` и ближайшие задачи `BACK-000111` ... `BACK-000114`; `Plans/Archive/Backlog/ROAD-000043.md` содержит завершённые `BACK-000108`, `BACK-000109` и `BACK-000110`; `ROAD-000044` не начат. Выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`.
+Результат: плановый контур `ROAD-000043` закрыт без нового домена, без нового ADR, без release-прохода, без терминологического рефакторинга, без выполнения `BACK-000111` ... `BACK-000114`, без изменения `Docs/Terms/*`, `Rules/Terms.md`, `Tools/*`, product bootstrap, zip-архивов, архивной структуры, `Setup_Guide.md`, `Templates/README.md` и `Schemas/README.md`.
+
+---
+
 ## QL-000105
 ID: QL-000105
 Дата: 2026-05-21
