@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000117
+ID: QL-000117
+Дата: 2026-05-23
+Статус: пройдено
+Проверка: `BACK-000122` и `PLAN-000110` закрыты; `Tools/bp_check.py` реализует минимальный инструмент уровня `check` с запуском `python3 Tools/bp_check.py --repo .`, форматами `text` и `json`, отдельной структурой результата, независимыми проверками, общим runner и CLI без расширения `bp_lint.py`; `Docs/Technical/Verification.md`, `Tools/README.md`, `Pipeline/Workflows.md`, `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000046.md` и `Plans/Archive/PLAN-000110-minimal-bp-check.md` согласованы. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json` и `python3 -m py_compile Tools/bp_check.py`.
+Результат: минимальный `bp_check.py` создан и проходит проверки; `ROAD-000046` завершён после закрытия `BACK-000119`, `BACK-000120`, `BACK-000121` и `BACK-000122`; `ADR-000028` не создан, потому что новое архитектурное решение не принималось; `bp_lint.py` не расширен; `bp_verify.py` не создан; product bootstrap, zip-архивы и `ROAD-000047` не затронуты. Остаточный риск: согласованность `ROAD/BACK/PLAN`, журнальных связей, архивных структур, README-карт и терминологических запретов остаётся будущим расширением уровня `check`, чтобы не создавать ложные срабатывания без отдельного договора реализации.
+
+---
+
 ## QL-000116
 ID: QL-000116
 Дата: 2026-05-22
