@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000110
+ID: QL-000110
+Дата: 2026-05-22
+Статус: пройдено
+Проверка: `BACK-000114` и `PLAN-000103` закрыты; `Docs/Terms/*` содержит термин `Определение готовности`; `Rules/Terms.md` и `Docs/Terms/README.md` ограничивают английскую форму внешним соответствием при первом упоминании; `Templates/Plan.md` и `Schemas/plan.schema.json` используют `Определение_готовности`; активное описание прохода в `Docs/Technical/Model.md` использует русское имя как основной термин; `Plans/Roadmap.md`, `Plans/Backlog.md` и `Plans/Archive/Backlog/ROAD-000044.md` подтверждают завершение `ROAD-000044` после закрытия `BACK-000111`, `BACK-000112`, `BACK-000113` и `BACK-000114`. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .` и `python3 -m json.tool Schemas/plan.schema.json`.
+Результат: Определение готовности закреплено без создания `ADR-000028`, без изменения проверочной архитектуры, без изменения `Pipeline/*` и без изменения `Tools/*`. Остаточный риск: generated plan wording в `Tools/bp_bootstrap.py` остаётся на прежнем имени и требует отдельного будущего прохода, потому что текущий проход не менял `Tools/*`.
+
+---
+
 ## QL-000109
 ID: QL-000109
 Дата: 2026-05-22
