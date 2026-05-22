@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000116
+ID: QL-000116
+Дата: 2026-05-22
+Статус: пройдено
+Проверка: `BACK-000121` и `PLAN-000109` закрыты; `Docs/Technical/Verification.md` закрепляет минимальную архитектуру, входы, выходы, базовый запуск и границы будущего `bp_check.py`; `Tools/README.md` отделяет будущий `bp_check.py` от `bp_lint.py`; `Pipeline/Workflows.md` связывает провал будущего инструмента с риском или блокером и оставляет спорные случаи за агентом и владельцем; `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000046.md` и `Plans/Archive/PLAN-000109-bp-check-implementation-contract.md` согласованы. Выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`.
+Результат: договор реализации `bp_check.py` закреплён без создания `ADR-000028`, потому что новое архитектурное решение не принималось; `bp_check.py` не создан; `bp_lint.py` не расширен; `bp_verify.py` не создан; `Tools/*`, product bootstrap, zip-архивы и `ROAD-000047` не затронуты. Остаточный риск: до отдельной реализации `bp_check.py` deterministic-состав уровня `check` остаётся договором и выполняется агентной сверкой.
+
+---
+
 ## QL-000115
 ID: QL-000115
 Дата: 2026-05-22
