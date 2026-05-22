@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000114
+ID: QL-000114
+Дата: 2026-05-22
+Статус: пройдено
+Проверка: `ROAD-000046` открыт, `BACK-000119` и `PLAN-000107` закрыты; `Docs/Technical/Verification.md` закрепляет уровни `lint`, `check`, `verify`, роль `bp_lint.py` как быстрой структурной проверки и будущие роли `bp_check.py` / `bp_verify.py` без реализации; `Pipeline/Workflows.md` связывает уровни с гейтом проверки; `Rules/Workflow.md` закрепляет разделение автоматической проверки, отчёта агента и решения человека; `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000046.md` и `Plans/Archive/PLAN-000107-verification-levels-and-tool-roles.md` согласованы. Выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`.
+Результат: модель уровней проверок и роли инструментов закреплены без создания `ADR-000028`, потому что новое архитектурное решение не принималось; `Tools/*`, product bootstrap, zip-архивы и `ROAD-000047` не затронуты. Остаточный риск: `bp_check.py` и `bp_verify.py` пока не реализованы и требуют отдельного будущего договора.
+
+---
+
 ## QL-000113
 ID: QL-000113
 Дата: 2026-05-22
