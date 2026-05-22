@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000115
+ID: QL-000115
+Дата: 2026-05-22
+Статус: пройдено
+Проверка: `BACK-000120` и `PLAN-000108` закрыты; `Docs/Technical/Verification.md` закрепляет deterministic-состав уровня `check`, будущий состав `bp_check.py` без реализации и границы автоматизации; `Pipeline/Workflows.md` синхронизирует уровень `check` с процессным контуром; `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000046.md` и `Plans/Archive/PLAN-000108-deterministic-check-scope.md` согласованы. Выполнены `git diff --check` и `python3 Tools/bp_lint.py --repo .`.
+Результат: deterministic-состав уровня `check` закреплён без создания `ADR-000028`, потому что новое архитектурное решение не принималось; `bp_lint.py` не расширен; `bp_check.py` и `bp_verify.py` не созданы; `Tools/*`, product bootstrap, zip-архивы и `ROAD-000047` не затронуты. Остаточный риск: до отдельной реализации `bp_check.py` deterministic-состав остаётся проверочным договором и выполняется агентной сверкой.
+
+---
+
 ## QL-000114
 ID: QL-000114
 Дата: 2026-05-22
