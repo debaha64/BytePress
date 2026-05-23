@@ -9,63 +9,32 @@ import re
 import sys
 from urllib.parse import unquote, urlparse
 
-
-CHECK_LEVEL = "check"
-STATUS_OK = "OK"
-STATUS_FAIL = "FAIL"
-STATUS_BLOCKED = "BLOCKED"
-DEFAULT_FORMAT = "text"
-
-TERM_REQUIRED_FIELDS = (
-    "ID",
-    "Термин",
-    "Статус",
-    "Область",
-    "Роль",
-    "Связи",
-    "Источник",
-    "Дата_создания",
-    "Дата_изменения",
-    "Решение_по_конфликту",
-)
-TERM_REQUIRED_SECTIONS = (
-    "Определение",
-    "Границы",
-    "Ключевые_характеристики",
-    "Недопустимые_синонимы",
-    "Связанные_термины",
-)
-TERM_ALLOWED_STATUSES = {
-    "Кандидат",
-    "Принят",
-    "Заменён",
-    "Устарел",
-    "Запрещён",
-}
-TERM_ALLOWED_CONFLICT_DECISIONS = {
-    "Не_требуется",
-    "Принять",
-    "Заменить",
-    "Запретить",
-    "Оставить_кандидатом",
-    "Существующий_термин_достаточен",
-}
-INDEX_SOURCES = (
-    ("CHK_INDEX_ROADMAP", "Plans/Roadmap.md", "ROAD"),
-    ("CHK_INDEX_BACKLOG", "Plans/Backlog.md", "ROAD|BACK"),
-    ("CHK_INDEX_CHANGELOG", "Logs/ChangeLog.md", "CHG"),
-    ("CHK_INDEX_QUALITYLOG", "Logs/QualityLog.md", "QL"),
-    ("CHK_INDEX_BASE_TERMS", "Docs/Terms/Base_Terms.md", "TERM"),
+from bp_check_contract import (
+    CHECK_ID_JSON_SCHEMAS,
+    CHECK_ID_MARKDOWN_LINKS,
+    CHECK_ID_TERM_CARDS,
+    CHECK_ID_TERM_CONFLICT_DECISION,
+    CHECK_ID_TERM_STATUS,
+    CHECK_LEVEL,
+    DEFAULT_FORMAT,
+    EXTERNAL_SCHEMES,
+    INDEX_SOURCES,
+    OUTPUT_FORMATS,
+    STATUS_BLOCKED,
+    STATUS_FAIL,
+    STATUS_OK,
+    TERM_ALLOWED_CONFLICT_DECISIONS,
+    TERM_ALLOWED_STATUSES,
+    TERM_REQUIRED_FIELDS,
+    TERM_REQUIRED_SECTIONS,
 )
 
 MARKDOWN_LINK = re.compile(r"!?\[[^\]\n]*\]\(([^)\n]+)\)")
 REFERENCE_LINK = re.compile(r"^\[[^\]\n]+\]:\s+(\S+)", re.MULTILINE)
 TERM_FIELD = re.compile(r"^([^:\n]+):\s*(.*)$", re.MULTILINE)
 TERM_SECTION = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
-ID_PATTERN = re.compile(r"\b([A-Z]+-[0-9]{6})\b")
 INDEX_ITEM = re.compile(r"^-\s+.*?\b([A-Z]+-[0-9]{6})\b", re.MULTILINE)
 QUALITY_HEADING = re.compile(r"^##\s+(QL-[0-9]{6})\s*$", re.MULTILINE)
-EXTERNAL_SCHEMES = {"http", "https", "mailto", "tel", "app"}
 
 
 @dataclass(frozen=True)
@@ -154,7 +123,7 @@ def check_markdown_links(root: Path) -> list[CheckResult]:
             if resolved is None:
                 results.append(
                     fail(
-                        "CHK_MD_LINKS",
+                        CHECK_ID_MARKDOWN_LINKS,
                         rel_path(root, path),
                         f"локальная Markdown-ссылка выходит за пределы репозитория: {target}",
                     )
@@ -163,7 +132,7 @@ def check_markdown_links(root: Path) -> list[CheckResult]:
             if not resolved.exists():
                 results.append(
                     fail(
-                        "CHK_MD_LINKS",
+                        CHECK_ID_MARKDOWN_LINKS,
                         rel_path(root, path),
                         f"локальная Markdown-ссылка указывает на отсутствующий путь: {target}",
                     )
@@ -175,14 +144,14 @@ def check_json_schemas(root: Path) -> list[CheckResult]:
     results: list[CheckResult] = []
     schemas_dir = root / "Schemas"
     if not schemas_dir.exists():
-        return [blocked("CHK_JSON_SCHEMAS", "Schemas", "каталог Schemas отсутствует")]
+        return [blocked(CHECK_ID_JSON_SCHEMAS, "Schemas", "каталог Schemas отсутствует")]
     for path in schema_files(root):
         try:
             json.loads(read_text(path))
         except json.JSONDecodeError as error:
             results.append(
                 fail(
-                    "CHK_JSON_SCHEMAS",
+                    CHECK_ID_JSON_SCHEMAS,
                     rel_path(root, path),
                     f"JSON-схема невалидна: строка {error.lineno}, столбец {error.colno}",
                 )
@@ -208,7 +177,7 @@ def check_term_cards(root: Path) -> list[CheckResult]:
     results: list[CheckResult] = []
     terms_dir = root / "Docs" / "Terms"
     if not terms_dir.exists():
-        return [blocked("CHK_TERM_CARDS", "Docs/Terms", "каталог Docs/Terms отсутствует")]
+        return [blocked(CHECK_ID_TERM_CARDS, "Docs/Terms", "каталог Docs/Terms отсутствует")]
     for path in sorted(terms_dir.glob("TERM-*.md")):
         text = read_text(path)
         fields = parse_term_fields(text)
@@ -216,17 +185,17 @@ def check_term_cards(root: Path) -> list[CheckResult]:
         path_text = rel_path(root, path)
         for field in TERM_REQUIRED_FIELDS:
             if field not in fields or not fields[field]:
-                results.append(fail("CHK_TERM_CARDS", path_text, f"нет обязательного поля: {field}"))
+                results.append(fail(CHECK_ID_TERM_CARDS, path_text, f"нет обязательного поля: {field}"))
         for section in TERM_REQUIRED_SECTIONS:
             if section not in sections:
-                results.append(fail("CHK_TERM_CARDS", path_text, f"нет обязательного раздела: {section}"))
+                results.append(fail(CHECK_ID_TERM_CARDS, path_text, f"нет обязательного раздела: {section}"))
         status = fields.get("Статус")
         if status and status not in TERM_ALLOWED_STATUSES:
-            results.append(fail("CHK_TERM_STATUS", path_text, f"недопустимый статус термина: {status}"))
+            results.append(fail(CHECK_ID_TERM_STATUS, path_text, f"недопустимый статус термина: {status}"))
         decision = fields.get("Решение_по_конфликту")
         if decision and decision not in TERM_ALLOWED_CONFLICT_DECISIONS:
             results.append(
-                fail("CHK_TERM_CONFLICT_DECISION", path_text, f"недопустимое решение по конфликту: {decision}")
+                fail(CHECK_ID_TERM_CONFLICT_DECISION, path_text, f"недопустимое решение по конфликту: {decision}")
             )
     return results
 
@@ -320,7 +289,7 @@ def render_json(results: list[CheckResult]) -> str:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Проверка связности BytePress уровня check.")
     parser.add_argument("--repo", required=True, help="Путь к корню репозитория BytePress.")
-    parser.add_argument("--format", choices=("text", "json"), default=DEFAULT_FORMAT, help="Формат вывода.")
+    parser.add_argument("--format", choices=OUTPUT_FORMATS, default=DEFAULT_FORMAT, help="Формат вывода.")
     return parser.parse_args(argv)
 
 
