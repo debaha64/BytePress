@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000118
+ID: QL-000118
+Дата: 2026-05-23
+Статус: пройдено
+Проверка: `BACK-000123` и `PLAN-000111` закрыты; `Tools/bp_check.py` сохраняет запуск `python3 Tools/bp_check.py --repo .` и `python3 Tools/bp_check.py --repo . --format json`; данные проверочного договора вынесены в `Tools/bp_check_contract.py`; текущий состав проверок не расширен; проверки остались независимыми функциями; runner только запускает проверки и собирает результат; CLI только разбирает параметры и печатает результат; `Tools/README.md`, `Docs/Technical/Verification.md`, `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000046.md` и `Plans/Archive/PLAN-000111-bp-check-architecture-hardening.md` согласованы. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_check.py` и `python3 -m py_compile Tools/bp_check_contract.py`.
+Результат: архитектура `bp_check.py` укреплена без расширения проверочного охвата; `ROAD-000046` остаётся завершённым после корректирующего прохода; `ADR-000028` не создан, потому что новое архитектурное решение не принималось; `bp_lint.py` не изменён; `bp_verify.py` не создан; product bootstrap, zip-архивы и `ROAD-000047` не затронуты.
+
+---
+
 ## QL-000117
 ID: QL-000117
 Дата: 2026-05-23
