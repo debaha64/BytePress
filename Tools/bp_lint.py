@@ -564,8 +564,8 @@ def check_reported_plan_closure(root: Path) -> list[str]:
         errors.append("Plans/Archive/Backlog/ROAD-000036.md: нет завершённого BACK-000101")
     if (root / "Plans" / "PLAN-000090-pre-release-cleanup-pass.md").exists():
         errors.append("Plans/PLAN-000090-pre-release-cleanup-pass.md: закрытый PLAN-000090 должен быть в архиве")
-    if not contains_pattern(root / "Plans" / "Archive" / "PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE):
-        errors.append("Plans/Archive/PLAN-000090-pre-release-cleanup-pass.md: нет завершённого PLAN-000090")
+    if not contains_pattern(root / "Plans" / "Archive" / "Plans" / "PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE):
+        errors.append("Plans/Archive/Plans/PLAN-000090-pre-release-cleanup-pass.md: нет завершённого PLAN-000090")
     return errors
 
 
@@ -839,7 +839,7 @@ def main() -> int:
     for rel in [
         "Profiles/Default.md",
         "Profiles/Speculorg.md",
-        "Plans/Archive/PLAN-000001-foundation.md",
+        "Plans/Archive/Plans/PLAN-000001-foundation.md",
     ]:
         err = check_has_id(root / rel)
         if err:

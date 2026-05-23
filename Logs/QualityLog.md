@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000119
+ID: QL-000119
+Дата: 2026-05-23
+Статус: пройдено
+Проверка: `BACK-000124` и `PLAN-000112` закрыты; `Plans/Archive/Plans/` создан и содержит завершённые `PLAN-*.md`; верхний уровень `Plans/Archive/` не содержит завершённых `PLAN-*.md`; `Plans/Archive/Backlog/` сохранён как архив этапов; `Plans/Archive/Releases/README.md` описывает release archive и manifest; `Plans/README.md`, `Docs/Technical/Verification.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Pipeline/Workflows.md`, `Tools/README.md`, `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000047.md` и `Plans/Archive/Plans/PLAN-000112-plans-archive-contour.md` согласованы. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .` и `python3 Tools/bp_check.py --repo . --format json`.
+Результат: архивный контур `Plans` разделён; release archive создан без zip-файлов; `ROAD-000047` остаётся `В_работе` для следующего zip/manifest-шага; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `Tools/bp_lint.py` затронут только минимальной синхронизацией двух hardcoded-путей старого архива, чтобы обязательный lint-гейт проверял новый путь.
+
+---
+
 ## QL-000118
 ID: QL-000118
 Дата: 2026-05-23
