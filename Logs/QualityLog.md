@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000122
+ID: QL-000122
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000127`, `PLAN-000115` и `ROAD-000047` закрыты; zip-пакеты созданы командами `git archive --format=zip --output=Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip 0.1.0`, `git archive --format=zip --output=Plans/Archive/Releases/0.2.0/BytePress-0.2.0.zip 0.2.0` и `git archive --format=zip --output=Plans/Archive/Releases/0.3.0/BytePress-0.3.0.zip 0.3.0`; размеры zip: `158252`, `423478`, `510585` байт; `python3 -m zipfile -t` пройден для всех трёх zip; состав каждого zip сверён с `git ls-tree -r --name-only` соответствующего tag: `0.1.0` — `git_files 167`, `zip_files 167`, `missing 0`, `extra 0`; `0.2.0` — `git_files 261`, `zip_files 261`, `missing 0`, `extra 0`; `0.3.0` — `git_files 258`, `zip_files 258`, `missing 0`, `extra 0`. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .` и `python3 Tools/bp_check.py --repo . --format json`.
+Результат: проверяемые zip-пакеты исторических выпусков созданы и связаны с manifest; `ROAD-000047` завершён после закрытия `BACK-000124`, `BACK-000125`, `BACK-000126` и `BACK-000127`; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py` и product bootstrap не затронуты.
+
+---
+
 ## QL-000121
 ID: QL-000121
 Дата: 2026-05-24

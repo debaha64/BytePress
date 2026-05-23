@@ -30,10 +30,12 @@ ID: RELEASE-MANIFEST-0.1.0
   - `git rev-list -n 1 0.1.0`
   - `git show -s --format='%H%n%s%n%b' 92891482e9bc88940069700ba93890fb317b5cab`
   - `git ls-tree -d --name-only 0.1.0`
+  - `git archive --format=zip --output=Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip 0.1.0`
+  - `python3 -m zipfile -t Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip`
+  - сверка списка файлов zip со списком `git ls-tree -r --name-only 0.1.0`: `OK`, `git_files 167`, `zip_files 167`, `missing 0`, `extra 0`
   - сверка `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Plans/Archive/Backlog/ROAD-000015.md` и `Plans/Archive/Plans/PLAN-000067-release-readiness-and-log-closure.md`
 - Непроверенные_зоны:
   - post-release sync PR для `0.1.0` не подтверждён найденными источниками
-  - отдельный zip-пакет выпуска не создавался и не проверялся
 
 ## Состав release package
 - Включено:
@@ -46,10 +48,11 @@ ID: RELEASE-MANIFEST-0.1.0
   - `git ls-tree -r --name-only 0.1.0`
 
 ## Zip
-- Решение: `не создавался`
-- Путь: `неприменимо`
-- Проверка_состава_zip: `неприменимо`
+- Решение: `создан как исторический пакет`
+- Путь: `Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip`
+- Размер_байт: `158252`
+- Проверка_состава_zip: `python3 -m zipfile -t Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip`; сверка списка файлов zip со списком `git ls-tree -r --name-only 0.1.0`: `OK`, `git_files 167`, `zip_files 167`, `missing 0`, `extra 0`
 - Решение_владельца_для_крупного_бинарного_архива: `неприменимо`
 
 ## Границы
-Manifest не заменяет `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag. Zip, если он будет создан отдельным будущим решением, является только проверяемым историческим пакетом и не становится текущим источником истины.
+Manifest не заменяет `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag. Zip является только проверяемым историческим пакетом и не становится текущим источником истины.
