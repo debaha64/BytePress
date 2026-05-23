@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000120
+ID: QL-000120
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000125` и `PLAN-000113` закрыты; `Plans/Archive/Releases/README.md` закрепляет обязательный состав release manifest, связь с `ReleaseLog`, `ChangeLog`, `QualityLog`, tag, release commit, release PR, post-release sync PR, `ROAD/BACK/PLAN`, проверками, непроверенными зонами, составом release package и решением по zip; `Plans/Archive/Releases/MANIFEST_TEMPLATE.md` добавлен; `Plans/README.md`, `Docs/Technical/Verification.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Pipeline/Workflows.md`, `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000047.md` и `Plans/Archive/Plans/PLAN-000113-release-manifest-contract.md` согласованы. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .` и `python3 Tools/bp_check.py --repo . --format json`.
+Результат: manifest-договор release archive и zip-пакета закреплён; release manifest не заменяет `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag; zip допустим только как проверяемый исторический package с manifest и проверкой состава; крупный бинарный zip не добавляется в репозиторий без отдельного решения владельца. Manifest конкретных версий и zip-файлы не создавались. `ROAD-000047` остаётся `В_работе` для следующего прохода по manifest релизов `0.1.0`, `0.2.0`, `0.3.0`; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `bp_lint.py`, `bp_check.py`, product bootstrap и `Logs/ReleaseLog.md` не затронуты.
+
+---
+
 ## QL-000119
 ID: QL-000119
 Дата: 2026-05-23

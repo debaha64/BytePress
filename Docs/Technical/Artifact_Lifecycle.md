@@ -65,13 +65,14 @@ Bootstrap note:
 Роль:
 - хранить stage, task, pass и historical planning-history.
 - отделять archive completed plans, archive completed stages и release archive.
+- связывать release manifest с release facts без превращения архива в active source of truth.
 
 Источники истины:
 - `Roadmap.md` для stage-state;
 - `Backlog.md` для task-state текущего этапа;
 - active `Plan` для текущего pass;
 - archive planning-files для завершённой planning-history.
-- `Plans/Archive/Releases/` для release manifest и будущих release package references.
+- `Plans/Archive/Releases/` для release manifest, manifest template и будущих release package references. Release manifest связывает версию, tag, release commit, release PR, post-release sync PR, `ROAD/BACK/PLAN`, `CHG/QL/RL`, выполненные проверки, непроверенные зоны, состав package и решение по zip; он не заменяет `Logs/*`, tag или active owner-documents.
 
 ### Process contracts
 - `Pipeline/*`
@@ -229,6 +230,18 @@ Bootstrap note:
 
 Недопустимо:
 - archive files используются как current source of truth вместо active layer.
+
+### Active -> Release archive
+Допустимо:
+- после подтверждённого release event или отдельного исторического прохода создать release manifest как проверяемый мост между `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, tag, release commit, release PR, post-release sync PR и архивными `ROAD/BACK/PLAN`;
+- сохранить reference на release package, если его состав проверен по manifest;
+- создать zip только как проверяемый исторический package после отдельного решения владельца для крупных бинарных архивов.
+
+Недопустимо:
+- считать release manifest заменой `ReleaseLog`, `ChangeLog`, `QualityLog` или tag;
+- считать zip текущим source of truth;
+- добавлять крупный бинарный архив в репозиторий без отдельного решения владельца;
+- создавать zip без manifest и проверки состава.
 
 ## Обязательное замыкание контура перед завершением pass
 Перед закрытием pass обязательно подтвердить:

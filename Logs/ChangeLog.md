@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000125 — Manifest-договор release archive и zip-пакета закреплён
 - CHG-000124 — Архивный контур Plans разделён
 - CHG-000123 — Архитектура bp_check.py укреплена без расширения охвата
 - CHG-000122 — Минимальный bp_check.py реализован
@@ -125,6 +126,29 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000125 — Manifest-договор release archive и zip-пакета закреплён
+ID: CHG-000125
+Дата: 2026-05-24
+Тип_изменения: Стандарт
+Источник: PLAN-000113
+Связи: ROAD-000047, BACK-000125, QL-000120
+Дата_создания: 2026-05-24
+Дата_изменения: 2026-05-24
+
+### Описание
+`BACK-000125` закрыт в `PLAN-000113`.
+
+`Plans/Archive/Releases/README.md` закрепил обязательный состав release manifest: версия, tag, тип tag при проверке, release commit, release PR, post-release sync PR, связанные `ROAD/BACK/PLAN`, `CHG/QL/RL`, выполненные проверки, непроверенные зоны, состав release package, решение по zip и проверка состава package.
+
+Добавлен `Plans/Archive/Releases/MANIFEST_TEMPLATE.md`. `Plans/README.md`, `Docs/Technical/Verification.md`, `Docs/Technical/Artifact_Lifecycle.md`, `Pipeline/Workflows.md`, `Plans/Roadmap.md`, `Plans/Backlog.md` и `Plans/Archive/Backlog/ROAD-000047.md` синхронизированы с manifest-договором.
+
+### Эффект
+Release manifest не заменяет `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag. Zip допустим только как проверяемый исторический package с manifest и проверкой состава; zip не является текущим источником истины, а крупный бинарный zip не добавляется в репозиторий без отдельного решения владельца.
+
+`BACK-000125` и `PLAN-000113` завершены. `ROAD-000047` остаётся `В_работе`, потому что следующим шагом нужно создать release manifest для `0.1.0`, `0.2.0` и `0.3.0`. Manifest конкретных версий и zip-файлы не создавались. `ADR-000028` не создан, потому что новое архитектурное решение не принималось: проход уточнил уже открытый архивный договор. `bp_lint.py`, `bp_check.py`, product bootstrap, `Logs/ReleaseLog.md` и `ROAD-000048` не затронуты.
 
 ---
 

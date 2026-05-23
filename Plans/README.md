@@ -21,7 +21,7 @@ Plan — пошаговая реализация одной задачи.
 - `Plans/PLAN-<NNNNNN>-<slug>.md` — текущий план одного прохода.
 - `Plans/Archive/Plans/PLAN-<NNNNNN>-<slug>.md` — архив завершённых планов.
 - `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` — архив реестра задач завершённого этапа.
-- `Plans/Archive/Releases/` — архив release-пакетов и manifest-файлов выпуска.
+- `Plans/Archive/Releases/` — архив release manifest, manifest template и future release package references.
 
 ## Правила
 - числовая часть ID содержит 6 знаков;
@@ -29,7 +29,8 @@ Plan — пошаговая реализация одной задачи.
 - в активном слое существует только один текущий `Plan`;
 - завершённый `Plan` архивируется в `Plans/Archive/Plans/`;
 - `Plans/Archive/Backlog/` хранит только завершённые реестры задач этапов;
-- `Plans/Archive/Releases/` хранит release manifest и будущие проверяемые release-пакеты без подмены `Logs/ReleaseLog.md`;
+- `Plans/Archive/Releases/` хранит release manifest и будущие проверяемые release-пакеты без подмены `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag;
+- zip-пакет допустим только как проверяемый исторический package с manifest и проверкой состава; крупный бинарный zip не добавляется в репозиторий без отдельного решения владельца;
 - `Backlog.md` хранит задачи активного и ближайшего этапа;
 - если активного этапа нет, `Backlog.md` явно фиксирует пустое состояние;
 - `Roadmap.md` не дублирует задачи реестра работ;
