@@ -58,17 +58,20 @@ Bootstrap note:
 - `Plans/Roadmap.md`
 - `Plans/Backlog.md`
 - active `Plans/PLAN-<NNNNNN>-<slug>.md`
-- archive `Plans/Archive/PLAN-<NNNNNN>-<slug>.md`
+- archive `Plans/Archive/Plans/PLAN-<NNNNNN>-<slug>.md`
 - archive `Plans/Archive/Backlog/ROAD-<NNNNNN>.md`
+- release archive `Plans/Archive/Releases/`
 
 Роль:
 - хранить stage, task, pass и historical planning-history.
+- отделять archive completed plans, archive completed stages и release archive.
 
 Источники истины:
 - `Roadmap.md` для stage-state;
 - `Backlog.md` для task-state текущего этапа;
 - active `Plan` для текущего pass;
 - archive planning-files для завершённой planning-history.
+- `Plans/Archive/Releases/` для release manifest и будущих release package references.
 
 ### Process contracts
 - `Pipeline/*`
