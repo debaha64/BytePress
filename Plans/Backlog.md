@@ -38,7 +38,7 @@
 ## Активный этап
 Активный этап: отсутствует.
 
-`ROAD-000047` завершён после выполнения `BACK-000124`, `BACK-000125`, `BACK-000126` и `BACK-000127`. Завершённые задачи этапа сохранены в `Plans/Archive/Backlog/ROAD-000047.md`.
+`ROAD-000047` завершён после выполнения `BACK-000124`, `BACK-000125`, `BACK-000126`, `BACK-000127` и исправляющего `BACK-000128`. Завершённые задачи этапа сохранены в `Plans/Archive/Backlog/ROAD-000047.md`.
 
 `ROAD-000046` завершён после выполнения `BACK-000119`, `BACK-000120`, `BACK-000121`, `BACK-000122` и корректирующего `BACK-000123`. Завершённые задачи этапа выведены в `Plans/Archive/Backlog/ROAD-000046.md`.
 
@@ -120,8 +120,25 @@ ID: BACK-000127
 #### Закрытие
 Задача завершена в `PLAN-000115`. Созданы `Plans/Archive/Releases/0.1.0/BytePress-0.1.0.zip`, `Plans/Archive/Releases/0.2.0/BytePress-0.2.0.zip` и `Plans/Archive/Releases/0.3.0/BytePress-0.3.0.zip`; manifest обновлены путями, размерами и проверкой состава zip; `ROAD-000047` завершён. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py`, product bootstrap и `ROAD-000048` не затронуты.
 
+### BACK-000128 — Исправить release zip-пакеты и размещение manifest template
+ID: BACK-000128
+Название: Исправить release zip-пакеты и размещение manifest template
+Тип: Стандарт
+Приоритет: Высокий
+Статус: Завершено
+Связи: ROAD-000047, PLAN-000116, CHG-000128, QL-000123
+Источник: Запрос владельца от 2026-05-24
+Дата_создания: 2026-05-24
+Дата_изменения: 2026-05-24
+
+#### Описание
+Исправить дефект `BACK-000127`: удалить ошибочные zip полного source tree, создать правильные release archive zip только из `MANIFEST.md`, архивного backlog и архивного plan релиза, перенести manifest template в `Templates/Release_Manifest.md`, не переписывать историю Git и не начинать `ROAD-000048`.
+
+#### Закрытие
+Задача завершена в `PLAN-000116`. Удалены каталоги `Plans/Archive/Releases/0.1.0/`, `Plans/Archive/Releases/0.2.0/`, `Plans/Archive/Releases/0.3.0/` и `Plans/Archive/Releases/MANIFEST_TEMPLATE.md`; созданы `Plans/Archive/Releases/0.1.0.zip`, `Plans/Archive/Releases/0.2.0.zip` и `Plans/Archive/Releases/0.3.0.zip`; `Templates/Release_Manifest.md` добавлен. `ROAD-000047` остаётся `Завершено`; `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py`, product bootstrap и `ROAD-000048` не затронуты.
+
 ## Последний завершённый этап
-`ROAD-000047` завершён после выполнения `BACK-000124`, `BACK-000125`, `BACK-000126` и `BACK-000127`. Завершённые задачи этапа сохранены в `Plans/Archive/Backlog/ROAD-000047.md`.
+`ROAD-000047` завершён после выполнения `BACK-000124`, `BACK-000125`, `BACK-000126`, `BACK-000127` и исправляющего `BACK-000128`. Завершённые задачи этапа сохранены в `Plans/Archive/Backlog/ROAD-000047.md`.
 
 ---
 

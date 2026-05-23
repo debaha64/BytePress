@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000128 — Release archive zip исправлены
 - CHG-000127 — Проверяемые zip-пакеты исторических выпусков созданы
 - CHG-000126 — Release manifest исторических выпусков созданы
 - CHG-000125 — Manifest-договор release archive и zip-пакета закреплён
@@ -128,6 +129,27 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000128 — Release archive zip исправлены
+ID: CHG-000128
+Дата: 2026-05-24
+Тип_изменения: Стандарт
+Источник: PLAN-000116
+Связи: ROAD-000047, BACK-000128, QL-000123
+Дата_создания: 2026-05-24
+Дата_изменения: 2026-05-24
+
+### Описание
+`BACK-000128` закрыт в `PLAN-000116` как исправляющий проход после `BACK-000127`.
+
+Удалены ошибочные release package полного source tree: `Plans/Archive/Releases/0.1.0/`, `Plans/Archive/Releases/0.2.0/`, `Plans/Archive/Releases/0.3.0/`. Вместо них созданы `Plans/Archive/Releases/0.1.0.zip`, `Plans/Archive/Releases/0.2.0.zip` и `Plans/Archive/Releases/0.3.0.zip`.
+
+Каждый zip содержит только `MANIFEST.md`, соответствующий `Backlog/ROAD-*.md` и соответствующий `Plans/PLAN-*.md`. `Plans/Archive/Releases/MANIFEST_TEMPLATE.md` удалён из release archive, а шаблон manifest перенесён в `Templates/Release_Manifest.md`.
+
+### Эффект
+Release archive больше не хранит полный source tree BytePress внутри исторических zip. `ROAD-000047` остаётся `Завершено` после исправления, потому что архивный контур завершён в корректном виде. `ROAD-000048` не начат. `ADR-000028` не создан, потому что новое архитектурное решение не принималось: проход исправил реализацию уже принятого архивного договора. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py` и product bootstrap не затронуты.
 
 ---
 
