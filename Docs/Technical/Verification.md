@@ -66,7 +66,7 @@ Deterministic-состав уровня `check`:
 - ключевые индексы доменов-владельцев: `Plans/Roadmap.md`, `Plans/Backlog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Docs/Terms/README.md` и README-карты доменов по затронутой области прохода;
 - согласованность цепочки `ROAD/BACK/PLAN`: наличие связанных ID, статусы, ссылки, архивирование завершённого backlog-элемента и соответствие итогового статуса фактическим файлам `Plans/*`;
 - согласованность `Logs/ChangeLog.md` и `Logs/QualityLog.md` со связанными `PLAN/BACK/ROAD`: наличие связанных ID, отсутствие противоречия статусов и фиксация фактически выполненных проверок;
-- структура `Plans/Archive/Backlog` для завершённых этапов и будущая структура `Plans/Archive/Plans` после отдельного архивного договора;
+- структура `Plans/Archive/Backlog` для завершённых этапов, `Plans/Archive/Plans` для завершённых планов и `Plans/Archive/Releases` для release manifest;
 - наличие карточек терминов `TERM-*` и их базовая форма: обязательные поля, допустимые статусы и связь с терминологическим индексом;
 - отсутствие запрещённых или устаревших терминов там, где это можно проверить по явному списку без смысловой интерпретации;
 - соответствие README-карт фактическим доменам на базовом уровне: карта не должна ссылаться на отсутствующий локальный домен и не должна пропускать собственный обязательный вход.
@@ -107,7 +107,7 @@ python3 Tools/bp_check.py --repo .
 Входы:
 - `Docs/Technical/Verification.md` как владелец проверочного договора;
 - `Pipeline/*` как владелец фаз, гейтов и workflow;
-- `Plans/Roadmap.md`, `Plans/Backlog.md`, текущий или архивируемый `PLAN-*` и `Plans/Archive/Backlog/*` как плановый контур;
+- `Plans/Roadmap.md`, `Plans/Backlog.md`, текущий или архивируемый `PLAN-*`, `Plans/Archive/Plans/*`, `Plans/Archive/Backlog/*` и `Plans/Archive/Releases/*` как плановый и архивный контур;
 - `Logs/ChangeLog.md` и `Logs/QualityLog.md` как журнальный контур;
 - README-карты, терминологические карточки и другие локальные owner-documents только в пределах утверждённого deterministic-состава `check`.
 
