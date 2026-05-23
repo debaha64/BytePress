@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000123
+ID: QL-000123
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000128` и `PLAN-000116` закрыты; ошибочные каталоги release zip полного source tree удалены; созданы `Plans/Archive/Releases/0.1.0.zip`, `Plans/Archive/Releases/0.2.0.zip`, `Plans/Archive/Releases/0.3.0.zip`; `Templates/Release_Manifest.md` добавлен, `Plans/Archive/Releases/MANIFEST_TEMPLATE.md` удалён. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m zipfile -t Plans/Archive/Releases/0.1.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.2.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.3.0.zip` и проверка списков файлов zip на отсутствие `AGENTS.md`, `Docs/`, `Rules/`, `Pipeline/`, `Tools/`, `Templates/`, `Schemas/` и других файлов source tree.
+Результат: исправленные release archive zip содержат только `MANIFEST.md`, архивный backlog и архивный plan релиза; `ROAD-000047` остаётся `Завершено`; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py` и product bootstrap не затронуты.
+
+---
+
 ## QL-000122
 ID: QL-000122
 Дата: 2026-05-24

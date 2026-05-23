@@ -18,6 +18,7 @@
 - `Document.md` — общий документ.
 - `Interview.md`, `Discussion.md`, `Research.md`, `Requirements.md` — аналитический слой.
 - `JTBD.md`, `PRD.md`, `Delivery.md` — продуктовый слой.
+- `Release_Manifest.md` — manifest внутри проверяемого release archive zip.
 
 ## Правила
 - примерные `ID` используют 6-значную числовую часть;
