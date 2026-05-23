@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000121
+ID: QL-000121
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000126` и `PLAN-000114` закрыты; созданы `Plans/Archive/Releases/0.1.0/MANIFEST.md`, `Plans/Archive/Releases/0.2.0/MANIFEST.md` и `Plans/Archive/Releases/0.3.0/MANIFEST.md`; manifest заполнены по `Plans/Archive/Releases/MANIFEST_TEMPLATE.md` и сверены с `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, архивными `ROAD/BACK/PLAN`, git tags, git log и PR refs в commit-сообщениях. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .` и `python3 Tools/bp_check.py --repo . --format json`.
+Результат: release manifest для `0.1.0`, `0.2.0` и `0.3.0` созданы без zip-архивов и без крупных бинарных файлов; неподтверждённый post-release sync PR для `0.1.0` отмечен как `не подтверждено`; `ROAD-000047` остаётся `В_работе`; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py` и product bootstrap не затронуты.
+
+---
+
 ## QL-000120
 ID: QL-000120
 Дата: 2026-05-24

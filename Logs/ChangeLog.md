@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## Индекс
+- CHG-000126 — Release manifest исторических выпусков созданы
 - CHG-000125 — Manifest-договор release archive и zip-пакета закреплён
 - CHG-000124 — Архивный контур Plans разделён
 - CHG-000123 — Архитектура bp_check.py укреплена без расширения охвата
@@ -126,6 +127,27 @@
 - CHG-000003 — Заполнена базовая терминология BytePress и политика её изменений
 - CHG-000002 — Уточнены схемы и шаблоны ключевых сущностей
 - CHG-000001 — Создан первичный каркас BytePress v1
+
+---
+
+## CHG-000126 — Release manifest исторических выпусков созданы
+ID: CHG-000126
+Дата: 2026-05-24
+Тип_изменения: Стандарт
+Источник: PLAN-000114
+Связи: ROAD-000047, BACK-000126, QL-000121
+Дата_создания: 2026-05-24
+Дата_изменения: 2026-05-24
+
+### Описание
+`BACK-000126` закрыт в `PLAN-000114`.
+
+Созданы `Plans/Archive/Releases/0.1.0/MANIFEST.md`, `Plans/Archive/Releases/0.2.0/MANIFEST.md` и `Plans/Archive/Releases/0.3.0/MANIFEST.md` по `Plans/Archive/Releases/MANIFEST_TEMPLATE.md`. Manifest связывают версии, tag, тип tag, release commit, release PR, post-release sync PR, `RL/CHG/QL`, `ROAD/BACK/PLAN`, выполненные проверки, непроверенные зоны, состав release package и решение по zip.
+
+Подтверждённые факты взяты из `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, архивных `ROAD/BACK/PLAN`, git tags и commit history. Неподтверждённый post-release sync PR для `0.1.0` отмечен как `не подтверждено`.
+
+### Эффект
+Release archive получил manifest исторических выпусков без создания zip-архивов и без добавления крупных бинарных файлов. `ROAD-000047` остаётся `В_работе` для возможного отдельного будущего решения по zip. `ADR-000028` не создан, потому что новое архитектурное решение не принималось: проход заполнил manifest по уже принятому договору. `Logs/ReleaseLog.md`, `bp_lint.py`, `bp_check.py`, product bootstrap и `ROAD-000048` не затронуты.
 
 ---
 
