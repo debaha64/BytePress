@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000124
+ID: QL-000124
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000129` и `PLAN-000117` закрыты; `0.1.0.zip`, `0.2.0.zip`, `0.3.0.zip` переупакованы по ID-интервалам; отсутствующих ожидаемых `ROAD` нет; отсутствующий ожидаемый `PLAN` — `PLAN-000089`, зафиксирован в `MANIFEST.md` внутри `0.3.0.zip`; из текущего дерева удалены `ROAD-000001` ... `ROAD-000042` и `PLAN-000001` ... `PLAN-000096`; в текущем дереве остались `ROAD-000043+` и `PLAN-000097+`; `bp_lint.py` минимально синхронизирован с проверкой исторических `ROAD/PLAN` внутри release zip. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m zipfile -t Plans/Archive/Releases/0.1.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.2.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.3.0.zip`, проверка namelist zip на отсутствие source tree и проверка текущего дерева на отсутствие исторических `ROAD/PLAN`.
+Результат: release archive хранит исторические `ROAD/PLAN` внутри zip по подтверждённым интервалам, а открытые архивные каталоги содержат только текущий релизный цикл `0.4.0`; `ROAD-000047` остаётся `Завершено`; `ROAD-000048` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось. `Logs/ReleaseLog.md`, `bp_check.py` и product bootstrap не затронуты.
+
+---
+
 ## QL-000123
 ID: QL-000123
 Дата: 2026-05-24
