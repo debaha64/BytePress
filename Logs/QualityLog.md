@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000126
+ID: QL-000126
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000131` и `PLAN-000119` закрыты; активные документы `Docs/User/*` нормализованы на русский технический язык; подтверждённые старые термины `pass`, `pass request`, `owner-document`, `owner-documents`, `repo contracts`, `scope`, `outcome`, `checks`, `PR-flow`, `human operating mode`, `human steering`, `agent execution`, `planning-state` и `stage/task/pass` отсутствуют в активном пользовательском слое; ссылка на `ROAD-000012` удалена; ссылки на пользовательскую настройку в `Docs/User/*` ведут в `Docs/User/Setup_Guide.md`; корневой `Setup_Guide.md` остаётся переходным указателем; `ROAD-000048` завершён; `ROAD-000049` не начат. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json` и ручные сверки терминов и ссылок.
+Результат: активный пользовательский слой согласован с терминологией BytePress и фактическим setup-маршрутом без изменения product bootstrap, `Tools/bp_lint.py`, `Tools/bp_check.py`, release zip и исторических журналов. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
+
+---
+
 ## QL-000125
 ID: QL-000125
 Дата: 2026-05-24
