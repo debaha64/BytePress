@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000125
+ID: QL-000125
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000130` и `PLAN-000118` закрыты; `ROAD-000048` открыт и оставлен `В_работе`; корневой `Setup_Guide.md` оставлен переходным указателем; пользовательская настройка среды перенесена в `Docs/User/Setup_Guide.md`; `Templates/README.md` не перечисляет отсутствующие `Standard.md` и `Role.md` и не требует английские commit/PR-артефакты; `Schemas/README.md` не перечисляет отсутствующие `standard.schema.json` и `role.schema.json`; плановый слой учитывает, что исторические `ROAD/PLAN` до `0.3.0` лежат в `Plans/Archive/Releases/*.zip`. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json` и ручные сверки ссылок и карт.
+Результат: карты доменов и пользовательская документация приведены к фактической структуре репозитория без изменения product bootstrap, `Tools/bp_lint.py`, `Tools/bp_check.py`, release zip и `Logs/ReleaseLog.md`. `ROAD-000049` не начат; `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
+
+---
+
 ## QL-000124
 ID: QL-000124
 Дата: 2026-05-24
