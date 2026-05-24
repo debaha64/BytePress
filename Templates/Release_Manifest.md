@@ -18,6 +18,8 @@ ID: RELEASE-MANIFEST-<version>
 - ChangeLog: `<CHG-*>`
 - QualityLog: `<QL-*>`
 
+Журнальные записи добавляются в конец соответствующих журналов.
+
 ## Источник архивных файлов
 - Backlog: `<Plans/Archive/Backlog/ROAD-*.md>`
 - Plan: `<Plans/Archive/Plans/PLAN-*.md>`
