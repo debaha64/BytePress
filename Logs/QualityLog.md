@@ -2,7 +2,7 @@
 
 ## Навигация
 - Первая запись: QL-000001
-- Последняя запись: QL-000128
+- Последняя запись: QL-000129
 
 ## Порядок записей
 Записи идут хронологически от старых к новым. Новая запись добавляется в конец файла.
@@ -1158,3 +1158,12 @@ ID: QL-000128
 Статус: пройдено
 Проверка: `BACK-000115` и `PLAN-000121` закрыты; `ROAD-000049` закрыт; `ROAD-000050` остался `Утверждено` и не начат; `Plans/Roadmap.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Logs/ReleaseLog.md` и `Logs/ADRlog.md` приведены к хронологическому порядку записей от старых к новым; верхние полные ID-индексы заменены краткой навигацией; `Plans/Backlog.md` не дублирует `Roadmap`; `Docs/Terms/Base_Terms.md` проверен и уже шёл от `TERM-000001` к `TERM-000027`; шаблоны и схемы синхронизированы с договором порядка; индексы не ссылаются на удалённые открытые `ROAD/PLAN`; release zip не изменялись. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_lint.py Tools/bp_check.py Tools/bp_check_contract.py` и ручные сверки порядка записей, индексов, `ROAD-000050`, Backlog и release zip.
 Результат: порядок записей реестров и журналов закреплён и применён без запуска финальной предрелизной консолидации, без release-readiness, без изменения product bootstrap, без перепаковки release zip и без новых доменов. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
+
+---
+
+## QL-000129
+ID: QL-000129
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `BACK-000132` и `PLAN-000122` закрыты; `ROAD-000050` открыт и завершён как последний этап горизонта `0.4.0`; `CHG-000134` добавлен; `RL-000010` добавлен как готовность выпуска `0.4.0`, а не как внешний release. Проверены `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000050.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Logs/ReleaseLog.md`, `Logs/ADRlog.md`, карты `README`, активные `Docs/*`, `Pipeline/*`, `Rules/*`, `Templates/*`, `Schemas/*`, `Tools/*` и release archive zip. Исправлен generated wording в `Tools/bp_bootstrap.py`: стартовый план создаваемого продукта использует `Определение_готовности` вместо `DoD`. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_lint.py Tools/bp_check.py Tools/bp_check_contract.py`, `python3 -m py_compile Tools/bp_bootstrap.py`, `python3 -m zipfile -t Plans/Archive/Releases/0.1.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.2.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.3.0.zip`, минимальная bootstrap-проверка временного продукта и удаление временного каталога.
+Результат: BytePress `0.4.0` готов к подготовке release PR. Release PR в `main`, tag, изменение `origin/main`, переписывание истории Git, перепаковка release zip, новые домены, тяжёлый CI, языковой линтер русского текста и `bp_verify.py` не создавались. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
