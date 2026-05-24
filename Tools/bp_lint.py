@@ -572,12 +572,13 @@ def check_reported_plan_closure(root: Path) -> list[str]:
         errors.append("Plans/Roadmap.md: журнал сообщает о закрытии ROAD-000036, но ROAD-000036 не имеет статус `Завершено`")
     if contains_pattern(root / "Plans" / "Backlog.md", BYTEPRESS_BACKLOG_000101_ACTIVE):
         errors.append("Plans/Backlog.md: журнал сообщает о закрытии BACK-000101, но BACK-000101 остаётся активным")
-    if not contains_pattern(root / "Plans" / "Archive" / "Backlog" / "ROAD-000036.md", BYTEPRESS_BACKLOG_000101_ARCHIVED_DONE) and not zip_entry_contains_pattern(root / "Plans" / "Archive" / "Releases" / "0.3.0.zip", "Backlog/ROAD-000036.md", BYTEPRESS_BACKLOG_000101_ARCHIVED_DONE):
-        errors.append("Plans/Archive/Backlog/ROAD-000036.md: нет завершённого BACK-000101")
+    release_archive = root / "Plans" / "Archive" / "Releases" / "0.3.0.zip"
+    if not zip_entry_contains_pattern(release_archive, "Backlog/ROAD-000036.md", BYTEPRESS_BACKLOG_000101_ARCHIVED_DONE):
+        errors.append("Plans/Archive/Releases/0.3.0.zip: нет завершённого BACK-000101 в Backlog/ROAD-000036.md")
     if (root / "Plans" / "PLAN-000090-pre-release-cleanup-pass.md").exists():
         errors.append("Plans/PLAN-000090-pre-release-cleanup-pass.md: закрытый PLAN-000090 должен быть в архиве")
-    if not contains_pattern(root / "Plans" / "Archive" / "Plans" / "PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE) and not zip_entry_contains_pattern(root / "Plans" / "Archive" / "Releases" / "0.3.0.zip", "Plans/PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE):
-        errors.append("Plans/Archive/Plans/PLAN-000090-pre-release-cleanup-pass.md: нет завершённого PLAN-000090")
+    if not zip_entry_contains_pattern(release_archive, "Plans/PLAN-000090-pre-release-cleanup-pass.md", BYTEPRESS_PLAN_000090_DONE):
+        errors.append("Plans/Archive/Releases/0.3.0.zip: нет завершённого PLAN-000090 в Plans/PLAN-000090-pre-release-cleanup-pass.md")
     return errors
 
 
@@ -851,7 +852,6 @@ def main() -> int:
     for rel in [
         "Profiles/Default.md",
         "Profiles/Speculorg.md",
-        "Plans/Archive/Plans/PLAN-000001-foundation.md",
     ]:
         err = check_has_id(root / rel)
         if err:
