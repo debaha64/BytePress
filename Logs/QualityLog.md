@@ -1,5 +1,14 @@
 # QualityLog
 
+## QL-000127
+ID: QL-000127
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `PLAN-000120` закрыт; `ROAD-000049` стал этапом порядка записей, шаблонов реестров и индексов и открыт со статусом `В_работе`; `BACK-000115` связан с `ROAD-000049` и остался `Утверждено`; финальная предрелизная консолидация перенесена в `ROAD-000050`, который остаётся `Утверждено` и не начат; `Tools/bp_lint.py` больше не содержит hardcoded-пути `Plans/Archive/Backlog/ROAD-000036.md`, `Plans/Archive/Plans/PLAN-000090-pre-release-cleanup-pass.md` и `Plans/Archive/Plans/PLAN-000001-foundation.md`; release zip не изменялись. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_lint.py` и ручные сверки горизонта, `BACK-000115`, `bp_lint.py` и release zip.
+Результат: горизонт `0.4.0` скорректирован без запуска финальной предрелизной консолидации, без release-readiness, без изменения product bootstrap, без изменения `Tools/bp_check.py`, без перепаковки release zip и без новых доменов. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
+
+---
+
 ## QL-000126
 ID: QL-000126
 Дата: 2026-05-24
