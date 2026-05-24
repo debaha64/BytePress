@@ -21,14 +21,21 @@ Manifest не заменяет `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/
 - `0.2.0.zip`;
 - `0.3.0.zip`.
 
+Release archive распределяет исторический плановый слой по подтверждённым ID-интервалам:
+- `0.1.0.zip`: `ROAD-000001` ... `ROAD-000015`, `PLAN-000001` ... `PLAN-000067`;
+- `0.2.0.zip`: `ROAD-000016`, `PLAN-000068`;
+- `0.3.0.zip`: `ROAD-000017` ... `ROAD-000042`, `PLAN-000069` ... `PLAN-000096`.
+
 Zip допустим только как проверяемый исторический release package:
 - zip не является текущим source of truth и не заменяет активные `Plans`, `Logs`, `Templates` или Git tag;
-- zip содержит только `MANIFEST.md`, `Backlog/<ROAD-файл>` и `Plans/<PLAN-файл>`;
+- zip содержит только `MANIFEST.md`, `Backlog/<ROAD-файлы>` и `Plans/<PLAN-файлы>`;
 - zip не содержит source tree BytePress: `AGENTS.md`, `Docs/`, `Rules/`, `Pipeline/`, `Tools/`, `Templates/`, `Schemas/` и другие файлы текущего дерева не включаются;
 - состав zip должен быть проверен по manifest и списку файлов zip;
 - zip не создаётся автоматически release route и не требуется для обычного рабочего прохода.
 
 Состав каждого zip сверяется по списку файлов внутри архива. Zip остаётся историческим пакетом архивного планового контура, а не текущим источником истины.
+
+После упаковки исторических интервалов открытые архивные каталоги хранят только текущий релизный цикл `0.4.0`: `Plans/Archive/Backlog/ROAD-000043.md` и далее, `Plans/Archive/Plans/PLAN-000097-*.md` и далее.
 
 ## Границы
 - `Plans/Archive/Plans/` хранит завершённые `PLAN-*.md`.
