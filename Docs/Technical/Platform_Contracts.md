@@ -63,6 +63,9 @@
 - локальные фиксации и self-check выполняются до финальной отправки ветки;
 - `main` и `develop` не редактируются напрямую;
 - запрос на слияние в `develop` остаётся каноническим delivery interface для task work.
+- release delivery идёт через `release/*` -> `main`, tag после merge в `main` и post-release sync содержимого обратно в `develop`;
+- если force-push в защищённый `develop` запрещён, post-release sync выполняется через отдельную рабочую ветку и PR в `develop`;
+- после squash merge совпадение дерева `main` и `develop` достаточно для post-release content sync, если отдельный договор не требует ancestry.
 
 ### Tooling-follows-documents contract
 - инструменты используют уже утверждённые documents и contracts;
@@ -155,6 +158,7 @@
 ## Допустимые режимы platform usage
 - работать внутри Git-репозитория `BytePress` или product repo, созданного по bootstrap contract;
 - синхронизироваться от `origin/develop` перед началом task pass;
+- выполнять release через PR из `release/*` в `main`, создавать tag после merge в `main` и возвращать `develop` к содержимому выпуска через post-release sync;
 - выполнять project tooling через `python3 Tools/...`;
 - выполнять integration smoke только через repo-native tool route, а не через прямые внешние connector calls;
 - использовать shell utilities для чтения, diff и навигации по active layer;

@@ -14,11 +14,12 @@
 - `README.md` — карта пользовательского домена.
 - `Operating_Mode.md` — режим работы человека с агентом и репозиторием.
 - `First_Start.md` — первый маршрут после получения репозитория.
-- `Pass_Request.md` — как формулировать проход для агента.
+- `Setup_Guide.md` — пользовательская подготовка локальной среды.
+- `Pass_Request.md` — как формулировать запрос на проход для агента.
 - `Usage_Scenarios.md` — базовые сценарии использования.
 
 ## Куда идти дальше
-- настройка среды: `../../Setup_Guide.md`;
-- агентный маршрут: `../../AGENTS.md`;
-- планирование: `../../Plans/README.md`;
-- проверки: `../Technical/Verification.md`.
+- настройка среды: [Setup_Guide.md](Setup_Guide.md);
+- агентный маршрут: [../../AGENTS.md](../../AGENTS.md);
+- планирование: [../../Plans/README.md](../../Plans/README.md);
+- проверки: [../Technical/Verification.md](../Technical/Verification.md).

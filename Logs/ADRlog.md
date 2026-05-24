@@ -1,33 +1,242 @@
 # ADRlog
 
-## Индекс
-- ADR-000027 — Предрелизная чистка создаваемого слоя: русский язык, разделение ограничения и стека, судьба scripts/*, рекомендация выпуска 0.3.0
-- ADR-000026 — Безопасные типы рабочих веток и русский канон generated Pipeline
-- ADR-000025 — Verification contract consolidated into one owner document
-- ADR-000024 — Rules catalog consolidated and semantic naming rule adopted
-- ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
-- ADR-000022 — Profiled self-contained product skeleton factory adopted
-- ADR-000021 — Russian lint markers accepted without weakening product gates
-- ADR-000020 — Domain maps and created product service-layer update route formalized
-- ADR-000019 — Fresh and developed product repository checks separated
-- ADR-000018 — Product-start contour, current truth and first gate formalized
-- ADR-000017 — Discovery layer, current-truth interview and artifact sync matrix formalized
-- ADR-000016 — Зафиксирован первый migration-pass для схем, шаблонов, профилей и языка Git/PR
-- ADR-000015 — Принята repo-wide policy фазной миграции ID и правил filename по доменам
-- ADR-000014 — Принят контракт 6-значных ID, plan-file naming и разделение brand/product profiles
-- ADR-000013 — Зафиксирован жизненный цикл ветки и целевой Auto-PR процесс
-- ADR-000012 — Принят единый формат рабочих веток `<type>/<NNNNNN>-<slug>`
-- ADR-000011 — Принята отдельная агентная Git/GitHub-идентичность и PR-only контур для `develop` и `main`
-- ADR-000010 — Принят рабочий режим Humans steer. Agents execute
-- ADR-000009 — Bootstrap продукта подтверждается отдельной генерацией каркаса
-- ADR-000008 — Адаптеры, память и MCP остаются расширяющими доменами `v1`
-- ADR-000007 — Навыки описывают процедуры фаз, инструменты выполняют детерминированные операции
-- ADR-000006 — Контур правил BytePress должен быть явным и минимальным
-- ADR-000005 — Техническое знание системы фиксируется отдельным слоем Docs/Technical
-- ADR-000004 — Сначала схемы и шаблоны, затем содержательное наполнение
-- ADR-000003 — Принять аналитико-проектный золотой путь и пакет основания до планирования
-- ADR-000002 — Развести знание, оперативную среду, планы и журналы
-- ADR-000001 — Переход от AIDevOS к BytePress и пересборка доменной архитектуры
+## Навигация
+- Первая активная запись: ADR-000016
+- Последняя запись: ADR-000027
+
+## Порядок записей
+Записи идут хронологически от старых к новым. Новая запись добавляется в конец файла.
+
+---
+
+## ADR-000016 — Зафиксирован первый migration-pass для схем, шаблонов, профилей и языка Git/PR
+ID: ADR-000016
+Дата: 2026-03-17
+Статус: Принято
+Связи: PLAN-000008, BACK-000021, BACK-000022, BACK-000025, CHG-000017
+Утверждено: Человек
+Источник: Первая фаза repo-wide migration contract после фиксации policy
+Дата_создания: 2026-03-17
+Дата_изменения: 2026-03-17
+
+### Контекст
+После фиксации repo-wide migration policy в репозитории оставались несогласованными `Schemas/*`, `Templates/*`, текущие brand profiles и правила языка для Git/PR-артефактов. Без отдельного решения сохранялся риск смешать первый migration-pass с более поздними фазами `Terms/*`, `Tools/*` и historical logs.
+
+### Решение
+Выполнить первый ограниченный migration-pass: перевести `Schemas/*` и `Templates/*` на 6-значную числовую часть `ID`, синхронизировать profile model через поля `Тип_профиля`, `Код_продукта` и `Язык_взаимодействия`, сохранить semantic filename для brand profiles в `BytePress`, а также зафиксировать language contract, по которому commit message, PR title, PR body и `branch slug` оформляются на английском. Язык user-facing взаимодействия определяется параметром профиля `Язык_взаимодействия`. `Tools/*`, `Docs/Terms/TERM-*`, semver и historical logs остаются вне scope этого прохода.
+
+### Последствия
+Контракты схем, шаблонов, профилей и Git/PR-языка синхронизированы до инструментальной и term/log migration phases. Следующие проходы могут обновлять `Tools/*` и `Docs/Terms/*` уже на стабильном наборе полей и правил языка.
+
+---
+
+## ADR-000017 — Discovery layer, current-truth interview and artifact sync matrix formalized
+ID: ADR-000017
+Дата: 2026-03-28
+Статус: Принято
+Связи: PLAN-000017, BACK-000029, CHG-000029
+Утверждено: Человек
+Источник: Discovery/sync-contract pass after baseline 0.1.0
+Дата_создания: 2026-03-28
+Дата_изменения: 2026-03-28
+
+### Контекст
+После формирования baseline `0.1.0` и минимального product-layer contract в системе отсутствовал явный аналитический слой внутри `Docs/`, интервью не было закреплено как текущая истина, а pipeline contract не определял обязательную проверку связанных артефактов после изменения аналитических ответов, шаблонов и ключевых документов.
+
+### Решение
+Ввести `Docs/Discovery/` как отдельный слой долговременного аналитического знания внутри `Docs/`. Зафиксировать `Docs/Discovery/Interview.md` как current-truth документ с вопросами и актуальными ответами без хранения истории версий в самом интервью. Историю изменений и решений хранить через `Plans/Roadmap.md`, `Plans/Backlog.md`, активные `Plans/*`, `Logs/*` и при необходимости `ADR`. Дополнить `Docs/Technical/Pipeline.md` минимальной sync-matrix, которая задаёт обязательную проверку связанных артефактов после изменения `Interview`, `Docs/Product/*`, `Templates/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и `Plans/Roadmap.md`.
+
+### Последствия
+Аналитический слой становится явной частью модели BytePress, интервью перестаёт быть журналом сессий и становится текущей истиной, а pipeline contract получает минимальный, но обязательный механизм синхронизации knowledge, planning и log artifacts после значимых изменений.
+
+---
+
+## ADR-000018 — Product-start contour, current truth and first gate formalized
+ID: ADR-000018
+Дата: 2026-04-21
+Статус: Принято
+Связи: PLAN-000069, PLAN-000070, PLAN-000071, PLAN-000072, PLAN-000073, PLAN-000077, BACK-000081, BACK-000082, BACK-000083, BACK-000084, BACK-000085, BACK-000089, CHG-000081, CHG-000082, CHG-000083, CHG-000084, CHG-000085, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+Серия первых полевых product-start проходов показала, что bootstrap-created product repo нуждается в явном стартовом контуре: discovery minimum, observable startup-handshake, current-truth owner, branch gate до любых writable changes, reset route failed start и запрет перехода к implementation до подтверждения пользовательских ответов.
+
+### Решение
+Закрепить, что bootstrap-created product repo стартует в discovery-only contour, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя. `Docs/Discovery/Interview.md` является owner текущей аналитической истины; bootstrap placeholders не являются подтверждённой current truth. Первый writable action требует task-ветку, включая изменения `Docs/Discovery/*`, `Plans/*` и `Logs/*`. Startup-handshake должен сообщать mode, scope, branch status, branch action/start route, planning-state, owner-domains первого чтения и первый конкретный шаг.
+
+### Последствия
+Ранний product-start стал управляемым end-to-end: generated repo не открывает предметную реализацию до подтверждения current truth, failed start имеет cleanup route, а agent entry contour становится наблюдаемым и проверяемым в документах, bootstrap result и lint checks.
+
+---
+
+## ADR-000019 — Fresh and developed product repository checks separated
+ID: ADR-000019
+Дата: 2026-04-26
+Статус: Принято
+Связи: PLAN-000074, PLAN-000077, BACK-000086, BACK-000089, CHG-000086, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+Первый развивающийся generated product repo после подтверждения current truth перестал соответствовать fresh bootstrap markers, хотя это было нормальным lifecycle transition. Один автоматический product check смешивал исходное bootstrap-состояние и состояние продукта после первого управляемого прохода.
+
+### Решение
+Развести режимы проверки generated product repo: `product-fresh` проверяет состояние сразу после `bp_bootstrap.py`, `product-developed` проверяет состояние после подтверждения current truth и закрытия первого pass, а `auto` выбирает режим по lifecycle state `Docs/Discovery/Interview.md`. Fresh gate не должен требовать возврата развивающегося продукта к initial placeholders, а developed gate должен выявлять реальные противоречия между current truth, `Plans/*` и `Logs/*`.
+
+### Последствия
+Проверка generated product repo стала соответствовать жизненному циклу: fresh bootstrap остаётся строгим, developed product state становится допустимым после закрытия первого прохода, а `scripts/dev-test.sh` получает стабильный route через `--mode auto` без ослабления structural gate.
+
+---
+
+## ADR-000020 — Domain maps and created product service-layer update route formalized
+ID: ADR-000020
+Дата: 2026-04-27
+Статус: Принято
+Связи: PLAN-000075, PLAN-000076, PLAN-000077, BACK-000087, BACK-000088, BACK-000089, CHG-000087, CHG-000088, CHG-000089
+Утверждено: Человек
+Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+После проходов `PLAN-000075` и `PLAN-000076` в active layer уже действовали два значимых договора: `README.md` домена используется как краткая карта домена, а уже созданный product repo обновляет служебный слой точечным product-side pass вместо повторного bootstrap. Эти договоры были отражены в технических документах, картах доменов и журналах изменений, но не имели отдельной ADR-записи.
+
+### Решение
+Зафиксировать `README.md` домена как краткую навигационную карту назначения, границ, артефактов, минимальных правил и дальнейших owner-documents, не заменяющую документы-владельцы. Для уже созданного product repo закрепить canonical service-layer update route: переносить только нужный служебный delta, не пересоздавать репозиторий, не переписывать confirmed current truth и предметные артефакты, проверять developed state через generated `scripts/dev-test.sh` или `bp_lint.py --mode auto` / `product-developed`.
+
+### Последствия
+Карты доменов получают явный шаблон и стандарт, а service-layer updates generated product repo отделены от fresh bootstrap. Это снижает риск случайного расширения bootstrap perimeter, потери предметного состояния продукта и превращения README.md в дубль owner-documents.
+
+---
+
+## ADR-000021 — Russian lint markers accepted without weakening product gates
+ID: ADR-000021
+Дата: 2026-04-27
+Статус: Принято
+Связи: PLAN-000078, BACK-000090, CHG-000090
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-27
+Дата_создания: 2026-04-27
+Дата_изменения: 2026-04-27
+
+### Контекст
+После языковой чистки active и generated layer часть проверочных формулировок оставалась на английском только потому, что `bp_lint.py` искал точные англоязычные маркеры: `discovery-only`, `current truth`, `startup-handshake`, `owner`, `writable action/changes` и близкие формы. Это удерживало смешанный язык в документах без технической необходимости.
+
+### Решение
+Сохранить прежние структурные проверки `bp_lint.py`, но разрешить для тех же смысловых условий русские эквиваленты: аналитический контур, текущая истина, стартовый отчёт первого ответа, документ-владелец, домены-владельцы и записываемые действия. CLI modes, имена файлов, ID, команды и branch naming остаются техническими маркерами и не переводятся.
+
+### Последствия
+Active и generated layer могут использовать русский проверочный текст без ослабления product-start, fresh/developed и startup-handshake gates. `bp_lint.py` остаётся structural check, а не языковым нормализатором всего архива.
+
+---
+
+## ADR-000022 — Profiled self-contained product skeleton factory adopted
+ID: ADR-000022
+Дата: 2026-04-28
+Статус: Принято
+Связи: ROAD-000026, BACK-000091, PLAN-000079, CHG-000091
+Утверждено: Человек
+Источник: Решение владельца от 2026-04-28
+Дата_создания: 2026-04-28
+Дата_изменения: 2026-04-28
+
+### Контекст
+Широкое архитектурное ревью показало, что доменная модель `BytePress` разрослась за счёт placeholder domains и преждевременного product-side replication contour. Прежняя модель делала создаваемый продукт зависимым от `BytePress` через generated `scripts/*` и `BYTEPRESS_ROOT`, materialize `Adapters/*` и `Runtime/*` без реального механизма и оставляла `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Memory/*` и `MCP/*` как потенциальные источники раздувания.
+
+### Решение
+Принять целевую модель `BytePress` как профильной фабрики самодостаточных продуктовых каркасов. Состав создаваемого продукта определяется product profile. Каждый продукт получает lightweight local `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` только для materialized artifacts и `Schemas/*` только для реально проверяемых artifacts. Generated `scripts/*` должны быть перенесены в product-local `Tools/*` или стать thin aliases. `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*` и `Roles/*` удаляются до появления реального mechanism contract. `Skills/*` переносится в `Pipeline/*` как procedures/workflows. `Standards/*` сворачивается: обязательные нормы переносятся в `Rules/*`, остальное удаляется. `Rules/*` сокращается до проектно-специфичных обязательных правил. `Docs/Technical/*` сокращается и объединяет повторяющиеся verification/validation contracts отдельными passes.
+
+### Последствия
+`Product_Bootstrap_Domain_Matrix.md` становится матрицей profile packages, а не списком копируемых top-level domains. Текущие `bp_bootstrap.py` и `bp_lint.py` не меняются в этом pass и временно остаются реализацией прежнего baseline; это зафиксированный implementation gap до tool-migration pass. Массовое удаление доменов запрещено до обновления contracts, checks и replacement routes. Будущие passes должны сначала реализовать local product `Tools/*`, transitional lint modes и profile package checks, затем переносить procedures/norms и только после этого удалять retired domains.
+
+---
+
+## ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
+ID: ADR-000023
+Дата: 2026-04-29
+Статус: Принято
+Связи: ROAD-000029, BACK-000094, PLAN-000082, CHG-000094
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-29
+Дата_создания: 2026-04-29
+Дата_изменения: 2026-04-29
+
+### Контекст
+Новый полевой тест `Minesweeper` подтвердил работоспособность product skeleton, но выявил управленческие дефекты: агент мог подтверждать текущую истину догадками, выбирать GUI-стек без явного источника, идти по слабому generated Pipeline, пробовать PR route не через `gh` и закрывать широкий pass одним коммитом. Одновременно в active layer оставались retired domains, уже признанные преждевременными в `ADR-000022`.
+
+### Решение
+Сделать `Pipeline/*` владельцем рабочего процесса и перенести туда процедуры прежнего `Skills/*`. Обязательные нормы прежнего `Standards/*` перенести в `Rules/*`. Удалить retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` из active layer после обновления contracts, tools и checks. Закрепить, что PR создаётся через `gh`, а GitHub connector не используется для создания PR. Generated product skeleton должен получать усиленный local `Pipeline/*`, запрет на guessed current truth, dependency gate и разделённые уровни проверок.
+
+### Последствия
+`BytePress` становится меньше и строже: процесс живёт в `Pipeline/*`, обязательные нормы в `Rules/*`, продуктовый каркас проверяется local tools и не получает retired domains. Исторические записи могут сохранять ссылки на удалённые домены как факты прошлого. Возврат любого retired domain требует нового ADR, владельца механизма, потребителя и проверки.
+
+---
+
+## ADR-000024 — Rules catalog consolidated and semantic naming rule adopted
+ID: ADR-000024
+Дата: 2026-04-30
+Статус: Принято
+Связи: ROAD-000031, BACK-000096, PLAN-000084, CHG-000096
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Контекст
+После удаления преждевременных доменов активный слой сохранял раздробленный `Rules/*`, длинные filename-формулировки правил, прямые ссылки на удалённые домены и дублирование `PLAN-000082`. Это создавало риск, что обязательные нормы будут читаться из старых названий файлов или соседних owner-доменов вместо короткого каталога правил.
+
+### Решение
+Собрать `Rules/*` в предметные файлы: `Source.md`, `Security.md`, `Domains.md`, `Workflow.md`, `Git.md`, `Logs.md`, `Dependencies.md`, `Terms.md` и `Naming.md`. Закрепить `RULE-000015`: путь задаёт домен, имя файла задаёт предмет договора, файл не называется длинным предложением, одинаковые сущности называются одинаково, исторические файлы не переименовываются без отдельной причины. Обновить `bp_lint.py`, чтобы он проверял новый ruleset и соответствие `Rules/README.md` фактическим файлам.
+
+### Последствия
+Правила стали короче и читаются по предметной области, а не по длинной формулировке условия. Обязательные условия из старых rule-файлов сохранены с прежними `RULE-*` ID. Возврат удалённых доменов остаётся запрещён без отдельного ADR, владельца механизма, потребителя и проверки.
+
+---
+
+## ADR-000025 — Verification contract consolidated into one owner document
+ID: ADR-000025
+Дата: 2026-04-30
+Статус: Принято
+Связи: ROAD-000032, BACK-000097, PLAN-000085, CHG-000097
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Контекст
+После сокращения доменной модели проверочный контур сохранял шесть документов с повторяющейся структурой: карта проверки, уровни, доказательства, подтверждение результата и связь с гейтами. Это раздувало `Docs/Technical/*` и создавало риск рассинхронизации прямых ссылок.
+
+### Решение
+Сделать `Docs/Technical/Verification.md` единственным владельцем общего проверочного договора. В нём хранить классы проверок, уровни, доказательства, подтверждение результата, владение интерпретацией и связь с `Pipeline/*`. Удалить дублирующие документы `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md`.
+
+### Последствия
+Проверочный договор стал короче и имеет одного владельца. `Product_Bootstrap_Validation.md` остаётся отдельным узким договором проверки bootstrap-result, потому что владеет acceptance criteria начального развёртывания, а не общим проверочным контуром. Fresh/developed checks не ослаблены.
+
+---
+
+## ADR-000026 — Безопасные типы рабочих веток и русский канон generated Pipeline
+ID: ADR-000026
+Дата: 2026-04-30
+Статус: Принято
+Связи: ROAD-000033, BACK-000098, PLAN-000086, CHG-000098
+Утверждено: Человек
+Источник: Запрос владельца от 2026-04-30
+Дата_создания: 2026-04-30
+Дата_изменения: 2026-04-30
+
+### Контекст
+Полевой тест продукта после усиления Pipeline показал, что рекомендации по веткам могут уводить агента к небезопасному типу `product/`, а generated `Pipeline/*` сохраняет англоязычные названия фаз, рабочих потоков и гейтов. Стартовое интервью также могло подсказывать лишний объём первой версии.
+
+### Решение
+Закрепить безопасные типы рабочих веток: `chore/`, `feature/`, `fix/`, `docs/`. `product/` не использовать как рекомендуемый или допустимый тип. Generated `AGENTS.md` и `Pipeline/*` вести по русскому канону названий фаз, рабочих потоков и гейтов. Стартовое интервью должно подтверждать границу и ограничения, не предлагая расширения первой версии без явного запроса пользователя.
+
+### Последствия
+`bp_lint.py` и generated `Tools/product_check.py` проверяют task-ветки по закрытому набору безопасных типов. Generated продукт не получает новых доменов и не меняет состав, но стартовый контур становится строже и понятнее для повторных полевых тестов.
 
 ---
 
@@ -54,230 +263,3 @@ ID: ADR-000027
 Создаваемый каркас использует чистый русский язык, интервью не расширяет первую версию без запроса, ограничение и стек разделены, `Tools/*` — главный служебный вход, `scripts/*` — переходный слой. Выпуск 0.3.0 отражает существенные изменения создаваемого слоя и языка. `Minesweeper` не затронут.
 
 ---
-
-## ADR-000026 — Безопасные типы рабочих веток и русский канон generated Pipeline
-ID: ADR-000026
-Дата: 2026-04-30
-Статус: Принято
-Связи: ROAD-000033, BACK-000098, PLAN-000086, CHG-000098
-Утверждено: Человек
-Источник: Запрос владельца от 2026-04-30
-Дата_создания: 2026-04-30
-Дата_изменения: 2026-04-30
-
-### Контекст
-Полевой тест продукта после усиления Pipeline показал, что рекомендации по веткам могут уводить агента к небезопасному типу `product/`, а generated `Pipeline/*` сохраняет англоязычные названия фаз, рабочих потоков и гейтов. Стартовое интервью также могло подсказывать лишний объём первой версии.
-
-### Решение
-Закрепить безопасные типы рабочих веток: `chore/`, `feature/`, `fix/`, `docs/`. `product/` не использовать как рекомендуемый или допустимый тип. Generated `AGENTS.md` и `Pipeline/*` вести по русскому канону названий фаз, рабочих потоков и гейтов. Стартовое интервью должно подтверждать границу и ограничения, не предлагая расширения первой версии без явного запроса пользователя.
-
-### Последствия
-`bp_lint.py` и generated `Tools/product_check.py` проверяют task-ветки по закрытому набору безопасных типов. Generated продукт не получает новых доменов и не меняет состав, но стартовый контур становится строже и понятнее для повторных полевых тестов.
-
-## ADR-000025 — Verification contract consolidated into one owner document
-ID: ADR-000025
-Дата: 2026-04-30
-Статус: Принято
-Связи: ROAD-000032, BACK-000097, PLAN-000085, CHG-000097
-Утверждено: Человек
-Источник: Запрос владельца от 2026-04-30
-Дата_создания: 2026-04-30
-Дата_изменения: 2026-04-30
-
-### Контекст
-После сокращения доменной модели проверочный контур сохранял шесть документов с повторяющейся структурой: карта проверки, уровни, доказательства, подтверждение результата и связь с гейтами. Это раздувало `Docs/Technical/*` и создавало риск рассинхронизации прямых ссылок.
-
-### Решение
-Сделать `Docs/Technical/Verification.md` единственным владельцем общего проверочного договора. В нём хранить классы проверок, уровни, доказательства, подтверждение результата, владение интерпретацией и связь с `Pipeline/*`. Удалить дублирующие документы `Verification_Levels.md`, `Verification_Evidence.md`, `Validation.md`, `Validation_Levels.md` и `Validation_Evidence.md`.
-
-### Последствия
-Проверочный договор стал короче и имеет одного владельца. `Product_Bootstrap_Validation.md` остаётся отдельным узким договором проверки bootstrap-result, потому что владеет acceptance criteria начального развёртывания, а не общим проверочным контуром. Fresh/developed checks не ослаблены.
-
----
-
-## ADR-000024 — Rules catalog consolidated and semantic naming rule adopted
-ID: ADR-000024
-Дата: 2026-04-30
-Статус: Принято
-Связи: ROAD-000031, BACK-000096, PLAN-000084, CHG-000096
-Утверждено: Человек
-Источник: Запрос владельца от 2026-04-30
-Дата_создания: 2026-04-30
-Дата_изменения: 2026-04-30
-
-### Контекст
-После удаления преждевременных доменов активный слой сохранял раздробленный `Rules/*`, длинные filename-формулировки правил, прямые ссылки на удалённые домены и дублирование `PLAN-000082`. Это создавало риск, что обязательные нормы будут читаться из старых названий файлов или соседних owner-доменов вместо короткого каталога правил.
-
-### Решение
-Собрать `Rules/*` в предметные файлы: `Source.md`, `Security.md`, `Domains.md`, `Workflow.md`, `Git.md`, `Logs.md`, `Dependencies.md`, `Terms.md` и `Naming.md`. Закрепить `RULE-000015`: путь задаёт домен, имя файла задаёт предмет договора, файл не называется длинным предложением, одинаковые сущности называются одинаково, исторические файлы не переименовываются без отдельной причины. Обновить `bp_lint.py`, чтобы он проверял новый ruleset и соответствие `Rules/README.md` фактическим файлам.
-
-### Последствия
-Правила стали короче и читаются по предметной области, а не по длинной формулировке условия. Обязательные условия из старых rule-файлов сохранены с прежними `RULE-*` ID. Возврат удалённых доменов остаётся запрещён без отдельного ADR, владельца механизма, потребителя и проверки.
-
----
-
-## ADR-000023 — Product pipeline becomes workflow owner and retired domains are removed
-ID: ADR-000023
-Дата: 2026-04-29
-Статус: Принято
-Связи: ROAD-000029, BACK-000094, PLAN-000082, CHG-000094
-Утверждено: Человек
-Источник: Запрос владельца от 2026-04-29
-Дата_создания: 2026-04-29
-Дата_изменения: 2026-04-29
-
-### Контекст
-Новый полевой тест `Minesweeper` подтвердил работоспособность product skeleton, но выявил управленческие дефекты: агент мог подтверждать текущую истину догадками, выбирать GUI-стек без явного источника, идти по слабому generated Pipeline, пробовать PR route не через `gh` и закрывать широкий pass одним коммитом. Одновременно в active layer оставались retired domains, уже признанные преждевременными в `ADR-000022`.
-
-### Решение
-Сделать `Pipeline/*` владельцем рабочего процесса и перенести туда процедуры прежнего `Skills/*`. Обязательные нормы прежнего `Standards/*` перенести в `Rules/*`. Удалить retired domains `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*`, `Roles/*`, `Skills/*` и `Standards/*` из active layer после обновления contracts, tools и checks. Закрепить, что PR создаётся через `gh`, а GitHub connector не используется для создания PR. Generated product skeleton должен получать усиленный local `Pipeline/*`, запрет на guessed current truth, dependency gate и разделённые уровни проверок.
-
-### Последствия
-`BytePress` становится меньше и строже: процесс живёт в `Pipeline/*`, обязательные нормы в `Rules/*`, продуктовый каркас проверяется local tools и не получает retired domains. Исторические записи могут сохранять ссылки на удалённые домены как факты прошлого. Возврат любого retired domain требует нового ADR, владельца механизма, потребителя и проверки.
-
----
-
-## ADR-000022 — Profiled self-contained product skeleton factory adopted
-ID: ADR-000022
-Дата: 2026-04-28
-Статус: Принято
-Связи: ROAD-000026, BACK-000091, PLAN-000079, CHG-000091
-Утверждено: Человек
-Источник: Решение владельца от 2026-04-28
-Дата_создания: 2026-04-28
-Дата_изменения: 2026-04-28
-
-### Контекст
-Широкое архитектурное ревью показало, что доменная модель `BytePress` разрослась за счёт placeholder domains и преждевременного product-side replication contour. Прежняя модель делала создаваемый продукт зависимым от `BytePress` через generated `scripts/*` и `BYTEPRESS_ROOT`, materialize `Adapters/*` и `Runtime/*` без реального механизма и оставляла `Rules/*`, `Standards/*`, `Roles/*`, `Skills/*`, `Memory/*` и `MCP/*` как потенциальные источники раздувания.
-
-### Решение
-Принять целевую модель `BytePress` как профильной фабрики самодостаточных продуктовых каркасов. Состав создаваемого продукта определяется product profile. Каждый продукт получает lightweight local `Pipeline/*`, local `Tools/*`, profile-bound `Templates/*` только для materialized artifacts и `Schemas/*` только для реально проверяемых artifacts. Generated `scripts/*` должны быть перенесены в product-local `Tools/*` или стать thin aliases. `Adapters/*`, `Memory/*`, `MCP/*`, `Runtime/*` и `Roles/*` удаляются до появления реального mechanism contract. `Skills/*` переносится в `Pipeline/*` как procedures/workflows. `Standards/*` сворачивается: обязательные нормы переносятся в `Rules/*`, остальное удаляется. `Rules/*` сокращается до проектно-специфичных обязательных правил. `Docs/Technical/*` сокращается и объединяет повторяющиеся verification/validation contracts отдельными passes.
-
-### Последствия
-`Product_Bootstrap_Domain_Matrix.md` становится матрицей profile packages, а не списком копируемых top-level domains. Текущие `bp_bootstrap.py` и `bp_lint.py` не меняются в этом pass и временно остаются реализацией прежнего baseline; это зафиксированный implementation gap до tool-migration pass. Массовое удаление доменов запрещено до обновления contracts, checks и replacement routes. Будущие passes должны сначала реализовать local product `Tools/*`, transitional lint modes и profile package checks, затем переносить procedures/norms и только после этого удалять retired domains.
-
----
-
-## ADR-000021 — Russian lint markers accepted without weakening product gates
-ID: ADR-000021
-Дата: 2026-04-27
-Статус: Принято
-Связи: PLAN-000078, BACK-000090, CHG-000090
-Утверждено: Человек
-Источник: Запрос владельца от 2026-04-27
-Дата_создания: 2026-04-27
-Дата_изменения: 2026-04-27
-
-### Контекст
-После языковой чистки active и generated layer часть проверочных формулировок оставалась на английском только потому, что `bp_lint.py` искал точные англоязычные маркеры: `discovery-only`, `current truth`, `startup-handshake`, `owner`, `writable action/changes` и близкие формы. Это удерживало смешанный язык в документах без технической необходимости.
-
-### Решение
-Сохранить прежние структурные проверки `bp_lint.py`, но разрешить для тех же смысловых условий русские эквиваленты: аналитический контур, текущая истина, стартовый отчёт первого ответа, документ-владелец, домены-владельцы и записываемые действия. CLI modes, имена файлов, ID, команды и branch naming остаются техническими маркерами и не переводятся.
-
-### Последствия
-Active и generated layer могут использовать русский проверочный текст без ослабления product-start, fresh/developed и startup-handshake gates. `bp_lint.py` остаётся structural check, а не языковым нормализатором всего архива.
-
----
-
-## ADR-000020 — Domain maps and created product service-layer update route formalized
-ID: ADR-000020
-Дата: 2026-04-27
-Статус: Принято
-Связи: PLAN-000075, PLAN-000076, PLAN-000077, BACK-000087, BACK-000088, BACK-000089, CHG-000087, CHG-000088, CHG-000089
-Утверждено: Человек
-Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
-Дата_создания: 2026-04-27
-Дата_изменения: 2026-04-27
-
-### Контекст
-После проходов `PLAN-000075` и `PLAN-000076` в active layer уже действовали два значимых договора: `README.md` домена используется как краткая карта домена, а уже созданный product repo обновляет служебный слой точечным product-side pass вместо повторного bootstrap. Эти договоры были отражены в технических документах, картах доменов и журналах изменений, но не имели отдельной ADR-записи.
-
-### Решение
-Зафиксировать `README.md` домена как краткую навигационную карту назначения, границ, артефактов, минимальных правил и дальнейших owner-documents, не заменяющую документы-владельцы. Для уже созданного product repo закрепить canonical service-layer update route: переносить только нужный служебный delta, не пересоздавать репозиторий, не переписывать confirmed current truth и предметные артефакты, проверять developed state через generated `scripts/dev-test.sh` или `bp_lint.py --mode auto` / `product-developed`.
-
-### Последствия
-Карты доменов получают явный шаблон и стандарт, а service-layer updates generated product repo отделены от fresh bootstrap. Это снижает риск случайного расширения bootstrap perimeter, потери предметного состояния продукта и превращения README.md в дубль owner-documents.
-
----
-
-## ADR-000019 — Fresh and developed product repository checks separated
-ID: ADR-000019
-Дата: 2026-04-26
-Статус: Принято
-Связи: PLAN-000074, PLAN-000077, BACK-000086, BACK-000089, CHG-000086, CHG-000089
-Утверждено: Человек
-Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
-Дата_создания: 2026-04-27
-Дата_изменения: 2026-04-27
-
-### Контекст
-Первый развивающийся generated product repo после подтверждения current truth перестал соответствовать fresh bootstrap markers, хотя это было нормальным lifecycle transition. Один автоматический product check смешивал исходное bootstrap-состояние и состояние продукта после первого управляемого прохода.
-
-### Решение
-Развести режимы проверки generated product repo: `product-fresh` проверяет состояние сразу после `bp_bootstrap.py`, `product-developed` проверяет состояние после подтверждения current truth и закрытия первого pass, а `auto` выбирает режим по lifecycle state `Docs/Discovery/Interview.md`. Fresh gate не должен требовать возврата развивающегося продукта к initial placeholders, а developed gate должен выявлять реальные противоречия между current truth, `Plans/*` и `Logs/*`.
-
-### Последствия
-Проверка generated product repo стала соответствовать жизненному циклу: fresh bootstrap остаётся строгим, developed product state становится допустимым после закрытия первого прохода, а `scripts/dev-test.sh` получает стабильный route через `--mode auto` без ослабления structural gate.
-
----
-
-## ADR-000018 — Product-start contour, current truth and first gate formalized
-ID: ADR-000018
-Дата: 2026-04-21
-Статус: Принято
-Связи: PLAN-000069, PLAN-000070, PLAN-000071, PLAN-000072, PLAN-000073, PLAN-000077, BACK-000081, BACK-000082, BACK-000083, BACK-000084, BACK-000085, BACK-000089, CHG-000081, CHG-000082, CHG-000083, CHG-000084, CHG-000085, CHG-000089
-Утверждено: Человек
-Источник: Ретро-фиксация решения при закрытии `PLAN-000077`
-Дата_создания: 2026-04-27
-Дата_изменения: 2026-04-27
-
-### Контекст
-Серия первых полевых product-start проходов показала, что bootstrap-created product repo нуждается в явном стартовом контуре: discovery minimum, observable startup-handshake, current-truth owner, branch gate до любых writable changes, reset route failed start и запрет перехода к implementation до подтверждения пользовательских ответов.
-
-### Решение
-Закрепить, что bootstrap-created product repo стартует в discovery-only contour, пока `Docs/Discovery/Interview.md` не подтверждён явными ответами пользователя. `Docs/Discovery/Interview.md` является owner текущей аналитической истины; bootstrap placeholders не являются подтверждённой current truth. Первый writable action требует task-ветку, включая изменения `Docs/Discovery/*`, `Plans/*` и `Logs/*`. Startup-handshake должен сообщать mode, scope, branch status, branch action/start route, planning-state, owner-domains первого чтения и первый конкретный шаг.
-
-### Последствия
-Ранний product-start стал управляемым end-to-end: generated repo не открывает предметную реализацию до подтверждения current truth, failed start имеет cleanup route, а agent entry contour становится наблюдаемым и проверяемым в документах, bootstrap result и lint checks.
-
----
-
-## ADR-000017 — Discovery layer, current-truth interview and artifact sync matrix formalized
-ID: ADR-000017
-Дата: 2026-03-28
-Статус: Принято
-Связи: PLAN-000017, BACK-000029, CHG-000029
-Утверждено: Человек
-Источник: Discovery/sync-contract pass after baseline 0.1.0
-Дата_создания: 2026-03-28
-Дата_изменения: 2026-03-28
-
-### Контекст
-После формирования baseline `0.1.0` и минимального product-layer contract в системе отсутствовал явный аналитический слой внутри `Docs/`, интервью не было закреплено как текущая истина, а pipeline contract не определял обязательную проверку связанных артефактов после изменения аналитических ответов, шаблонов и ключевых документов.
-
-### Решение
-Ввести `Docs/Discovery/` как отдельный слой долговременного аналитического знания внутри `Docs/`. Зафиксировать `Docs/Discovery/Interview.md` как current-truth документ с вопросами и актуальными ответами без хранения истории версий в самом интервью. Историю изменений и решений хранить через `Plans/Roadmap.md`, `Plans/Backlog.md`, активные `Plans/*`, `Logs/*` и при необходимости `ADR`. Дополнить `Docs/Technical/Pipeline.md` минимальной sync-matrix, которая задаёт обязательную проверку связанных артефактов после изменения `Interview`, `Docs/Product/*`, `Templates/*`, `Tools/bp_bootstrap.py`, `Tools/bp_lint.py` и `Plans/Roadmap.md`.
-
-### Последствия
-Аналитический слой становится явной частью модели BytePress, интервью перестаёт быть журналом сессий и становится текущей истиной, а pipeline contract получает минимальный, но обязательный механизм синхронизации knowledge, planning и log artifacts после значимых изменений.
-
----
-
-## ADR-000016 — Зафиксирован первый migration-pass для схем, шаблонов, профилей и языка Git/PR
-ID: ADR-000016
-Дата: 2026-03-17
-Статус: Принято
-Связи: PLAN-000008, BACK-000021, BACK-000022, BACK-000025, CHG-000017
-Утверждено: Человек
-Источник: Первая фаза repo-wide migration contract после фиксации policy
-Дата_создания: 2026-03-17
-Дата_изменения: 2026-03-17
-
-### Контекст
-После фиксации repo-wide migration policy в репозитории оставались несогласованными `Schemas/*`, `Templates/*`, текущие brand profiles и правила языка для Git/PR-артефактов. Без отдельного решения сохранялся риск смешать первый migration-pass с более поздними фазами `Terms/*`, `Tools/*` и historical logs.
-
-### Решение
-Выполнить первый ограниченный migration-pass: перевести `Schemas/*` и `Templates/*` на 6-значную числовую часть `ID`, синхронизировать profile model через поля `Тип_профиля`, `Код_продукта` и `Язык_взаимодействия`, сохранить semantic filename для brand profiles в `BytePress`, а также зафиксировать language contract, по которому commit message, PR title, PR body и `branch slug` оформляются на английском. Язык user-facing взаимодействия определяется параметром профиля `Язык_взаимодействия`. `Tools/*`, `Docs/Terms/TERM-*`, semver и historical logs остаются вне scope этого прохода.
-
-### Последствия
-Контракты схем, шаблонов, профилей и Git/PR-языка синхронизированы до инструментальной и term/log migration phases. Следующие проходы могут обновлять `Tools/*` и `Docs/Terms/*` уже на стабильном наборе полей и правил языка.

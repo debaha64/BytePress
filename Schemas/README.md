@@ -16,17 +16,19 @@
 - `plan.schema.json` — план одного прохода.
 - `changelog_entry.schema.json` — запись журнала изменений.
 - `adr_entry.schema.json` — запись журнала решений.
-- `rule.schema.json`, `standard.schema.json` — правило и стандарт.
-- `role.schema.json`, `profile.schema.json` — роль и профиль.
+- `rule.schema.json` — правило.
+- `profile.schema.json` — профиль.
 - `term.schema.json` — термин.
 
 ## Правила
 - внутренняя числовая часть `ID` содержит 6 знаков;
+- schema-файлы описывают форму отдельной записи, а порядок реестра задаётся владельцем домена и шаблоном;
+- для реестров и журналов принятый порядок записей — от старых к новым, с добавлением новых записей в конец;
 - каждый активный schema-file, кроме `Schemas/README.md`, несёт внутренний `ID` в поле `"$id": "SCH-<NNNNNN>"`;
 - схемы для serial- и hybrid-доменов фиксируют внутренний `ID`, а не правило имени файла;
 - `Schemas/*` и `Templates/*` должны оставаться синхронизированными.
 
 ## Куда идти дальше
-- шаблоны: `Templates/README.md`;
-- правила: `../Rules/README.md`;
-- проверка структуры: `../Tools/bp_lint.py`.
+- шаблоны: [../Templates/README.md](../Templates/README.md);
+- правила: [../Rules/README.md](../Rules/README.md);
+- проверка структуры: [../Tools/bp_lint.py](../Tools/bp_lint.py).
