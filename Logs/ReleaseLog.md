@@ -2,7 +2,7 @@
 
 ## Навигация
 - Первая запись: RL-000001
-- Последняя запись: RL-000010
+- Последняя запись: RL-000011
 
 ## Порядок записей
 Записи идут хронологически от старых к новым. Новая запись добавляется в конец файла.
@@ -86,5 +86,13 @@ ID: RL-000010
 Дата: 2026-05-24
 Статус: готовность выпуска
 Событие: готовность выпуска BytePress `0.4.0` подтверждена финальной предрелизной консолидацией `PLAN-000122`: `ROAD-000050` и `BACK-000132` завершены, обязательные проверки и проверка release archive zip пройдены, минимальная bootstrap-проверка подтвердила текущий generated product contract. Эта запись фиксирует release-readiness, а не факт внешнего release; release PR в `main`, tag и изменение `origin/main` не выполнялись.
+
+---
+
+## RL-000011
+ID: RL-000011
+Дата: 2026-05-24
+Статус: внешний выпуск
+Событие: factual release event BytePress `0.4.0` подтверждён merge `PR #137` в `main`, main commit `beda664870d84a2d18d3ecd1a11e227a8445847e`, annotated tag `0.4.0`, GitHub Release `https://github.com/debaha64/BytePress/releases/tag/0.4.0` и readiness record `RL-000010`. Release archive `Plans/Archive/Releases/0.4.0.zip` создан; post-release cleanup открытого архивного слоя выполнен: `ROAD-000043` ... `ROAD-000050` и `PLAN-000097` ... `PLAN-000122` перенесены в zip и удалены из открытых архивных каталогов. `develop` получает post-release факты отдельным PR; `origin/main` и tag не менялись в post-release проходе.
 
 ---

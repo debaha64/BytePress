@@ -2,7 +2,7 @@
 
 ## Навигация
 - Первая запись: QL-000001
-- Последняя запись: QL-000129
+- Последняя запись: QL-000130
 
 ## Порядок записей
 Записи идут хронологически от старых к новым. Новая запись добавляется в конец файла.
@@ -1167,3 +1167,12 @@ ID: QL-000129
 Статус: пройдено
 Проверка: `BACK-000132` и `PLAN-000122` закрыты; `ROAD-000050` открыт и завершён как последний этап горизонта `0.4.0`; `CHG-000134` добавлен; `RL-000010` добавлен как готовность выпуска `0.4.0`, а не как внешний release. Проверены `Plans/Roadmap.md`, `Plans/Backlog.md`, `Plans/Archive/Backlog/ROAD-000050.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md`, `Logs/ReleaseLog.md`, `Logs/ADRlog.md`, карты `README`, активные `Docs/*`, `Pipeline/*`, `Rules/*`, `Templates/*`, `Schemas/*`, `Tools/*` и release archive zip. Исправлен generated wording в `Tools/bp_bootstrap.py`: стартовый план создаваемого продукта использует `Определение_готовности` вместо `DoD`. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_lint.py Tools/bp_check.py Tools/bp_check_contract.py`, `python3 -m py_compile Tools/bp_bootstrap.py`, `python3 -m zipfile -t Plans/Archive/Releases/0.1.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.2.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.3.0.zip`, минимальная bootstrap-проверка временного продукта и удаление временного каталога.
 Результат: BytePress `0.4.0` готов к подготовке release PR. Release PR в `main`, tag, изменение `origin/main`, переписывание истории Git, перепаковка release zip, новые домены, тяжёлый CI, языковой линтер русского текста и `bp_verify.py` не создавались. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
+
+---
+
+## QL-000130
+ID: QL-000130
+Дата: 2026-05-24
+Статус: пройдено
+Проверка: `PR #137` подтверждён как `MERGED`; `origin/main` указывает на `beda664870d84a2d18d3ecd1a11e227a8445847e`; tag `0.4.0` имеет тип `tag` и указывает на `origin/main`; GitHub Release `0.4.0` создан и проверен как не draft, не prerelease и latest; `BACK-000133`, `PLAN-000123` и `ROAD-000051` закрыты; `RL-000011` добавлен как factual release event. Создан `Plans/Archive/Releases/0.4.0.zip`; состав zip содержит только `MANIFEST.md`, `Backlog/*`, `Plans/*`; `AGENTS.md`, `Docs/`, `Rules/`, `Pipeline/`, `Tools/`, `Templates/`, `Schemas/` внутри zip отсутствуют. Из открытых архивных каталогов удалены `ROAD-000043` ... `ROAD-000050` и `PLAN-000097` ... `PLAN-000122`; `ROAD-000051` и `PLAN-000123` остались в текущем дереве. Выполнены `git diff --check`, `python3 Tools/bp_lint.py --repo .`, `python3 Tools/bp_check.py --repo .`, `python3 Tools/bp_check.py --repo . --format json`, `python3 -m py_compile Tools/bp_lint.py Tools/bp_check.py Tools/bp_check_contract.py Tools/bp_bootstrap.py`, `python3 -m zipfile -t Plans/Archive/Releases/0.1.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.2.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.3.0.zip`, `python3 -m zipfile -t Plans/Archive/Releases/0.4.0.zip` и проверка GitHub Release.
+Результат: внешний выпуск BytePress `0.4.0` зафиксирован и архивирован. Post-release PR синхронизирует `develop` с release-фактом; `origin/main`, tag `0.4.0`, старые release zip, product bootstrap, тяжёлый CI, языковой линтер русского текста, `bp_verify.py` и история Git не менялись. `ADR-000028` не создан, потому что новое архитектурное решение не принималось.
