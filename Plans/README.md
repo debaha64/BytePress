@@ -20,17 +20,19 @@ Plan — пошаговая реализация одной задачи.
 - `Backlog.md` — задачи активного и ближайшего этапа или явная фиксация отсутствия активного этапа; не является журналом, не хранит все дальние идеи и не дублирует Roadmap.
 - `Plans/PLAN-<NNNNNN>-<slug>.md` — текущий план одного прохода.
 - `Plans/Archive/Plans/PLAN-<NNNNNN>-<slug>.md` — архив завершённых планов.
-- `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` — архив реестра задач завершённого этапа.
-- `Plans/Archive/Releases/` — архив release manifest, manifest template и future release package references.
+- `Plans/Archive/Backlog/ROAD-<NNNNNN>.md` — открытый архив реестров задач текущего релизного цикла.
+- `Plans/Archive/Releases/` — проверяемые zip-пакеты исторических выпусков и карта release archive.
 
 ## Правила
 - числовая часть ID содержит 6 знаков;
 - текущий `Plan` описывает пошаговую реализацию только одной задачи и содержит текущую истину, шаги, риски, артефакты, проверки и определение готовности;
 - в активном слое существует только один текущий `Plan`;
 - завершённый `Plan` архивируется в `Plans/Archive/Plans/`;
-- `Plans/Archive/Backlog/` хранит только завершённые реестры задач этапов;
-- `Plans/Archive/Releases/` хранит release manifest и будущие проверяемые release-пакеты без подмены `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag;
-- zip-пакет допустим только как проверяемый исторический package с manifest и проверкой состава; крупный бинарный zip не добавляется в репозиторий без отдельного решения владельца;
+- `Plans/Archive/Backlog/` хранит завершённые реестры задач текущего релизного цикла `0.4.0`: `ROAD-000043+`;
+- `Plans/Archive/Plans/` хранит завершённые планы текущего релизного цикла `0.4.0`: `PLAN-000097+`;
+- исторические `ROAD-000001` ... `ROAD-000042` и `PLAN-000001` ... `PLAN-000096` хранятся внутри `Plans/Archive/Releases/*.zip`;
+- `Plans/Archive/Releases/` хранит проверяемые исторические release-пакеты без подмены `Logs/ReleaseLog.md`, `Logs/ChangeLog.md`, `Logs/QualityLog.md` и tag;
+- zip-пакет допустим только как проверяемый исторический package с manifest и проверкой состава;
 - `Backlog.md` хранит задачи активного и ближайшего этапа;
 - если активного этапа нет, `Backlog.md` явно фиксирует пустое состояние;
 - `Roadmap.md` не дублирует задачи реестра работ;

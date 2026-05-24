@@ -14,7 +14,7 @@
 - `Domain_README.md` — шаблон краткой карты домена для `README.md` каталога.
 - `Roadmap.md`, `Backlog.md`, `Plan.md` — плановый контур.
 - `ChangeLog.md`, `ADRlog.md` — журнальные записи.
-- `Rule.md`, `Standard.md`, `Role.md`, `Profile.md`, `Term.md` — нормируемые сущности.
+- `Rule.md`, `Profile.md`, `Term.md` — нормируемые сущности.
 - `Document.md` — общий документ.
 - `Interview.md`, `Discussion.md`, `Research.md`, `Requirements.md` — аналитический слой.
 - `JTBD.md`, `PRD.md`, `Delivery.md` — продуктовый слой.
@@ -24,10 +24,10 @@
 - примерные `ID` используют 6-значную числовую часть;
 - каждый активный шаблон, кроме `Templates/README.md`, несёт внутренний `ID` в форме `<!-- ID: TPL-<NNNNNN> -->`;
 - `Domain_README.md` задаёт навигационную карту домена, а не заменяет документы-владельцы домена;
-- commit message, PR title и PR body оформляются на английском;
+- commit message, PR title и PR body оформляются на русском языке по `../Rules/Workflow.md`; английский допускается для имён собственных, путей, веток, ID и технически неизбежных мест;
 - язык пользовательского взаимодействия задаёт профиль через `Язык_взаимодействия`.
 
 ## Куда идти дальше
-- схемы: `Schemas/README.md`;
-- правила: `../Rules/README.md`;
-- проверка структуры: `../Tools/bp_lint.py`.
+- схемы: [../Schemas/README.md](../Schemas/README.md);
+- правила: [../Rules/README.md](../Rules/README.md);
+- проверка структуры: [../Tools/bp_lint.py](../Tools/bp_lint.py).
