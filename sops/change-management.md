@@ -10,43 +10,46 @@
 
 ## Когда применять
 
-Применять в owner-initiated `system-editing`, а также при изменении:
+Применять в `system-editing`, открытом владельцем, а также при изменении:
 
 1. термина или SOP;
 2. шаблона или инструмента;
-3. фазы, gate или SoT;
+3. фазы, точки контроля или SoT;
 4. README или пользовательской документации.
 
 ## Карта связей
 
-- термин -> glossary, `SYSTEM.md`, `AGENTS.md`, связанные SOP/templates, `logs/terminology.md`;
-- SOP -> `SYSTEM.md`, `AGENTS.md`, связанные SOP/templates/tools, `logs/changes.md`;
-- template -> `SYSTEM.md`, `templates/README.md`, применяющая SOP, журналы;
-- tool -> `tools/README.md`, `SYSTEM.md`, `tests/README.md`, `logs/quality.md`;
-- phase/gate -> `sops/sdlc.md`, `sops/project-management.md`, `templates/plan-active.md`, `bp_check.py`;
-- SoT -> `sops/sot.md`, `bp_init.py`, `bp_check.py`, glossary, `SYSTEM.md`, active PLAN и решения владельца;
-- README -> `templates/product-readme.md`, `docs/user/`, product identity и текущая фаза;
-- docs/SOP boundary -> README соответствующих слоёв, связанная SOP, `logs/changes.md`, `logs/quality.md`.
+- термин -> глоссарий, `SYSTEM.md`, `AGENTS.md`, связанные SOP и шаблоны, `logs/terminology.md`;
+- SOP -> `SYSTEM.md`, `AGENTS.md`, связанные SOP, шаблоны и инструменты, `logs/changes.md`;
+- шаблон -> `SYSTEM.md`, `templates/README.md`, применяющая SOP, журналы;
+- инструмент -> `tools/README.md`, `SYSTEM.md`, `tests/README.md`, `logs/quality.md`;
+- фаза или точка контроля -> `docs/technical/sdlc.md`, `sops/sdlc.md`, `sops/project-management.md`, `roles/README.md`, `templates/plan-active.md`, `bp_check.py` и связанные тесты;
+- роль -> `roles/README.md`, `templates/role.md`, прямые ссылки и проверка обязательных файлов;
+- навык -> `skills/README.md`, `AGENTS.md`, `SYSTEM.md` и граница необязательной клиентской проекции;
+- SoT -> `sops/sot.md`, `bp_check.py`, глоссарий, `SYSTEM.md`, активный PLAN и решения владельца;
+- README -> `templates/product-readme.md`, `docs/user/`, идентичность продукта и текущая фаза;
+- граница документов и SOP -> README соответствующих слоёв, связанная SOP, `logs/changes.md`, `logs/quality.md`.
 
 ## Процедура
 
-1. Подтвердить active PLAN и разрешённые поверхности.
+1. Подтвердить активный PLAN и разрешённые поверхности.
 2. Определить затронутые связи по карте.
 3. Изменить только ставшие ложными или неполными артефакты.
 4. Если меняется шаблон, проверить `templates/README.md` и применяющую SOP.
-5. Если меняется docs, оставить в docs смысл и ссылки, а порядок действий — в SOP.
-6. Если меняется tool, обновить `tools/README.md`, `SYSTEM.md` и релевантные проверки.
-7. Если меняется SoT, подтвердить три изолированных handler: отсутствие Git-вызовов в `sot_files`; root/branch/clean/remote absent в `sot_git`; local identity/`origin`/upstream/`origin/HEAD`/divergence и no-network в `sot_github`.
-8. Записать факт в `logs/changes.md`, проверки — в `logs/quality.md`, изменившийся риск — в `logs/risks.md`.
+5. Если меняются документы, оставить в них смысл и ссылки, а порядок действий — в SOP.
+6. Если меняется инструмент, обновить `tools/README.md`, `SYSTEM.md` и относящиеся к нему проверки.
+7. Если меняется граница роли или навыка, проверить канонический каталог, шаблон при наличии, прямых потребителей и отсутствие второй канонической проекции.
+8. Если меняется SoT, подтвердить три изолированных обработчика: отсутствие Git-вызовов в `sot_files`; корень, ветвь, чистое дерево и отсутствие remote в `sot_git`; локальную идентичность, `origin`, upstream, `origin/HEAD`, допустимое расхождение и отсутствие сетевых вызовов в `sot_github`.
+9. Записать факт в `logs/changes.md`, проверки — в `logs/quality.md`, изменившийся риск — в `logs/risks.md`.
 
 ## Проверки
 
 ```bash
-python3 -m py_compile tools/bp_init.py tools/bp_check.py tools/bp_clean.py
+python3 -m py_compile tools/bp_check.py tools/bp_clean.py
 python3 tools/bp_check.py --repo .
 ```
 
-При наличии продуктового кода добавляются product unit tests и product smoke.
+Для Harness/tool/test delta добавляется полный релевантный Product Unit regression suite. При наличии затронутого продуктового кода добавляются его тесты и проверка запуска; обычная несвязанная правка не требует безусловного полного suite.
 
 ## Запреты
 

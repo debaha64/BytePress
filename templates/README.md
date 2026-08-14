@@ -22,8 +22,8 @@
 Режимы записи:
 
 1. `replace` - целевой файл создаётся или переписывается как текущая форма.
-2. `append` - запись добавляется в конец журнала или results-файла.
-3. `move+append` - артефакт переносится и получает итоговую append-секцию.
+2. `append` - запись добавляется в конец журнала или файла результатов.
+3. `move+append` - артефакт переносится и получает итоговый раздел дозаписи.
 4. `reference` - шаблон описывает форму внешнего пакета или отчёта.
 
 Обязательность:
@@ -36,34 +36,36 @@
 
 - `agents.md` -> `AGENTS.md` -> `owner:harness-engineering` -> `replace` -> `required` -> `bp_check.py`.
 - `system.md` -> `SYSTEM.md` -> `owner:harness-engineering` -> `replace` -> `required` -> `system contract`.
-- `product-readme.md` -> `README.md` -> `owner:harness-engineering` -> `replace` -> `required` -> product-first readme coverage после появления продуктового кода.
-- `domain-readme.md` -> `*/README.md` домена -> `owner:agent` -> `replace` -> `conditional` -> `readme coverage`.
+- `product-readme.md` -> `README.md` -> `owner:harness-engineering` -> `replace` -> `required` -> полнота README с приоритетом продукта после появления продуктового кода.
+- `domain-readme.md` -> `*/README.md` домена -> `owner:agent` -> `replace` -> `conditional` -> полнота README.
 - `agent-state-message.md` -> сообщение `Состояние агента` -> `owner:agent` -> `reference` -> `conditional` -> ручная сверка SOP.
 - `owner-decision-package.md` -> пакет вопросов владельцу -> `owner:human` -> `reference` -> `conditional` -> ручная сверка `sops/project-management.md`.
 
 ## Продукт и документы
 
-- `docs-product-brief.md` -> `docs/product/product-brief.md` -> `owner:human` -> `replace` -> `required` -> `phase profile`.
-- `docs-product-passport.md` -> `docs/product/product-passport.md` -> `owner:human` -> `replace` -> `required` -> `phase profile`.
-- `docs-product-jtbd.md` -> `docs/product/jtbd.md` -> `owner:human` -> `replace` -> `required` -> `phase profile`.
+- `docs-product-brief.md` -> `docs/product/product-brief.md` -> `owner:human` -> `replace` -> `required` -> профиль фазы.
+- `docs-product-passport.md` -> `docs/product/product-passport.md` -> `owner:human` -> `replace` -> `required` -> профиль фазы.
+- `docs-product-jtbd.md` -> `docs/product/jtbd.md` -> `owner:human` -> `replace` -> `required` -> профиль фазы.
 - `docs-product-prd.md` -> `docs/product/prd.md` -> `owner:human` -> `replace` -> `conditional` -> русская форма требований к продукту и точка контроля `implementation`.
 - `docs-product-dods.md` -> `docs/product/dods.md` -> `owner:human` -> `replace` -> `required` -> русская форма критериев готовности и точка контроля `implementation`.
 - `docs-terminology-glossary.md` -> `docs/terminology/glossary.md` -> `owner:harness-engineering` -> `replace` -> `required` -> `terminology review`.
-- `docs-architecture-architecture.md` -> `docs/architecture/architecture.md` -> `owner:agent` -> `replace` -> `conditional` -> `phase profile`.
-- `docs-architecture-domain-model.md` -> `docs/architecture/domain-model.md` -> `owner:agent` -> `replace` -> `conditional` -> `phase profile`.
+- `docs-architecture-architecture.md` -> `docs/architecture/architecture.md` -> `owner:agent` -> `replace` -> `conditional` -> профиль фазы.
+- `docs-architecture-domain-model.md` -> `docs/architecture/domain-model.md` -> `owner:agent` -> `replace` -> `conditional` -> профиль фазы.
 - `docs-technical-architecture.md` -> краткая справочная форма технической архитектуры -> `owner:agent` -> `reference` -> `optional` -> ручная сверка.
-- `docs-technical-testing.md` -> `docs/technical/testing.md` -> `owner:agent` -> `replace` -> `conditional` -> русские разделы модульных тестов и сквозной проверки, `phase profile`.
-- `docs-user-guide.md` -> `docs/user/*` -> `owner:human` -> `replace` -> `conditional` -> `docs phase gates`.
+- `docs-technical-testing.md` -> `docs/technical/testing.md` -> `owner:agent` -> `replace` -> `conditional` -> русские разделы модульных тестов и сквозной проверки, профиль фазы.
+- `docs-user-guide.md` -> `docs/user/*` -> `owner:human` -> `replace` -> `conditional` -> точки контроля фазы документов.
 
 ## SOP, роли и плановый контур
 
 - `sop.md` -> `sops/*.md` -> `owner:harness-engineering` -> `replace` -> `required` -> `required files`.
-- `role.md` -> `sops/roles/*.md` -> `owner:harness-engineering` -> `replace` -> `conditional` -> `roles check`.
+- `role.md` -> `roles/*.md` -> `owner:harness-engineering` -> `replace` -> `conditional` -> покрытие `21/21` и проверка контракта роли.
 - `plan-roadmap.md` -> `plans/roadmap.md` -> `owner:human` -> `replace` -> `required` -> плановый контур.
 - `plan-backlog.md` -> `plans/backlog.md` -> `owner:agent` -> `replace` -> `required` -> плановый контур.
 - `plan-active.md` -> `plans/active/PLAN-*.md` -> `owner:agent` -> `replace` -> `required` -> PLAN ID, `ALLOWED_SURFACES`, `PRODUCT_ACCEPTANCE_REF` и плановый контур.
 - `plan-completed-readme.md` -> `plans/completed/README.md` -> `owner:harness-engineering` -> `replace` -> `required` -> плановый контур.
 - `execution-plan.md` -> внешний PLAN фазы `implementation` или проход миграции -> `owner:agent` -> `reference` -> `optional` -> ручная сверка.
+
+Глобальный `templates/skill.md` отсутствует намеренно: стандартный `SKILL.md` уже задаёт форму Agent Skill, а Product Unit не поставляет встроенные собственные навыки.
 
 ## Исследования и Codex
 
@@ -71,17 +73,17 @@
 - `research-record.md` -> `research/<xxx>-<slug>/<nnn>-<slug>.md` -> `owner:agent` -> `replace` или `append` -> `conditional` -> `sops/research.md`.
 - `research-results.md` -> `research/<xxx>-<slug>/results.md` -> `owner:agent` -> `replace` -> `conditional` -> `sops/research.md`.
 - `codex-task.md` -> задание Codex -> `owner:human` -> `reference` -> `conditional` -> входная точка контроля и чистое завершение (`clean-exit`).
-- `codex-report.md` -> итоговый отчёт Codex -> `owner:agent` -> `reference` -> `conditional` -> сверка с PLAN и logs.
+- `codex-report.md` -> итоговый отчёт Codex -> `owner:agent` -> `reference` -> `conditional` -> сверка с PLAN и журналами.
 - `interview.md` -> слоевое пакетное интервью -> `owner:human` -> `reference` -> `conditional` -> решение владельца.
 
 ## Журналы
 
 - `log-file.md` -> файл журнала `logs/*.md` -> `owner:harness-engineering` -> `replace` -> `required` -> контур Управления проектом.
 - `change-record.md` -> запись `logs/changes.md` -> `owner:agent` -> `append` -> `required` для изменений -> контур Управления проектом.
-- `decision-record.md` -> запись `owner_decision` (`OD-*`) или `product_acceptance` (`PA-*`) в `logs/decisions.md` -> `owner:human` -> `append` -> `required` для решений -> локальный конечный `#lines=` locator.
-- `quality-record.md` -> запись `logs/quality.md` -> `owner:tools` -> `append` -> `required` для проверок -> локальный конечный `#lines=` locator.
+- `decision-record.md` -> запись `owner_decision` (`OD-*`) или `product_acceptance` (`PA-*`) в `logs/decisions.md` -> `owner:human` -> `append` -> `required` для решений -> локальный конечный указатель `#lines=`.
+- `quality-record.md` -> запись `logs/quality.md` -> `owner:tools` -> `append` -> `required` для проверок -> локальный конечный указатель `#lines=`.
 - `risk-record.md` -> запись `logs/risks.md` -> `owner:agent` -> `append` -> `conditional` -> проверка `high-risk`.
-- `session-record.md` -> запись `logs/sessions.md` -> `owner:agent` -> `append` -> `required` для чистого завершения (`clean-exit`) -> capture PLAN и локальный конечный `#lines=` locator ответа владельца.
+- `session-record.md` -> запись `logs/sessions.md` -> `owner:agent` -> `append` -> `required` для чистого завершения (`clean-exit`) -> фиксация PLAN и локальный конечный указатель `#lines=` ответа владельца.
 - `terminology-record.md` -> запись `logs/terminology.md` -> `owner:harness-engineering` -> `append` -> `conditional` -> `terminology review`.
 - `log-release-record.md` -> запись `logs/releases.md` -> `owner:human` -> `append` -> `conditional` -> только точка контроля выпуска.
 
@@ -95,7 +97,7 @@
 
 ## Реестры
 
-- `registry-file.md` -> реестровый markdown-файл -> `owner:harness-engineering` -> `replace` -> `conditional` -> `system contract`.
+- `registry-file.md` -> реестровый Markdown-файл -> `owner:harness-engineering` -> `replace` -> `conditional` -> системный контракт.
 - `registry-item.md` -> строка реестра -> `owner:harness-engineering` -> `append` или `replace` -> `conditional` -> `system contract`.
 
 ## Правила слоя
@@ -103,7 +105,7 @@
 - Для нового целевого артефакта сначала выбрать существующий шаблон или добавить новый.
 - Для нового журнала нужны шаблон файла и шаблон записи.
 - При изменении шаблона проверить `SYSTEM.md`, эту карту, связанные SOP и журналы.
-- Не создавать демонстрационные каталоги, fixtures или скрытые реализации внутри `templates/`.
+- Не создавать демонстрационные каталоги, тестовые данные или скрытые реализации внутри `templates/`.
 - Шаблоны интервью, Codex-заданий и записей границы выпуска не являются продуктовой приёмкой и не разрешают выпуск, тег или архив.
 
 ## Быстрая привязка форм
@@ -113,7 +115,7 @@
 3. Состояние агента: `templates/agent-state-message.md`.
 4. Запись качества: `templates/quality-record.md`.
 5. Чистое завершение (`clean-exit`): `templates/session-record.md`.
-6. Research:
+6. Исследования:
    - `templates/research-domain-index.md`
    - `templates/research-record.md`
    - `templates/research-results.md`

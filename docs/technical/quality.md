@@ -25,4 +25,4 @@
 
 ## Где процедура
 
-Процедуры verifier, записи качества и чистого завершения (`clean-exit`) описаны в [../../sops/verify-work.md](../../sops/verify-work.md), [../../sops/record-quality.md](../../sops/record-quality.md) и [../../sops/clean-exit.md](../../sops/clean-exit.md).
+Контракт [Verification Engineer](../../roles/12-verification-engineer.md), процедуры проверки, записи качества и чистого завершения (`clean-exit`) описаны в [../../sops/verify-work.md](../../sops/verify-work.md), [../../sops/record-quality.md](../../sops/record-quality.md) и [../../sops/clean-exit.md](../../sops/clean-exit.md).

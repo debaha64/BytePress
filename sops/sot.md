@@ -117,7 +117,7 @@ Checker не создаёт remote, не делает fetch и не меняет
 sot_files -> sot_git -> sot_github
 ```
 
-Переходы `sot_github -> sot_git` и `sot_github -> sot_files` в `0.5.0` не реализованы и требуют отдельного решения владельца. Если обратный переход будет разрешён в будущем, поле repository удаляется в его checkpoint.
+Переходы `sot_github -> sot_git` и `sot_github -> sot_files` текущим контрактом не реализованы и требуют отдельного решения владельца. Если обратный переход будет разрешён в будущем, поле repository удаляется в его checkpoint.
 
 ## Роли и merge contract
 
