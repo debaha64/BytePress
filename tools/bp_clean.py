@@ -12,11 +12,12 @@ import re
 
 DISPOSABLE_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 DISPOSABLE_SUFFIXES = {".pyc", ".pyo", ".tmp", ".temp", ".orig"}
-ZONE_IDENTIFIER_PATTERNS = (
-    re.compile(r".*:Zone\.Identifier$"),
-    re.compile(r".*\.Identifier$"),
-)
+ZONE_IDENTIFIER_RE = re.compile(r".*:Zone\.Identifier$")
 LOCAL_SERVICE_DIR_NAMES = {".agents", ".codex"}
+PRODUCT_UNIT_FILE_MARKERS = (
+    "AGENTS.md", "SYSTEM.md", "tools/bp_check.py", "tools/bp_clean.py",
+)
+PRODUCT_UNIT_DIRECTORY_MARKERS = ("plans/active", "logs", "tools")
 DURABLE_RAW_LOG_RE = re.compile(r"^.+\.raw\.log$")
 CODEXLOG_REF_RE = re.compile(
     r"^[A-Z][A-Z0-9_]*:\s*codexlog:(?P<path>\.codex/[^#\r\n]+)#"
@@ -26,7 +27,51 @@ CODEXLOG_REF_RE = re.compile(
 
 
 def is_zone_identifier(path):
-    return any(pattern.match(path.name) for pattern in ZONE_IDENTIFIER_PATTERNS)
+    return bool(ZONE_IDENTIFIER_RE.fullmatch(path.name))
+
+
+def path_has_type_no_symlink(root, relative, expected_type):
+    current = Path(root)
+    try:
+        for part in Path(relative).parts:
+            current = current / part
+            mode = os.lstat(current).st_mode
+            if stat.S_ISLNK(mode):
+                return False
+    except OSError:
+        return False
+    return expected_type(mode)
+
+
+def product_unit_root_error(repo):
+    """Возвращает причину отказа, если exact root Product Unit не доказан."""
+    try:
+        root_mode = os.lstat(repo).st_mode
+    except OSError as error:
+        return f"корень недоступен: {error}"
+    if stat.S_ISLNK(root_mode) or not stat.S_ISDIR(root_mode):
+        return "--repo не является обычным каталогом"
+    for relative in PRODUCT_UNIT_FILE_MARKERS:
+        if not path_has_type_no_symlink(repo, relative, stat.S_ISREG):
+            return f"отсутствует обязательный file marker без symlink: {relative}"
+    for relative in PRODUCT_UNIT_DIRECTORY_MARKERS:
+        if not path_has_type_no_symlink(repo, relative, stat.S_ISDIR):
+            return f"отсутствует обязательный directory marker без symlink: {relative}"
+    try:
+        agents = (repo / "AGENTS.md").read_text(encoding="utf-8")
+        system = (repo / "SYSTEM.md").read_text(encoding="utf-8")
+    except OSError as error:
+        return f"не удалось прочитать markers: {error}"
+    modes = re.findall(
+        r"^\s*SOT_MODE\s*[:=]\s*`?(sot_files|sot_git|sot_github)`?\s*$",
+        agents,
+        flags=re.MULTILINE,
+    )
+    if len(modes) != 1:
+        return "AGENTS.md не содержит ровно один поддерживаемый SOT_MODE"
+    if "registry:protected-surfaces" not in system:
+        return "SYSTEM.md не содержит marker registry:protected-surfaces"
+    return None
 
 
 def scan_directory(directory, *, skip_local_service=True):
@@ -172,6 +217,39 @@ def apply_paths(paths, retained_codex_paths=frozenset()):
     return removed
 
 
+def unexpected_local_service_paths(repo, retained_codex_paths):
+    """Отделяет durable `.codex` evidence от неожиданного остатка cleanup."""
+    unexpected = []
+    for service in local_service_paths(repo):
+        try:
+            mode = os.lstat(service).st_mode
+        except OSError:
+            continue
+        if service.name != ".codex" or stat.S_ISLNK(mode) or not stat.S_ISDIR(mode):
+            unexpected.append(service)
+            continue
+        pending = [service]
+        while pending:
+            base = pending.pop()
+            with os.scandir(base) as iterator:
+                entries = sorted(iterator, key=lambda entry: entry.name)
+            for entry in entries:
+                path = base / entry.name
+                if entry.is_symlink():
+                    unexpected.append(path)
+                elif entry.is_dir(follow_symlinks=False):
+                    pending.append(path)
+                elif entry.is_file(follow_symlinks=False):
+                    if not (
+                        DURABLE_RAW_LOG_RE.fullmatch(entry.name)
+                        or path in retained_codex_paths
+                    ):
+                        unexpected.append(path)
+                else:
+                    unexpected.append(path)
+    return sorted(unexpected, key=lambda path: str(path.relative_to(repo)))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", default=".")
@@ -179,7 +257,27 @@ def main():
     parser.add_argument("--local-service", action="store_true")
     args = parser.parse_args()
 
-    repo = Path(args.repo).resolve()
+    requested_repo = Path(args.repo).expanduser()
+    try:
+        requested_mode = os.lstat(requested_repo).st_mode
+        repo = requested_repo.resolve(strict=True)
+    except OSError as error:
+        print(f"FAIL clean-boundary: корень Product Unit недоступен: {error}")
+        return 1
+    mode = "apply" if args.apply else "dry-run"
+    if args.apply and args.local_service:
+        mode += " with local-service"
+    if args.apply:
+        root_error = (
+            "--repo не должен быть symbolic link"
+            if stat.S_ISLNK(requested_mode)
+            else product_unit_root_error(repo)
+        )
+        if root_error:
+            print(f"bp_clean: режим {mode}")
+            print(f"FAIL exact-product-unit-root: {root_error}")
+            print("Удалено: 0")
+            return 1
     try:
         found = disposable_paths(repo)
         service = local_service_paths(repo)
@@ -189,9 +287,6 @@ def main():
         return 1
     if args.local_service:
         found.extend(service)
-    mode = "apply" if args.apply else "dry-run"
-    if args.apply and args.local_service:
-        mode += " with local-service"
     print(f"bp_clean: режим {mode}")
     if service and not args.local_service:
         print("Локальные служебные пути игнорируются и не удаляются:")
@@ -205,8 +300,31 @@ def main():
         print(str(path.relative_to(repo)))
 
     if args.apply:
-        removed = apply_paths(found, retained_codex)
+        try:
+            removed = apply_paths(found, retained_codex)
+        except OSError as error:
+            print(f"FAIL clean-apply: удаление завершилось с ошибкой: {error}")
+            return 1
         print(f"Удалено: {removed}")
+        try:
+            remaining = disposable_paths(repo)
+            unexpected_service = (
+                unexpected_local_service_paths(repo, retained_codex)
+                if args.local_service
+                else []
+            )
+        except OSError as error:
+            print(f"FAIL clean-postcondition: невозможно проверить результат: {error}")
+            return 1
+        unexpected = sorted(
+            set(remaining + unexpected_service),
+            key=lambda path: str(path.relative_to(repo)),
+        )
+        if unexpected:
+            print("FAIL clean-postcondition: остались непредусмотренные одноразовые пути:")
+            for path in unexpected:
+                print(str(path.relative_to(repo)))
+            return 1
     else:
         print("Ничего не удалено. Для удаления перечисленных путей повторите команду с --apply.")
     return 0

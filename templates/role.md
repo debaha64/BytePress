@@ -1,20 +1,39 @@
-# Роль: {{role}}
+# {{professional_role_name}}
 
-Статус: рабочая инструкция
+Фаза SDLC: {{phase_number}} — {{phase_name}}{{terminal_state_if_applicable}}
 
 ## Назначение
 
 {{purpose}}
 
-## Разрешено
+## Ответственность
 
-- {{allowed}}
+{{responsibility}}
 
-## Запрещено
+## Полномочия
 
-- {{forbidden}}
-- считать технические проверки продуктовой приёмкой.
+{{authority}}
 
-## Чистое завершение (`clean-exit`)
+## Запрещённые действия
 
-- {{clean_exit}}
+{{forbidden_actions}}
+
+## Граница владельца
+
+{{owner_boundary}}
+
+## Ожидаемый результат
+
+{{expected_result}}
+
+## Передача
+
+{{handoff}}
+
+## Связанные SOP
+
+{{related_sops}}
+
+## Применимые навыки
+
+{{applicable_existing_skills_or_none}}

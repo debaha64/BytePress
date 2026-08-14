@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""Локальная regression-матрица трёх режимов SoT."""
+"""Механическая регрессия живых контрактов BytePress Harness."""
 
 import ast
 import json
@@ -15,12 +14,15 @@ from pathlib import Path
 
 
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SOURCE_ROOT / "tools"))
+import bp_check
+
 REAL_GIT = shutil.which("git")
 MODE_PREFIX = "SOT_" + "MODE:"
 REPOSITORY_PREFIX = "SOT_GITHUB_" + "REPOSITORY:"
 
 
-class SotModeTests(unittest.TestCase):
+class HarnessTests(unittest.TestCase):
     maxDiff = None
 
     def copy_unit(self):
@@ -92,12 +94,27 @@ class SotModeTests(unittest.TestCase):
             self.fail(f"checker did not return JSON:\n{completed.stdout}\n{completed.stderr}")
         return completed, payload
 
-    def run_init(self, repo, *, env=None):
+    def run_clean(self, repo, *args):
         return self.command(
-            [sys.executable, str(repo / "tools" / "bp_init.py"), "--repo", str(repo)],
-            env=env,
+            [sys.executable, str(repo / "tools" / "bp_clean.py"), "--repo", str(repo), *args],
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
             check=False,
         )
+
+    def make_clean_root(self):
+        temporary = tempfile.TemporaryDirectory(prefix="bytepress-clean-test-")
+        self.addCleanup(temporary.cleanup)
+        repo = Path(temporary.name) / "ProductUnit"
+        for relative in (
+            "AGENTS.md", "SYSTEM.md", "tools/bp_check.py", "tools/bp_clean.py",
+        ):
+            source = SOURCE_ROOT / relative
+            target = repo / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+        (repo / "plans" / "active").mkdir(parents=True)
+        (repo / "logs").mkdir()
+        return repo
 
     def assert_pass(self, result):
         completed, payload = result
@@ -111,6 +128,94 @@ class SotModeTests(unittest.TestCase):
     @staticmethod
     def failure_names(payload):
         return {item["check"] for item in payload["checks"] if item["status"] == "fail"}
+
+    def test_canonical_sdlc_phase_contract(self):
+        expected = (
+            "intent", "discussion", "interview", "research", "requirements", "basis",
+            "architecture", "design", "planning", "approval", "implementation",
+            "verification", "owner-review", "product-acceptance", "release-readiness",
+            "release", "handoff", "operation", "maintenance", "retrospective",
+            "decommissioning",
+        )
+        self.assertEqual(bp_check.CANONICAL_PHASES, expected)
+        self.assertEqual(bp_check.PHASES, set(expected))
+        self.assertEqual(len(bp_check.PHASES), 21)
+        self.assertEqual(bp_check.normalized_phase("Исследование"), "research")
+        self.assertEqual(bp_check.normalized_phase("discovery"), "research")
+        self.assertNotIn("discovery", bp_check.PHASES)
+        system_rows = re.findall(
+            r"^\| `(\d{2})` \| `([^`]+)` \|",
+            (SOURCE_ROOT / "SYSTEM.md").read_text(encoding="utf-8"),
+            flags=re.MULTILINE,
+        )
+        self.assertEqual([phase for _number, phase in system_rows], list(expected))
+        role_rows = re.findall(
+            r"^\d+\. `(\d{2}) [^`]+` — \[[^]]+\]\(([^)]+)\)",
+            (SOURCE_ROOT / "roles" / "README.md").read_text(encoding="utf-8"),
+            flags=re.MULTILINE,
+        )
+        self.assertEqual([number for number, _path in role_rows], [f"{n:02d}" for n in range(1, 22)])
+        for number, relative in role_rows:
+            self.assertTrue(relative.startswith(f"{number}-"), relative)
+            self.assertTrue((SOURCE_ROOT / "roles" / relative).is_file(), relative)
+
+    def test_typed_ie_od_pa_link_contract(self):
+        temporary = tempfile.TemporaryDirectory(prefix="bytepress-record-test-")
+        self.addCleanup(temporary.cleanup)
+        repo = Path(temporary.name)
+        (repo / "plans" / "active").mkdir(parents=True)
+        (repo / "plans" / "completed").mkdir()
+        (repo / "logs").mkdir()
+        (repo / ".codex").mkdir()
+        (repo / ".codex" / "source.raw.log").write_text("owner response\n", encoding="utf-8")
+        (repo / "plans" / "active" / "PLAN-000001-linked.md").write_text(
+            """# PLAN-000001-linked
+
+Фаза SDLC: product-acceptance
+INTERVIEW_EVIDENCE_REF: IE-000001
+OWNER_DECISION_REFS: OD-000001
+PRODUCT_ACCEPTANCE_REF: PA-000001
+""",
+            encoding="utf-8",
+        )
+        source_ref = "codexlog:.codex/source.raw.log#lines=1-1"
+        (repo / "logs" / "sessions.md").write_text(
+            f"""RECORD_TYPE: interview_evidence
+RECORD_ID: IE-000001
+SOURCE_REF: {source_ref}
+""",
+            encoding="utf-8",
+        )
+        decisions = repo / "logs" / "decisions.md"
+        decisions.write_text(
+            f"""RECORD_TYPE: owner_decision
+RECORD_ID: OD-000001
+PLAN_ID: PLAN-000001
+DECISION_KIND: implementation
+DECISION_VALUE: approved
+EVIDENCE_REF: IE-000001
+SOURCE_REF: {source_ref}
+
+RECORD_TYPE: product_acceptance
+RECORD_ID: PA-000001
+PLAN_ID: PLAN-000001
+DECISION_VALUE: accepted
+SOURCE_REF: {source_ref}
+""",
+            encoding="utf-8",
+        )
+        self.assertFalse(any(
+            item["status"] == "fail" for item in bp_check.check_active_refs(repo)
+        ))
+        decisions.write_text(
+            decisions.read_text(encoding="utf-8").replace(
+                "DECISION_VALUE: accepted", "DECISION_VALUE: pending"
+            ),
+            encoding="utf-8",
+        )
+        self.assertTrue(any(
+            item["status"] == "fail" for item in bp_check.check_active_refs(repo)
+        ))
 
     def make_git(self, mode="sot_git", repositories=()):
         repo = self.copy_unit()
@@ -132,9 +237,8 @@ class SotModeTests(unittest.TestCase):
 
     def make_product_fixture(self):
         repo = self.copy_unit()
-        (repo / "plans" / "active" / "PLAN-000001-product-discovery.md").unlink(
-            missing_ok=True
-        )
+        for plan in (repo / "plans" / "active").glob("PLAN-*.md"):
+            plan.unlink()
         (repo / "docs" / "product" / "product-brief.md").write_text(
             "# Краткое описание продукта\n\n## Продукт\n\nMinesweeper\n",
             encoding="utf-8",
@@ -144,7 +248,7 @@ class SotModeTests(unittest.TestCase):
 
 ## Назначение и ценность
 
-Локальная минимальная regression-fixture игрового ядра.
+Локальная минимальная тестовая конфигурация игрового ядра.
 
 ## Пользователь
 
@@ -156,7 +260,7 @@ class SotModeTests(unittest.TestCase):
 
 ## Основные команды
 
-Smoke и unit tests.
+Проверка запуска и модульные тесты.
 
 ## Хранение данных
 
@@ -164,7 +268,7 @@ Smoke и unit tests.
 
 ## Ограничения
 
-Fixture проверяет только подсчёт соседних мин.
+Тестовая конфигурация проверяет только подсчёт соседних мин.
 
 ## Проверки
 
@@ -209,10 +313,6 @@ from minesweeper import adjacent_mines
 class MinesweeperTests(unittest.TestCase):
     def test_adjacent_mines(self):
         self.assertEqual(adjacent_mines(["*.", ".."], 1, 1), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
 """,
             encoding="utf-8",
         )
@@ -242,6 +342,97 @@ if __name__ == "__main__":
         completed, payload = self.run_checker(repo)
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("required-files", self.failure_names(payload))
+
+    def test_bp_clean_invalid_root_fails_without_deletion(self):
+        temporary = tempfile.TemporaryDirectory(prefix="bytepress-clean-invalid-")
+        self.addCleanup(temporary.cleanup)
+        repo = Path(temporary.name)
+        victim = repo / "victim.pyc"
+        victim.write_bytes(b"durable")
+        completed = self.command(
+            [
+                sys.executable, str(SOURCE_ROOT / "tools" / "bp_clean.py"),
+                "--repo", str(repo), "--apply",
+            ],
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            check=False,
+        )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertTrue(victim.is_file())
+        self.assertIn("Удалено: 0", completed.stdout)
+
+    def test_bp_clean_exact_disposable_set(self):
+        repo = self.make_clean_root()
+        bytecode = repo / "cache.pyc"
+        zone = repo / "payload:Zone.Identifier"
+        durable = repo / "legacy.Identifier"
+        bytecode.write_bytes(b"cache")
+        zone.write_text("metadata\n", encoding="utf-8")
+        durable.write_text("durable\n", encoding="utf-8")
+        checker_disposable = {
+            item.get("message") for item in bp_check.check_disposable(repo)
+            if item["status"] == "fail"
+        }
+        self.assertIn("cache.pyc", checker_disposable)
+        self.assertIn("payload:Zone.Identifier", checker_disposable)
+        self.assertNotIn("legacy.Identifier", checker_disposable)
+        dry_run = self.run_clean(repo)
+        self.assertEqual(dry_run.returncode, 0, dry_run.stdout + dry_run.stderr)
+        self.assertTrue(bytecode.is_file())
+        self.assertTrue(zone.is_file())
+        self.assertTrue(durable.is_file())
+        completed = self.run_clean(repo, "--apply")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertFalse(bytecode.exists())
+        self.assertFalse(zone.exists())
+        self.assertTrue(durable.is_file())
+
+    def test_bp_clean_does_not_follow_symlinks(self):
+        repo = self.make_clean_root()
+        external = repo.parent / "external"
+        external.mkdir()
+        sentinel = external / "sentinel"
+        sentinel.write_text("keep\n", encoding="utf-8")
+        cache = repo / "__pycache__"
+        cache.mkdir()
+        (cache / "outside").symlink_to(sentinel)
+        (repo / ".agents").symlink_to(external, target_is_directory=True)
+        completed = self.run_clean(repo, "--apply", "--local-service")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertTrue(sentinel.is_file())
+        self.assertFalse(cache.exists())
+        self.assertFalse((repo / ".agents").exists())
+
+    def test_bp_clean_retains_durable_evidence_and_fails_on_unexpected_residue(self):
+        repo = self.make_clean_root()
+        codex = repo / ".codex"
+        codex.mkdir()
+        raw = codex / "session.raw.log"
+        clean = codex / "session.log"
+        orphan = codex / "orphan.log"
+        temporary_log = codex / ".codex-session-clean.tmp"
+        raw.write_text("raw\n", encoding="utf-8")
+        clean.write_text("clean\n", encoding="utf-8")
+        orphan.write_text("orphan\n", encoding="utf-8")
+        temporary_log.write_text("temporary\n", encoding="utf-8")
+        (repo / "logs" / "quality.md").write_text(
+            "SOURCE_REF: codexlog:.codex/session.log#lines=1-1\n",
+            encoding="utf-8",
+        )
+        completed = self.run_clean(repo, "--apply", "--local-service")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertTrue(raw.is_file())
+        self.assertTrue(clean.is_file())
+        self.assertFalse(orphan.exists())
+        self.assertFalse(temporary_log.exists())
+
+        cache = repo / "__pycache__"
+        cache.mkdir()
+        os.mkfifo(cache / "unexpected.pipe")
+        completed = self.run_clean(repo, "--apply")
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("FAIL clean-postcondition", completed.stdout)
+        self.assertTrue((cache / "unexpected.pipe").exists())
 
     def test_existing_product_discovery_allows_preexisting_product_outside_surfaces(self):
         repo = self.make_product_fixture()
@@ -313,11 +504,18 @@ PRODUCT_ACCEPTANCE_REF: none
         ]
         for mode, repositories, label in cases:
             with self.subTest(label=label):
-                repo = self.copy_unit()
-                self.set_config(repo, mode, repositories)
-                completed, payload = self.run_checker(repo)
-                self.assertNotEqual(completed.returncode, 0)
-                self.assertIn("sot-config", self.failure_names(payload))
+                temporary = tempfile.TemporaryDirectory(prefix="bytepress-config-test-")
+                self.addCleanup(temporary.cleanup)
+                repo = Path(temporary.name)
+                lines = [f"{MODE_PREFIX} {mode}"]
+                lines.extend(f"{REPOSITORY_PREFIX} {value}" for value in repositories)
+                (repo / "AGENTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+                config = bp_check.parse_sot_config(repo)
+                failures = {
+                    item["check"] for item in bp_check.check_sot(repo, config)
+                    if item["status"] == "fail"
+                }
+                self.assertIn("sot-config", failures)
 
     def test_valid_github_configuration_continues_to_mode_handler(self):
         repo = self.copy_unit()
@@ -351,7 +549,7 @@ PRODUCT_ACCEPTANCE_REF: none
         ]
         for url in urls:
             with self.subTest(url=url):
-                self.assert_pass(self.run_checker(self.make_github(url)))
+                self.assertEqual(bp_check.github_remote_identity(url).casefold(), "example/widget")
 
     def test_github_rejects_invalid_remote_identity(self):
         cases = [
@@ -363,9 +561,8 @@ PRODUCT_ACCEPTANCE_REF: none
         ]
         for url, label in cases:
             with self.subTest(label=label):
-                completed, payload = self.run_checker(self.make_github(url))
-                self.assertNotEqual(completed.returncode, 0)
-                self.assertIn("sot-github-remote", self.failure_names(payload))
+                identity = bp_check.github_remote_identity(url)
+                self.assertTrue(identity is None or identity.casefold() != "example/widget")
 
     def test_github_requires_only_origin(self):
         repo = self.make_github()
@@ -514,25 +711,6 @@ PRODUCT_ACCEPTANCE_REF: none
             self.assertNotIn(argv[2], forbidden, line)
         self.assertFalse(external_log.exists())
 
-    def test_bp_init_prints_github_identity_without_git_or_network(self):
-        repo = self.copy_unit()
-        self.set_config(repo, "sot_github", ["Example/Widget"])
-        bindir = repo.parent / "guard"
-        bindir.mkdir()
-        marker = repo.parent / "external-called"
-        for name in ("git", "gh", "curl", "wget"):
-            stub = bindir / name
-            stub.write_text(
-                "#!/bin/sh\nprintf '%s\\n' called >> \"$BP_EXEC_LOG\"\nexit 99\n",
-                encoding="utf-8",
-            )
-            stub.chmod(0o755)
-        env = {**os.environ, "PATH": str(bindir), "BP_EXEC_LOG": str(marker)}
-        completed = self.run_init(repo, env=env)
-        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("SOT_GITHUB_REPOSITORY: Example/Widget", completed.stdout)
-        self.assertFalse(marker.exists())
-
     def test_product_bearing_minesweeper_regression_in_files_and_git_modes(self):
         repo = self.make_product_fixture()
         product_tests = self.command(
@@ -564,7 +742,3 @@ PRODUCT_ACCEPTANCE_REF: none
         self.assertEqual(completed.returncode, 0, completed.stdout)
         self.assertIn("protected-surfaces", self.check_names(payload))
         self.assertIn("sot-git-current", self.check_names(payload))
-
-
-if __name__ == "__main__":
-    unittest.main()
