@@ -29,4 +29,4 @@ Remote, push, PR, merge, tag, выпуск и GitHub write не разрешаю
 
 `bp_check.py` дополнительно проверяет machine-readable `owner/repository`, ровно один `origin`, поддерживаемый URL, matching identity, upstream, existing local remote refs, symbolic `origin/HEAD` и отсутствие behind/diverged state. Checker не выполняет сеть, fetch или repair; freshness и authentication принадлежат внешнему preflight.
 
-Default/release branch names и merge methods являются repository policy, а не полями core mode. Обратные переходы в `0.5.0` не реализованы.
+Default/release branch names и merge methods являются repository policy, а не полями core mode. Обратные переходы текущим контрактом не реализованы.

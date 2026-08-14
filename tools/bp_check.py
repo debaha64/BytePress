@@ -14,9 +14,6 @@ from urllib.parse import unquote, urlsplit
 sys.dont_write_bytecode = True
 
 PLAN_FILE_RE = re.compile(r"^(PLAN-\d{6})(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?\.md$")
-ROAD_ID_RE = re.compile(r"^ROAD-\d{6}$")
-BACK_ID_RE = re.compile(r"^BACK-\d{6}$")
-PLAN_ID_RE = re.compile(r"^PLAN-\d{6}$")
 IE_ID_RE = re.compile(r"^IE-\d{6}$")
 OD_ID_RE = re.compile(r"^OD-\d{6}$")
 PA_ID_RE = re.compile(r"^PA-\d{6}$")
@@ -25,27 +22,42 @@ SOT_REPOSITORY_FIELD_RE = re.compile(r"^\s*SOT_GITHUB_REPOSITORY\s*:\s*`?(.*?)`?
 CODEXLOG_RE = re.compile(r"^codexlog:(\.codex/[^#]+)#lines=(\d+)-(\d+)$")
 
 SOT_SUPPORTED = {"sot_files", "sot_git", "sot_github"}
-PHASES = {
-    "intent", "interview", "requirements", "planning", "approval", "discovery",
-    "implementation", "verification", "owner-review", "product-acceptance",
-    "release-readiness", "release",
-}
+CANONICAL_PHASES = (
+    "intent", "discussion", "interview", "research", "requirements", "basis",
+    "architecture", "design", "planning", "approval", "implementation",
+    "verification", "owner-review", "product-acceptance", "release-readiness",
+    "release", "handoff", "operation", "maintenance", "retrospective",
+    "decommissioning",
+)
+PHASES = set(CANONICAL_PHASES)
 PHASE_ALIASES = {
     "замысел": "intent",
+    "обсуждение": "discussion",
     "интервью": "interview",
+    "исследование": "research",
     "требования": "requirements",
+    "основание": "basis",
+    "архитектура": "architecture",
+    "проектирование": "design",
     "планирование": "planning",
     "утверждение": "approval",
-    "исследование": "discovery",
-    "product discovery": "discovery",
     "реализация": "implementation",
     "проверка": "verification",
     "обзор владельцем": "owner-review",
     "продуктовая приёмка": "product-acceptance",
     "готовность к выпуску": "release-readiness",
     "выпуск": "release",
+    "передача": "handoff",
+    "эксплуатация": "operation",
+    "сопровождение": "maintenance",
+    "ретроспектива": "retrospective",
+    "вывод из эксплуатации": "decommissioning",
+    "discovery": "research",
+    "product discovery": "research",
 }
-PROTECTED_ROOTS = ("AGENTS.md", "SYSTEM.md", "sops/", "templates/", "tools/")
+PROTECTED_ROOTS = (
+    "AGENTS.md", "SYSTEM.md", "sops/", "roles/", "skills/", "templates/", "tools/",
+)
 EXACT_EXCEPTIONS = {"AGENTS.md::SOT_MODE", "AGENTS.md::SOT_GITHUB_REPOSITORY"}
 LOCAL_SERVICE_DIRS = {".agents", ".codex"}
 DISPOSABLE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
@@ -71,10 +83,18 @@ REQUIRED_FILES = [
     "sops/change-management.md", "sops/interview.md", "sops/task-intake.md",
     "sops/verify-work.md", "sops/system-diagnostics.md", "sops/start-session.md",
     "sops/record-change.md", "sops/record-decision.md", "sops/record-quality.md",
-    "sops/record-risk.md", "sops/record-terminology.md", "sops/roles/README.md",
-    "sops/roles/architect.md", "sops/roles/archive-curator.md", "sops/roles/implementer.md",
-    "sops/roles/product-acceptance-assistant.md", "sops/roles/release-assistant.md",
-    "sops/roles/researcher.md", "sops/roles/verifier.md", "templates/README.md",
+    "sops/record-risk.md", "sops/record-terminology.md", "roles/README.md",
+    "roles/01-concept-developer.md", "roles/02-discussion-facilitator.md",
+    "roles/03-interviewer.md", "roles/04-researcher.md",
+    "roles/05-requirements-engineer.md", "roles/06-systems-analyst.md",
+    "roles/07-architect.md", "roles/08-system-designer.md", "roles/09-planner.md",
+    "roles/10-decision-coordinator.md", "roles/11-developer.md",
+    "roles/12-verification-engineer.md", "roles/13-review-coordinator.md",
+    "roles/14-product-acceptance-coordinator.md",
+    "roles/15-release-readiness-reviewer.md", "roles/16-release-engineer.md",
+    "roles/17-transition-coordinator.md", "roles/18-operator.md",
+    "roles/19-maintenance-engineer.md", "roles/20-retrospective-facilitator.md",
+    "roles/21-decommissioning-engineer.md", "skills/README.md", "templates/README.md",
     "templates/agent-state-message.md", "templates/interview.md", "templates/agents.md",
     "templates/system.md", "templates/product-readme.md", "templates/domain-readme.md",
     "templates/docs-product-brief.md", "templates/docs-product-passport.md",
@@ -90,23 +110,17 @@ REQUIRED_FILES = [
     "templates/registry-item.md", "templates/terminology-record.md",
     "templates/research-domain-index.md", "templates/research-record.md",
     "templates/research-results.md", "templates/owner-decision-package.md",
-    "tools/README.md", "tools/bp_init.py", "tools/bp_check.py", "tools/bp_clean.py",
-    "src/README.md", "tests/README.md", "tests/test_sot_modes.py",
+    "tools/README.md", "tools/bp_check.py", "tools/bp_clean.py",
+    "src/README.md", "tests/README.md", "tests/test_harness.py",
 ]
 
 ALLOWED_TOP_LEVEL = {
     ".agents", ".codex", ".git", ".gitignore", "AGENTS.md", "LICENSE", "README.md", "SYSTEM.md",
-    "docs", "logs", "plans", "research", "sops", "src", "templates", "tests", "tools",
+    "docs", "logs", "plans", "research", "roles", "skills", "sops", "src",
+    "templates", "tests", "tools",
 }
-ALLOWED_TOOLS = {"README.md", "bp_init.py", "bp_check.py", "bp_clean.py"}
-FORBIDDEN_CURRENT_PATHS = {
-    "state", "checks", "schemas", "roles", "sops/checklists", "docs/technical/agent-roles",
-    "Rules", "Pipeline", "Profiles", "docs/git", "docs/sdlc", "docs/operations",
-    "docs/references", "docs/evaluation", "comparison", "_sources", "bp_bootstrap.py",
-    "tools/bp_ops.py", "tools/bp_core.py", "tools/bp_new_product.py", "release-record.md",
-    "examples", "samples", "demo", "playgrounds", "fixtures",
-}
-HARNESS_TEST_FILES = {"tests/test_sot_modes.py"}
+ALLOWED_TOOLS = {"README.md", "bp_check.py", "bp_clean.py"}
+HARNESS_TEST_FILES = {"tests/test_harness.py"}
 
 
 def read(path):
@@ -150,7 +164,7 @@ def safe_tree(repo):
             if entry.name in LOCAL_SERVICE_DIRS or rel == ".git":
                 continue
             if entry.is_symlink():
-                issues.append(f"symlink запрещён: {rel}")
+                issues.append(f"символическая ссылка запрещена: {rel}")
                 continue
             if entry.is_dir(follow_symlinks=False):
                 pending.append(path)
@@ -169,7 +183,7 @@ def check_required(repo):
     if tools.is_dir():
         for path in sorted(tools.iterdir(), key=lambda item: item.name):
             if path.is_file() and path.name not in ALLOWED_TOOLS:
-                items.append(result("required-files", "fail", f"неразрешённый tool: tools/{path.name}"))
+                items.append(result("required-files", "fail", f"неразрешённый инструмент: tools/{path.name}"))
     return items or [result("required-files", "pass")]
 
 
@@ -268,7 +282,7 @@ def parse_allowed(value):
 def protected_token(token):
     plain = token[:-3] if token.endswith("/**") else token
     plain = plain.rstrip("/")
-    return plain in {"AGENTS.md", "SYSTEM.md", "sops", "templates", "tools"}
+    return plain in {"AGENTS.md", "SYSTEM.md", "sops", "roles", "skills", "templates", "tools"}
 
 
 def check_plans(repo):
@@ -308,9 +322,9 @@ def check_plans(repo):
         road_match = re.findall(r"^- ROAD:\s*(ROAD-\d{6})\s*$", text, flags=re.MULTILINE)
         back_match = re.findall(r"^- BACK:\s*(BACK-\d{6})\s*$", text, flags=re.MULTILINE)
         if len(road_match) != 1 or road_match[0] not in table_ids(repo / "plans" / "roadmap.md"):
-            items.append(result("active-plan-fields", "fail", "active PLAN не связан с существующим ROAD"))
+            items.append(result("active-plan-fields", "fail", "активный PLAN не связан с существующим ROAD"))
         if len(back_match) != 1 or back_match[0] not in table_ids(repo / "plans" / "backlog.md"):
-            items.append(result("active-plan-fields", "fail", "active PLAN не связан с существующим BACK"))
+            items.append(result("active-plan-fields", "fail", "активный PLAN не связан с существующим BACK"))
         allowed = field_values(text, "ALLOWED_SURFACES")
         if allowed:
             tokens = parse_allowed(allowed[0])
@@ -327,7 +341,7 @@ def check_plans(repo):
 
 
 def parse_sot_config(repo):
-    """Читает machine-readable SoT configuration из AGENTS.md ровно один раз."""
+    """Читает машиночитаемую конфигурацию SoT из AGENTS.md ровно один раз."""
     agents = repo / "AGENTS.md"
     text = read(agents) if agents.is_file() else ""
     mode_values = [match.group(1) for line in text.splitlines() if (match := SOT_FIELD_RE.match(line))]
@@ -408,29 +422,29 @@ def run_git(repo, *args):
 def check_local_git_repository(repo, check_name):
     git_path = repo / ".git"
     if not os.path.lexists(git_path) or git_path.is_symlink():
-        return [result(check_name, "fail", "локальный repository отсутствует или невалиден")], None
+        return [result(check_name, "fail", "локальный репозиторий отсутствует или недействителен")], None
     items = []
     code, top, error = run_git(repo, "rev-parse", "--show-toplevel")
     if code or not top:
-        items.append(result(check_name, "fail", f"repository невалиден: {error}"))
+        items.append(result(check_name, "fail", f"репозиторий недействителен: {error}"))
     else:
         try:
             if Path(top).resolve() != repo.resolve():
-                items.append(result(check_name, "fail", f"неверный repository root: {top}"))
+                items.append(result(check_name, "fail", f"неверный корень репозитория: {top}"))
         except OSError as exc:
             items.append(result(check_name, "fail", str(exc)))
     code, _head, error = run_git(repo, "rev-parse", "--verify", "HEAD^{commit}")
     if code:
-        items.append(result(check_name, "fail", f"HEAD невалиден: {error}"))
+        items.append(result(check_name, "fail", f"HEAD недействителен: {error}"))
     code, branch, error = run_git(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
     if code or not branch:
         items.append(result(check_name, "fail", f"рабочая ветка невалидна: {error or 'detached HEAD'}"))
         branch = None
     code, status, error = run_git(repo, "status", "--porcelain=v1", "--untracked-files=all")
     if code:
-        items.append(result(check_name, "fail", f"status недоступен: {error}"))
+        items.append(result(check_name, "fail", f"статус недоступен: {error}"))
     elif status:
-        items.append(result(check_name, "fail", "working tree не чист"))
+        items.append(result(check_name, "fail", "рабочее дерево не чисто"))
     return (items or [result(check_name, "pass")]), branch
 
 
@@ -497,9 +511,9 @@ def check_mode_sot_git(repo, _config):
         return items
     code, remotes, error = run_git(repo, "remote")
     if code:
-        items.append(result("sot-git-remote", "fail", f"remote недоступен: {error}"))
+        items.append(result("sot-git-remote", "fail", f"удалённый репозиторий недоступен: {error}"))
     elif remotes:
-        items.append(result("sot-git-remote", "fail", f"remote запрещён: {remotes}"))
+        items.append(result("sot-git-remote", "fail", f"удалённый репозиторий запрещён: {remotes}"))
     else:
         items.append(result("sot-git-remote", "pass"))
     return items
@@ -509,9 +523,9 @@ def check_github_remote(repo, expected):
     code, remotes, error = run_git(repo, "remote")
     names = remotes.splitlines() if not code else []
     if code:
-        return [result("sot-github-remote", "fail", f"remote недоступен: {error}")]
+        return [result("sot-github-remote", "fail", f"удалённый репозиторий недоступен: {error}")]
     if names != ["origin"]:
-        return [result("sot-github-remote", "fail", "требуется ровно один remote origin")]
+        return [result("sot-github-remote", "fail", "требуется ровно один удалённый репозиторий origin")]
     items = []
     identities = []
     for label, args in (
@@ -523,14 +537,14 @@ def check_github_remote(repo, expected):
         if not identity:
             items.append(result(
                 "sot-github-remote", "fail",
-                f"{label} URL не является поддерживаемым GitHub remote: {error or url}",
+                f"URL операции {label} не является поддерживаемым удалённым репозиторием GitHub: {error or url}",
             ))
         else:
             identities.append(identity)
     if identities and any(identity.casefold() != expected.casefold() for identity in identities):
-        items.append(result("sot-github-remote", "fail", "repository identity не совпадает с AGENTS.md"))
+        items.append(result("sot-github-remote", "fail", "идентичность репозитория не совпадает с AGENTS.md"))
     if len(identities) == 2 and identities[0].casefold() != identities[1].casefold():
-        items.append(result("sot-github-remote", "fail", "fetch и push URL указывают на разные repository"))
+        items.append(result("sot-github-remote", "fail", "URL операций fetch и push указывают на разные репозитории"))
     return items or [result("sot-github-remote", "pass")]
 
 
@@ -538,18 +552,18 @@ def check_github_refs(repo, branch):
     items = []
     code, upstream, error = run_git(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
     if code or not upstream.startswith("origin/") or upstream == "origin/HEAD":
-        items.append(result("sot-github-upstream", "fail", f"upstream невалиден: {error or upstream}"))
+        items.append(result("sot-github-upstream", "fail", f"вышестоящая ветвь недействительна: {error or upstream}"))
     else:
         code, _value, error = run_git(repo, "show-ref", "--verify", f"refs/remotes/{upstream}")
         if code:
-            items.append(result("sot-github-upstream", "fail", f"remote ref отсутствует: {error or upstream}"))
+            items.append(result("sot-github-upstream", "fail", f"удалённая ссылка отсутствует: {error or upstream}"))
     code, default_ref, error = run_git(repo, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
     if code or not default_ref.startswith("refs/remotes/origin/") or default_ref == "refs/remotes/origin/HEAD":
-        items.append(result("sot-github-default-ref", "fail", f"origin/HEAD невалиден: {error or default_ref}"))
+        items.append(result("sot-github-default-ref", "fail", f"origin/HEAD недействителен: {error or default_ref}"))
     else:
         code, _value, error = run_git(repo, "show-ref", "--verify", default_ref)
         if code:
-            items.append(result("sot-github-default-ref", "fail", f"target origin/HEAD отсутствует: {error or default_ref}"))
+            items.append(result("sot-github-default-ref", "fail", f"цель origin/HEAD отсутствует: {error or default_ref}"))
     if upstream.startswith("origin/"):
         code, counts, error = run_git(repo, "rev-list", "--left-right", "--count", "HEAD...@{upstream}")
         try:
@@ -559,7 +573,7 @@ def check_github_refs(repo, branch):
         if code or ahead < 0 or behind != 0:
             items.append(result(
                 "sot-github-divergence", "fail",
-                f"ветка behind или diverged: {error or counts}",
+                f"ветка отстаёт или разошлась: {error or counts}",
             ))
     if branch is None:
         items.append(result("sot-github-upstream", "fail", "рабочая ветка отсутствует"))
@@ -602,14 +616,11 @@ def check_disposable(repo):
 
 def check_current_paths(repo):
     items = []
-    for rel in sorted(FORBIDDEN_CURRENT_PATHS):
-        if (repo / rel).exists():
-            items.append(result("current-paths", "fail", f"запрещённый путь: {rel}"))
     research = repo / "research"
     if research.is_dir():
         for path in research.iterdir():
             if path.is_dir() and path.name != "archives" and not re.match(r"^\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*$", path.name):
-                items.append(result("current-paths", "fail", f"некорректный research-домен: research/{path.name}"))
+                items.append(result("current-paths", "fail", f"некорректный исследовательский домен: research/{path.name}"))
     return items or [result("current-paths", "pass")]
 
 
@@ -656,15 +667,15 @@ def check_identity_and_user_docs(repo):
     plan = active_plan(repo)
     if has_product:
         if not identity:
-            items.append(result("product-identity", "fail", "product identity не задана"))
+            items.append(result("product-identity", "fail", "идентичность продукта не задана"))
         readme = repo / "README.md"
         heading = re.search(r"^#\s+(.+)$", read(readme), flags=re.MULTILINE) if readme.is_file() else None
         if identity and (not heading or heading.group(1).strip() != identity):
-            items.append(result("product-identity", "fail", "root README не совпадает с product identity"))
+            items.append(result("product-identity", "fail", "корневой README не совпадает с идентичностью продукта"))
         if plan and identity:
             units = field_values(read(plan), "Product Unit")
             if units != [identity]:
-                items.append(result("product-identity", "fail", "active PLAN использует другую product identity"))
+                items.append(result("product-identity", "fail", "активный PLAN использует другую идентичность продукта"))
         required_sections = [
             "## Назначение и ценность", "## Пользователь", "## Запуск", "## Основные команды",
             "## Хранение данных", "## Ограничения", "## Проверки",
@@ -673,14 +684,7 @@ def check_identity_and_user_docs(repo):
         for section in required_sections:
             if section not in readme_text:
                 items.append(result("product-readme", "fail", f"отсутствует {section}"))
-        user_root = repo / "docs" / "user"
-        forbidden = ("ROAD", "BACK", "PLAN", "Harness")
-        for path in user_root.rglob("*.md") if user_root.is_dir() else []:
-            body = read(path)
-            for marker in forbidden:
-                if marker in body:
-                    items.append(result("user-doc-boundary", "fail", f"{path.relative_to(repo)} содержит {marker}"))
-    return items or [result("product-identity", "pass"), result("product-readme", "pass"), result("user-doc-boundary", "pass")]
+    return items or [result("product-identity", "pass"), result("product-readme", "pass")]
 
 
 def parse_records(path):
@@ -722,7 +726,8 @@ def validate_codexlog(repo, value):
     if start < 1 or end < start:
         return False
     try:
-        line_count = sum(1 for _line in path.open(encoding="utf-8", errors="replace"))
+        with path.open(encoding="utf-8", errors="replace") as stream:
+            line_count = sum(1 for _line in stream)
     except OSError:
         return False
     return end <= line_count
@@ -737,7 +742,7 @@ def ref_list(value):
 def check_active_refs(repo):
     plan = active_plan(repo)
     if not plan:
-        return [result("active-plan-links", "pass", "active PLAN absent")]
+        return [result("active-plan-links", "pass", "активный PLAN отсутствует")]
     text = read(plan)
     phase_values = field_values(text, "Фаза SDLC")
     phase = normalized_phase(phase_values[0]) if len(phase_values) == 1 else "invalid"
@@ -745,7 +750,7 @@ def check_active_refs(repo):
     od_values = field_values(text, "OWNER_DECISION_REFS")
     pa_values = field_values(text, "PRODUCT_ACCEPTANCE_REF")
     if not (len(ie_values) == len(od_values) == len(pa_values) == 1):
-        return [result("active-plan-links", "fail", "машинные ссылки active PLAN некорректны")]
+        return [result("active-plan-links", "fail", "машинные ссылки активного PLAN некорректны")]
     sessions = parse_records(repo / "logs" / "sessions.md")
     decisions = parse_records(repo / "logs" / "decisions.md")
     items = []
@@ -768,10 +773,10 @@ def check_active_refs(repo):
         if od.get("DECISION_KIND") == "implementation" and od.get("DECISION_VALUE") == "approved":
             implementation = od
             if od.get("PLAN_ID") != plan_id(plan) or od.get("EVIDENCE_REF") != ie_ref:
-                items.append(result("active-plan-links", "fail", f"implementation decision не связан с active PLAN: {od_ref}"))
+                items.append(result("active-plan-links", "fail", f"решение о реализации не связано с активным PLAN: {od_ref}"))
     if phase in {"implementation", "verification", "owner-review", "product-acceptance"}:
         if ie_ref == "none" or implementation is None:
-            items.append(result("active-plan-links", "fail", "фаза требует IE и implementation decision"))
+            items.append(result("active-plan-links", "fail", "фаза требует IE и решение о реализации"))
     pa_ref = pa_values[0]
     if pa_ref != "none":
         pa = decisions.get(pa_ref)
@@ -779,11 +784,11 @@ def check_active_refs(repo):
             items.append(result("active-plan-links", "fail", f"невалидная PA-ссылка: {pa_ref}"))
         else:
             if pa.get("PLAN_ID") != plan_id(plan) or pa.get("DECISION_VALUE") not in {"accepted", "rejected"}:
-                items.append(result("active-plan-links", "fail", f"PA не связана с active PLAN: {pa_ref}"))
+                items.append(result("active-plan-links", "fail", f"PA не связана с активным PLAN: {pa_ref}"))
             if not validate_codexlog(repo, pa.get("SOURCE_REF")):
                 items.append(result("active-plan-links", "fail", f"PA SOURCE_REF невалиден: {pa_ref}"))
     if phase == "product-acceptance" and pa_ref == "none":
-        items.append(result("active-plan-links", "fail", "product-acceptance требует PA-ссылку"))
+        items.append(result("active-plan-links", "fail", "продуктовая приёмка требует PA-ссылку"))
     return items or [result("active-plan-links", "pass")]
 
 
@@ -854,7 +859,7 @@ def main():
     args = parser.parse_args()
     repo = Path(args.repo).resolve()
     if not repo.is_dir():
-        print("FAIL repository-root: Product Unit root отсутствует")
+        print("FAIL корня репозитория: корень Product Unit отсутствует")
         return 1
     checks = run(repo)
     failures = [item for item in checks if item["status"] == "fail"]

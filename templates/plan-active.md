@@ -8,7 +8,7 @@
 
 Product Unit: <name>
 
-Фаза SDLC: <intent|interview|requirements|planning|implementation|verification|owner-review|product-acceptance>
+Фаза SDLC: <intent|discussion|interview|research|requirements|basis|architecture|design|planning|approval|implementation|verification|owner-review|product-acceptance|release-readiness|release|handoff|operation|maintenance|retrospective|decommissioning>
 Операционный режим: <product-work|system-editing>
 INTERVIEW_EVIDENCE_REF: none
 OWNER_DECISION_REFS: none
@@ -17,10 +17,10 @@ ALLOWED_SURFACES: none
 Маршрут решений: <кратко>
 Граница решения владельца: <кратко>
 
-Transition PLAN принятого продукта ссылается на IE текущей задачи класса `transition`; следующий discovery PLAN переиспользует тот же `INTERVIEW_EVIDENCE_REF` без создания копии.
+Переходный PLAN принятого продукта ссылается на IE текущей задачи класса `transition`; следующий PLAN стартового исследования (`discovery`) переиспользует тот же `INTERVIEW_EVIDENCE_REF` без создания копии.
 
-Роли: <roles>
-Gate: <gate>
+Роль: <основная роль текущей фазы>
+Точка контроля: <машинное значение точки контроля>
 
 ## Цель
 
@@ -43,6 +43,6 @@ Gate: <gate>
 
 1. none
 
-## Разрешение глоссария discovery
+## Разрешение глоссария стартового исследования
 
-`docs/terminology/glossary.md` можно пополнять draft-терминами, если термин выбран владельцем или устойчиво появился в discovery.
+`docs/terminology/glossary.md` можно пополнять черновыми терминами, если термин выбран владельцем или устойчиво появился в стартовом исследовании.
