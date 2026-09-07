@@ -1,37 +1,25 @@
 # Запись качества
 
+Применение: [sops/record-quality.md](../sops/record-quality.md).
+
 ```text
 RECORD_ID: QUALITY-000001
-PLAN_ID: PLAN-000001 | none
+WPLAN_ID: <WPLAN-ID | none>
+EVIDENCE_KIND: <canonical required evidence kind | not-applicable>
 DATE: YYYY-MM-DD
 SUMMARY: <краткий факт>
 SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
 ```
 
-Runtime-ссылка разрешается в существующий конечный диапазон. Промежуточная ошибка не доказывает итог проверки.
+- Факт/результат: {{summary}}
+- Изменённые поверхности: {{paths}}
+- Свидетельство: {{reference}}
+- Непроверенные области: {{limits}}
+- Следующий шаг: {{next}}
 
-- Дата:
-- Связь ROAD/BACK/PLAN: обязательна, если запись относится к задаче.
-- Содержание:
-- Команды:
-- Свидетельство:
-- Краткий результат:
-- Непроверенные области:
-- Cleanup:
-- Что не выполнялось:
-- Blocker:
-- Остаточные риски:
-- Следующий шаг:
-
-Полный вывод команд не обязателен, если записан проверяемый summary, например `PASS summary`, точный fail или blocker.
-
-## Классификация runtime-запуска
-
-- проверка импорта:
-- модульные тесты:
-- механические проверки:
-- визуально подтверждённый запуск GUI:
-- запуск продукта владельцем:
-- status: `ready-for-owner-check` / `verified` / `blocked`
-
-Для GUI-продукта технический PASS не равен визуально подтверждённому запуску GUI или запуску продукта владельцем.
+- Класс изменения и прослеживаемость: {{S0/S1/S2; REQ/INV/SCN}}
+- Verification: {{result/reference}}
+- Validation: {{status/reference}}
+- Product Acceptance: {{status/reference}}
+- Release Authorization: {{status/reference}}
+- GUI, если применим: {{визуальный результат либо ready-for-owner-check}}
