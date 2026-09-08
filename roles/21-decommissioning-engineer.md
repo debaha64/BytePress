@@ -1,6 +1,6 @@
 # Decommissioning Engineer
 
-Фаза SDLC: 21 — Вывод из эксплуатации; terminal state: retired
+Фаза SDLC: 21 — Вывод из эксплуатации; конечное состояние: `retired`
 
 ## Назначение
 

@@ -15,9 +15,10 @@ DISPOSABLE_SUFFIXES = {".pyc", ".pyo", ".tmp", ".temp", ".orig"}
 ZONE_IDENTIFIER_RE = re.compile(r".*:Zone\.Identifier$")
 LOCAL_SERVICE_DIR_NAMES = {".agents", ".codex"}
 PRODUCT_UNIT_FILE_MARKERS = (
-    "AGENTS.md", "SYSTEM.md", "tools/bp_check.py", "tools/bp_clean.py",
+    "AGENTS.md", "SYSTEM.md", "tools/check_workspace.py",
+    "tools/check_product.py", "tools/bp_clean.py",
 )
-PRODUCT_UNIT_DIRECTORY_MARKERS = ("plans/active", "logs", "tools")
+PRODUCT_UNIT_DIRECTORY_MARKERS = ("tools",)
 DURABLE_RAW_LOG_RE = re.compile(r"^.+\.raw\.log$")
 CODEXLOG_REF_RE = re.compile(
     r"^[A-Z][A-Z0-9_]*:\s*codexlog:(?P<path>\.codex/[^#\r\n]+)#"
@@ -62,13 +63,6 @@ def product_unit_root_error(repo):
         system = (repo / "SYSTEM.md").read_text(encoding="utf-8")
     except OSError as error:
         return f"не удалось прочитать markers: {error}"
-    modes = re.findall(
-        r"^\s*SOT_MODE\s*[:=]\s*`?(sot_files|sot_git|sot_github)`?\s*$",
-        agents,
-        flags=re.MULTILINE,
-    )
-    if len(modes) != 1:
-        return "AGENTS.md не содержит ровно один поддерживаемый SOT_MODE"
     if "registry:protected-surfaces" not in system:
         return "SYSTEM.md не содержит marker registry:protected-surfaces"
     return None
@@ -148,6 +142,8 @@ def referenced_codex_paths(repo):
     """Собирает существующие `.codex`-файлы из корректных ссылок постоянных Markdown records."""
     retained = set()
     records = Path(repo) / "logs"
+    if not records.is_dir():
+        return retained
     _directories, filenames, _symlinks = scan_directory(records)
     for name in filenames:
         if not name.endswith(".md"):

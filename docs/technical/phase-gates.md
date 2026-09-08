@@ -12,22 +12,62 @@
 
 `discovery-complete` требует, чтобы обязательные слои стартового исследования были завершены или явно отложены как `deferred` с причиной. Вопрос о следующем переходе не задаётся до этой точки контроля.
 
-Команда «Продолжай» продолжает текущий информационный слой, уточнение или подготовку следующего пакета вопросов внутри уже разрешённой фазы. Переход фазы или маршрута требует явного выбора владельца: `A/B/C/D` или недвусмысленного текстового решения.
+Правила продолжения работы и смены маршрута принадлежат [project-management](../../sops/project-management.md); точка контроля сама не выполняет переход.
 
-## Продуктовая приёмка и PLAN
+## Контракт переходов
 
-Фаза `owner-review` не закрывает PLAN реализации автоматически. Отдельный ответ владельца фиксируется записью `RECORD_TYPE: product_acceptance` с ID `PA-*`, ссылкой на исходный PLAN и `SOURCE_REF` на событие `owner_acceptance`. Итоговая техническая проверка доказывается отдельной ссылкой качества и не подменяет ответ владельца.
+Для перехода нужны свидетельства завершения исходной фазы, точная контрольная отметка, передача результата и прекращение полномочий исходной роли на изменение файлов. Столбец `Required evidence kind` задаёт требуемый вид свидетельства, а `Required owner decision kind` — единственное нормативное соответствие перехода и вида решения владельца. WPLAN ссылается на свидетельство через `EVIDENCE_KIND`. Проверяющий инструмент читает оба вида и политику из одной строки; название точки контроля или произвольное положительное значение их не переопределяют.
 
-1. `DECISION_VALUE: accepted` закрывает PLAN без изменения его ID и переносит файл в `plans/completed/` без префикса `COMPLETED-`.
-2. `DECISION_VALUE: rejected` оставляет PLAN в `owner-review` и требует явного блокера следующего решения.
-3. Технический PASS не создаёт `PA-*`.
+`none` означает, что политика перехода не требует решения владельца. Поддерживаются только принятые контракты: `implementation`, `product_acceptance`, `release_authorization`, `decommissioning_authorization`, `retirement_authorization`. `implementation`, `decommissioning_authorization` и `retirement_authorization` — значения `DECISION_KIND` одного семейства записей `owner_decision` / `OD-*`; `product_acceptance` — отдельный `product_acceptance` / `PA-*`; `release_authorization` сохраняет собственный контракт. Политика `owner-open` оставляет точку контроля в состоянии `pending`; решение проверяется строкой `owner-decision`, которая его требует.
 
-Последовательные принятые PLAN функциональных изменений не конфликтуют сами по себе. Текущим основанием продукта является принятый завершённый PLAN с наибольшим последовательным PLAN ID; предыдущие принятые PLAN остаются историческими основаниями.
+| From | To | Required evidence kind | Owner gate policy | Required owner decision kind |
+|---|---|---|---|---|
+| `intent` | `discussion` | `intent-record` | `none` | `none` |
+| `discussion` | `interview` | `discussion-outcome` | `none` | `none` |
+| `interview` | `research` | `owner-answers` | `none` | `none` |
+| `research` | `requirements` | `research-closure` | `none` | `none` |
+| `requirements` | `basis` | `req-inv-scn` | `none` | `none` |
+| `basis` | `architecture` | `traceable-basis` | `none` | `none` |
+| `architecture` | `design` | `architecture-contract` | `none` | `none` |
+| `design` | `planning` | `design-and-test-plan` | `none` | `none` |
+| `planning` | `approval` | `bounded-wback-wplan` | `owner-open` | `none` |
+| `approval` | `implementation` | `owner-implementation-authorization` | `owner-decision` | `implementation` |
+| `implementation` | `verification` | `implementation-red-green-delta` | `none` | `none` |
+| `verification` | `owner-review` | `technical-verdict-and-traceability` | `owner-open` | `none` |
+| `owner-review` | `product-acceptance` | `owner-review-decision` | `owner-open` | `none` |
+| `product-acceptance` | `release-readiness` | `product-acceptance-decision` | `owner-decision` | `product_acceptance` |
+| `release-readiness` | `release` | `release-readiness-evidence` | `owner-decision` | `release_authorization` |
+| `release` | `handoff` | `release-identity` | `none` | `none` |
+| `handoff` | `operation` | `handoff-record` | `none` | `none` |
+| `operation` | `maintenance` | `operational-evidence` | `none` | `none` |
+| `maintenance` | `retrospective` | `maintenance-evidence` | `none` | `none` |
+| `retrospective` | `decommissioning` | `retrospective-and-decommission-authorization` | `owner-decision` | `decommissioning_authorization` |
+| `decommissioning` | `retired` | `decommissioning-evidence` | `owner-decision` | `retirement_authorization` |
 
-## Связь с ROAD -> BACK -> PLAN
+Verification подтверждает техническое соответствие спецификации, проектному решению и тестам. Validation оценивает пригодность для намерения владельца. Product Acceptance и Release Authorization — отдельные решения о приёмке продукта и разрешении выпуска. Ни один из этих фактов автоматически не создаёт другой.
 
-`ROAD` задаёт этап, `BACK` фиксирует задачу, `PLAN` задаёт границы исполняемого прохода. Точка контроля имеет силу только внутри этой связки и не заменяет решение владельца.
+## Связь с WROAD -> WBACK -> WPLAN
+
+`WROAD` задаёт этап, `WBACK` фиксирует задачу, `WPLAN` задаёт границы исполняемого прохода. Точка контроля имеет силу только внутри этой связки и не заменяет решение владельца.
 
 ## Где процедура
 
-Исполнение точки контроля и порядок управляемого прохода описаны в [../../sops/managed-agent-pass.md](../../sops/managed-agent-pass.md), [../../sops/sdlc.md](../../sops/sdlc.md) и [../../sops/project-management.md](../../sops/project-management.md).
+Исполнение точки контроля и порядок управляемого прохода принадлежат [управлению проектом](../../sops/project-management.md).
+
+Технический PASS завершает Verification в проверенной области. Обсуждение с владельцем, приёмка, разрешение выпуска, тег и выпуск остаются отдельными точками контроля.
+
+## Передача результата фазы
+
+Решения владельца, WROAD/WBACK/WPLAN, журналы, внутренние исследования и свидетельства принадлежат Workspace. Документация, тесты, код и манифесты продукта принадлежат корню Product Unit. Внешний материал становится источником истины после принятия владельцем и размещения у соответствующего владельца смысла.
+
+Результат завершённой фазы — согласованная запись WPLAN: ссылки на свидетельства разрешаются, контрольная отметка совпадает с маршрутом, передача результата зафиксирована, прежние полномочия прекращены, новые выданы только указанной роли. Ожидающая решения владельца точка контроля остаётся `pending` независимо от технического PASS.
+
+## Границы Product Acceptance
+
+Для owner gate `product-acceptance -> release-readiness` требуется accepted `PA-*`, полученный в том же WPLAN: `PA.WPLAN_ID == current WPLAN_ID`. PA другого WPLAN не удовлетворяет этому gate.
+
+После успешного перехода accepted `PA-*` является постоянной ссылкой на принятый результат (`durable reference`). Последующий WPLAN может использовать `PRODUCT_ACCEPTANCE_STATUS: accepted` и `PRODUCT_ACCEPTANCE_REF: PA-*`; `PA.WPLAN_ID` сохраняет происхождение приёмки и не обязан совпадать с текущим WPLAN. Это status projection, а не новое решение владельца.
+
+Для projection проверяются единственная структурно валидная запись, `RECORD_TYPE: product_acceptance`, точный `RECORD_ID` вида `PA-<6 digits>`, provenance `WPLAN_ID` вида `WPLAN-<6 digits>` и соответствие `DECISION_VALUE` заявленному статусу. Значения `pending` и `rejected` не подтверждают `accepted`. Отсутствие или подмена записи/ссылки не допускается; scope текущего WPLAN дополнительно проверяется только у owner gate.
+
+Generic Workspace checker проверяет эти Workspace contracts. Сопоставление точного кандидата с принятым Product принадлежит [выпускной процедуре](../../sops/release-management.md) и не требует чтения или исполнения Product этим checker.
