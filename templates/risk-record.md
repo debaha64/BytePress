@@ -2,14 +2,14 @@
 
 ```text
 RECORD_ID: RISK-000001
-PLAN_ID: PLAN-000001 | none
+WPLAN_ID: <WPLAN-ID | none>
 DATE: YYYY-MM-DD
 SUMMARY: <краткий факт>
 SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
 ```
 
 - Дата:
-- Связь ROAD/BACK/PLAN: обязательна, если запись относится к задаче.
+- Связь WROAD/WBACK/WPLAN: обязательна, если запись относится к задаче.
 - ID риска:
 - Описание:
 - Причина:

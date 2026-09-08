@@ -38,3 +38,5 @@
 ## Применимые навыки
 
 Не назначены.
+
+Контракт свидетельств принадлежит [release-evidence](../docs/technical/release-evidence.md), процедура — [release-management](../sops/release-management.md). Роль отвечает за свой результат и пределы его доказательности.
