@@ -18,6 +18,8 @@ import sys
 import tempfile
 import time
 import unittest
+import shlex
+import test_check_workspace as bootstrap_fixtures
 from pathlib import Path
 from unittest import mock
 
@@ -246,7 +248,7 @@ class NewProductTests(ProjectStartCase):
             document,
             {
                 "display_name": "Пример продукта",
-                "harness_version": "0.5.2",
+                "harness_version": "0.5.3",
                 "schema_version": 1,
                 "sot_mode": "sot_files",
             },
@@ -475,6 +477,7 @@ class NewProductTests(ProjectStartCase):
             stream.write("\nHANDOFF-IMPLEMENTATION\nHANDOFF-VERIFICATION\n")
         owner_review = in_progress
         replacements = {
+            "AUTHORITY_REF: OD-000001": "AUTHORITY_REF: none",
             "Фаза SDLC: implementation": "Фаза SDLC: owner-review",
             "FROM_PHASE: implementation": "FROM_PHASE: verification",
             "FROM_ROLE: roles/11-developer.md": "FROM_ROLE: roles/12-verification-engineer.md",
@@ -679,7 +682,7 @@ class NewProductTests(ProjectStartCase):
         profile_path = root / "Example.profile"
         profile_path.write_bytes(new_project.serialize_project_profile(profile_path.name, {
             "schema_version": 1,
-            "harness_version": "0.5.2",
+            "harness_version": "0.5.3",
             "sot_mode": "sot_files",
             "display_name": "Example Product",
             "product_parts": {"Core": {"responsibility": "Neutral core"}},
@@ -1048,3 +1051,116 @@ class CliTests(ProjectStartCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class BootstrapStartTests(ProjectStartCase):
+    """REQ-BP-BOOT-001..005 and generated registry/documented bootstrap contracts."""
+    run_checker = bootstrap_fixtures.WorkspaceCheckerTests.run_checker
+    assert_pass = bootstrap_fixtures.WorkspaceCheckerTests.assert_pass
+    assert_fail = bootstrap_fixtures.WorkspaceCheckerTests.assert_fail
+
+    def test_bootstrap_new_and_existing_first_research(self):
+        for mode in ("new", "existing"):
+            with self.subTest(mode=mode):
+                destination = self.base / ("bootstrap-" + mode)
+                destination.mkdir()
+                updates = dict(destination_parent=destination, product_mode=mode)
+                if mode == "existing":
+                    source = self.existing("product-" + mode)
+                    (source / "private.txt").write_bytes(b"neutral Product preserved\n")
+                    (source / "private.txt").chmod(0o640)
+                    before = tree_manifest(source)
+                    updates["existing_product"] = source
+                root = Path(self.apply(**updates)["target_workspace"])
+                self.assertNotIn("RECORD_TYPE: owner_decision", (root / "logs/decisions.md").read_text())
+                self.assert_pass(self.run_checker(root))
+                if mode == "new":
+                    self.assertEqual(tree_manifest(root / "Example"), {})
+                bootstrap_fixtures.open_first_research(root)
+                self.assert_pass(self.run_checker(root))
+                self.assertFalse((root / "research/archives").exists())
+                if mode == "existing":
+                    self.assertEqual(before, tree_manifest(source))
+                    self.assertEqual(before, tree_manifest(root / "Example"))
+                    self.assertEqual(source.stat().st_mode & 0o7777, (root / "Example").stat().st_mode & 0o7777)
+                else:
+                    self.assertEqual(tree_manifest(root / "Example"), {})
+                self.assertNotIn("DECISION_KIND: implementation", (root / "logs/decisions.md").read_text())
+
+    def test_historical_corpus_is_external_first_research_input(self):
+        corpus = self.base / "historical-reference"
+        corpus.mkdir()
+        (corpus / "notes.txt").write_bytes(b"Historical observations for a new Product.\n")
+        (corpus / "SYSTEM.md").write_bytes(b"Old Harness is reference material, not a Product root.\n")
+        original = tree_manifest(corpus)
+        root = Path(self.apply()["target_workspace"])
+        self.assertEqual(tree_manifest(root / "Example"), {})
+        self.assertFalse((root / corpus.name).exists())
+        bootstrap_fixtures.open_first_research(root)
+        material = (corpus / "notes.txt").read_bytes()
+        evidence = root / "research/01_bootstrap/01-evidence.md"
+        evidence.write_text("# External input evidence\n\n"
+                            f"Source: `{corpus / 'notes.txt'}`\n\n"
+                            f"SHA-256: `{hashlib.sha256(material).hexdigest()}`\n\n"
+                            "Historical observations inform research; no automatic Product import.\n")
+        self.assert_pass(self.run_checker(root))
+        self.assertEqual(tree_manifest(corpus), original)
+        self.assertEqual(tree_manifest(root / "Example"), {})
+        self.assertNotIn("DECISION_KIND: implementation", (root / "logs/decisions.md").read_text())
+
+    def test_bootstrap_system_has_canonical_registry(self):
+        root = Path(self.apply()["target_workspace"])
+        system = (root / "SYSTEM.md").read_text()
+        self.assertEqual(system.count("registry:protected-surfaces"), 1)
+        self.assertIn("| `Example/**` | `pre-implementation` |", system)
+        self.assertIn("| `SYSTEM.md` | `exact-wplan` |", system)
+        self.assert_pass(self.run_checker(root))
+        (root / "SYSTEM.md").write_text(system.replace("registry:protected-surfaces", "missing-registry"))
+        self.assert_fail(self.run_checker(root), "protected-surfaces")
+
+    def test_bootstrap_missing_registry_form_fails_before_materialization(self):
+        distribution = self.distribution_copy()
+        (distribution / "templates/system.md").write_text("# Missing registry form\n")
+        with self.assertRaisesRegex(new_project.InspectionError, "system template requires exactly one protected-surfaces registry"):
+            self.preview(source_distribution=distribution)
+        self.assertFalse((self.destination / "WS_Example").exists())
+
+    def test_bootstrap_active_template_expresses_none_authority(self):
+        root = Path(self.apply()["target_workspace"])
+        template = (root / "templates/workspace-plan-active.md").read_text()
+        self.assertIn("AUTHORITY_REF: <none | OD-000001>", template)
+        self.assertNotIn("transitional logs/decisions.md#implementation", template)
+
+    def test_bootstrap_documented_minimal_research_structure_is_valid(self):
+        root = Path(self.apply()["target_workspace"])
+        sop = (root / "sops/research.md").read_text()
+        section = sop.split("Минимальная структура:", 1)[1]
+        paths = re.search(r"```text\n(.*?)```", section, re.S).group(1).splitlines()
+        for relative in paths:
+            relative = relative.replace("<NN>", "01").replace("<slug>", "bootstrap")
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.name != "00-index.md" or path.parent != root / "research":
+                path.write_text("# Neutral research evidence\n")
+        (root / "research/00-index.md").write_text("# Исследования\nСледующий research ID: `02`.\n")
+        self.assert_pass(self.run_checker(root))
+        self.assertFalse((root / "research/archives").exists())
+
+    def test_bootstrap_documented_change_management_commands_execute(self):
+        root = Path(self.apply()["target_workspace"])
+        sop = (root / "sops/change-management.md").read_text()
+        commands = re.findall(r"```bash\n(.*?)```", sop, re.S)
+        self.assertGreaterEqual(len(commands), 2)
+        self.assertFalse((root / "tools/new_project.py").exists())
+        self.assertFalse((root / "tools/bp_clean.py").exists())
+        for block in commands:
+            command = block.replace("<deployed-workspace>", shlex.quote(str(root)))
+            command = command.replace("<path>", shlex.quote(str(root)))
+            command = command.replace("<external-complete-baseline.tsv>", shlex.quote(str(self.base / "baseline.tsv")))
+            result = subprocess.run(["bash", "-e", "-c", command], cwd=root, text=True, capture_output=True,
+                                    env={**os.environ, "PYTHONPATH": "", "PYTHONDONTWRITEBYTECODE": "1"}, timeout=30)
+            self.assertEqual(result.returncode, 0, command + result.stdout + result.stderr)
+        self.assertTrue((self.base / "baseline.tsv").read_text().startswith("manifest\t1\tcomplete\t."))
+
+if __name__ == "__main__":
+    unittest.main()

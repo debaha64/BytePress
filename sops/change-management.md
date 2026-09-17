@@ -46,10 +46,12 @@
 ## Проверки
 
 ```bash
-python3 -B -c 'from pathlib import Path; paths = (Path("tools/check_workspace.py"), Path("tools/check_product.py"), Path("tools/bp_clean.py"), Path("tools/project_profile.py"), Path("tools/new_project.py")); [compile(path.read_text(encoding="utf-8"), str(path), "exec") for path in paths]'
+python3 -B -c 'from pathlib import Path; paths = (Path("tools/check_workspace.py"), Path("tools/check_product.py"), Path("tools/project_profile.py")); [compile(path.read_text(encoding="utf-8"), str(path), "exec") for path in paths]'
 python3 -B tools/check_workspace.py --workspace <deployed-workspace>
 python3 -B tools/check_product.py --workspace <deployed-workspace>
 ```
+
+Команды выше выполняются из корня deployed Workspace. `tools/new_project.py` и source-only `tools/bp_clean.py` принадлежат исходной distribution и проверяются Product tests; downstream Workspace их не требует. Project Start не поставляет cleaner; если existing Workspace сохраняет private `tools/bp_workspace_clean.py`, его используют только по локальному cleanup contract.
 
 При изменении Harness, инструментов или тестов добавляется полный применимый регрессионный набор Product Unit. Project Start дополнительно проверяется `tests/test_new_project.py` и настоящими временными E2E для нового и существующего продукта с манифестами источника до и после. Для затронутого продуктового кода добавляются его тесты и проверка запуска; обычная несвязанная правка не требует безусловного полного набора.
 
@@ -80,7 +82,7 @@ Workspace Update применяет новую поставку Harness к су�
 2. Проверить точную резервную копию или снимок и контрольную сумму, безопасный единственный корень, пути, типы, содержимое и POSIX-режимы. Зафиксировать полный манифест постоянной области, манифесты продукта, частных материалов и истории, префиксы журналов и отдельно исключённые служебные проекции.
 3. Только во внешнем временном родительском каталоге создать через Project Start эталонный Workspace из новой поставки. Нейтральные продукт и WROAD служат образцом структуры и не получают полномочий существующего проекта.
 4. Сопоставить фиксированный перечень копируемой поставки, создаваемые контракты и частные изменения. Задать точные `CREATE/UPDATE/PRESERVE/REMOVE`. Копируемые поверхности без частных изменений получают точные байты и режимы поставки; создаваемые и частные документы объединяются по смыслу. История и продукт никогда не заменяются эталонным содержимым.
-5. До реализации получить содержательный RED для полной смены владельца конфигурации, версии, сохранности, отказов, контрольного чтения и трёх режимов SoT. Тесты возможности миграции принадлежат тестам продукта; проверки частного обновления собственного Workspace — корневым тестам.
+5. При разработке/квалификации контракта Update получить содержательный RED для применимых изменений конфигурации, версии, сохранности, отказов, контрольного чтения и трёх режимов SoT. Deployment использует квалифицированный контракт и не открывает research под старым Harness. Тесты возможности миграции принадлежат тестам продукта; проверки частного обновления собственного Workspace — корневым тестам.
 6. При переносе прежней конфигурации остановить обычное исполнение. Удалить старое машинное поле, затем создать канонический `<Slug>.profile` через размещённый рядом `project_profile.serialize_project_profile(profile_name, document)` с прежним развёрнутым `harness_version`. Краткий промежуток без владельца конфигурации явно фиксируется; два машинных источника одновременно не допускаются. Не создавать проекцию или режим совместимости.
 7. Обновить только объявленные контракты, инструменты и тесты Harness и прямых потребителей поставки. После обновления всех действующих импортов и команд удалить переходный проверяющий инструмент; обёртку или псевдоним не оставлять. Отдельный частный инструмент ограниченной очистки сохраняет свою ответственность.
 8. Проверить обновлённые копируемые байты и режимы, профиль, Slug, корень продукта, настроенный SoT, маршрут, ссылки, защищённые и частные манифесты, префиксы дозаписи, служебные изменения, происхождение и остатки при прежнем `harness_version`. Структурный PASS сам по себе не доказывает обновление: обязательно контрольное чтение фактического развёртывания и результата по каждому пути.
@@ -88,6 +90,35 @@ Workspace Update применяет новую поставку Harness к су�
 10. Только после успешного контрольного чтения сменить `harness_version` канонической сериализацией на версию применённой поставки. Принадлежащий продукту `VERSION` не меняется вследствие обновления. Зафиксировать наблюдаемые исходное состояние, результат контрольного чтения, переключение версии и итоговое состояние.
 11. Повторить полную проверку из корня Workspace и продукта на внешней свежей копии, заготовки всех режимов SoT и свежий Project Start для нового и существующего продукта. Bugfixes и Consistency Closure проверяют всех прямых потребителей; технический PASS не закрывает точку решения владельца по миграции.
 12. При отказе прекратить обычное исполнение, сохранить точные промежуточные свидетельства и прежнюю развёрнутую версию. До разрешённого владельцем восстановления не заявлять успешное обновление; восстанавливать по точной резервной копии и манифесту сохранности, без сброса или исправления истории и служебных проекций. После последнего разрешённого изменения создать обычный снимок по процедуре архивации, проверить свежую распаковку и больше не писать в Workspace. Удалить внешний эталон после проверки.
+
+### Внешняя граница Workspace Update
+
+`REQ-BP-UPDATE-001`: Workspace Update — ограниченная операция deployment Harness из новой проверенной distribution над замороженным существующим Workspace. Она не является обычной project work под старым Harness и не требует сначала открывать research/system-editing WPLAN в нём. Основной путь требует quiescent Workspace: active WPLAN count `0`, явно записанный non-executing checkpoint, нет concurrent writes. Единственное исключение — [recovery при active WPLAN](#recovery-при-active-wplan) по RU-REQ-01..06; иначе STOP. Существующий active route не закрывается автоматически.
+
+Полномочие операции — фактическое отдельное разрешение владельца на exact snapshot/digest, source distribution identity, target identity и полный update disposition. Это внешний deployment contract, аналогичный границе доверия Project Start; generic implementation OD старого Workspace не синтезируется. Исполнитель работает из новой distribution, сохраняет backup, авторизацию и промежуточные свидетельства вне target. Нового updater executable, режима CLI, сервиса или типа решения нет.
+
+Перед mutation подтвердить старую structural проверку на quiescent Workspace, immutable source/target manifests и authority. Известный отказ старого checker на первом research фиксируется как field evidence; его PASS на таком research не является условием Update. Checker не отключается: после переноса новый checker проверяет обновлённый Harness при прежнем `harness_version`. Ordinary project work и Product mutation остаются под обычными WPLAN/phase/owner gates.
+
+`REQ-BP-UPDATE-002`: сравнить actual trees двух fresh Project Start deployments из exact старой и новой distributions, включая типы, bytes и modes. Fixed COPY list не является полным transition manifest. Каждый изменившийся downstream path получает ровно один disposition: `COPY`, `GENERATED_MERGE`, `PRESERVE`, `REMOVE` или `NOT_APPLICABLE` с причиной. Неизвестный, пропущенный или повторный path — FAIL до mutation. Generated `docs/technical/project-start.md` обязательно получает `GENERATED_MERGE`; mandatory contract нельзя скрыть через PRESERVE/NOT_APPLICABLE. Generated project state/history reference не импортируются. Частный overlay требует явного merge и preservation criteria, а не безусловного COPY.
+
+`REQ-BP-UPDATE-003`: Product, project identity, WROAD/WBACK/все WPLAN, research/history, SoT и service projections сохраняются. Apply меняет только разрешённый Harness delta. Проверить exact disposition read-back, preservation, новый checker и first research на отдельной копии при старой версии. Затем обновить связанную текстовую проекцию версии и последним среди Harness изменений переключить `harness_version`. После successful final read-back обычного clean Update append-only записать evidence операции в обновлённом Workspace; эта ограниченная фиксация является окончанием deployment, а не открытием project work без WPLAN. После clean Update дальнейшая работа открывает обычный WPLAN; recovery сохраняет существующий active WPLAN.
+
+При failure не заявлять успешный Update: до cutover старая версия остаётся без изменений; если отказ обнаружен после cutover, восстановить прежний version claim и сохранить точное intermediate evidence вне target. Восстановление Harness выполняется только в заранее разрешённой recovery boundary по backup, без изменения Product/history. Не продолжать обычную работу в промежуточном состоянии. Product tests квалифицируют deployment на self-contained projection настоящего released baseline; changing VERSION текущих исходников не создаёт старую distribution.
+
+
+### Recovery при active WPLAN
+
+`RU-REQ-01`: основной путь остаётся clean Update с active WPLAN count `0`. Узкое исключение допускает frozen/quiescent Workspace с ровно одним active WPLAN, если именно доказанный Harness defect блокирует конкретную следующую разрешённую операцию. WPLAN не завершается, не переоткрывается и не подменяется; новый маршрут и новый тип owner decision не создаются.
+
+`RU-REQ-02`: до любых target writes связать внешнее разрешение владельца с exact backup/digest, target/source manifests, полным disposition, исходным WPLAN и воспроизводимым blocker evidence. Зафиксировать следующую операцию, почему её блокирует Harness contract/checker и что остаётся допустимым. Structural PASS старого checker не исключает процедурный defect: такой отказ воспроизводится по реально развёрнутой SOP/форме и достаточному исходному факту. Наличие active WPLAN или желание обновиться само по себе не разрешает recovery. Missing authorization/evidence, concurrent writes/drift, несколько active WPLAN, Product/project defect либо отсутствие причинной связи — STOP до mutation. Нельзя исправлять Harness под видом обычной работы старого WPLAN.
+
+`RU-REQ-03`: до apply зафиксировать path/type/bytes/POSIX modes для Product, Profile composition/SoT, WROAD/WBACK, всех WPLAN, research, logs, feedback и private project state. Обновлять только declared Harness-owned contracts, copied/generated/private consumers по обычному disposition. Не переносить reference plans/logs/research, не переписывать active WPLAN даже ради blocker field и не импортировать Feedback records. Во время recovery весь исходный project state сохраняется exact; update evidence до read-back находится вне target. Допустимые service projections не обходятся и не изменяются.
+
+`RU-REQ-04`: candidate checker исполняется из обновлённого target/tools при прежнем `harness_version`; проверить полный disposition read-back и preservation. Тот же active WPLAN должен проходить новый контракт без выключения gate. Разблокированную операцию проверить на отдельной disposable probe: её переход фазы и новые records не включаются в preservation baseline самого Update. Owner authorization на Update не означает принятие исследовательских выводов, расширение обычного WPLAN или разрешение Product work.
+
+`RU-REQ-05`: только после полного read-back менять связанную текстовую version projection и последним `harness_version` canonical serializer; затем final read-back. До cutover failure сохраняет старую версию; после cutover failure восстанавливает прежний Profile/version claim и связанную проекцию, сохраняя точное intermediate evidence вне target. Это исправление version claim, не автоматический reset Harness, Product или истории. Обычную работу не возобновлять до проверенного результата. При одинаковых версиях успех доказывается exact candidate manifest/digest и deployed delta.
+
+`RU-REQ-06`: в recovery исходные logs сохраняются exact до конца операции; финальное evidence передаётся во внешнем отчёте. После successful Update прежний active WPLAN продолжается только в своих обычных границах и по отдельным применимым owner gates. Реальный field result, Product Acceptance и release не следуют из тестовой disposable recovery. Новый updater framework/executable не вводится; процедура и её existing Product tests остаются владельцами исполнения и проверки.
 
 ## Documentation Impact
 
@@ -102,3 +133,30 @@ Workspace Update применяет новую поставку Harness к су�
 Последовательность: изменение → Documentation Impact → владельцы смысла → связанные документы, SOP, формы и терминология → объективные проверки → применимое чтение человеком → Consistency Closure. Обязательность формы определяет применяющая SOP; наличие шаблона не требует отдельного документа. Пользовательские шаги принадлежат `docs/user`; полномочия агента, точки контроля, STOP и восстановление — соответствующей SOP. [Проверки и критерии чтения](verify-work.md), [изменение терминов](terminology.md) и [русский стиль](../docs/technical/system-style.md) имеют отдельных владельцев.
 
 MOVE/RENAME включает все действующие Markdown-потребители, в том числе ссылки из принятых свидетельств. В таких свидетельствах допустимо только явно разрешённое владельцем ограниченное обслуживание ссылок: перенос адреса 1→1 при неизменных тексте ссылки и окружении; перенос 1→N сохраняет исторический исходный путь некликабельным только по точному разрешению. Все вхождения перечисляются до изменения; обратное преобразование разрешённых участков должно восстановить исходные байты. Находки, решения и выводы не переписываются. Неоднозначность вне разрешения требует STOP. Заглушка совместимости ради истории не создаётся.
+
+## Feedback при Workspace Update
+
+`FB-REQ-11` / `FB-SCN-11`: [модель Feedback](../docs/technical/feedback.md) отделяет static contracts от Workspace data. До apply включить весь `feedback/` target в backup и preservation manifest: пути, типы, bytes, POSIX modes, original/provenance, IDs, связи, закрытые записи и частный индекс. Наличие записей само по себе не разрешает recovery или обход quiescent gate; узкое исключение определяется RU-REQ-01..06.
+
+1. Четыре static owners из [Project Start](../docs/technical/project-start.md#feedback) и изменённые copied consumers получают `COPY`, если private overlay отсутствует. Частные изменения требуют точного `GENERATED_MERGE` с критериями сохранения.
+2. Generated README/AGENTS/SYSTEM, docs/user/README.md, docs/technical/README.md и docs/technical/project-start.md получают `GENERATED_MERGE`: обновить ссылки и contracts, сохранить private смысл. Не переносить начальные reference plans/logs или authority.
+3. Существующий `feedback/` и всё его содержимое получают `PRESERVE`. Не регенерировать и не перезаписывать `feedback/README.md`, records или original; не менять IDs, modes или private navigation. Если каталог либо README отсутствует, создать только отсутствующий элемент из пустого reference, без records. В полном old/new deployment disposition это условный `GENERATED_MERGE` домена; точный target manifest отдельно фиксирует `CREATE` отсутствующего и `PRESERVE` существующего.
+4. У каждого изменённого downstream path должен быть ровно один disposition с причиной; source-only tests/new_project.py не копируются в Workspace. Пропущенный обязательный consumer, replacement данных или неизвестный private overlay дают FAIL до mutation.
+5. До version cutover подтвердить static/copied/generated read-back и сохранность всей Feedback data surface. При failure оставить прежнюю версию; исправление только в заранее разрешённой recovery boundary по exact backup. Совпадающий `harness_version` не доказывает тождество candidates: сравнить exact distribution manifest/digest и actual deployed delta. Повторная доставка/Update не импортирует и не дублирует Feedback records.
+
+## Минимальная проверка новой capability
+
+Для S1/S2 перед завершением дать короткое соответствие «пункт → existing owner/evidence → PASS/pending/not-applicable + причина», пропорционально фактическому изменению. Один accepted specification может покрыть несколько пунктов; отдельных документов или нового gate не требуется. Blocking pending criterion остаётся открытым. SDD/DDD, authority и V&V сохраняют действующих owners.
+
+1. Пользователь и наблюдаемая польза.
+2. Bounded context, responsibilities и semantic owners без конкурирующих норм.
+3. Достаточные inputs и наблюдаемые outputs.
+4. Lifecycle, states и guards конкретной capability.
+5. Authority и запрещённые автоматические действия.
+6. Данные, provenance и неизменяемые части.
+7. REQ/INV/SCN и positive/negative/failure cases до реализации по [task-flow](../docs/technical/task-flow.md).
+8. Deployment/Workspace Update: static/data separation, full copied/generated/private disposition и preservation по этой SOP.
+9. Documentation Impact: owners, инструкция пользователю, SOP/template и все direct navigation/generated consumers.
+10. Verification: наблюдаемые оракулы, exact evidence и предел технического PASS по [verify-work](verify-work.md).
+11. Реальное применение: пользователь/сценарий, данные и результат; synthetic/self-review не заменяют field use или human Validation.
+12. Критерии переноса в Product: что доказано pilot, что осталось проверить и какое отдельное owner authorization требуется по [PM](project-management.md).

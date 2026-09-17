@@ -21,7 +21,7 @@
 
 Полный `PRODUCT_INPUT` закрывает пять продуктовых слоёв интервью без дополнительного подтверждения `Да`. Агент сразу переходит к слою `next-transition`: при первоначальном создании продукта в `sot_files` это обычное стартовое исследование (`discovery`) без выбора маршрута; для принятого продукта действует раздел ниже; в уже объявленном `sot_git` это отдельный запрос `local_git_route`. Неполный `PRODUCT_INPUT` по-прежнему требует уточнений по незакрытым слоям.
 
-Карточка точки контроля реализации готовится только после зафиксированной и проверенной контрольной отметки стартового исследования (`discovery`). Единственная точка контроля владельца для реализации — новая отдельная однозначная реплика `Разрешаю реализацию <Product Unit>.`, полученная после этой проверки.
+Карточка точки контроля реализации готовится только после зафиксированной и проверенной контрольной отметки стартового исследования (`discovery`). Разрешение реализации — новое отдельное однозначное решение владельца, полученное после этой проверки; `Разрешаю реализацию <Product Unit>.` является примером формулировки. Явное post-discovery разрешение конкретного fix фиксируется по фактическому ответу; повторный discovery или ритуальное подтверждение не требуются. Первый research WPLAN работает с AUTHORITY_REF: none и непустой рабочей границей без implementation OD; canonical phase/transition contract принадлежит [phase-gates](../docs/technical/phase-gates.md), Product до implementation gate защищён.
 
 ## Выбор маршрута принятого продукта
 
@@ -66,10 +66,10 @@ LAYERS_COMPLETE: product-frame,user-scenario,data-storage,technical-frame,verifi
 LAYERS_DEFERRED: none | data-storage=отложено владельцем до следующего slice
 STATUS: complete
 SOURCE_KIND: owner_response
-SOURCE_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<product-input-start>-<product-input-end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
-Для обычного IE без `EVIDENCE_CLASS: transition` поле `WPLAN_ID` указывает WPLAN фиксации, активный в момент фактического получения ответов интервью. Будущий WPLAN реализации не записывается в IE и ссылается на него через `INTERVIEW_EVIDENCE_REF`. `SOURCE_REF` указывает существующий конечный диапазон фактического ответа внутри долговечного `.codex/*.raw.log`; ожидаемый класс — `owner_answer` или `owner_confirmation`. `SOURCE_KIND: agent_inference` запрещён.
+Для обычного IE без `EVIDENCE_CLASS: transition` поле `WPLAN_ID` указывает WPLAN фиксации, активный в момент фактического получения ответов интервью. Будущий WPLAN реализации не записывается в IE и ссылается на него через `INTERVIEW_EVIDENCE_REF`. `SOURCE_REF` указывает сохранённый фактический ответ по [контракту источников](../docs/technical/artifact-lifecycle.md#источники-свидетельств); ожидаемый класс — `owner_answer` или `owner_confirmation`. `SOURCE_KIND: agent_inference` запрещён.
 
 Существующие обычные принятые записи могут сохранять корректный указатель существующего очищенного `.log`; такая историческая совместимость не требует миграции или нового поля записи.
 
@@ -77,11 +77,11 @@ Transition IE дополнительно содержит:
 
 ```text
 EVIDENCE_CLASS: transition
-PRODUCT_INPUT_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<start>-<end>
-ROUTE_CHOICE_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<choice>-<choice>
+PRODUCT_INPUT_REF: <workspace-relative-path>#<anchor-or-lines>
+ROUTE_CHOICE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
-Оба диапазона принадлежат тому же необработанному файлу и текущему `SESSION_ID`; полный `PRODUCT_INPUT` расположен раньше выбора `B`. Узкое исключение действует только для принятого продукта, новой задачи и перехода `sot_files -> sot_git`: `WPLAN_ID` переходного IE указывает переходный WPLAN, созданный из того же выбора `B` и впервые зафиксированный вместе с IE и обеими OD в одном коммите перехода. Не утверждается, что этот WPLAN существовал или был активным при получении `PRODUCT_INPUT` либо `B`; время и порядок входа владельца доказывают `PRODUCT_INPUT_REF`, `ROUTE_CHOICE_REF`, `SOURCE_REF` и `SESSION_ID`. Переходный IE закрывает пять продуктовых слоёв и `next-transition`, но не открывает реализацию. Следующий WPLAN функционального изменения или стартового исследования (`discovery`) ссылается на этот IE без создания второй записи и без смены `EVIDENCE_CLASS`.
+Обе ссылки указывают фрагменты одного сохранённого оригинального источника текущего `SESSION_ID`; полный `PRODUCT_INPUT` расположен раньше выбора `B`. Узкое исключение действует только для принятого продукта, новой задачи и перехода `sot_files -> sot_git`: `WPLAN_ID` переходного IE указывает переходный WPLAN, созданный из того же выбора `B` и впервые зафиксированный вместе с IE и обеими OD в одном коммите перехода. Не утверждается, что этот WPLAN существовал или был активным при получении `PRODUCT_INPUT` либо `B`; время и порядок входа владельца доказывают `PRODUCT_INPUT_REF`, `ROUTE_CHOICE_REF`, `SOURCE_REF` и `SESSION_ID`. Переходный IE закрывает пять продуктовых слоёв и `next-transition`, но не открывает реализацию. Следующий WPLAN функционального изменения или стартового исследования (`discovery`) ссылается на этот IE без создания второй записи и без смены `EVIDENCE_CLASS`.
 
 ## Решение реализации
 
@@ -102,7 +102,7 @@ ROUTE_REF: none
 PREVIOUS_STATUS: none
 STATUS: active
 SOURCE_KIND: owner_response
-SOURCE_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<start>-<end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 WPLAN хранит только ссылки:
@@ -114,7 +114,7 @@ OWNER_DECISION_REFS: OD-000001
 
 Для действительной точки контроля обычный `IE.WPLAN_ID` остаётся WPLAN фиксации; у переиспользуемого переходного IE он остаётся переходным WPLAN той контрольной отметки. `OD.WPLAN_ID` реализации совпадает с активным WPLAN реализации. `EVIDENCE_REF` решения и `INTERVIEW_EVIDENCE_REF` WPLAN реализации ссылаются на один действительный `IE-*`. Дополнительные поля `BASIS_WPLAN_ID` и `CAPTURE_WPLAN_ID` не используются.
 
-Если связанный `IE-*` имеет `EVIDENCE_CLASS: transition`, `SOURCE_REF` OD реализации обязан указывать существующий конечный диапазон долговечного `*.raw.log`. Более позднее разрешение реализации может находиться в другом локальном необработанном файле.
+Если связанный `IE-*` имеет `EVIDENCE_CLASS: transition`, `SOURCE_REF` OD реализации указывает сохранённый оригинал фактического ответа. Более позднее разрешение может находиться в другом локальном источнике. При managed Codex transport действуют raw-source guards ES-REQ-03; в generic Workspace не требуется `.raw.log` или служебный каталог.
 
 Временная граница решения:
 

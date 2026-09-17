@@ -28,7 +28,7 @@
 
 ## Передача
 
-После завершения обзора владельцем передать результат и свидетельства `Product Acceptance Coordinator` либо вернуть замечания в соответствующую предыдущую фазу.
+Если результат допускается к следующему gate, передать его и evidence `Product Acceptance Coordinator`. При changes requested передать замечания владельцу для terminal disposition текущей итерации и отдельно разрешённого corrective WPLAN по [project-management](../sops/project-management.md#доработка-после-owner-review); обратный phase transition не выполнять.
 
 ## Связанные SOP
 

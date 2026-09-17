@@ -7,7 +7,7 @@ RECORD_ID: <типизированный ID>
 WPLAN_ID: <WPLAN-ID | none>
 DATE: <YYYY-MM-DD>
 SUMMARY: <краткий факт>
-SOURCE_REF: codexlog:.codex/<actual-log-file>#<ровно один селектор>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 - Факт/результат: {{summary}}
@@ -15,3 +15,5 @@ SOURCE_REF: codexlog:.codex/<actual-log-file>#<ровно один селект�
 - Свидетельство: {{reference}}
 - Непроверенные области: {{limits}}
 - Следующий шаг: {{next}}
+
+Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.
