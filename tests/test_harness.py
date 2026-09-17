@@ -29,12 +29,12 @@ EXPECTED_TOOL_FILES = {
 }
 EXPECTED_TEST_FILES = {
     "README.md", "test_check_product.py", "test_check_workspace.py",
-    "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py",
+    "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py",
 }
-EXPECTED_DISTRIBUTION_FILES = 142
-EXPECTED_DISTRIBUTION_DIRECTORIES = 13
-EXPECTED_DEPLOY_FILES = 111
-EXPECTED_DEPLOY_MANIFEST_SHA256 = "8ba826c6eee9063f8c42db14abd7b1ea1174e56728ea212f378b9b7dd22fb60e"
+EXPECTED_DISTRIBUTION_FILES = 149
+EXPECTED_DISTRIBUTION_DIRECTORIES = 14
+EXPECTED_DEPLOY_FILES = 115
+EXPECTED_DEPLOY_MANIFEST_SHA256 = "4367d56af0520cc38ff6c098e3ba753921f42bcde9c7db9cd528db2f3e9f69c2"
 DISPOSABLE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 DISPOSABLE_SUFFIXES = (".pyc", ".pyo", ".tmp", ".temp", ".orig")
 
@@ -233,7 +233,7 @@ class BytePressQualificationTests(unittest.TestCase):
         directories = [path for path in root.rglob("*") if path.is_dir() and not path.is_symlink()]
         self.assertEqual(len(files), EXPECTED_DISTRIBUTION_FILES)
         self.assertEqual(len(directories) + 1, EXPECTED_DISTRIBUTION_DIRECTORIES)
-        self.assertEqual((root / "VERSION").read_bytes(), b"0.5.2\n")
+        self.assertEqual((root / "VERSION").read_bytes(), b"0.5.3\n")
         self.assertEqual({path.name for path in (root / "tools").iterdir() if path.is_file()}, EXPECTED_TOOL_FILES)
         self.assertEqual({path.name for path in (root / "tests").iterdir() if path.is_file()}, EXPECTED_TEST_FILES)
         for forbidden in ("plans", "logs", "research", "src"):
@@ -250,7 +250,7 @@ class BytePressQualificationTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.assert_distribution_identity(root)
         generic = (root / "tools/check_product.py").read_text(encoding="utf-8")
-        self.assertNotIn("0.5.2", generic)
+        self.assertNotIn("0.5.3", generic)
         self.assertNotIn(str(EXPECTED_DISTRIBUTION_FILES), generic)
 
     def test_project_start_manifest_has_new_checkers_and_no_legacy_checker(self):

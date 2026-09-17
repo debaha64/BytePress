@@ -37,3 +37,18 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 `test_check_workspace.py` проверяет обязательность и корректность Documentation Impact для S1/S2, отсутствие искусственного требования к S0, обновление ссылочных потребителей при MOVE, сохранение принятого свидетельства при разрешённом изменении только ссылок и сохранение исторического исходного пути при разделении документа. Отрицательный случай подтверждает, что некорректное выбранное решение отклоняется, а несвязанный исторический блок не подменяет текущие полномочия.
 
 `test_harness.py` проверяет граф README и документации, непосредственные индексы, ссылки и якоря и только утверждённые устаревшие формы из глоссария. В граф входят README и все поставляемые темы `docs/`; SOP, формы, роли и внутренние создаваемые артефакты не считаются потерянными пользовательскими темами. Отрицательные заготовки проверяют сломанный якорь, потерянную тему, устаревший заголовок SoT и допустимые фрагменты кода и цитат. Навигация Project Start и отсутствие удалённых путей проверяются в действительно созданном Workspace. Ясность и полнота смысла остаются предметом чтения человеком.
+
+## Released fixture для Workspace Update
+
+`fixtures/deployed-0.5.2.tar.gz` — замороженный результат fresh Project Start настоящей released distribution 0.5.2: нейтральный WS_Example, пустой Product, только начальные generated записи. Это не копия исторического пользовательского Workspace. Все 142 deployed файла сохранены для полной проверки changed paths; source-only generator и пользовательская история в fixture не входят. `fixtures/deployed-0.5.2.json` хранит exact source snapshot/Product/generator hashes, архивный digest и полный tree manifest с modes. Tests проверяют manifest перед применением; путь к пользовательскому ~/code и изменение VERSION текущего generator не используются. Квалификация связывает этот fixture с byte-exact released source и fresh deployed output.
+
+Patch driver находится только в test_workspace_update.py и механически проверяет контракт existing change-management SOP. Это не shipped updater. RED ловит ложный old checker и пропуск TRANSFORM project-start; negative cases проверяют authority/quiescence/freeze, каждый missing disposition и отказ read-back до version cutover. Rework regression сохраняет старый WPLAN и OD, требует fresh OD нового WPLAN и оставляет backward transition запрещённым.
+
+## Feedback / T09
+
+`test_feedback.py` проверяет [модель](../docs/technical/feedback.md), New/Existing Project Start, автономный ручной цикл на копии формы, original/planning separation, пустую поставку и сохранение пользовательских bytes/modes при Update. `test_workspace_update.py` применяет full deployment disposition к released fixture, проверяет обязательные generated consumers, отказ read-back и последующее переключение версии. Synthetic records создаются только во временных Workspace; реальный field PASS и Product Acceptance не выводятся из tests.
+
+
+## Источники и recovery Update
+
+`test_workspace_update.py` проверяет ES-REQ-01..04 и RU-REQ-01..06: реальные Project Start формы и generic CHANGE/QUALITY/DECISION без client runtime, research → requirements, сохранение managed codexlog, один Harness-blocked active WPLAN при recovery, отказ неподходящему состоянию, exact Product/route/research/history/Feedback и failure до/после version cutover. Tests-first RED относится к старым deployed contracts и guard existing manual Update driver. Нейтральные fixtures не являются реальными owner decisions или field validation.

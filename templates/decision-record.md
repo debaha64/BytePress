@@ -17,7 +17,7 @@ ALLOWED_ACTIONS: <exact allowed actions>
 PREVIOUS_STATUS: none
 STATUS: active
 SOURCE_KIND: owner_response
-SOURCE_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<start>-<end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 ```text
@@ -26,7 +26,9 @@ RECORD_ID: PA-000001
 WPLAN_ID: <WPLAN-ID>
 DECISION_VALUE: accepted | rejected
 SOURCE_KIND: owner_response
-SOURCE_REF: codexlog:.codex/<actual-raw-file>.raw.log#lines=<start>-<end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 `PA-*` и Release Authorization имеют отдельные контракты; `decommissioning_authorization` и `retirement_authorization` — виды OD-*.
+
+Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.

@@ -27,3 +27,15 @@ Project Start создаёт отдельный Workspace из поставки 
 Workspace README заканчивается полным текстом лицензионного уведомления BytePress из `LICENSE`; отдельный файл лицензии Harness в месте назначения не создаётся. Профиль материализует [каноническая сериализация](../architecture/project-profile.md), а разрешённые копируемые поверхности задаёт пофайловый манифест Project Start. Формы могут копироваться без заполнения: `AGENTS.md`, `SYSTEM.md`, часть README и журналов создаются инструментом отдельно.
 
 Проект после создания находится в [состоянии только с WROAD](../user/after-project-start.md). При создании код продукта, оболочка, Git/GitHub и сеть не используются; первый WBACK/WPLAN не открывается, приёмка не выполняется. Контракты исполнения проверяются [тестами продукта](../../tests/README.md), команды описаны в [справке инструментов](../../tools/README.md).
+
+## Защищённые поверхности нового Workspace
+
+Project Start материализует в generated `SYSTEM.md` canonical machine-readable `registry:protected-surfaces` по [форме SYSTEM](../../templates/system.md). В таблице `Path | Protection` Product root из Slug имеет policy `pre-implementation`, обязательные системные поверхности — `exact-wplan`. Checker читает единственный registry owner SYSTEM, проверяет обязательные уникальные bounded строки и применяет защиту Product к pre-implementation WPLAN. Нового config file и второго registry owner нет. Формы и инструмент генерации являются прямыми потребителями; созданный SYSTEM владеет реестром данного Workspace.
+
+`REQ-BP-START-001`: New Product создаёт пустой Product root; Existing Product копирует реальный Product root с сохранением bytes/types/modes. Historical input corpus остаётся внешним входом первого research и автоматически не импортируется. [Выбор трёх операций](../user/README.md#как-выбрать) отделяет эти варианты от Workspace Update существующей среды.
+
+## Feedback
+
+`FB-REQ-11` / `FB-SCN-11`: оба варианта Project Start копируют `docs/technical/feedback.md`, `docs/user/feedback.md`, `sops/feedback.md`, `templates/feedback-record.md` по фиксированному пофайловому manifest. Generated AGENTS/SYSTEM/README и пользовательский индекс дают ссылки на capability. Создаётся `feedback/README.md` только с навигацией ID/тема/ссылка, без records, состояния очереди и чужих данных. Каталог `feedback/` принадлежит Workspace; New Product остаётся пустым, Existing Product сохраняет opaque bytes/types/modes. Приём текста применяется по [SOP](../../sops/feedback.md) только в действующей рабочей границе; Project Start не создаёт Feedback records, WBACK или WPLAN.
+
+[Workspace Update](../../sops/change-management.md#feedback-при-workspace-update) сохраняет existing feedback data и обновляет static/copied/generated contracts отдельно. Отсутствие Feedback directory в static distribution намеренно; новый Workspace получает механизм и пустой индекс, без пользовательского corpus.

@@ -465,7 +465,19 @@ def _check_sdlc_transition(workspace: Path):
     plan_checkpoint = _single_field(text, "Текущая контрольная отметка")
     if values["TRANSITION_CHECKPOINT"] != plan_checkpoint:
         raise ContractError("transition checkpoint mismatch")
-    _implementation_authority(workspace, text, values["AUTHORITY_REF"])
+    # Work scope and the decision required by this transition have separate owners.
+    raw_surfaces = _line_value(text, "ALLOWED_SURFACES")
+    if raw_surfaces == "none":
+        raise ContractError("active WPLAN requires non-empty ALLOWED_SURFACES")
+    for surface in raw_surfaces.split(","):
+        _declared_path(surface.strip())
+    _owner_decision_refs(text)
+    implementation_work = source == "implementation"
+    implementation_gate = required_decision_kind == "implementation" and values["OWNER_GATE_STATUS"] == "satisfied"
+    if implementation_work or implementation_gate:
+        _implementation_authority(workspace, text, values["AUTHORITY_REF"])
+    elif values["AUTHORITY_REF"] != "none":
+        raise ContractError("premature/wrong-phase implementation authority; AUTHORITY_REF must be none")
     if values["EVIDENCE_KIND"] != required_evidence_kind:
         raise ContractError("EVIDENCE_KIND does not match phase-gate required evidence kind")
 
@@ -685,6 +697,54 @@ def _plan_surface_declarations(workspace: Path):
                     f"plan surfaces overlap: {left_action} {left}; {right_action} {right}"
                 )
     return declarations
+
+
+
+def _check_protected_surfaces(workspace: Path, product_name: str):
+    text = (workspace / "SYSTEM.md").read_text(encoding="utf-8")
+    sections = re.split(r"(?m)^registry:protected-surfaces\s*$", text)
+    if len(sections) != 2:
+        raise ContractError("SYSTEM requires exactly one registry:protected-surfaces")
+    section = re.split(r"(?m)^##? ", sections[1], maxsplit=1)[0]
+    rows = {}
+    for line in section.splitlines():
+        if not line.startswith("|") or line in {"| Path | Protection |", "|---|---|"}:
+            continue
+        match = re.fullmatch(r"\| `([^`]+)` \| `(pre-implementation|exact-wplan)` \|", line)
+        if not match:
+            raise ContractError("invalid protected-surfaces registry row")
+        path, policy = match.groups()
+        _declared_path(path)
+        if path in rows:
+            raise ContractError("duplicate protected-surfaces registry path")
+        rows[path] = policy
+    required = {f"{product_name}/**": "pre-implementation"}
+    required.update({path: "exact-wplan" for path in
+                     ("AGENTS.md", "SYSTEM.md", "sops/**", "roles/**", "skills/**", "templates/**", "tools/**")})
+    if any(rows.get(path) != policy for path, policy in required.items()):
+        raise ContractError("protected-surfaces registry missing required path/policy")
+    plans = _raw_sorted((workspace / "plans/active").glob("WPLAN-*.md"))
+    if plans:
+        plan = plans[0].read_text(encoding="utf-8")
+        phases = [phase for phase, _role in _phase_role_projection(workspace)]
+        source = _single_field(plan, "FROM_PHASE")
+        # Completed approval hands Product work to implementation only after its owner gate.
+        entered = (source == "approval" and _single_field(plan, "TO_PHASE") == "implementation"
+                   and _single_field(plan, "TRANSITION_STATE") == "complete"
+                   and _single_field(plan, "OWNER_GATE_STATUS") == "satisfied")
+        if source in phases and phases.index(source) < phases.index("implementation") and not entered:
+            surfaces = [value.strip() for value in _line_value(plan, "ALLOWED_SURFACES").split(",") if value != "none"]
+            declarations = _plan_surface_declarations(workspace) or {}
+            surfaces.extend(row["raw"] for action in ("CREATE", "UPDATE", "REMOVE") for row in declarations.get(action, []))
+            for surface in surfaces:
+                path = _declared_path(surface)
+                for protected, policy in rows.items():
+                    if policy != "pre-implementation":
+                        continue
+                    boundary = _declared_path(protected)
+                    if path == boundary or boundary in path.parents or path in boundary.parents:
+                        raise ContractError(f"pre-implementation Product surface is protected: {surface}")
+    return {"owner": "SYSTEM.md", "count": len(rows)}
 
 
 def _check_plan_surfaces(workspace: Path):
@@ -1149,6 +1209,7 @@ def inspect_workspace(workspace_value, preservation_manifest=None, baseline_mani
     perform("plan-surfaces", lambda: _check_plan_surfaces(workspace))
     perform("documentation-impact", lambda: _check_documentation_impact(workspace))
     if state["profile"] is not None:
+        perform("protected-surfaces", lambda: _check_protected_surfaces(workspace, state["profile"].slug))
         perform("workspace-sot", lambda: _check_sot(workspace, state["profile"]))
     perform("research-registry", lambda: _check_research_registry(workspace))
     archive = perform("research-archives", lambda: _check_research(workspace))

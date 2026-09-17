@@ -24,3 +24,5 @@
 - [Приём задачи](task-intake.md).
 - [Терминология](terminology.md).
 - [Проверка работы](verify-work.md).
+
+- [Обработка обратной связи](feedback.md).
