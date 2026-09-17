@@ -5,7 +5,7 @@ RECORD_ID: RISK-000001
 WPLAN_ID: <WPLAN-ID | none>
 DATE: YYYY-MM-DD
 SUMMARY: <краткий факт>
-SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 - Дата:
@@ -21,3 +21,5 @@ SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
 - Следующий шаг:
 
 Повышенный риск не закрывается техническим PASS без решения владельца, если требуется решение владельца.
+
+Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.

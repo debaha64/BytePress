@@ -8,7 +8,7 @@ WPLAN_ID: <WPLAN-ID | none>
 EVIDENCE_KIND: <canonical required evidence kind | not-applicable>
 DATE: YYYY-MM-DD
 SUMMARY: <краткий факт>
-SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
+SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
 - Факт/результат: {{summary}}
@@ -23,3 +23,5 @@ SOURCE_REF: codexlog:.codex/<actual-log-file>#lines=<start>-<end>
 - Product Acceptance: {{status/reference}}
 - Release Authorization: {{status/reference}}
 - GUI, если применим: {{визуальный результат либо ready-for-owner-check}}
+
+Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.

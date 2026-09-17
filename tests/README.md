@@ -47,3 +47,8 @@ Patch driver находится только в test_workspace_update.py и ме
 ## Feedback / T09
 
 `test_feedback.py` проверяет [модель](../docs/technical/feedback.md), New/Existing Project Start, автономный ручной цикл на копии формы, original/planning separation, пустую поставку и сохранение пользовательских bytes/modes при Update. `test_workspace_update.py` применяет full deployment disposition к released fixture, проверяет обязательные generated consumers, отказ read-back и последующее переключение версии. Synthetic records создаются только во временных Workspace; реальный field PASS и Product Acceptance не выводятся из tests.
+
+
+## Источники и recovery Update
+
+`test_workspace_update.py` проверяет ES-REQ-01..04 и RU-REQ-01..06: реальные Project Start формы и generic CHANGE/QUALITY/DECISION без client runtime, research → requirements, сохранение managed codexlog, один Harness-blocked active WPLAN при recovery, отказ неподходящему состоянию, exact Product/route/research/history/Feedback и failure до/после version cutover. Tests-first RED относится к старым deployed contracts и guard existing manual Update driver. Нейтральные fixtures не являются реальными owner decisions или field validation.

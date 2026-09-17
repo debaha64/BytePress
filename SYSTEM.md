@@ -109,7 +109,7 @@
 | `owner_decision`, `OD-*` | `WS_<Slug>/logs/decisions.md` | отдельное решение владельца |
 | `product_acceptance`, `PA-*` | `WS_<Slug>/logs/decisions.md` | отдельная продуктовая приёмка |
 
-Активный WPLAN Workspace хранит ссылки на записи, но не копирует их содержимое. Канонический локальный источник использует конечный диапазон `codexlog:.codex/<actual-log-file>#lines=<start>-<end>`.
+Активный WPLAN Workspace хранит ссылки на записи, но не копирует их содержимое. Источник записи выбирается по [контракту источников](docs/technical/artifact-lifecycle.md#источники-свидетельств) и не зависит от agent client/runtime.
 
 ## Состояние и поставка
 

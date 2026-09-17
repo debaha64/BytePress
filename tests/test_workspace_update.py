@@ -199,15 +199,32 @@ class WorkspaceUpdateTests(unittest.TestCase):
         return result
 
     def apply_patch_contracts(self, root, reference, preview, *, authorization=None, rows=None):
-        self.assertFalse(list((root / "plans/active").glob("WPLAN-*.md")), "Update requires quiescent Workspace")
-        self.assertIn("NON_EXECUTING_CHECKPOINT:", (root / "plans/backlog.md").read_text())
+        plans = list((root / "plans/active").glob("WPLAN-*.md"))
+        recovery = authorization.get("recovery") if authorization else None
+        if plans:
+            self.assertEqual(len(plans), 1, "Recovery preserves exactly one active WPLAN")
+            self.assertIsNotNone(recovery, "Active route requires exact recovery authorization")
+            self.assertIs(recovery.get("frozen"), True, "Recovery target must be frozen")
+            self.assertEqual(recovery.get("blocked_by"), "Harness", "Not a Harness blocker")
+            self.assertEqual(recovery.get("wplan"), plans[0].relative_to(root).as_posix())
+            self.assertTrue(recovery.get("operation"), "Blocked operation required")
+            observed = self.run_checker(root)
+            self.assertEqual(recovery.get("diagnostic"), observed[1], "Reproduce exact blocker evidence")
+            self.assert_fail(observed, "sdlc-transition")
+            failed = {item["id"] for item in observed[1]["checks"] if item["status"] == "FAIL"}
+            self.assertEqual(failed, {"sdlc-transition"}, "Unrelated project defect is not this recovery case")
+            self.assertIn("owner decision must be projected", str(observed[1]["errors"]))
+        else:
+            self.assertIsNone(recovery, "Use normal clean Update for a quiescent checkpoint")
+            self.assertIn("NON_EXECUTING_CHECKPOINT:", (root / "plans/backlog.md").read_text())
         self.assertIsNotNone(rows, "Exact disposition required")
         self.validate_disposition(reference, preview, rows)
         self.assertIsNotNone(authorization, "Explicit owner authorization required")
         self.assertEqual(authorization["digest"], self.update_digest(root, reference, rows), "Frozen inputs/authorization mismatch")
         self.verify_backup(root, authorization)
         self.assertTrue(all(x[0] in {"file", "directory"} for x in self.patch_tree(root).values()))
-        self.assert_pass(self.run_checker(root))  # Real old checker; no research or synthetic OD.
+        if not plans:
+            self.assert_pass(self.run_checker(root))  # Real old checker; no synthetic OD.
         released = self.released_workspace()
         # Stop before writes if a copied contract has an unreviewed private overlay.
         for row in rows:
@@ -536,6 +553,215 @@ class WorkspaceUpdateTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-B", "-c", probe],
                                     cwd=product, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+class EvidenceSourceTests(unittest.TestCase):
+    """ES-REQ-01..04: deployed forms/SOP, real records and phase handoff."""
+
+    def deployment(self):
+        helper = WorkspaceUpdateTests()
+        self.addCleanup(helper.doCleanups)
+        root, _ = helper.patch_reference()
+        self.assertFalse((root / '.codex').exists())
+        return helper, root
+
+    def neutral_forms(self, root):
+        for name in ('change-record', 'quality-record', 'decision-record',
+                     'interview-evidence-record', 'risk-record', 'log-file'):
+            text = (root / ('templates/' + name + '.md')).read_text()
+            values = re.findall(r'(?m)^(?:SOURCE_REF|PRODUCT_INPUT_REF|ROUTE_CHOICE_REF): (.+)$', text)
+            self.assertTrue(values, name)
+            for value in values:
+                self.assertFalse('codexlog:' in value or '.codex' in value,
+                                 name + ' requires a client runtime: ' + value)
+        contract = (root / 'docs/technical/artifact-lifecycle.md').read_text()
+        self.assertIn('ES-REQ-01', contract)
+        self.assertIn('SOURCE_REF', contract)
+
+    def append_template(self, root, name, destination, source, **fields):
+        path, anchor = source.split('#', 1)
+        self.assertTrue((root / path).is_file())
+        self.assertIn(anchor, (root / path).read_text())
+        template = (root / ('templates/' + name + '-record.md')).read_text()
+        block = re.findall(r'```text\n(.*?)```', template, re.S)[0]
+        values = dict(re.findall(r'(?m)^([A-Z_]+): (.+)$', block))
+        values.update(WPLAN_ID='WPLAN-000001', SOURCE_REF=source, DATE='2026-01-01', SUMMARY='Fixture observation', **fields)
+        with (root / destination).open('a') as stream:
+            stream.write('\n\n' + '\n'.join(k + ': ' + v for k, v in values.items()) + '\n')
+
+    def test_generic_no_codex_records_and_research_transition(self):
+        helper, root = self.deployment()
+        plan = fixtures.open_first_research(root)
+        helper.assert_pass(helper.run_checker(root))
+        self.neutral_forms(root)  # RED on the actual old deployed contract, not import/setup.
+        result = root / 'research/01_bootstrap/results.md'
+        result.write_text('# Result\n\n## observed\n\nResearch source inspected; fixture result prepared.\n')
+        source = 'research/01_bootstrap/results.md#observed'
+        self.append_template(root, 'change', 'logs/changes.md', source)
+        self.append_template(root, 'quality', 'logs/quality.md', source, EVIDENCE_KIND='research-closure')
+        with (root / 'logs/quality.md').open('a') as stream:
+            stream.write('\n\nEVIDENCE_ID: RESEARCH-READY\nEVIDENCE_KIND: research-closure\nWPLAN_ID: WPLAN-000001\nRESULT: pass\n')
+        fixtures.set_plan_fields(root, **{'Фаза SDLC': 'requirements', 'TRANSITION_STATE': 'complete',
+            'PHASE_COMPLETION': 'complete', 'EVIDENCE_REFS': 'logs/quality.md#RESEARCH-READY',
+            'HANDOFF_REF': 'logs/quality.md#RESEARCH-READY', 'FROM_ROLE_AUTHORITY': 'relinquished',
+            'TO_ROLE_AUTHORITY': 'granted'})
+        helper.assert_pass(helper.run_checker(root))
+        self.assertFalse((root / '.codex').exists())
+        self.assertEqual(json.loads((root / 'Example.profile').read_text())['sot_mode'], 'sot_files')
+        self.assertTrue(plan.is_file())
+
+    def test_generic_decision_uses_actual_local_owner_response(self):
+        helper, root = self.deployment()
+        fixtures.open_first_research(root)
+        self.neutral_forms(root)
+        # Simulated owner response belongs to this test, never a real owner decision.
+        with (root / 'logs/sessions.md').open('a') as stream:
+            stream.write('\n\n## owner-response\n\n2026-01-01, fixture owner: permit the declared implementation.\n')
+        self.append_template(root, 'decision', 'logs/decisions.md', 'logs/sessions.md#owner-response',
+            EVIDENCE_REF='none', DECISION_KIND='implementation', DECISION_VALUE='approved',
+            ROUTE_REF='WBACK-000001', STATUS='active', SOURCE_KIND='owner_response',
+            SOT_FROM='none', SOT_TO='none', ALLOWED_ACTIONS='fixture implementation')
+        fixtures.set_plan_fields(root, **{'Фаза SDLC': 'approval', 'FROM_PHASE': 'approval',
+            'FROM_ROLE': 'roles/10-decision-coordinator.md', 'TO_PHASE': 'implementation',
+            'TO_ROLE': 'roles/11-developer.md', 'EVIDENCE_KIND': 'owner-implementation-authorization',
+            'OWNER_DECISION_REFS': 'OD-000001', 'AUTHORITY_REF': 'OD-000001',
+            'OWNER_GATE': 'GATE-OWNER-IMPLEMENTATION-AUTHORIZATION', 'OWNER_GATE_STATUS': 'satisfied',
+            'OWNER_GATE_REF': 'OD-000001'})
+        helper.assert_pass(helper.run_checker(root))
+        self.assertFalse((root / '.codex').exists())
+
+    def test_managed_codexlog_is_valid_and_retained(self):
+        import bp_clean
+        helper, root = self.deployment()
+        runtime = root / '.codex'
+        runtime.mkdir()
+        raw = runtime / 'managed.raw.log'
+        raw.write_text('owner answer\nexecution result\n')
+        raw.chmod(0o640)
+        with (root / 'logs/quality.md').open('a') as stream:
+            stream.write('\nSOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-2\n')
+        before = raw.read_bytes(), raw.stat().st_mode
+        self.assertEqual(bp_clean.referenced_codex_paths(root), {raw})
+        bp_clean.remove_path_no_follow(runtime, frozenset({raw}))
+        self.assertEqual((raw.read_bytes(), raw.stat().st_mode), before)
+        # Missing, escaping and out-of-range references cannot retain an unrelated file.
+        (root / 'logs/quality.md').write_text('SOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-9\n'
+            'SOURCE_REF: codexlog:.codex/missing.raw.log#lines=1-2\n'
+            'SOURCE_REF: codexlog:.codex/../escape.raw.log#lines=1-2\n')
+        self.assertEqual(bp_clean.referenced_codex_paths(root), set())
+
+    def test_generic_sops_do_not_require_raw_client_transport(self):
+        _, root = self.deployment()
+        self.neutral_forms(root)
+        for name in ('record-change', 'record-quality', 'record-decision', 'interview'):
+            text = (root / ('sops/' + name + '.md')).read_text()
+            self.assertIn('artifact-lifecycle.md#источники-свидетельств', text)
+            for line in text.splitlines():
+                if line.startswith(('SOURCE_REF:', 'PRODUCT_INPUT_REF:', 'ROUTE_CHOICE_REF:')):
+                    self.assertNotIn('codexlog:', line)
+
+
+class RecoveryUpdateTests(unittest.TestCase):
+    """RU-REQ-01..06: existing manual Update sequence with a narrow active-route exception."""
+
+    feedback_name = "FB-" + format(1, "06d") + ".md"
+
+    def prepared(self):
+        helper = WorkspaceUpdateTests()
+        self.addCleanup(helper.doCleanups)
+        root = helper.patch_old_workspace()
+        fixtures.open_first_research(root)
+        # Preserve a real existing feedback domain, including read-only data/modes.
+        folder = root / 'feedback'; folder.mkdir()
+        (folder / 'README.md').write_text('# Private feedback index\n')
+        (folder / self.feedback_name).write_text('# Neutral preserved feedback\nOriginal: fixture input\n')
+        (folder / self.feedback_name).chmod(0o440)
+        reference, preview = helper.patch_reference()
+        rows = helper.patch_disposition(reference, preview)
+        observed = helper.run_checker(root)
+        helper.assert_fail(observed, 'sdlc-transition')
+        self.assertIn('owner decision must be projected', str(observed))
+        authorization = helper.authorize_update(root, reference, rows)
+        authorization['recovery'] = {'frozen': True, 'blocked_by': 'Harness',
+            'wplan': 'plans/active/WPLAN-000001-example.md',
+            'operation': 'first research without implementation authority',
+            'diagnostic': observed[1]}
+        return helper, root, reference, preview, rows, authorization
+
+    def test_recovery_active_harness_blocked_route_is_preserved(self):
+        helper, root, reference, preview, rows, authorization = self.prepared()
+        before, profile = helper.protected(root), (root / 'Example.profile').read_bytes()
+        helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
+        helper.patch_readback(root, reference, rows, before)
+        self.assertEqual(helper.protected(root), before)
+        self.assertEqual((root / 'Example.profile').read_bytes(), profile)
+        self.assertEqual(len(list((root / 'plans/active').glob('WPLAN-*.md'))), 1)
+        self.assertIn('RU-REQ-01', (root / 'sops/change-management.md').read_text())
+
+    def test_recovery_unsuitable_states_refused_before_mutation(self):
+        for condition in ('no-authorization', 'not-frozen', 'product-defect', 'missing-diagnostic',
+                          'wrong-plan', 'multiple-plans', 'drift', 'not-blocked'):
+            with self.subTest(condition=condition):
+                helper, root, reference, preview, rows, authorization = self.prepared()
+                if condition == 'no-authorization': authorization = None
+                elif condition == 'not-frozen': authorization['recovery']['frozen'] = False
+                elif condition == 'product-defect': authorization['recovery']['blocked_by'] = 'Product'
+                elif condition == 'missing-diagnostic': authorization['recovery'].pop('diagnostic')
+                elif condition == 'wrong-plan': authorization['recovery']['wplan'] = 'plans/active/missing.md'
+                elif condition == 'multiple-plans':
+                    shutil.copy2(root / 'plans/active/WPLAN-000001-example.md', root / 'plans/active/WPLAN-000002-extra.md')
+                elif condition == 'drift': (root / 'Example/private.txt').write_text('concurrent write\n')
+                else:
+                    # Valid active route under the current checker has no diagnosed Harness failure.
+                    shutil.copy2(SOURCE / 'tools/check_workspace.py', root / 'tools/check_workspace.py')
+                    recovery = dict(authorization['recovery'], diagnostic=helper.run_checker(root)[1])
+                    authorization = helper.authorize_update(root, reference, rows)
+                    authorization['recovery'] = recovery
+                before = helper.patch_tree(root)
+                with self.assertRaises(AssertionError):
+                    helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
+                self.assertEqual(helper.patch_tree(root), before)
+
+    def test_recovery_failed_readback_preserves_old_version(self):
+        helper, root, reference, preview, rows, authorization = self.prepared()
+        before = helper.protected(root)
+        helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
+        (root / 'sops/record-quality.md').write_text('incomplete deployment\n')
+        with self.assertRaises(AssertionError): helper.patch_readback(root, reference, rows, before)
+        self.assertEqual(json.loads((root / 'Example.profile').read_text())['harness_version'], '0.5.2')
+        self.assertEqual(helper.protected(root), before)
+
+    def test_recovery_preservation_detects_product_route_feedback_corruption(self):
+        for path in ('Example/private.txt', 'plans/active/WPLAN-000001-example.md',
+                     'research/01_bootstrap/results.md', 'logs/history.md', 'feedback/' + self.feedback_name):
+            with self.subTest(path=path):
+                helper, root, reference, preview, rows, authorization = self.prepared()
+                before = helper.protected(root)
+                helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
+                target = root / path; target.chmod(0o644); target.write_text('injected corruption\n')
+                with self.assertRaises(AssertionError): helper.patch_readback(root, reference, rows, before)
+                self.assertEqual(json.loads((root / 'Example.profile').read_text())['harness_version'], '0.5.2')
+
+    def test_recovery_post_cutover_failure_restores_version_claim(self):
+        helper, root, reference, preview, rows, authorization = self.prepared()
+        before = helper.protected(root)
+        old_profile, old_system = (root / 'Example.profile').read_bytes(), None
+        helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
+        helper.patch_readback(root, reference, rows, before)
+        old_system = (root / 'SYSTEM.md').read_bytes()
+        document = json.loads(old_profile); document['harness_version'] = '0.5.3'
+        try:
+            (root / 'SYSTEM.md').write_bytes(old_system.replace(b'`0.5.2`', b'`0.5.3`'))
+            (root / 'Example.profile').write_bytes(project_profile.serialize_project_profile('Example.profile', document))
+            # Failure is injected after the cutover, before final successful read-back.
+            (root / 'tools/check_workspace.py').write_text('raise SystemExit(1)\n')
+            helper.assert_pass(helper.run_checker(root))
+        except (AssertionError, json.JSONDecodeError):
+            (root / 'Example.profile').write_bytes(old_profile)
+            (root / 'SYSTEM.md').write_bytes(old_system)
+        else: self.fail('injected post-cutover failure was missed')
+        self.assertEqual((root / 'Example.profile').read_bytes(), old_profile)
+        self.assertEqual((root / 'SYSTEM.md').read_bytes(), old_system)
+        self.assertEqual(helper.protected(root), before)
 
 
 if __name__ == "__main__":
