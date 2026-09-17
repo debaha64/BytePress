@@ -680,7 +680,17 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "2. В non-executing checkpoint active WPLAN count равен `0`; первая permanent mutation нового прохода создаёт active WPLAN.\n"
         "3. `sot_files` не читает Git. Product code/checks не исполняются при discovery Profile.\n"
         "4. Technical PASS, owner acceptance, Product Acceptance и Release Authorization являются разными фактами.\n"
+        "5. Отдельная внешняя операция [Workspace Update](sops/change-management.md#внешняя-граница-workspace-update) "
+        "из новой distribution действует только над frozen/quiescent Workspace по exact owner authorization; "
+        "она не открывает ordinary project work или Product mutation без WPLAN.\n"
     ).encode("utf-8")
+    system_form = _read_source_file(source, "templates/system.md").decode("utf-8")
+    registry_marker = "registry:protected-surfaces\n"
+    if system_form.count(registry_marker) != 1:
+        raise InspectionError("system template requires exactly one protected-surfaces registry")
+    registry = system_form.split(registry_marker, 1)[1].split("\n## ", 1)[0]
+    system += ("\n## Реестр защищённых поверхностей\n\n" + registry_marker
+               + registry.replace("<Slug>", slug)).encode("utf-8")
     roadmap_template = _read_source_file(source, "templates/workspace-roadmap.md").decode("utf-8")
     road_separator = "|---|---|---|---|\n"
     if roadmap_template.count(road_separator) != 1:
@@ -755,6 +765,9 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
             f"# Первый старт Workspace {slug}\n\n"
             f"Project Start завершён. Прочитайте root `README.md`, `AGENTS.md`, `SYSTEM.md`, `{slug}.profile` и `plans/`. "
             "Текущий checkpoint — `WROAD-000001-OWNER-PLANNING`; первый WBACK/WPLAN требует отдельного решения владельца.\n"
+            "New Product создаёт пустой Product root; Existing Product переносит сам Product root. "
+            "Исторические материалы остаются внешними inputs первого research. "
+            "[Выбор операции](README.md#как-выбрать) отделяет эти случаи от Workspace Update.\n"
         ).encode("utf-8"),
         "docs/user/source-of-truth-mode.md": (
             "# Режим источника истины\n\n"
@@ -792,10 +805,19 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
         "- [Начальное состояние](first-start.md).\n"
         "- [После Project Start](after-project-start.md).\n"
         "- [Режим источника истины](source-of-truth-mode.md).\n"
-        "- [Существующий продукт](existing-product.md).\n"
-        "- [Обновление Workspace](workspace-update.md).\n"
+        "- [Project Start — Existing Product](existing-product.md).\n"
+        "- [Workspace Update](workspace-update.md).\n"
         "- [Переход 0.5.1 → 0.5.2](migration-0.5.1-to-0.5.2.md).\n"
         "- [Подготовка GitHub](github-repository-preparation.md).\n"
+        "\n## Как выбрать\n\n"
+        "Project Start — New Product создаёт новую среду с пустым Product root. "
+        "Project Start — Existing Product создаёт новую среду с точной копией реального Product root. "
+        "Workspace Update обновляет Harness существующей среды, сохраняя Product, состояние проекта и историю.\n\n"
+        "Старый Workspace snapshot, research, logs, отчёты/чаты, .txt, .md, .pdf, .zip или .tar.gz "
+        "не становятся Existing Product автоматически. Для новой разработки используйте New Product "
+        "и внешние reference materials первого research; старый Harness/history в Product root не импортируются. "
+        "Для TAS 0.0.2: New Product, старый TAS 0.0.1 как reference corpus. "
+        "Project Start запускается из исходной distribution, не из tools этого Workspace.\n"
     ).encode("utf-8")
     files["docs/technical/README.md"] = _read_source_file(source, "docs/technical/README.md")
     files["docs/user/source-of-truth-mode.md"] = _read_source_file(source, "docs/user/source-of-truth-mode.md")

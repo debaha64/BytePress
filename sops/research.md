@@ -41,7 +41,6 @@ research/<NN>_<slug>/
 
 ```text
 research/00-index.md
-research/archives/README.md
 research/<NN>_<slug>/00-index.md
 research/<NN>_<slug>/01-<slug>.md
 research/<NN>_<slug>/results.md
@@ -57,7 +56,7 @@ research/<NN>_<slug>/03-<slug>.md
 Правила слоя:
 
 1. `research/00-index.md` является индексом исследовательского домена.
-2. `research/archives/README.md` является индексом архивов.
+2. `research/archives/README.md` является индексом только существующего полного архивного слоя; новый Workspace и активное первое исследование не требуют его создания.
 3. `00-index.md` конкретного исследовательского домена описывает этот домен; общий индекс находится в `research/00-index.md`.
 4. Правила не хранятся в `00-index.md`.
 5. Формы живут в `templates/`.
@@ -104,7 +103,15 @@ research/<NN>_<slug>/03-<slug>.md
 
 ## 8. Архив
 
-Архивирование выполняется только отдельным разрешённым маршрутом.
+Архивирование выполняется только отдельным разрешённым маршрутом. Archive lifecycle появляется атомарно как согласованный результат этого маршрута:
+
+1. каталог `research/archives/`;
+2. индекс `README.md`;
+3. checksum manifest `MANIFEST.sha256`;
+4. проверенный payload;
+5. синхронизированные `research/00-index.md` и архивный индекс с тем же множеством payload.
+
+Отсутствующий archive layer является valid состоянием до архивации; отдельный README без manifest/payload даёт FAIL. Промежуточное создание файлов внутри archive route не выдаётся за valid checkpoint. Исторические payload не переписываются.
 
 Правила архива:
 

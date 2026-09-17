@@ -24,8 +24,288 @@ SDLC_SOURCE = SOURCE_ROOT / "docs" / "technical" / "sdlc.md"
 PHASE_GATES_SOURCE = SOURCE_ROOT / "docs" / "technical" / "phase-gates.md"
 
 
+def protected_registry(slug):
+    return ("# System\n\n## Protected surfaces\n\nregistry:protected-surfaces\n\n"
+            "| Path | Protection |\n|---|---|\n"
+            f"| `{slug}/**` | `pre-implementation` |\n" + "".join(
+                f"| `{path}` | `exact-wplan` |\n" for path in
+                ("AGENTS.md", "SYSTEM.md", "sops/**", "roles/**", "skills/**", "templates/**", "tools/**")))
+
+
+def set_plan_fields(root, **fields):
+    plan = root / "plans/active/WPLAN-000001-example.md"
+    text = plan.read_text()
+    for label, value in fields.items():
+        text, count = re.subn(rf"(?m)^{re.escape(label)}:.*$", f"{label}: {value}", text)
+        if count != 1:
+            raise AssertionError((label, count))
+    plan.write_text(text)
+    return plan
+
+
+def open_first_research(root):
+    """Fresh bootstrap: no decision is created or assumed by this helper."""
+    (root / "plans/backlog.md").write_text(
+        "WROAD-000001 active\nWBACK-000001 active\nactive WPLAN count 1\n"
+        "CHECKPOINT: WBACK-000001-RESEARCH\n")
+    fields = {
+        "Статус": "active", "WPLAN ID": "WPLAN-000001", "WROAD": "WROAD-000001", "WBACK": "WBACK-000001",
+        "Фаза SDLC": "research", "INTERVIEW_EVIDENCE_REF": "none", "OWNER_DECISION_REFS": "none",
+        "ALLOWED_SURFACES": "research/01_bootstrap/**,logs/quality.md",
+        "Текущая контрольная отметка": "WBACK-000001-RESEARCH",
+        "SDLC_TRANSITION": "v1", "TRANSITION_STATE": "in-progress", "FROM_PHASE": "research",
+        "FROM_ROLE": "roles/04-researcher.md", "PHASE_COMPLETION": "pending", "EVIDENCE_KIND": "research-closure",
+        "EVIDENCE_REFS": "none", "TRANSITION_CHECKPOINT": "WBACK-000001-RESEARCH", "HANDOFF_REF": "none",
+        "TO_PHASE": "requirements", "TO_ROLE": "roles/05-requirements-engineer.md",
+        "FROM_ROLE_AUTHORITY": "active", "TO_ROLE_AUTHORITY": "withheld", "AUTHORITY_REF": "none",
+        "OWNER_GATE": "none", "OWNER_GATE_STATUS": "not-applicable", "OWNER_GATE_REF": "none",
+        "VERIFICATION_STATUS": "pending", "VERIFICATION_REF": "none", "VALIDATION_STATUS": "not-performed",
+        "VALIDATION_REF": "none", "PRODUCT_ACCEPTANCE_STATUS": "not-performed", "PRODUCT_ACCEPTANCE_REF": "none",
+        "RELEASE_AUTHORIZATION_STATUS": "not-performed", "RELEASE_AUTHORIZATION_REF": "none",
+    }
+    plan = root / "plans/active/WPLAN-000001-example.md"
+    plan.write_text("# First research\n\n" + "".join(f"{key}: {value}\n" for key, value in fields.items()))
+    domain = root / "research/01_bootstrap"
+    domain.mkdir()
+    for name in ("00-index.md", "01-evidence.md", "results.md"):
+        (domain / name).write_text("# Neutral research evidence\n")
+    (root / "research/00-index.md").write_text("# Исследования\n\nСледующий research ID: `02`.\n")
+    return plan
+
+
+def grant_implementation(root):
+    """Simulated new owner response, invoked only at the explicit test gate."""
+    with (root / "logs/decisions.md").open("a") as stream:
+        stream.write("\nRECORD_TYPE: owner_decision\nRECORD_ID: OD-000001\nWPLAN_ID: WPLAN-000001\n"
+                     "DECISION_KIND: implementation\nDECISION_VALUE: approved\nEVIDENCE_REF: none\n"
+                     "ROUTE_REF: WBACK-000001\nSTATUS: active\n")
+    return set_plan_fields(root, OWNER_DECISION_REFS="OD-000001", AUTHORITY_REF="OD-000001")
+
+
 class WorkspaceCheckerTests(unittest.TestCase):
     maxDiff = None
+
+    def test_changes_requested_new_plan_requires_fresh_implementation_od(self):
+        """REQ-BP-REWORK-001: close an iteration without PA; retain WBACK and provenance."""
+        root = self.fixture(active=True, decisions=False)
+        set_plan_fields(root, INTERVIEW_EVIDENCE_REF="none")
+        grant_implementation(root)
+        row = next(row for row in self.phase_gate_rows(root) if row[0] == "verification")
+        self.materialize_transition(root, row)
+        self.assert_pass(self.run_checker(root))
+        plan = root / "plans/active/WPLAN-000001-example.md"
+        frozen = plan.read_bytes()
+        set_plan_fields(root, FROM_PHASE="owner-review", TO_PHASE="implementation")
+        result = self.run_checker(root)
+        self.assert_fail(result, "sdlc-transition")
+        self.assertIn("phase transition skips canonical next phase", str(result[1]["errors"]))
+        plan.write_bytes(frozen)
+        decisions = root / "logs/decisions.md"
+        old_records = decisions.read_bytes()
+        with decisions.open("a") as stream:
+            stream.write("\nOwner review: changes requested; terminalize iteration; authorize corrective WPLAN.\n")
+        with plan.open("a") as stream:
+            stream.write("\nTerminal disposition: completed; changes requested; superseded / not accepted; PA not performed.\n")
+        completed = root / "plans/completed" / plan.name
+        plan.rename(completed)
+        backlog = root / "plans/backlog.md"
+        backlog.write_text("WROAD-000001 active\nWBACK-000001 active\nactive WPLAN count 0\n"
+                           "NON_EXECUTING_CHECKPOINT: WBACK-000001-CORRECTIVE\n")
+        self.assert_pass(self.run_checker(root))
+        self.assertTrue(completed.read_bytes().startswith(frozen))
+        self.assertNotIn("RECORD_TYPE: product_acceptance", decisions.read_text())
+        new = root / "plans/active/WPLAN-000002-example.md"
+        new.write_text(frozen.decode().replace("WPLAN-000001", "WPLAN-000002"))
+
+        def fields(**values):
+            text = new.read_text()
+            for key, value in values.items():
+                text, count = re.subn(rf"(?m)^{re.escape(key)}:.*$", f"{key}: {value}", text)
+                self.assertEqual(count, 1)
+            new.write_text(text)
+
+        fields(**{"Фаза SDLC": "approval", "FROM_PHASE": "approval", "FROM_ROLE": "roles/10-approval-coordinator.md",
+                  "TO_PHASE": "implementation", "TO_ROLE": "roles/11-developer.md", "TRANSITION_STATE": "in-progress",
+                  "PHASE_COMPLETION": "pending", "EVIDENCE_KIND": "owner-implementation-authorization",
+                  "EVIDENCE_REFS": "none", "HANDOFF_REF": "none", "FROM_ROLE_AUTHORITY": "active",
+                  "TO_ROLE_AUTHORITY": "withheld", "OWNER_GATE": "GATE-OWNER-IMPLEMENTATION-AUTHORIZATION",
+                  "OWNER_GATE_STATUS": "pending", "OWNER_GATE_REF": "none", "AUTHORITY_REF": "none",
+                  "OWNER_DECISION_REFS": "none"})
+        # Obtain canonical approval role from the independent phase catalogue.
+        catalogue = (root / "docs/technical/sdlc.md").read_text()
+        role = re.search(r"\|[^\n]*`approval`[^\n]*\(\.\./\.\./(roles/[^)]+)\)", catalogue)[1]
+        fields(FROM_ROLE=role)
+        checkpoint = re.search(r"(?m)^Текущая контрольная отметка: (.+)$", new.read_text())[1]
+        backlog.write_text("WROAD-000001 active\nWBACK-000001 active\nactive WPLAN count 1\nCHECKPOINT: " + checkpoint + "\n")
+        self.assert_pass(self.run_checker(root))
+        fields(OWNER_DECISION_REFS="OD-000001", AUTHORITY_REF="OD-000001", OWNER_GATE_REF="OD-000001", OWNER_GATE_STATUS="satisfied")
+        result = self.run_checker(root)
+        self.assert_fail(result, "sdlc-transition")
+        self.assertIn("WPLAN_ID mismatch", str(result[1]["errors"]))
+        with decisions.open("a") as stream:
+            stream.write("\nRECORD_TYPE: owner_decision\nRECORD_ID: OD-000002\nWPLAN_ID: WPLAN-000002\n"
+                         "DECISION_KIND: implementation\nDECISION_VALUE: approved\nEVIDENCE_REF: none\n"
+                         "ROUTE_REF: WBACK-000001\nSTATUS: active\n")
+        fields(OWNER_DECISION_REFS="OD-000002", AUTHORITY_REF="OD-000002", OWNER_GATE_REF="OD-000002")
+        self.assert_pass(self.run_checker(root))
+        with (root / "logs/sessions.md").open("a") as stream:
+            stream.write("\nEVIDENCE_ID: FRESH-APPROVAL\nWPLAN_ID: WPLAN-000002\n"
+                         "EVIDENCE_KIND: owner-implementation-authorization\n\nFRESH-HANDOFF\n")
+        fields(**{"Фаза SDLC": "implementation", "TRANSITION_STATE": "complete", "PHASE_COMPLETION": "complete",
+                  "FROM_ROLE_AUTHORITY": "relinquished", "TO_ROLE_AUTHORITY": "granted",
+                  "EVIDENCE_REFS": "logs/sessions.md#FRESH-APPROVAL", "HANDOFF_REF": "logs/sessions.md#FRESH-HANDOFF"})
+        self.assert_pass(self.run_checker(root))
+        self.assertIn("WBACK-000001 active", backlog.read_text())
+        self.assertTrue(decisions.read_bytes().startswith(old_records))
+        self.assertTrue(completed.read_bytes().startswith(frozen))
+        self.assertNotIn("RECORD_TYPE: product_acceptance", decisions.read_text())
+
+
+    def test_bootstrap_fresh_research_has_no_implementation_decision(self):
+        """REQ-BP-BOOT-001/005: Project Start and first research both PASS."""
+        root = self.fixture(decisions=False)
+        self.assertNotIn("OD-", (root / "logs/decisions.md").read_text())
+        result = self.run_checker(root)
+        self.assert_pass(result)
+        transition = next(c for c in result[1]["checks"] if c["id"] == "sdlc-transition")
+        self.assertEqual(transition["value"], "NOT_APPLICABLE")
+        open_first_research(root)
+        self.assert_pass(self.run_checker(root))
+        self.assertFalse((root / "research/archives").exists())
+
+    def test_bootstrap_research_rejects_premature_implementation_authority(self):
+        """REQ-BP-BOOT-004: a premature OD is not research authority."""
+        root = self.fixture(decisions=False)
+        open_first_research(root)
+        grant_implementation(root)
+        result = self.run_checker(root)
+        self.assert_fail(result, "sdlc-transition")
+        self.assertIn("premature/wrong-phase implementation authority", str(result[1]["errors"]))
+
+    def test_bootstrap_preimplementation_product_allowances_fail(self):
+        """REQ-BP-BOOT-002: allowances cannot open Product before the gate."""
+        for surface in ("Example", "Example/**", "Example/src/code.py", "Example/./data"):
+            with self.subTest(surface=surface):
+                root = self.fixture(decisions=False)
+                open_first_research(root)
+                set_plan_fields(root, ALLOWED_SURFACES=surface)
+                result = self.run_checker(root)
+                self.assert_fail(result)
+                self.assertIn("pre-implementation Product surface is protected", str(result[1]["errors"]))
+        for action, contract in (("CREATE", "file:0644"), ("UPDATE", "content"), ("REMOVE", "file")):
+            with self.subTest(declaration=action):
+                root = self.fixture(decisions=False)
+                plan = open_first_research(root)
+                with plan.open("a") as stream:
+                    stream.write(f"\n### {action} — 1\n\n1. `Example/private.txt` — `{contract}`.\n")
+                result = self.run_checker(root)
+                self.assert_fail(result)
+                self.assertIn("pre-implementation Product surface is protected", str(result[1]["errors"]))
+
+    def test_bootstrap_empty_work_scope_fails_without_od(self):
+        root = self.fixture(decisions=False)
+        open_first_research(root)
+        set_plan_fields(root, ALLOWED_SURFACES="none")
+        result = self.run_checker(root)
+        self.assert_fail(result, "sdlc-transition")
+        self.assertIn("active WPLAN requires non-empty ALLOWED_SURFACES", str(result[1]["errors"]))
+
+    def test_bootstrap_implementation_requires_valid_current_od(self):
+        """REQ-BP-BOOT-003: none fails; fresh current approval passes."""
+        root = self.fixture(decisions=False)
+        open_first_research(root)
+        set_plan_fields(root, **{"Фаза SDLC": "implementation", "FROM_PHASE": "implementation",
+            "FROM_ROLE": "roles/11-developer.md", "TO_PHASE": "verification", "TO_ROLE": "roles/12-verification-engineer.md",
+            "EVIDENCE_KIND": "implementation-red-green-delta"})
+        self.assert_fail(self.run_checker(root), "sdlc-transition")
+        grant_implementation(root)
+        self.assert_pass(self.run_checker(root))
+        decisions = root / "logs/decisions.md"
+        original = decisions.read_text()
+        for old, new in (("DECISION_KIND: implementation", "DECISION_KIND: sot_transition"),
+                         ("DECISION_VALUE: approved", "DECISION_VALUE: rejected"),
+                         ("STATUS: active", "STATUS: revoked"),
+                         ("WPLAN_ID: WPLAN-000001", "WPLAN_ID: WPLAN-000002"),
+                         ("ROUTE_REF: WBACK-000001", "ROUTE_REF: WBACK-000002"),
+                         ("EVIDENCE_REF: none", "EVIDENCE_REF: IE-000002")):
+            with self.subTest(injection=new):
+                decisions.write_text(original.replace(old, new))
+                self.assert_fail(self.run_checker(root), "sdlc-transition")
+        decisions.write_text(original)
+        set_plan_fields(root, OWNER_DECISION_REFS="none")
+        self.assert_fail(self.run_checker(root), "sdlc-transition")
+
+    def test_bootstrap_pending_approval_and_implementation_open_are_distinct(self):
+        root = self.fixture(decisions=False)
+        open_first_research(root)
+        set_plan_fields(root, **{"Фаза SDLC": "approval", "FROM_PHASE": "approval",
+            "FROM_ROLE": "roles/10-decision-coordinator.md", "TO_PHASE": "implementation", "TO_ROLE": "roles/11-developer.md",
+            "EVIDENCE_KIND": "owner-implementation-authorization", "OWNER_GATE": "GATE-OWNER-IMPLEMENTATION-AUTHORIZATION",
+            "OWNER_GATE_STATUS": "pending"})
+        self.assert_pass(self.run_checker(root))
+        grant_implementation(root)
+        self.assert_fail(self.run_checker(root), "sdlc-transition")
+        set_plan_fields(root, OWNER_GATE_STATUS="satisfied", OWNER_GATE_REF="OD-000001")
+        self.assert_pass(self.run_checker(root))
+        set_plan_fields(root, ALLOWED_SURFACES="Example/**")
+        self.assert_fail(self.run_checker(root), "protected-surfaces")
+        row = next(row for row in self.phase_gate_rows(root) if row[0] == "approval")
+        self.materialize_transition(root, row)
+        self.assert_pass(self.run_checker(root))
+
+    def test_bootstrap_registry_is_required_unique_bounded_and_complete(self):
+        root = self.fixture(decisions=False)
+        path = root / "SYSTEM.md"
+        original = path.read_text()
+        for bad in ("# Missing registry\n", original.replace("Example/**", "Other/**"),
+                    original.replace("Example/**", "../escape/**"),
+                    original.replace("pre-implementation", "allow"),
+                    original + "\nregistry:protected-surfaces\n",
+                    original.replace("| `SYSTEM.md` | `exact-wplan` |\n", "")):
+            with self.subTest(registry=bad):
+                path.write_text(bad)
+                self.assert_fail(self.run_checker(root), "protected-surfaces")
+        path.write_text(original)
+        self.assert_pass(self.run_checker(root))
+
+    def test_bootstrap_research_archive_lifecycle_is_atomic(self):
+        root = self.fixture(decisions=False)
+        open_first_research(root)
+        self.assert_pass(self.run_checker(root))
+        archives = root / "research/archives"
+        archives.mkdir()
+        (archives / "README.md").write_text("# Archives\n")
+        self.assert_fail(self.run_checker(root), "research-archives")
+        import zipfile
+        payload = archives / "01_bootstrap.zip"
+        with zipfile.ZipFile(payload, "w") as archive:
+            archive.writestr("RESEARCH.md", "# Research\n")
+        digest = hashlib.sha256(payload.read_bytes()).hexdigest()
+        (archives / "MANIFEST.sha256").write_text(f"{digest}  research/archives/{payload.name}\n")
+        (archives / "README.md").write_text(f"# Archives\n\n1. `{payload.name}`.\n")
+        (root / "research/00-index.md").write_text(
+            "# Исследования\n\nСледующий research ID: `02`.\n\n## Архивы\n\n1. `research/archives/01_bootstrap.zip`.\n")
+        self.assert_pass(self.run_checker(root))
+
+    def test_bootstrap_complete_sequence_new_decision_after_verified_research(self):
+        root = self.fixture(decisions=False)
+        self.assert_pass(self.run_checker(root))
+        open_first_research(root)
+        self.assert_pass(self.run_checker(root))
+        rows = self.phase_gate_rows(root)
+        # Complete the canonical pre-implementation phases without any OD.
+        for row in rows[3:10]:
+            if row[0] == "approval":
+                self.assertNotIn("RECORD_TYPE: owner_decision", (root / "logs/decisions.md").read_text())
+                grant_implementation(root)  # new simulated owner response after verified checkpoint
+            self.materialize_transition(root, row)
+            self.assert_pass(self.run_checker(root))
+        set_plan_fields(root, **{"Фаза SDLC": "implementation", "FROM_PHASE": "implementation",
+            "FROM_ROLE": "roles/11-developer.md", "TO_PHASE": "verification", "TO_ROLE": "roles/12-verification-engineer.md",
+            "EVIDENCE_KIND": "implementation-red-green-delta", "TRANSITION_STATE": "in-progress", "PHASE_COMPLETION": "pending",
+            "EVIDENCE_REFS": "none", "HANDOFF_REF": "none", "FROM_ROLE_AUTHORITY": "active", "TO_ROLE_AUTHORITY": "withheld",
+            "OWNER_GATE": "none", "OWNER_GATE_STATUS": "not-applicable", "OWNER_GATE_REF": "none"})
+        self.assert_pass(self.run_checker(root))
 
     def test_documentation_impact_required_only_for_semantic_classes(self):
         for kind in ('S1', 'S2'):
@@ -86,7 +366,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
                 (root / "AGENTS.md").write_text(field + "\n", encoding="utf-8")
                 self.assert_fail(self.run_checker(root), "workspace-sot")
 
-    def fixture(self, *, active=False, profile=None):
+    def fixture(self, *, active=False, profile=None, decisions=True):
         temporary = tempfile.TemporaryDirectory(prefix="bytepress-check-workspace-")
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name) / "WS_Example"
@@ -121,7 +401,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
             encoding="utf-8",
         )
         (root / "AGENTS.md").write_text("# Agent map\n", encoding="utf-8")
-        (root / "SYSTEM.md").write_text("# System\n", encoding="utf-8")
+        (root / "SYSTEM.md").write_text(protected_registry("Example"), encoding="utf-8")
         (root / "logs/decisions.md").write_text(
             "RELEASE_AUTHORIZATION_FIXTURE: authorized\nWPLAN_ID: WPLAN-000001\n\n"
             "RECORD_TYPE: owner_decision\nRECORD_ID: OD-000001\nWPLAN_ID: WPLAN-000001\n"
@@ -134,7 +414,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
             "DECISION_KIND: retirement_authorization\nDECISION_VALUE: approved\n"
             "EVIDENCE_REF: IE-000001\nROUTE_REF: WBACK-000001\nSTATUS: active\n\n"
             "RECORD_TYPE: product_acceptance\nRECORD_ID: PA-000001\nWPLAN_ID: WPLAN-000001\n"
-            "DECISION_VALUE: accepted\n",
+            "DECISION_VALUE: accepted\n" if decisions else "# No owner decisions\n",
             encoding="utf-8",
         )
         (root / "logs/sessions.md").write_text("# Sessions\n", encoding="utf-8")
@@ -273,7 +553,8 @@ class WorkspaceCheckerTests(unittest.TestCase):
             "PRODUCT_ACCEPTANCE_REF": "none",
             "RELEASE_AUTHORIZATION_STATUS": "not-performed",
             "RELEASE_AUTHORIZATION_REF": "none",
-            "OWNER_DECISION_REFS": "OD-000001",
+            "OWNER_DECISION_REFS": "OD-000001" if source == "implementation" or required_kind == "implementation" else "none",
+            "AUTHORITY_REF": "OD-000001" if source == "implementation" or required_kind == "implementation" else "none",
         }
         if policy == "owner-open":
             fields.update({
@@ -297,7 +578,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
                 "OWNER_GATE_REF": reference,
             })
             if reference.startswith("OD-"):
-                fields["OWNER_DECISION_REFS"] = "OD-000001" if reference == "OD-000001" else f"OD-000001,{reference}"
+                fields["OWNER_DECISION_REFS"] = "OD-000001" if reference == "OD-000001" else reference
             if supplied_kind == "product_acceptance":
                 fields.update({
                     "PRODUCT_ACCEPTANCE_STATUS": "accepted",
@@ -540,6 +821,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         plan = self.complete_transition(root)
         transition = plan.read_text(encoding="utf-8")
         replacements = {
+            "AUTHORITY_REF: OD-000001": "AUTHORITY_REF: none",
             "Фаза SDLC: verification": "Фаза SDLC: decommissioning",
             "FROM_PHASE: implementation": "FROM_PHASE: retrospective",
             "FROM_ROLE: roles/11-developer.md": "FROM_ROLE: roles/20-retrospective-facilitator.md",
@@ -575,6 +857,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         plan = self.complete_transition(root)
         transition = plan.read_text(encoding="utf-8")
         replacements = {
+            "AUTHORITY_REF: OD-000001": "AUTHORITY_REF: none",
             "Фаза SDLC: verification": "Фаза SDLC: retired",
             "FROM_PHASE: implementation": "FROM_PHASE: decommissioning",
             "FROM_ROLE: roles/11-developer.md": "FROM_ROLE: roles/21-decommissioning-engineer.md",
@@ -614,9 +897,29 @@ class WorkspaceCheckerTests(unittest.TestCase):
         self.assertEqual(sum(policy == "owner-open" for *_prefix, policy, _kind in rows), 3)
         for row in rows:
             with self.subTest(transition=row[:2]):
-                root = self.fixture(active=True)
+                root = self.fixture(decisions=False)
+                open_first_research(root)
+                source, _target, _evidence, _policy, kind = row
+                if source == "implementation" or kind == "implementation":
+                    grant_implementation(root)
+                elif kind in {"decommissioning_authorization", "retirement_authorization"}:
+                    reference = "OD-000002" if kind == "decommissioning_authorization" else "OD-000003"
+                    with (root / "logs/decisions.md").open("a") as stream:
+                        stream.write(f"\nRECORD_TYPE: owner_decision\nRECORD_ID: {reference}\nWPLAN_ID: WPLAN-000001\n"
+                                     f"DECISION_KIND: {kind}\nDECISION_VALUE: approved\nEVIDENCE_REF: none\n"
+                                     "ROUTE_REF: WBACK-000001\nSTATUS: active\n")
+                elif kind == "product_acceptance":
+                    with (root / "logs/decisions.md").open("a") as stream:
+                        stream.write("\nRECORD_TYPE: product_acceptance\nRECORD_ID: PA-000001\nWPLAN_ID: WPLAN-000001\nDECISION_VALUE: accepted\n")
+                elif kind == "release_authorization":
+                    with (root / "logs/decisions.md").open("a") as stream:
+                        stream.write("\nRELEASE_AUTHORIZATION_FIXTURE: authorized\nWPLAN_ID: WPLAN-000001\n")
                 self.materialize_transition(root, row)
                 self.assert_pass(self.run_checker(root))
+                if source != "implementation" and kind != "implementation":
+                    self.assertNotIn("DECISION_KIND: implementation", (root / "logs/decisions.md").read_text())
+                    set_plan_fields(root, AUTHORITY_REF="OD-000001")
+                    self.assert_fail(self.run_checker(root), "sdlc-transition")
 
     def test_product_acceptance_phase_opens_without_pa(self):
         """Entering product-acceptance is owner-open and does not require PA."""
@@ -640,6 +943,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         else:
             text = plan.read_text(encoding="utf-8")
             for old, new in (
+                ("AUTHORITY_REF: OD-000001", "AUTHORITY_REF: none"),
                 ("Фаза SDLC: implementation", "Фаза SDLC: release-readiness"),
                 ("FROM_PHASE: implementation", "FROM_PHASE: release-readiness"),
                 ("FROM_ROLE: roles/11-developer.md", "FROM_ROLE: roles/15-release-readiness-reviewer.md"),
@@ -842,6 +1146,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         evidence = root / "tests/transition-evidence.md"
         owner_gate = plan.read_text(encoding="utf-8")
         replacements = {
+            "AUTHORITY_REF: OD-000001": "AUTHORITY_REF: none",
             "Фаза SDLC: verification": "Фаза SDLC: release-readiness",
             "FROM_PHASE: implementation": "FROM_PHASE: product-acceptance",
             "FROM_ROLE: roles/11-developer.md": "FROM_ROLE: roles/14-product-acceptance-coordinator.md",

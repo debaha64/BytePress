@@ -22,7 +22,7 @@ Consistency Closure: <pending | PASS с четырьмя нулевыми наб
 
 INTERVIEW_EVIDENCE_REF: <none | IE-000001>
 OWNER_DECISION_REFS: <none | OD-000001[,OD-000002]>
-ALLOWED_SURFACES: <none | точные относительные пути,деревья,исключения полей>
+ALLOWED_SURFACES: <непустой exact набор относительных путей,деревьев,исключений полей>
 
 SDLC_TRANSITION: v1
 TRANSITION_STATE: <in-progress | complete>
@@ -37,7 +37,7 @@ TO_PHASE: <каноническая следующая фаза | retired>
 TO_ROLE: <roles/path.md | none>
 FROM_ROLE_AUTHORITY: <active | relinquished>
 TO_ROLE_AUTHORITY: <withheld | granted | not-applicable>
-AUTHORITY_REF: <OD-000001>
+AUTHORITY_REF: <none | OD-000001>
 OWNER_GATE: <none | gate>
 OWNER_GATE_STATUS: <not-applicable | pending | satisfied>
 OWNER_GATE_REF: <none | OD-000001 | PA-000001 | logs/decisions.md#exact-release-token>
@@ -103,3 +103,5 @@ Reason: <влияние на читателя, связанные формы/т�
 1. <команда или ручная сверка>
 
 Этот шаблон материализуется только в `WS_<Slug>/plans/active/`; поставка BytePress не содержит активного WPLAN.
+
+Рабочая граница ALLOWED_SURFACES непустая и независима от OD. Для research AUTHORITY_REF равен none; условия implementation authority и отдельного required owner gate задаёт только `docs/technical/phase-gates.md`.

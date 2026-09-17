@@ -19,4 +19,4 @@ BytePress помогает владельцу управлять работой 
 - [Модель Workspace и продукта](docs/architecture/domain-model.md) — где живут работа, профиль и поставка.
 - [Обновление Workspace](docs/user/workspace-update.md) — отдельная задача для существующей среды.
 
-Текущая версия — `0.5.2`; её машинный источник — [VERSION](VERSION). [Паспорт](docs/product/product-passport.md) содержит краткие требования среды. BytePress распространяется по [MIT License](LICENSE).
+Текущая версия — `0.5.3`; её машинный источник — [VERSION](VERSION). [Паспорт](docs/product/product-passport.md) содержит краткие требования среды. BytePress распространяется по [MIT License](LICENSE).
