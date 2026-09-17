@@ -42,3 +42,5 @@
 - [WPLAN-<ID>-<slug>](workspace-plan-active.md).
 - [Завершённые WPLAN](workspace-plan-completed-readme.md).
 - [Дорожная карта Workspace](workspace-roadmap.md).
+
+- [Запись Feedback](feedback-record.md).

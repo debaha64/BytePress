@@ -16,3 +16,5 @@
 - [Русский технический стиль](system-style.md).
 - [Модель задач и SDD/TDD](task-flow.md).
 - [Стратегия тестирования](testing.md).
+
+- [Feedback — модель обратной связи](feedback.md).

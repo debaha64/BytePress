@@ -63,6 +63,7 @@ DEPLOY_COPY_FILES = tuple(
 docs/technical/artifact-lifecycle.md
 docs/technical/checks.md
 docs/technical/data-formats.md
+docs/technical/feedback.md
 docs/technical/git.md
 docs/technical/phase-gates.md
 docs/technical/quality.md
@@ -75,6 +76,7 @@ docs/technical/testing.md
 docs/terminology/glossary.md
 docs/user/after-project-start.md
 docs/user/existing-product.md
+docs/user/feedback.md
 docs/user/github-repository-preparation.md
 docs/user/migration-0.5.1-to-0.5.2.md
 docs/user/workspace-update.md
@@ -106,6 +108,7 @@ sops/analytics.md
 sops/architecture.md
 sops/change-management.md
 sops/clean-exit.md
+sops/feedback.md
 sops/interview.md
 sops/managed-agent-pass.md
 sops/project-management.md
@@ -140,6 +143,7 @@ templates/docs-technical-testing.md
 templates/docs-terminology-glossary.md
 templates/docs-user-guide.md
 templates/domain-readme.md
+templates/feedback-record.md
 templates/interview-evidence-record.md
 templates/interview.md
 templates/log-file.md
@@ -652,6 +656,7 @@ def _generated_readme(slug: str, display_name: str, license_bytes: bytes) -> byt
         "- initial SoT `sot_files`.\n\n"
         "Product architecture, первый WBACK/WPLAN, лицензия продукта и переход SoT требуют отдельных решений владельца.\n\n"
         "[После Project Start](docs/user/after-project-start.md) поможет выбрать первую задачу. [Документация](docs/README.md) объясняет модель и проверки.\n\n"
+        "[Обратная связь о продукте](docs/user/feedback.md); записи команды — [Feedback](feedback/README.md).\n\n"
         "## Лицензия BytePress Harness\n\n"
     ).encode("utf-8")
     return prefix + license_bytes
@@ -666,6 +671,7 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "Git CLI не вызывается до отдельного owner-gated перехода.\n\n"
         "Человек управляет, агенты исполняют. Прочитайте `SYSTEM.md`, Project Profile и root `plans/`; "
         "technical PASS не является Product Acceptance.\n"
+        "\nОбработка обратной связи: [SOP Feedback](sops/feedback.md).\n"
     ).encode("utf-8")
     system = (
         f"# SYSTEM.md — Workspace {slug}\n\n"
@@ -675,6 +681,9 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         f"- deployed Harness version: `{version}`;\n"
         "- configured SoT owner: Project Profile;\n"
         "- planning authority: root `WROAD -> WBACK -> WPLAN`.\n\n"
+        "## Feedback\n\n"
+        "`feedback/` хранит пользовательский опыт по [модели Feedback](docs/technical/feedback.md); "
+        "`plans/` управляет работой. Feedback не создаёт WBACK/WPLAN автоматически.\n\n"
         "## Invariants\n\n"
         "1. Workspace управляет работой над Product Unit; Product Unit не хранит текущий Workspace route.\n"
         "2. В non-executing checkpoint active WPLAN count равен `0`; первая permanent mutation нового прохода создаёт active WPLAN.\n"
@@ -809,6 +818,7 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
         "- [Workspace Update](workspace-update.md).\n"
         "- [Переход 0.5.1 → 0.5.2](migration-0.5.1-to-0.5.2.md).\n"
         "- [Подготовка GitHub](github-repository-preparation.md).\n"
+        "- [Обратная связь](feedback.md).\n"
         "\n## Как выбрать\n\n"
         "Project Start — New Product создаёт новую среду с пустым Product root. "
         "Project Start — Existing Product создаёт новую среду с точной копией реального Product root. "
@@ -823,6 +833,13 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
     files["docs/user/source-of-truth-mode.md"] = _read_source_file(source, "docs/user/source-of-truth-mode.md")
     files["docs/architecture/README.md"] = _read_source_file(source, "docs/architecture/README.md")
     files["docs/terminology/README.md"] = _read_source_file(source, "docs/terminology/README.md")
+    files["feedback/README.md"] = (
+        "# Feedback\n\n"
+        "[Модель](../docs/technical/feedback.md) · [SOP](../sops/feedback.md) · "
+        "[Как сообщить об опыте](../docs/user/feedback.md).\n\n"
+        "Индекс содержит только ID, тему и ссылку на запись.\n\n"
+        "| ID | Тема | Запись |\n|---|---|---|\n"
+    ).encode("utf-8")
     # No copied path may also be generated; source-required inputs are explicit.
     return files
 

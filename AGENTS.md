@@ -57,3 +57,7 @@ HARNESS_BLOCKER: <краткое описание>
 ```
 
 Технический PASS не равен Product Acceptance.
+
+## Feedback
+
+Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит records. Полномочия задаёт активный WPLAN.

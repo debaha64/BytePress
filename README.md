@@ -20,3 +20,5 @@ BytePress помогает владельцу управлять работой 
 - [Обновление Workspace](docs/user/workspace-update.md) — отдельная задача для существующей среды.
 
 Текущая версия — `0.5.3`; её машинный источник — [VERSION](VERSION). [Паспорт](docs/product/product-passport.md) содержит краткие требования среды. BytePress распространяется по [MIT License](LICENSE).
+
+[Feedback](docs/user/feedback.md) помогает передать опыт использования продукта и получить результат рассмотрения; команда ведёт записи локально в Workspace.

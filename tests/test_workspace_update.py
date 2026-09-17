@@ -113,6 +113,11 @@ class WorkspaceUpdateTests(unittest.TestCase):
         # A bounded patch qualification driver, not a shipped updater capability.
         actions = {row["path"]: row["action"] for row in preview["authorization_payload"]["actions"]}
         generated = {
+            "README.md": ("GENERATED_MERGE", "Merge Feedback entry; preserve private content and license."),
+            "AGENTS.md": ("GENERATED_MERGE", "Merge Feedback SOP navigation; preserve authority."),
+            "docs/technical/README.md": ("GENERATED_MERGE", "Merge technical navigation."),
+            "feedback": ("GENERATED_MERGE", "Create only if absent; preserve existing data and directory mode."),
+            "feedback/README.md": ("GENERATED_MERGE", "Create empty index only if absent; preserve private index."),
             "Example.profile": ("GENERATED_MERGE", "Preserve composition and SoT; version cutover last."),
             "SYSTEM.md": ("GENERATED_MERGE", "Merge generated contract; preserve stronger private rules."),
             "docs/technical/project-start.md": ("GENERATED_MERGE", "Rendered Project Start contract, not a COPY action."),
@@ -207,15 +212,29 @@ class WorkspaceUpdateTests(unittest.TestCase):
         # Stop before writes if a copied contract has an unreviewed private overlay.
         for row in rows:
             if row["disposition"] != "PRESERVE" and row["path"] not in {"SYSTEM.md", "Example.profile"}:
-                self.assertEqual((root / row["path"]).read_bytes(), (released / row["path"]).read_bytes(),
-                                 "Private contract overlay needs explicit merge: " + row["path"])
-                self.assertEqual((root / row["path"]).stat().st_mode & 0o7777,
-                                 (released / row["path"]).stat().st_mode & 0o7777)
+                path = row["path"]
+                if path in {"feedback", "feedback/README.md"}:
+                    continue  # Existing user data is preserved, never a copied contract overlay.
+                if not (released / path).exists():
+                    self.assertFalse((root / path).exists(), "New contract conflicts with private path: " + path)
+                else:
+                    self.assertEqual((root / path).read_bytes(), (released / path).read_bytes(),
+                                     "Private contract overlay needs explicit merge: " + path)
+                    self.assertEqual((root / path).stat().st_mode & 0o7777,
+                                     (released / path).stat().st_mode & 0o7777)
         old_system = (released / "SYSTEM.md").read_bytes()
         self.assertTrue((root / "SYSTEM.md").read_bytes().startswith(old_system), "SYSTEM requires reviewed semantic merge")
         for row in rows:
             path = row["path"]
             if path == "Example.profile" or row["disposition"] == "PRESERVE":
+                continue
+            if path in {"feedback", "feedback/README.md"}:
+                if not (root / path).exists():
+                    if (reference / path).is_dir():
+                        (root / path).mkdir()
+                        (root / path).chmod((reference / path).stat().st_mode & 0o7777)
+                    else:
+                        shutil.copy2(reference / path, root / path)
                 continue
             if path == "SYSTEM.md":
                 private = (root / path).read_bytes()[len(old_system):]
@@ -226,13 +245,24 @@ class WorkspaceUpdateTests(unittest.TestCase):
         return rows
 
     def patch_readback(self, root, reference, rows, protected):
-        self.assertEqual(self.protected(root), protected)
+        observed = self.protected(root)
+        expected = dict(protected)
+        # A new empty Feedback domain may be created; existing data remains exact.
+        for path in ("feedback", "feedback/README.md"):
+            if path not in expected and path in observed:
+                expected[path] = observed[path]
+        self.assertEqual(observed, expected)
         self.assertEqual(json.loads((root / "Example.profile").read_text())["harness_version"], "0.5.2")
         for row in rows:
             path = row["path"]
             if path in {"Example.profile", "SYSTEM.md"} or row["disposition"] == "PRESERVE":
                 continue
             actual, expected = root / path, reference / path
+            if path in {"feedback", "feedback/README.md"}:
+                self.assertTrue(actual.is_dir() if expected.is_dir() else actual.is_file())
+                if path not in protected and actual.is_file():
+                    self.assertEqual(actual.read_bytes(), expected.read_bytes())
+                continue
             self.assertEqual(actual.read_bytes(), expected.read_bytes(), path)
             self.assertEqual(actual.stat().st_mode & 0o7777, expected.stat().st_mode & 0o7777, path)
         expected_system = (reference / "SYSTEM.md").read_bytes().replace(b"deployed Harness version: `0.5.3`", b"deployed Harness version: `0.5.2`")
@@ -262,7 +292,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         system.write_bytes(system.read_bytes().replace(b"deployed Harness version: `0.5.2`", b"deployed Harness version: `0.5.3`"))
         (root / "Example.profile").write_bytes(project_profile.serialize_project_profile("Example.profile", document))
         self.assert_pass(self.run_checker(root))
-        self.assertEqual(self.protected(root), before)
+        self.assertEqual({k: self.protected(root)[k] for k in before}, before)
         self.assertEqual({k: v for k, v in json.loads((root / "Example.profile").read_text()).items() if k != "harness_version"},
                          {k: v for k, v in json.loads(profile).items() if k != "harness_version"})
         # Successful deployment evidence is appended after cutover, under the same bounded operation.
@@ -377,10 +407,16 @@ class WorkspaceUpdateTests(unittest.TestCase):
 
     def protected(self, root):
         paths = ("Example", "plans", "research", "skills", "logs")
-        return {
+        result = {
             p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(p.read_bytes()).hexdigest())
             for prefix in paths for p in (root / prefix).rglob("*") if p.is_file()
         }
+        folder = root / "feedback"
+        if folder.exists():
+            for p in (folder, *folder.rglob("*")):
+                result[p.relative_to(root).as_posix()] = (
+                    p.stat().st_mode & 0o7777, hashlib.sha256(p.read_bytes()).hexdigest() if p.is_file() else "directory")
+        return result
 
     def represent_previous_version(self, root):
         agents = root / "AGENTS.md"

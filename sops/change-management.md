@@ -118,3 +118,30 @@ Workspace Update применяет новую поставку Harness к су�
 Последовательность: изменение → Documentation Impact → владельцы смысла → связанные документы, SOP, формы и терминология → объективные проверки → применимое чтение человеком → Consistency Closure. Обязательность формы определяет применяющая SOP; наличие шаблона не требует отдельного документа. Пользовательские шаги принадлежат `docs/user`; полномочия агента, точки контроля, STOP и восстановление — соответствующей SOP. [Проверки и критерии чтения](verify-work.md), [изменение терминов](terminology.md) и [русский стиль](../docs/technical/system-style.md) имеют отдельных владельцев.
 
 MOVE/RENAME включает все действующие Markdown-потребители, в том числе ссылки из принятых свидетельств. В таких свидетельствах допустимо только явно разрешённое владельцем ограниченное обслуживание ссылок: перенос адреса 1→1 при неизменных тексте ссылки и окружении; перенос 1→N сохраняет исторический исходный путь некликабельным только по точному разрешению. Все вхождения перечисляются до изменения; обратное преобразование разрешённых участков должно восстановить исходные байты. Находки, решения и выводы не переписываются. Неоднозначность вне разрешения требует STOP. Заглушка совместимости ради истории не создаётся.
+
+## Feedback при Workspace Update
+
+`FB-REQ-11` / `FB-SCN-11`: [модель Feedback](../docs/technical/feedback.md) отделяет static contracts от Workspace data. До apply включить весь `feedback/` target в backup и preservation manifest: пути, типы, bytes, POSIX modes, original/provenance, IDs, связи, закрытые записи и частный индекс. Наличие записей не разрешает active WPLAN или обход quiescent gate.
+
+1. Четыре static owners из [Project Start](../docs/technical/project-start.md#feedback) и изменённые copied consumers получают `COPY`, если private overlay отсутствует. Частные изменения требуют точного `GENERATED_MERGE` с критериями сохранения.
+2. Generated README/AGENTS/SYSTEM, docs/user/README.md, docs/technical/README.md и docs/technical/project-start.md получают `GENERATED_MERGE`: обновить ссылки и contracts, сохранить private смысл. Не переносить начальные reference plans/logs или authority.
+3. Существующий `feedback/` и всё его содержимое получают `PRESERVE`. Не регенерировать и не перезаписывать `feedback/README.md`, records или original; не менять IDs, modes или private navigation. Если каталог либо README отсутствует, создать только отсутствующий элемент из пустого reference, без records. В полном old/new deployment disposition это условный `GENERATED_MERGE` домена; точный target manifest отдельно фиксирует `CREATE` отсутствующего и `PRESERVE` существующего.
+4. У каждого изменённого downstream path должен быть ровно один disposition с причиной; source-only tests/new_project.py не копируются в Workspace. Пропущенный обязательный consumer, replacement данных или неизвестный private overlay дают FAIL до mutation.
+5. До version cutover подтвердить static/copied/generated read-back и сохранность всей Feedback data surface. При failure оставить прежнюю версию; исправление только в заранее разрешённой recovery boundary по exact backup. Совпадающий `harness_version` не доказывает тождество candidates: сравнить exact distribution manifest/digest и actual deployed delta. Повторная доставка/Update не импортирует и не дублирует Feedback records.
+
+## Минимальная проверка новой capability
+
+Для S1/S2 перед завершением дать короткое соответствие «пункт → existing owner/evidence → PASS/pending/not-applicable + причина», пропорционально фактическому изменению. Один accepted specification может покрыть несколько пунктов; отдельных документов или нового gate не требуется. Blocking pending criterion остаётся открытым. SDD/DDD, authority и V&V сохраняют действующих owners.
+
+1. Пользователь и наблюдаемая польза.
+2. Bounded context, responsibilities и semantic owners без конкурирующих норм.
+3. Достаточные inputs и наблюдаемые outputs.
+4. Lifecycle, states и guards конкретной capability.
+5. Authority и запрещённые автоматические действия.
+6. Данные, provenance и неизменяемые части.
+7. REQ/INV/SCN и positive/negative/failure cases до реализации по [task-flow](../docs/technical/task-flow.md).
+8. Deployment/Workspace Update: static/data separation, full copied/generated/private disposition и preservation по этой SOP.
+9. Documentation Impact: owners, инструкция пользователю, SOP/template и все direct navigation/generated consumers.
+10. Verification: наблюдаемые оракулы, exact evidence и предел технического PASS по [verify-work](verify-work.md).
+11. Реальное применение: пользователь/сценарий, данные и результат; synthetic/self-review не заменяют field use или human Validation.
+12. Критерии переноса в Product: что доказано pilot, что осталось проверить и какое отдельное owner authorization требуется по [PM](project-management.md).

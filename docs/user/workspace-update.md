@@ -28,3 +28,7 @@ Patch исправляет первый research, его authority и archive bo
 6. Только после успешного read-back обновить текстовую проекцию версии SYSTEM, если она имеется, и последним переключить `harness_version` через canonical Profile serializer на `0.5.3`; повторить проверки. При отказе оставить прежнюю версию и промежуточные свидетельства.
 
 Код и данные TAS для этой проверки не требуются: нейтральная fixture воспроизводит Product/history/WROAD preservation и bootstrap. Обновление конкретного Workspace выполняется только по отдельной exact authorization внешней операции. Для новой разработки TAS 0.0.2 выбирайте [New Product](first-start.md), используя старый TAS 0.0.1 как внешний reference corpus. Successful Update заканчивается append-only evidence в обновлённом Workspace; первая дальнейшая задача открывает обычный WPLAN. В обычной поставке deployed cleaner отсутствует; локальный private cleaner сохраняет собственный contract. Команды [change-management](../../sops/change-management.md) не требуют source-only tools.
+
+## Сохранение обратной связи
+
+Обновление добавляет [механизм Feedback](feedback.md), если его ещё нет. Ваши существующие `feedback/` записи, исходные тексты и индекс сохраняются вместе с правами доступа. Пустой индекс из reference Workspace не заменяет ваш индекс. Исполнитель отдельно проверяет сохранность данных и обновление инструкции, формы и SOP по [контракту Update](../../sops/change-management.md#feedback-при-workspace-update). При одинаковом `harness_version` точную поставку различают по Product manifest и SHA-256, а не по версии.
