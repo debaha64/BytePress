@@ -95,7 +95,7 @@ sot_files -> sot_git -> sot_github
 
 ## Маршрутное разрешение
 
-Для одного WBACK используется не более одной записи `DECISION_KIND: local_git_route`. Только статус `active` разрешает локальную работу; `suspended`, `closed` и `revoked` не разрешают новые изменения. `ALLOWED_SURFACES` активного WPLAN остаётся более узкой границей.
+Для одного WBACK используется не более одной записи `DECISION_KIND: local_git_route`. Только статус `active` разрешает локальную работу; `suspended`, `closed` и `revoked` не разрешают новые изменения. CREATE ∪ UPDATE ∪ REMOVE активного WPLAN остаётся более узкой границей.
 
 ## Остановка и чистое завершение
 

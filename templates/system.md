@@ -20,7 +20,7 @@
 
 ## Реестр защищённых поверхностей
 
-Форма материализуется в SYSTEM создаваемого Workspace; `<Slug>` заменяется Slug из Project Profile. Единственный canonical owner реестра — полученный SYSTEM.md. `pre-implementation` запрещает изменения Product до завершённого implementation gate; `exact-wplan` требует точного исключения активного WPLAN. Machine contract: одна таблица `Path | Protection`, уникальные bounded paths и указанные ниже обязательные строки. Дополнительные защищённые пути сохраняют одну из этих политик.
+Форма материализуется в SYSTEM создаваемого Workspace; `<Slug>` заменяется Slug из Project Profile. Единственный canonical owner реестра — полученный SYSTEM.md. `pre-implementation` допускает точные операции Product для разрешённых действий по [phase-gates](../docs/technical/phase-gates.md#условия-действий), с соответствующим видом решения и его областью; для старого SDLC_TRANSITION сохраняется прежний implementation gate; `exact-wplan` требует точного исключения активного WPLAN. Machine contract: одна таблица `Path | Protection`, уникальные bounded paths и указанные ниже обязательные строки. Дополнительные защищённые пути сохраняют одну из этих политик.
 
 registry:protected-surfaces
 

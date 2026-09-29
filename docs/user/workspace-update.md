@@ -32,3 +32,16 @@ Patch исправляет первый research, его authority и archive bo
 ## Сохранение обратной связи
 
 Обновление добавляет [механизм Feedback](feedback.md), если его ещё нет. Ваши существующие `feedback/` записи, исходные тексты и индекс сохраняются вместе с правами доступа. Пустой индекс из reference Workspace не заменяет ваш индекс. Исполнитель отдельно проверяет сохранность данных и обновление инструкции, формы и SOP по [контракту Update](../../sops/change-management.md#feedback-при-workspace-update). При одинаковом `harness_version` точную поставку различают по Product manifest и SHA-256, а не по версии.
+
+
+## 0.5.3 → 0.5.4 Workspace Update
+
+Обновление исправляет проверку actual delta при закрытии последнего WPLAN и упрощает его форму. Используйте существующую [процедуру Workspace Update](../../sops/change-management.md#workspace-update). Если доказанный дефект блокирует закрытие единственного active WPLAN, применим раздел [Recovery](../../sops/change-management.md#recovery-при-active-wplan).
+
+1. Проверьте exact released 0.5.3 и candidate 0.5.4, backup и полный disposition по двум свежим reference deployments. Существующие Product, project docs/research/history, Feedback, WROAD/WBACK/WPLAN и частные данные сохраняются.
+2. Перенесите только изменившиеся Harness contracts по disposition. Generated `docs/technical/project-start.md` требует reviewed merge; private owners сохраняют проектный смысл и режимы доступа. Source-only `new_project.py` в downstream не переносится.
+3. Оставьте старый active WPLAN с его counted headings, ALLOWED_SURFACES и PRESERVE без переписывания во время Update. Новый checker принимает эту форму; новый WPLAN template использует только CREATE/UPDATE/REMOVE без counts.
+4. Выполните read-back обновлёнными target/tools при прежнем `harness_version`; проверьте bytes/types/modes всех сохранённых данных и same identity active WPLAN. Только после PASS обновите связанную текстовую version projection и последним `harness_version` canonical serializer на 0.5.4, затем повторите проверки.
+5. Перед отдельно разрешённым закрытием подготовьте closing declarations существующего WPLAN, получите fresh complete baseline уже после Update, выполните same-ID move и terminal projection. Итоговая проверка — `tools/check_workspace.py --workspace <path> --baseline-manifest <closing-baseline>`. Новый WPLAN и фиктивный phase transition для closing не требуются.
+
+Успешный Update либо disposable replay не означают Product Acceptance, Release Authorization или независимую Validation принимающей команды.

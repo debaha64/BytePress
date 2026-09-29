@@ -81,7 +81,7 @@ Original хранится без смысловой, орфографическ�
 | FB-REQ-02 | Сохранить original отдельно и неизменно, включая source scope и provenance при импорте |
 | FB-REQ-03 | Разделить understanding, classification и analysis; поддержать четыре вида опыта |
 | FB-REQ-04 | Выразить полный цикл двумя states и dispositions, с проверяемыми guards |
-| FB-REQ-05 | Не создавать работу или authority автоматически; действовать только по active WPLAN |
+| FB-REQ-05 | Не создавать исполнение или authority автоматически; разбор/исполнение только по active WPLAN, узкая регистрация по task-intake |
 | FB-REQ-06 | Связать с отдельно разрешённой work/research/change/verification без копирования их состояния |
 | FB-REQ-07 | Зафиксировать result и честный response status, включая no-change closure |
 | FB-REQ-08 | Сохранить устойчивую identity и later retrieval по ID, тексту, источнику и work ref |
@@ -135,3 +135,5 @@ Record ссылается на source/evidence локальными relative pat
 При проверке пройти intake, поиск, interpretation, disposition, response и closure; отдельно сравнить original, планы и Product до/после действий. Negative cases: изменение original, work-accepted без decision, closed при draft, пропуск deployment consumer, повреждение данных при Update. Технические тесты исходной поставки проверяют T09 по этому контракту и deployment SOP; они не создают автоматического enforcement ручного рассмотрения.
 
 Факты Verification принадлежат журналу качества Workspace. Технический PASS не является human Validation или приёмкой Product. Реальная команда отдельно проверяет понятность инструкции и цикл ответа; новый candidate принимается владельцем только по собственному evidence. Closure record не открывает приёмку или release.
+
+Узкая регистрация исходного текста при нуле или одном WPLAN выполняется по [task-intake](../../sops/task-intake.md#узкая-регистрация). Это не triage, изменение старой записи или исполнение задачи. Новая короткая запись не требует пустых analysis/result/response блоков; прежние records сохраняются.

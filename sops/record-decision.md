@@ -6,7 +6,7 @@
 
 `SOURCE_REF` выбирается по [контракту источников](../docs/technical/artifact-lifecycle.md#источники-свидетельств). Локальная схема `owner_decision` или `product_acceptance` и `SOURCE_KIND: owner_response` требуют фактическую реплику владельца; transport не создаёт и не заменяет полномочия.
 
-`owner_decision` / `OD-*` сохраняет существующие виды `implementation`, `sot_transition`, `local_git_route` и допускает два вида решений жизненного цикла: `decommissioning_authorization`, `retirement_authorization`. OD жизненного цикла требует `DECISION_VALUE: approved`, текущий `WPLAN_ID`, текущий либо `none` в `ROUTE_REF` и `STATUS: active | applied`. Точный вид решения для перехода фазы читается из `docs/technical/phase-gates.md`.
+`owner_decision` / `OD-*` сохраняет существующие виды `implementation`, `sot_transition`, `local_git_route` и допускает два вида решений жизненного цикла: `decommissioning_authorization`, `retirement_authorization`. OD жизненного цикла требует `DECISION_VALUE: approved`, текущий `WPLAN_ID`, текущий либо `none` в `ROUTE_REF` и `STATUS: active | applied`. Точный вид решения для действия или прежнего перехода фазы читается из `docs/technical/phase-gates.md`.
 
 `product_acceptance` / `PA-*` и Release Authorization остаются отдельными существующими контрактами. Ни один из них не заменяет вид OD, а OD жизненного цикла не заменяет `PA-*` или Release Authorization.
 
@@ -23,3 +23,5 @@
 `implementation`, `decommissioning_authorization`, `retirement_authorization`, `sot_transition`: `active -> applied | revoked`. `local_git_route`: `active -> suspended -> active`, `active -> closed | revoked`, `suspended -> closed | revoked`.
 
 Для одного `ROUTE_REF` создаётся одна запись `local_git_route`. Последующие WPLAN того же WBACK используют её до окончательного закрытия; `closed` остаётся историческим свидетельством. В контрольной отметке перехода `WPLAN_ID` указывает WPLAN перехода; IE и обе OD впервые фиксируются вместе в одном коммите перехода и `SESSION_ID`. Проверка ссылки при исполнении не требует внешнего индекса.
+
+Короткая форма потребляет решение по условию действия, прежняя — по совместимому transition. Запись решения остаётся у существующего владельца logs/decisions.md; SOURCE/OWNER_REQUEST в WPLAN указывают происхождение, а не новый реестр.

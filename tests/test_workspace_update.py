@@ -21,6 +21,7 @@ import test_check_workspace as fixtures
 import test_new_project as project_start
 
 SOURCE = Path(__file__).resolve().parents[1]
+CURRENT_VERSION = (SOURCE / "VERSION").read_text().strip()
 sys.path.insert(0, str(SOURCE / "tools"))
 import project_profile
 
@@ -32,11 +33,11 @@ class WorkspaceUpdateTests(unittest.TestCase):
     assert_fail = fixtures.WorkspaceCheckerTests.assert_fail
     maxDiff = None
 
-    def released_workspace(self):
-        """Frozen output of the real released 0.5.2 generator, never VERSION spoofing."""
+    def released_workspace(self, version="0.5.2"):
+        """Frozen output of a real released generator, never VERSION spoofing."""
         directory = SOURCE / "tests/fixtures"
-        provenance = json.loads((directory / "deployed-0.5.2.json").read_text())
-        archive = directory / "deployed-0.5.2.tar.gz"
+        provenance = json.loads((directory / f"deployed-{version}.json").read_text())
+        archive = directory / f"deployed-{version}.tar.gz"
         self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(), provenance["archive_sha256"])
         temporary = tempfile.TemporaryDirectory(prefix="bytepress-released-052-")
         self.addCleanup(temporary.cleanup)
@@ -65,6 +66,67 @@ class WorkspaceUpdateTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256((root / "tools/check_workspace.py").read_bytes()).hexdigest(),
                          provenance["checker_sha256"])
         return root
+
+    def test_released_053_update_preserves_legacy_active_and_closes(self):
+        """AD-SCN-11: real released baseline, exact recovery read-back, cutover last."""
+        released = self.released_workspace('0.5.3')
+        root = self.released_workspace('0.5.3')
+        plan = fixtures.open_first_research(root)
+        plan.write_text(plan.read_text().replace('### UPDATE', '### UPDATE — 1') +
+                        '\n### PRESERVE — 1\n\n1. `Example/**`.\n')
+        for relative in ('Example/private.txt', 'docs/project-private.md', 'feedback/private.md'):
+            path=root/relative; path.write_text('private project data\n'); path.chmod(0o640)
+        self.assert_pass(self.run_checker(root))
+        before=self.patch_tree(root)
+        original_plan=plan.read_bytes()
+        reference,preview=self.patch_reference()
+        old_tree,new_tree=self.patch_tree(released),self.patch_tree(reference)
+        changed={p for p in old_tree.keys()|new_tree.keys() if old_tree.get(p)!=new_tree.get(p)}
+        actions={row['path']:row['action'] for row in preview['authorization_payload']['actions']}
+        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','sops/verify-work.md','tools/README.md'}
+        preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md'}
+        # Explicit closed disposition: no copied private/history/route content.
+        self.assertFalse(changed-{p for p in changed if actions.get(p)=='COPY'}-generated-preserved)
+        version=(SOURCE/'VERSION').read_text().strip()
+        applied=set()
+        for relative in sorted(changed-generated-preserved):
+            self.assertEqual(actions.get(relative),'COPY')
+            self.assertEqual(before[relative],old_tree[relative])
+            shutil.copy2(reference/relative,root/relative);applied.add(relative)
+        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','sops/verify-work.md','tools/README.md'}):
+            self.assertEqual(before[relative],old_tree[relative])
+            data=(reference/relative).read_bytes()
+            if relative=='SYSTEM.md':
+                data=data.replace(f'deployed Harness version: `{version}`'.encode(),b'deployed Harness version: `0.5.3`')
+            (root/relative).write_bytes(data);applied.add(relative)
+        after=self.patch_tree(root)
+        self.assertEqual({p:v for p,v in before.items() if p not in applied},
+                         {p:v for p,v in after.items() if p not in applied})
+        self.assertEqual(plan.read_bytes(),original_plan)
+        self.assertEqual(json.loads((root/'Example.profile').read_text())['harness_version'],'0.5.3')
+        self.assert_pass(self.run_checker(root))
+        for relative in applied-{'SYSTEM.md'}:
+            self.assertEqual(after[relative],new_tree[relative])
+        self.assertEqual((root/'SYSTEM.md').read_bytes(),(reference/'SYSTEM.md').read_bytes().replace(
+            f'deployed Harness version: `{version}`'.encode(),b'deployed Harness version: `0.5.3`'))
+        # The successful read-back above is the prerequisite for both version projections.
+        (root/'SYSTEM.md').write_bytes((reference/'SYSTEM.md').read_bytes())
+        document=json.loads((root/'Example.profile').read_text());document['harness_version']=version
+        (root/'Example.profile').write_bytes(project_profile.serialize_project_profile('Example.profile',document))
+        self.assert_pass(self.run_checker(root))
+        self.assertEqual(plan.read_bytes(),original_plan)
+        fixture=fixtures.WorkspaceCheckerTests()
+        try:
+            fixture.ad_plan(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n'
+                '### UPDATE\n\n1. `plans/backlog.md` — `content`.\n\n'
+                '### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+            baseline=fixture.write_baseline_manifest(root)
+            plan.write_text(plan.read_text().replace('Статус: active','Статус: completed'))
+            plan.rename(root/'plans/completed'/plan.name)
+            (root/'plans/backlog.md').write_text('WROAD-000001 active\nWBACK-000001 done\nactive WPLAN count 0\nNON_EXECUTING_CHECKPOINT: WROAD-000001-OWNER-PLANNING\n')
+            self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        finally:
+            fixture.doCleanups()
 
     def test_patch_old_fixture_uses_released_checker_bytes(self):
         released = self.released_workspace()
@@ -121,9 +183,13 @@ class WorkspaceUpdateTests(unittest.TestCase):
             "Example.profile": ("GENERATED_MERGE", "Preserve composition and SoT; version cutover last."),
             "SYSTEM.md": ("GENERATED_MERGE", "Merge generated contract; preserve stronger private rules."),
             "docs/technical/project-start.md": ("GENERATED_MERGE", "Rendered Project Start contract, not a COPY action."),
+            "sops/verify-work.md": ("GENERATED_MERGE", "Rendered deployed verification contract with source-only commands adapted."),
             "docs/user/README.md": ("GENERATED_MERGE", "Rendered instance navigation."),
             "docs/user/first-start.md": ("GENERATED_MERGE", "Rendered instance onboarding."),
             "logs/changes.md": ("PRESERVE", "Initial Project Start fact is historical; never import reference history."),
+            "logs/sessions.md": ("PRESERVE", "Existing session facts are immutable; do not import a new empty form."),
+            "plans/backlog.md": ("PRESERVE", "Existing queue and route are project state; the new checker reads old forms."),
+            "tools/README.md": ("GENERATED_MERGE", "Document the deployed short-form checker and legacy reader."),
         }
         rows = []
         for path in sorted(self.changed_deployed_paths(reference)):
@@ -255,7 +321,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 continue
             if path == "SYSTEM.md":
                 private = (root / path).read_bytes()[len(old_system):]
-                merged = (reference / path).read_bytes().replace(b"deployed Harness version: `0.5.3`", b"deployed Harness version: `0.5.2`")
+                merged = (reference / path).read_bytes().replace(f"deployed Harness version: `{CURRENT_VERSION}`".encode(), b"deployed Harness version: `0.5.2`")
                 (root / path).write_bytes(merged + private)
             else:
                 shutil.copy2(reference / path, root / path)
@@ -282,7 +348,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 continue
             self.assertEqual(actual.read_bytes(), expected.read_bytes(), path)
             self.assertEqual(actual.stat().st_mode & 0o7777, expected.stat().st_mode & 0o7777, path)
-        expected_system = (reference / "SYSTEM.md").read_bytes().replace(b"deployed Harness version: `0.5.3`", b"deployed Harness version: `0.5.2`")
+        expected_system = (reference / "SYSTEM.md").read_bytes().replace(f"deployed Harness version: `{CURRENT_VERSION}`".encode(), b"deployed Harness version: `0.5.2`")
         self.assertTrue((root / "SYSTEM.md").read_bytes().startswith(expected_system))
         self.assert_pass(self.run_checker(root))  # New checker, previous version claim.
 
@@ -304,9 +370,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
         fixtures.open_first_research(probe)
         self.assert_pass(self.run_checker(probe))
         document = json.loads(profile)
-        document["harness_version"] = "0.5.3"
+        document["harness_version"] = CURRENT_VERSION
         system = root / "SYSTEM.md"
-        system.write_bytes(system.read_bytes().replace(b"deployed Harness version: `0.5.2`", b"deployed Harness version: `0.5.3`"))
+        system.write_bytes(system.read_bytes().replace(b"deployed Harness version: `0.5.2`", f"deployed Harness version: `{CURRENT_VERSION}`".encode()))
         (root / "Example.profile").write_bytes(project_profile.serialize_project_profile("Example.profile", document))
         self.assert_pass(self.run_checker(root))
         self.assertEqual({k: self.protected(root)[k] for k in before}, before)
@@ -315,7 +381,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         # Successful deployment evidence is appended after cutover, under the same bounded operation.
         original_log = (root / "logs/changes.md").read_bytes()
         with (root / "logs/changes.md").open("a") as stream:
-            stream.write("\nWorkspace Update 0.5.2 -> 0.5.3: owner-authorized disposition/read-back PASS.\n")
+            stream.write(f"\nWorkspace Update 0.5.2 -> {CURRENT_VERSION}: owner-authorized disposition/read-back PASS.\n")
         self.assertTrue((root / "logs/changes.md").read_bytes().startswith(original_log))
         fixtures.open_first_research(root)
         self.assert_pass(self.run_checker(root))
@@ -748,9 +814,9 @@ class RecoveryUpdateTests(unittest.TestCase):
         helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
         helper.patch_readback(root, reference, rows, before)
         old_system = (root / 'SYSTEM.md').read_bytes()
-        document = json.loads(old_profile); document['harness_version'] = '0.5.3'
+        document = json.loads(old_profile); document['harness_version'] = CURRENT_VERSION
         try:
-            (root / 'SYSTEM.md').write_bytes(old_system.replace(b'`0.5.2`', b'`0.5.3`'))
+            (root / 'SYSTEM.md').write_bytes(old_system.replace(b'`0.5.2`', f'`{CURRENT_VERSION}`'.encode()))
             (root / 'Example.profile').write_bytes(project_profile.serialize_project_profile('Example.profile', document))
             # Failure is injected after the cutover, before final successful read-back.
             (root / 'tools/check_workspace.py').write_text('raise SystemExit(1)\n')

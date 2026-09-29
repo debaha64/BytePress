@@ -16,6 +16,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import tarfile
 import time
 import unittest
 import shlex
@@ -231,6 +232,28 @@ class PreviewTests(ProjectStartCase):
 
 
 class NewProductTests(ProjectStartCase):
+
+    def test_materialized_short_form_is_readable_without_phase_fields(self):
+        result = self.apply()
+        root = Path(result["target_workspace"])
+        form = (root / "templates/workspace-plan-active.md").read_text()
+        replacements = {
+            "<ID>": "000001", "<slug>": "example", "<проверяемый результат прохода>": "Проверить вход",
+            "<прямой запрос владельца и его источник; без повторного запроса известного>": "Прямой вход нейтрального владельца",
+            "<действие из docs/technical/phase-gates.md>": "research",
+            "<сделано; следующий незавершённый шаг; исходная база и свидетельства; blocker при наличии>": "Продолжить проверку входа",
+        }
+        for old, new in replacements.items(): form = form.replace(old, new)
+        for path in ("docs/new.md", "logs/quality.md", "docs/obsolete.md"):
+            form = form.replace("<relative path>", path, 1)
+        (root / "plans/active/WPLAN-000001-example.md").write_text(form)
+        (root / "plans/backlog.md").write_text("## WBACK-000001\n\nWROAD: WROAD-000001\nСтатус: active\nРезультат: Проверить вход\n")
+        for _ in range(2):
+            check = subprocess.run([sys.executable, "-B", str(root / "tools/check_workspace.py"),
+                                    "--workspace", str(root)], capture_output=True, text=True, cwd=root)
+            self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+        self.assertNotIn("SDLC_TRANSITION", form)
+        self.assertEqual(len(list((root / "plans/active").glob("WPLAN-*.md"))), 1)
     """REQ-COMP/PROFILE/SOT/START/SEED/TAS/BOUNDARY; INV-001/003/006–009/013."""
 
     def test_new_product_exact_composition_profile_and_wroad_only(self):
@@ -248,7 +271,7 @@ class NewProductTests(ProjectStartCase):
             document,
             {
                 "display_name": "Пример продукта",
-                "harness_version": "0.5.3",
+                "harness_version": "0.5.4",
                 "schema_version": 1,
                 "sot_mode": "sot_files",
             },
@@ -258,7 +281,7 @@ class NewProductTests(ProjectStartCase):
         self.assertFalse(any((root / "plans").rglob("WPLAN-*.md")))
         backlog = (root / "plans" / "backlog.md").read_text(encoding="utf-8")
         roadmap = (root / "plans" / "roadmap.md").read_text(encoding="utf-8")
-        self.assertIn("WROAD-000001-OWNER-PLANNING", backlog)
+        self.assertNotIn("active WPLAN count", backlog)
         self.assertIn("WROAD-000001", roadmap)
         self.assertNotIn("WBACK-000001", roadmap + backlog)
         self.assertNotIn("WPLAN-000001", roadmap + backlog)
@@ -360,18 +383,17 @@ class NewProductTests(ProjectStartCase):
             return payload
 
         initial = assert_status("PASS", run_checker())
-        self.assertIn("WROAD-000001-OWNER-PLANNING", initial["checks"][2]["value"]["checkpoint"])
+        self.assertEqual(initial["checks"][2]["value"]["active_wplan_count"], 0)
 
         plan_template = (root / "templates/workspace-plan-active.md").read_text(encoding="utf-8")
         for required_contract in (
-            "INTERVIEW_EVIDENCE_REF:", "OWNER_DECISION_REFS:", "ALLOWED_SURFACES:",
-            "EVIDENCE_KIND:", "### CREATE", "### UPDATE", "### PRESERVE", "### REMOVE",
-            "file:mode", "content,mode,type",
+            "WORK_CONTRACT: v1", "OWNER_REQUEST:", "ACTION:",
+            "### CREATE", "### UPDATE", "### REMOVE", "file:0644", "Обязательный результат",
         ):
             self.assertIn(required_contract, plan_template)
         for relative in ("sops/verify-work.md", "tools/README.md"):
             deployed_consumer = (root / relative).read_text(encoding="utf-8")
-            self.assertIn("required owner decision kind", deployed_consumer)
+            self.assertIn("WORK_CONTRACT", deployed_consumer)
             self.assertIn("docs/technical/phase-gates.md", deployed_consumer)
 
         plan = root / "plans/active/WPLAN-000001-fixture.md"
@@ -406,7 +428,10 @@ class NewProductTests(ProjectStartCase):
             self.assertEqual(count, 1, label)
             return document
 
-        plan_text = plan_template.replace("# WPLAN-<ID>-<slug>", "# WPLAN-000001-fixture", 1)
+        # Exercise the real old writer contract; the new short writer has its own behavioral test.
+        with tarfile.open(SOURCE_ROOT / "tests/fixtures/deployed-0.5.3.tar.gz") as archive:
+            legacy_template = archive.extractfile("WS_Example/templates/workspace-plan-active.md").read().decode("utf-8")
+        plan_text = legacy_template.replace(" — <count>", "").replace("# WPLAN-<ID>-<slug>", "# WPLAN-000001-fixture", 1)
         fields = {
             "WPLAN ID": "WPLAN-000001", "WROAD": "WROAD-000001", "WBACK": "WBACK-000001",
             "Фаза SDLC": "implementation", "Операционный режим": "system-editing",
@@ -414,7 +439,6 @@ class NewProductTests(ProjectStartCase):
             "Owners": "docs/technical/phase-gates.md", "Reason": "Проверка fixture перехода.",
             "Текущая контрольная отметка": "WBACK-000001-WORK-IN-PROGRESS",
             "INTERVIEW_EVIDENCE_REF": "IE-000001", "OWNER_DECISION_REFS": "OD-000001",
-            "ALLOWED_SURFACES": "tests/evidence.md,logs/sessions.md,logs/decisions.md",
             "TRANSITION_STATE": "in-progress", "FROM_PHASE": "implementation",
             "FROM_ROLE": "roles/11-developer.md", "PHASE_COMPLETION": "pending",
             "EVIDENCE_KIND": "implementation-red-green-delta", "EVIDENCE_REFS": "none",
@@ -431,15 +455,13 @@ class NewProductTests(ProjectStartCase):
         for label, value in fields.items():
             plan_text = set_field(plan_text, label, value)
         surface_sections = {
-            "### CREATE — <count>\n\n1. `<relative path>` — `<file:mode | directory:mode>`.":
+            "### CREATE\n\n1. `<relative path>` — `<file:mode | directory:mode>`.":
                 "### CREATE — 1\n\n1. `tests/evidence.md` — `file:0644`.",
-            "### UPDATE — <count>\n\n1. `<relative path>` — `<непустое подмножество content,mode,type>`.":
+            "### UPDATE\n\n1. `<relative path>` — `<непустое подмножество content,mode,type>`.":
                 "### UPDATE — 3\n\n1. `plans/active/WPLAN-000001-fixture.md` — `content`.\n"
                 "2. `logs/sessions.md` — `content`.\n"
                 "3. `logs/decisions.md` — `content`.",
-            "### PRESERVE — <count>\n\n1. `<relative path | relative tree/**>`.":
-                "### PRESERVE — 1\n\n1. `SYSTEM.md`.",
-            "### REMOVE — <count>\n\n1. `<relative path>` — `<file | directory>`.":
+            "### REMOVE\n\n1. `<relative path>` — `<file | directory>`.":
                 "### REMOVE — 0",
         }
         for placeholder, concrete in surface_sections.items():
@@ -664,7 +686,7 @@ class NewProductTests(ProjectStartCase):
         assert_status("FAIL", run_checker("--baseline-manifest", baseline), "actual-delta")
         system.write_bytes(protected)
         final_payload = assert_status("PASS", run_checker("--baseline-manifest", baseline))
-        self.assertEqual(next(item for item in final_payload["checks"] if item["id"] == "actual-delta")["value"]["PROTECTED"], 1)
+        self.assertTrue({"CREATE", "UPDATE", "REMOVE", "unused_permissions", "primary_delta"} <= set(next(item for item in final_payload["checks"] if item["id"] == "actual-delta")["value"]))
         self.assertEqual(next(item for item in final_payload["checks"] if item["id"] == "runtime-residue")["status"], "PASS")
         self.assertEqual(tree_manifest(root / "Example"), product_before)
         self.assertEqual((root / "logs/history.md").read_bytes(), history_before)
@@ -682,7 +704,7 @@ class NewProductTests(ProjectStartCase):
         profile_path = root / "Example.profile"
         profile_path.write_bytes(new_project.serialize_project_profile(profile_path.name, {
             "schema_version": 1,
-            "harness_version": "0.5.3",
+            "harness_version": "0.5.4",
             "sot_mode": "sot_files",
             "display_name": "Example Product",
             "product_parts": {"Core": {"responsibility": "Neutral core"}},
@@ -1128,7 +1150,8 @@ class BootstrapStartTests(ProjectStartCase):
     def test_bootstrap_active_template_expresses_none_authority(self):
         root = Path(self.apply()["target_workspace"])
         template = (root / "templates/workspace-plan-active.md").read_text()
-        self.assertIn("AUTHORITY_REF: <none | OD-000001>", template)
+        self.assertNotRegex(template, r"(?m)^AUTHORITY_REF:")
+        self.assertIn("только для применимого действия", template)
         self.assertNotIn("transitional logs/decisions.md#implementation", template)
 
     def test_bootstrap_documented_minimal_research_structure_is_valid(self):

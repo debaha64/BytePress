@@ -1,27 +1,18 @@
 # Запись качества
 
-Применение: [sops/record-quality.md](../sops/record-quality.md).
+Применение: [sops/record-quality.md](../sops/record-quality.md). Один самостоятельный факт проверки; результат WPLAN ссылается на него, не копирует содержимое.
 
 ```text
 RECORD_ID: QUALITY-000001
-WPLAN_ID: <WPLAN-ID | none>
-EVIDENCE_KIND: <canonical required evidence kind | not-applicable>
+WPLAN_ID: <WPLAN-ID>
+VERDICT: <PASS | FAIL>
 DATE: YYYY-MM-DD
-SUMMARY: <краткий факт>
+SUMMARY: <проверенный результат и граница>
 SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
-- Факт/результат: {{summary}}
-- Изменённые поверхности: {{paths}}
-- Свидетельство: {{reference}}
-- Непроверенные области: {{limits}}
-- Следующий шаг: {{next}}
+- Ожидаемое поведение: <критерий>.
+- Наблюдение и команды: <воспроизводимая проверка и её фактический результат>.
+- Ограничения: <если есть>.
 
-- Класс изменения и прослеживаемость: {{S0/S1/S2; REQ/INV/SCN}}
-- Verification: {{result/reference}}
-- Validation: {{status/reference}}
-- Product Acceptance: {{status/reference}}
-- Release Authorization: {{status/reference}}
-- GUI, если применим: {{визуальный результат либо ready-for-owner-check}}
-
-Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.
+SOURCE_REF ведёт к сохранённым команде, наблюдению и результату по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств). Для прежнего SDLC_TRANSITION добавляется применимый EVIDENCE_KIND. Класс/прослеживаемость, Validation, Product Acceptance, Release Authorization и GUI-свидетельство добавляются только при собственном применимом факте. Неприменимые status/ref и копии текущего WPLAN не требуются.

@@ -31,7 +31,7 @@ EXPECTED_TEST_FILES = {
     "README.md", "test_check_product.py", "test_check_workspace.py",
     "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py",
 }
-EXPECTED_DISTRIBUTION_FILES = 149
+EXPECTED_DISTRIBUTION_FILES = 151
 EXPECTED_DISTRIBUTION_DIRECTORIES = 14
 EXPECTED_DEPLOY_FILES = 115
 EXPECTED_DEPLOY_MANIFEST_SHA256 = "4367d56af0520cc38ff6c098e3ba753921f42bcde9c7db9cd528db2f3e9f69c2"
@@ -174,7 +174,7 @@ class BytePressQualificationTests(unittest.TestCase):
             relative: (SOURCE_ROOT / relative).read_text(encoding="utf-8")
             for relative in (
                 "templates/decision-record.md", "sops/record-decision.md",
-                "sops/project-management.md", "docs/terminology/glossary.md",
+                "docs/technical/phase-gates.md", "docs/terminology/glossary.md",
             )
         }
         for relative, document in consumers.items():
@@ -187,7 +187,7 @@ class BytePressQualificationTests(unittest.TestCase):
         self.assertIn("DECISION_KIND: implementation | decommissioning_authorization | retirement_authorization", template)
         plan_template = (SOURCE_ROOT / "templates/workspace-plan-active.md").read_text(encoding="utf-8")
         self.assertNotRegex(plan_template, r"(?m)^REQUIRED_OWNER_DECISION_KIND:")
-        self.assertIn("только из `docs/technical/phase-gates.md`", plan_template)
+        self.assertIn("docs/technical/phase-gates.md", plan_template)
 
 
     def test_product_acceptance_role_and_sop_ownership(self):
@@ -195,10 +195,10 @@ class BytePressQualificationTests(unittest.TestCase):
         acceptance = (SOURCE_ROOT / "roles/14-product-acceptance-coordinator.md").read_text(encoding="utf-8")
         procedure = (SOURCE_ROOT / "sops/project-management.md").read_text(encoding="utf-8")
         self.assertIn("создавать Product Acceptance вместо владельца", review)
-        self.assertIn("После передачи `owner-open` получить полномочия фазы", acceptance)
+        self.assertIn("По прямому запросу в границе WPLAN", acceptance)
         self.assertIn("Заранее принятый `PA-*`", acceptance)
-        self.assertIn("owner-review -> product-acceptance", procedure)
-        self.assertIn("product-acceptance -> release-readiness", procedure)
+        self.assertIn("phase-gates.md#условия-действий", procedure)
+        self.assertIn("явному решению владельца", procedure)
 
 
     def test_real_deployment_includes_preflight_without_autorun(self):
@@ -233,7 +233,7 @@ class BytePressQualificationTests(unittest.TestCase):
         directories = [path for path in root.rglob("*") if path.is_dir() and not path.is_symlink()]
         self.assertEqual(len(files), EXPECTED_DISTRIBUTION_FILES)
         self.assertEqual(len(directories) + 1, EXPECTED_DISTRIBUTION_DIRECTORIES)
-        self.assertEqual((root / "VERSION").read_bytes(), b"0.5.3\n")
+        self.assertEqual((root / "VERSION").read_bytes(), b"0.5.4\n")
         self.assertEqual({path.name for path in (root / "tools").iterdir() if path.is_file()}, EXPECTED_TOOL_FILES)
         self.assertEqual({path.name for path in (root / "tests").iterdir() if path.is_file()}, EXPECTED_TEST_FILES)
         for forbidden in ("plans", "logs", "research", "src"):
@@ -250,7 +250,7 @@ class BytePressQualificationTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.assert_distribution_identity(root)
         generic = (root / "tools/check_product.py").read_text(encoding="utf-8")
-        self.assertNotIn("0.5.3", generic)
+        self.assertNotIn("0.5.4", generic)
         self.assertNotIn(str(EXPECTED_DISTRIBUTION_FILES), generic)
 
     def test_project_start_manifest_has_new_checkers_and_no_legacy_checker(self):

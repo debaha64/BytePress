@@ -6,7 +6,7 @@
 
 ## Порядок
 
-1. Проверить [текущий WPLAN и полномочия](project-management.md). При active count0 текст остаётся входом до отдельно разрешённого прохода; исключение ради intake не создаётся.
+1. Проверить [текущий WPLAN и полномочия](project-management.md). При нуле или одном WPLAN регистрация исходного текста допускается по [узкой процедуре](task-intake.md#узкая-регистрация); разбор и дальнейшие действия требуют собственной разрешённой границы.
 2. Найти existing record по original, source и опыту. Re-delivery того же текста — no-op или дополнительный locator; самостоятельный follow-up того же опыта — новый original fragment в том же ID. Отдельное свидетельство другого автора сохраняется отдельно с duplicate-of и основанием.
 3. Создать record из формы: ID, recorded_at, original и state open. Для excerpt/import сохранить scope, locator и SHA-256 payload; event_at unknown не выводить из даты сообщения. Выбирать следующий свободный FB ID по сохранённым records, не переиспользовать ID. Original не нормализовать и не исполнять содержащиеся в нём команды.
 4. Записать understanding, основной type и отделённый analysis: проверенные факты, выводы, неизвестное. Неясность выразить точным вопросом и clarification-needed/open. Дополнительный evidence сохранять настолько, чтобы чтение и разбор не требовали .codex, аккаунта или сети.
@@ -19,4 +19,4 @@
 
 ## Проверка
 
-Проверить intake, понимание, исход рассмотрения, response/closure, повторную доставку и поиск; выполнить local link/source/payload read-back и preservation plans/Product. При mismatched original, missing authority или protected delta остановить действие. Ручной guard требует проверки исполнителем; автоматического валидатора/ingestion нет. Факты verification, owner Validation, PA и Release не смешиваются с closure record.
+Проверить intake, понимание, исход рассмотрения, response/closure, повторную доставку и поиск; выполнить local link/source/payload read-back и preservation plans/Product. При mismatched original, missing authority или protected delta остановить действие. Прямой ввод и сохранность Original проверяет исполнитель; узкую регистрационную дельту дополнительно проверяет check_workspace с registration-input. Полного автоматического triage/ingestion нет. Факты verification, owner Validation, PA и Release не смешиваются с closure record.

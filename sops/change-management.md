@@ -62,9 +62,9 @@ python3 -B tools/check_product.py --workspace <deployed-workspace>
 3. Не выводить продуктовую приёмку, выпуск, тег или GitHub-действия из технического PASS.
 4. Не предлагать `system-editing` из `product-work`: при дефекте Harness вывести `HARNESS_BLOCKER: <краткое описание>` и остановиться.
 
-До изменений определить владельцев смысла и потребителей и замкнуть точные `CREATE/UPDATE/PRESERVE/REMOVE` через Impact Scan. После основных действий выполнить Bugfixes и Consistency Closure; PASS требует по `0` устаревших ссылок, пропущенных потребителей, конкурирующих владельцев смысла и неизвестных потребителей.
+До изменений определить владельцев смысла и потребителей и замкнуть точные `CREATE/UPDATE/REMOVE` через Impact Scan. После основных действий выполнить Bugfixes и Consistency Closure; PASS требует по `0` устаревших ссылок, пропущенных потребителей, конкурирующих владельцев смысла и неизвестных потребителей.
 
-Полная исходная база фиксируется до первого изменения. В точных разделах WPLAN каждая `CREATE` имеет `file|directory:mode`, каждая `UPDATE` — непустое подмножество `content,mode,type`, каждая `REMOVE` — исходный тип, а `PRESERVE` задаёт неизменяемый путь или дерево. После изменений проверяющий инструмент сопоставляет объявления с фактическими созданием, обновлением и удалением и требует `0` изменений защищённых поверхностей; он не выполняет исправлений.
+Полная исходная база фиксируется до первого изменения. В точных разделах WPLAN каждая `CREATE` имеет `file|directory:mode`, каждая `UPDATE` — непустое подмножество `content,mode,type`, каждая `REMOVE` — исходный тип; весь неизменённый complement сохраняется неявно. После изменений проверяющий инструмент сопоставляет объявления с фактическими созданием, обновлением и удалением и требует `0` изменений защищённых поверхностей; он не выполняет исправлений.
 
 Вызывающая сторона получает воспроизводимую исходную базу до изменений; проверяющий инструмент не пишет в Workspace:
 
@@ -74,6 +74,23 @@ python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest
 
 Полученный stdout имеет точный заголовок `manifest<TAB>1<TAB>complete<TAB>.` и отсортированные строки `type<TAB>mode<TAB>sha256-or--<TAB>relative-path`; этот файл затем передаётся через `--baseline-manifest`. Полнота относится ко всей постоянной области проверки: служебные каталоги `.git/.agents/.codex`, `temp/` и канонические удаляемые остатки исключаются одинаково при выводе исходной базы и вычислении фактических изменений.
 
+
+## Actual delta
+
+`AD-REQ-01`: единственный источник mutation authority WPLAN — точные разделы `CREATE`, `UPDATE`, `REMOVE`; mutable surface = CREATE ∪ UPDATE ∪ REMOVE. Заголовки имеют форму `### CREATE`, `### UPDATE`, `### REMOVE`; число объявлений вычисляется из строк. `ALLOWED_SURFACES` и WPLAN-level `PRESERVE` не нужны. Весь неизменённый complement complete baseline сохраняется неявно. Независимые Workspace Update `COPY / GENERATED_MERGE / PRESERVE / REMOVE / NOT_APPLICABLE`, классификация Impact Scan и `PRESERVED_PATHS` продуктовых прогонов сохраняют собственный смысл.
+
+`AD-REQ-02`: parser принимает legacy counted headings, включая `### PRESERVE — N`, и legacy `ALLOWED_SURFACES`. Старые counts и PRESERVE не являются mutation authority; число строк вычисляется, старое поле не требуется. Это позволяет Recovery Workspace Update сохранить существующий active WPLAN byte/mode-exact. Завершённые исторические планы не переписываются.
+
+`AD-REQ-03`: для `--baseline-manifest` canonical current active WPLAN имеет приоритет. Если active отсутствует, complete baseline должен однозначно содержать ровно один обычный файл `plans/active/WPLAN-*.md`; declarations читаются только из same-ID/same-basename `plans/completed/`. Механическое закрытие сохраняет исходные фазу, authority и protected boundaries, без обязательного перехода к следующей фазе. Missing/mismatched/ambiguous owner даёт FAIL; выбор последнего completed по времени или номеру запрещён.
+
+`AD-REQ-04`: если declaration owner отсутствует и complete baseline равен current, результат CREATE=0 UPDATE=0 REMOVE=0, PASS. Ненулевой delta без owner даёт FAIL. Current active contract не ослабляется: его mutation surfaces остаются непустыми и подчиняются SYSTEM.
+
+`AD-REQ-05`: CREATE требует exact path и фактические type/mode; UPDATE — exact path и непустое допустимое подмножество content/mode/type; REMOVE — exact path и исходный type. Незаявленная мутация, неверный contract либо нарушение защиты дают FAIL. Неиспользованное разрешение допустимо; обязательный результат проверяется отдельно. Trees/globs не заменяют exact mutation paths. Защищённые поверхности и pre-implementation Product policy принадлежат SYSTEM и проверяются также для closing owner.
+
+`AD-REQ-06`: единый путь проверки normal, closing и zero-delta: complete baseline + WPLAN declarations + current tree → `check_workspace.py --baseline-manifest`. Перед closing подготовить exact closing declarations, затем fresh complete baseline, same-ID move active→completed и terminal route projection; после последней мутации вызвать тот же checker. Внешнее специальное сравнение terminal manifest не требуется и не заменяет этот путь. Отдельного closing mode/record, LAST_WPLAN или synthetic active WPLAN нет.
+
+Regression AD-SCN-01..12: normal active PASS; unexpected mutation FAIL; wrong contract FAIL; same-ID closure PASS; identity mismatch FAIL; ambiguous owner FAIL; zero-delta PASS; unowned delta FAIL; Product protection без legacy поля; counted headings; legacy active после Update; новая форма без redundant fields/counts. Отрицательные controls включают недостигнутый обязательный результат и closing Product protection.
+
 ## Workspace Update
 
 Workspace Update применяет новую поставку Harness к существующему Workspace. Идентичность проекта, фиксированный корень продукта, WROAD/WBACK/WPLAN, история, исследования, частные изменения и выбранный SoT сохраняются. Project Start создаёт новый Workspace и не используется для обновления. Обновление не является выпуском или Product Acceptance; отдельный инструмент или платформа миграции не нужны.
@@ -81,7 +98,7 @@ Workspace Update применяет новую поставку Harness к су�
 1. Подтвердить точные границы владельца, прежнюю поставку и развёрнутую версию, идентичность проекта, SoT и следующую точку контроля. Не выводить SoT из физического `.git`. Неясные полномочия, ссылка или специальный узел, несовместимая архитектура или необходимость изменения зависимых проектов требуют STOP.
 2. Проверить точную резервную копию или снимок и контрольную сумму, безопасный единственный корень, пути, типы, содержимое и POSIX-режимы. Зафиксировать полный манифест постоянной области, манифесты продукта, частных материалов и истории, префиксы журналов и отдельно исключённые служебные проекции.
 3. Только во внешнем временном родительском каталоге создать через Project Start эталонный Workspace из новой поставки. Нейтральные продукт и WROAD служат образцом структуры и не получают полномочий существующего проекта.
-4. Сопоставить фиксированный перечень копируемой поставки, создаваемые контракты и частные изменения. Задать точные `CREATE/UPDATE/PRESERVE/REMOVE`. Копируемые поверхности без частных изменений получают точные байты и режимы поставки; создаваемые и частные документы объединяются по смыслу. История и продукт никогда не заменяются эталонным содержимым.
+4. Сопоставить фиксированный перечень копируемой поставки, создаваемые контракты и частные изменения. Задать точные `CREATE/UPDATE/REMOVE`. Копируемые поверхности без частных изменений получают точные байты и режимы поставки; создаваемые и частные документы объединяются по смыслу. История и продукт никогда не заменяются эталонным содержимым.
 5. При разработке/квалификации контракта Update получить содержательный RED для применимых изменений конфигурации, версии, сохранности, отказов, контрольного чтения и трёх режимов SoT. Deployment использует квалифицированный контракт и не открывает research под старым Harness. Тесты возможности миграции принадлежат тестам продукта; проверки частного обновления собственного Workspace — корневым тестам.
 6. При переносе прежней конфигурации остановить обычное исполнение. Удалить старое машинное поле, затем создать канонический `<Slug>.profile` через размещённый рядом `project_profile.serialize_project_profile(profile_name, document)` с прежним развёрнутым `harness_version`. Краткий промежуток без владельца конфигурации явно фиксируется; два машинных источника одновременно не допускаются. Не создавать проекцию или режим совместимости.
 7. Обновить только объявленные контракты, инструменты и тесты Harness и прямых потребителей поставки. После обновления всех действующих импортов и команд удалить переходный проверяющий инструмент; обёртку или псевдоним не оставлять. Отдельный частный инструмент ограниченной очистки сохраняет свою ответственность.
@@ -93,7 +110,7 @@ Workspace Update применяет новую поставку Harness к су�
 
 ### Внешняя граница Workspace Update
 
-`REQ-BP-UPDATE-001`: Workspace Update — ограниченная операция deployment Harness из новой проверенной distribution над замороженным существующим Workspace. Она не является обычной project work под старым Harness и не требует сначала открывать research/system-editing WPLAN в нём. Основной путь требует quiescent Workspace: active WPLAN count `0`, явно записанный non-executing checkpoint, нет concurrent writes. Единственное исключение — [recovery при active WPLAN](#recovery-при-active-wplan) по RU-REQ-01..06; иначе STOP. Существующий active route не закрывается автоматически.
+`REQ-BP-UPDATE-001`: Workspace Update — ограниченная операция deployment Harness из новой проверенной distribution над замороженным существующим Workspace. Она не является обычной project work под старым Harness и не требует сначала открывать research/system-editing WPLAN в нём. Основной путь требует quiescent Workspace: active WPLAN count `0`, нет concurrent writes; отдельная ручная проекция checkpoint не обязательна. Единственное исключение — [recovery при active WPLAN](#recovery-при-active-wplan) по RU-REQ-01..06; иначе STOP. Существующий active route не закрывается автоматически.
 
 Полномочие операции — фактическое отдельное разрешение владельца на exact snapshot/digest, source distribution identity, target identity и полный update disposition. Это внешний deployment contract, аналогичный границе доверия Project Start; generic implementation OD старого Workspace не синтезируется. Исполнитель работает из новой distribution, сохраняет backup, авторизацию и промежуточные свидетельства вне target. Нового updater executable, режима CLI, сервиса или типа решения нет.
 
@@ -160,3 +177,7 @@ MOVE/RENAME включает все действующие Markdown-потреб
 10. Verification: наблюдаемые оракулы, exact evidence и предел технического PASS по [verify-work](verify-work.md).
 11. Реальное применение: пользователь/сценарий, данные и результат; synthetic/self-review не заменяют field use или human Validation.
 12. Критерии переноса в Product: что доказано pilot, что осталось проверить и какое отдельное owner authorization требуется по [PM](project-management.md).
+
+## Разрешения и результат
+
+Неиспользованное разрешение допустимо. Обязательный результат проверяется отдельно по [рабочему договору](../docs/technical/task-flow.md#рабочий-договор), включая `--check-result` и применимые REQUIRED assertions. Перед работой сохранить complete baseline; не расширять manifest задним числом. При узкой регистрации передать точный `--registration-input` по task-intake: checker отдельно показывает основной delta и registrations, сохраняя исходную базу основной работы.

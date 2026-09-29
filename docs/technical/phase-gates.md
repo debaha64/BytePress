@@ -1,18 +1,30 @@
-# Точки контроля фаз
+# Условия действий и совместимость фаз
 
-Точка контроля фазы (`phase gate`) — смысловая точка контроля в Конвейере разработки (SDLC). Она отделяет состояния работы и фиксирует, где нужен владелец, `Verification Engineer` или отдельный управляемый проход.
+Новая работа разделяет продуктовые факты, разрешённый WPLAN и сессию по [рабочему договору](task-flow.md#рабочий-договор). Инженерные этапы выбираются по задаче; обязательного движения по графу в короткой форме нет. Решения принимает владелец. Название роли, ACTION или технический PASS само по себе не разрешает запись.
 
-## Фаза
+## Условия действий
 
-Фаза использует одно из `21` канонических машинных значений из [полного каталога SDLC](sdlc.md): `intent`, `discussion`, `interview`, `research`, `requirements`, `basis`, `architecture`, `design`, `planning`, `approval`, `implementation`, `verification`, `owner-review`, `product-acceptance`, `release-readiness`, `release`, `handoff`, `operation`, `maintenance`, `retrospective`, `decommissioning`. `discovery` и `product discovery` нормализуются в `research` как совместимые имена стартового прохода. Фаза не является командой к действию сама по себе; `decommissioning` переводит продукт в `retired` только после отдельного решения владельца.
+Эта таблица — единственный владелец требуемого вида решения для `WORK_CONTRACT: v1`. `none` означает отсутствие дополнительного типизированного решения, но не отсутствие прямого запроса, WPLAN и точной границы. `AUTHORITY_REF` записывается только при применимости. Решения implementation и вывода из эксплуатации сохраняют kind/value/status/WPLAN/route scope; Product Acceptance сохраняет своё происхождение и exact result. Выпускная процедура дополнительно связывает принятого кандидата, текущую политику и точное действие.
 
-## Точка контроля
+| Действие | Решение |
+|---|---|
+| `research` | `none` |
+| `implementation` | `implementation` |
+| `verification` | `none` |
+| `owner-review` | `none` |
+| `product-acceptance` | `none` |
+| `release-readiness` | `product_acceptance` |
+| `release` | `release_authorization` |
+| `decommissioning` | `decommissioning_authorization` |
+| `retired` | `retirement_authorization` |
 
-Точка контроля (`gate`) показывает, какие условия и свидетельства связаны с переходом. Она не является автоматическим разрешением на изменение границ, код, выпуск и тег, GitHub-действия или продуктовую приёмку.
+`research` включает подготовительную работу с фактами, требованиями и конструкцией без изменения Product. `implementation` требует scoped OD и точной границы до записи. `product-acceptance` разрешает подготовку рассмотрения: accepted PA создаётся только по отдельному явному решению владельца. Release Readiness потребляет существующий accepted PA; новый WPLAN не переписывает его provenance. Проверки и роли не выдают новые решения. Для реализации сохраняются применимые specification/design, tests-first, Bugfixes и проверки; отсутствие графа не отменяет эти инженерные условия.
 
-`discovery-complete` требует, чтобы обязательные слои стартового исследования были завершены или явно отложены как `deferred` с причиной. Вопрос о следующем переходе не задаётся до этой точки контроля.
+`implementation`, `decommissioning` и `retired` допускают только точные операции Product из CREATE/UPDATE/REMOVE при действительном решении соответствующего вида из таблицы. Обычное разрешение реализации не заменяет разрешения вывода из эксплуатации или прекращения поддержки; обратная подмена также запрещена. Другие ACTION не снимают защиту Product. Неиспользованное разрешение REMOVE допустимо, но обязательное удаление проверяется отдельно как результат.
 
-Правила продолжения работы и смены маршрута принадлежат [project-management](../../sops/project-management.md); точка контроля сама не выполняет переход.
+## Совместимость прежней формы
+
+Следующие разделы применяются только к существующему `SDLC_TRANSITION: v1`, а не к новой короткой форме. Они сохраняют чтение старого активного WPLAN, его продолжение и завершение без переписывания completed history. При переходе незавершённого WPLAN на короткую форму граф больше не определяет следующее действие; сохраняются исходные решения, их границы и факты. Прежняя таблица остаётся владельцем только проверки прежнего представления.
 
 ## Контракт переходов
 
@@ -74,14 +86,14 @@ Generic Workspace checker проверяет эти Workspace contracts. Соп�
 
 ## Полномочия работы и решения перехода
 
-WPLAN задаёт разрешённую работу; решение владельца о реализации имеет отдельное назначение. `ALLOWED_SURFACES` — непустая точная граница любого active WPLAN, независимо от наличия OD. Она не отменяет защиту Product Unit. `AUTHORITY_REF: none | OD-*` проецирует только требуемое разрешение реализации; отдельный универсальный research OD не вводится.
+WPLAN задаёт разрешённую работу; решение владельца о реализации имеет отдельное назначение. `CREATE ∪ UPDATE ∪ REMOVE` задаёт непустую точную границу active WPLAN, независимо от наличия OD. Она не отменяет защиту Product Unit. `AUTHORITY_REF: none | OD-*` проецирует только требуемое разрешение реализации; отдельный универсальный research OD не вводится.
 
 1. `REQ-BP-BOOT-001`: первый research WPLAN работает с `AUTHORITY_REF: none` и `OWNER_DECISION_REFS: none`, если иных решений нет. Project Start только с WROAD имеет transition `NOT_APPLICABLE` и не требует OD.
-2. `REQ-BP-BOOT-002`: до завершения перехода в `implementation` WPLAN не разрешает изменение Product root или его потомков — ни через ALLOWED_SURFACES, ни через CREATE/UPDATE/REMOVE. Product root и его policy принадлежат `SYSTEM.md`, `registry:protected-surfaces`; Profile задаёт Slug. Planning scope не снимает эту защиту.
+2. `REQ-BP-BOOT-002`: до завершения перехода в `implementation` WPLAN не разрешает изменение Product root или его потомков — через CREATE/UPDATE/REMOVE. Product root и его policy принадлежат `SYSTEM.md`, `registry:protected-surfaces`; Profile задаёт Slug. Planning scope не снимает эту защиту.
 3. `REQ-BP-BOOT-003`: работа исходной фазы `implementation`, включая завершённый handoff в verification, требует действительного current implementation OD. Его kind/value/status/WPLAN/route/evidence/projection проверяются строго. В `approval -> implementation` такая authority допустима и обязательна только при `OWNER_GATE_STATUS: satisfied`, со ссылкой на то же решение в OWNER_GATE_REF; сама Product work начинается после complete handoff. Pending approval работает с none.
 4. `REQ-BP-BOOT-004`: в остальных фазах `AUTHORITY_REF` равен `none`; преждевременный или неверно применённый implementation OD даёт FAIL. Исторические OWNER_DECISION_REFS не превращаются в текущую authority. Проверка работы implementation и required decision перехода раздельны: строка с required decision `none` не наследует implementation OD; OD в implementation -> verification проверяет только выполненную implementation work.
 5. `REQ-BP-BOOT-005`: форма active WPLAN явно выражает `AUTHORITY_REF: <none | OD-000001>` без legacy implementation fallback. Technical PASS не создаёт owner decision.
 
 Допустимая цепочка bootstrap: Project Start -> research без OD -> verified research checkpoint и последовательные canonical preparation transitions -> новое отдельное разрешение владельца в implementation gate -> implementation-open -> implementation work. Discovery, выбор результата и разрешение реализации не синтезируются из создания WPLAN; фактическое post-discovery решение фиксируется по существующему typed contract. Проверка требований принадлежит fresh bootstrap fixtures, matrix21 и negative authority injections; Product Acceptance, Release Authorization и lifecycle gates сохраняют исходные отдельные контракты.
 
-Canonical graph остаётся однонаправленным. `changes requested` в owner review не добавляет backward edge: завершение итерации и новый corrective WPLAN следуют [route semantics](../../sops/project-management.md#доработка-после-owner-review); Product correction получает fresh implementation OD нового WPLAN.
+В прежнем SDLC_TRANSITION граф проверяется как исторический формат; он не добавляет обратного перехода. Доработка может продолжаться в прежней разрешённой границе незавершённого WPLAN или после его согласованного перевода в короткую форму. Решения и история сохраняются по [PM](../../sops/project-management.md#доработка-после-owner-review).

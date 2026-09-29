@@ -686,7 +686,7 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "`plans/` управляет работой. Feedback не создаёт WBACK/WPLAN автоматически.\n\n"
         "## Invariants\n\n"
         "1. Workspace управляет работой над Product Unit; Product Unit не хранит текущий Workspace route.\n"
-        "2. В non-executing checkpoint active WPLAN count равен `0`; первая permanent mutation нового прохода создаёт active WPLAN.\n"
+        "2. Число active WPLAN вычисляется: ноль означает отсутствие исполнения; первая запись нового исполняемого прохода создаёт WPLAN. Узкая регистрация допустима по task-intake.\n"
         "3. `sot_files` не читает Git. Product code/checks не исполняются при discovery Profile.\n"
         "4. Technical PASS, owner acceptance, Product Acceptance и Release Authorization являются разными фактами.\n"
         "5. Отдельная внешняя операция [Workspace Update](sops/change-management.md#внешняя-граница-workspace-update) "
@@ -709,21 +709,7 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         road_separator + f"| WROAD-000001 | active | {wroad} | Owner planning: определить первый WBACK/WPLAN. |\n",
     ).replace("WS_<Slug>", f"WS_{slug}")
     backlog_template = _read_source_file(source, "templates/workspace-backlog.md").decode("utf-8")
-    old_route = """```text
-<WROAD> active
--> <WBACK> active
--> <WPLAN active|absent at non-executing checkpoint>
-```"""
-    new_route = """```text
-WROAD-000001 active
-active WBACK count 0
-active WPLAN count 0
-```
-
-NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
-    if backlog_template.count(old_route) != 1:
-        raise InspectionError("workspace-backlog template contract mismatch")
-    backlog = backlog_template.replace(old_route, new_route).replace("WS_<Slug>", f"WS_{slug}")
+    backlog = backlog_template.replace("WS_<Slug>", f"WS_{slug}")
     completed = _read_source_file(source, "templates/workspace-plan-completed-readme.md")
     files = {
         "README.md": readme,
@@ -736,7 +722,7 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
         "logs/decisions.md": "# Решения владельца\n\nProject Start не создаёт синтетического решения владельца.\n".encode("utf-8"),
         "logs/changes.md": (f"# Изменения Workspace\n\n- Project Start материализовал `WS_{slug}` из Harness `{version}`.\n").encode("utf-8"),
         "logs/quality.md": "# Качество Workspace\n\n- Начальная структурная проверка Project Start: PASS.\n- Product Acceptance: не выполнялась.\n".encode("utf-8"),
-        "logs/sessions.md": "# Сессии Workspace\n\n- Initial checkpoint: WROAD-000001-OWNER-PLANNING.\n".encode("utf-8"),
+        "logs/sessions.md": "# Сессии Workspace\n\nОтдельная запись нужна только для самостоятельного факта передачи или прерывания.\n".encode("utf-8"),
         "logs/risks.md": "# Риски Workspace\n\nТекущие риски не зарегистрированы.\n".encode("utf-8"),
         "logs/terminology.md": "# Терминология Workspace\n\nБудущие изменения ведутся append-only.\n".encode("utf-8"),
         "logs/history.md": "# История Workspace\n\nProject Start создал начальную composition Workspace.\n".encode("utf-8"),
@@ -765,7 +751,7 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
             "optional `product_parts` и `product_native_checks` отсутствуют. Parsing Profile не исполняет Product code или declared commands.\n\n"
             "Для actual-delta проверки caller до mutation получает complete TSV командой "
             "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <external-manifest>`; "
-            "active WPLAN связывает exact CREATE/UPDATE/PRESERVE/REMOVE с фактическими path/type/content/POSIX-mode изменениями.\n"
+            "active WPLAN связывает exact CREATE/UPDATE/REMOVE с фактическими path/type/content/POSIX-mode изменениями.\n"
         ).encode("utf-8"),
         "docs/technical/README.md": "# Техническая документация Workspace\n\nТехнические контракты этого каталога применяются через root WPLAN и не создают owner authority.\n".encode("utf-8"),
         "docs/terminology/README.md": "# Терминология Workspace\n\nКанонический словарь: [glossary.md](glossary.md).\n".encode("utf-8"),
@@ -784,8 +770,8 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
             "Иной режим и любые Git/GitHub actions требуют отдельного owner-gated перехода.\n\n"
             "SoT не разрешает реализацию, owner acceptance, Product Acceptance, release или closeout.\n"
         ).encode("utf-8"),
-        "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` read-only читает required evidence kind, owner-gate policy и exact required owner decision kind из одной transition row `docs/technical/phase-gates.md`; WPLAN хранит только projections, а gate name или generic positive record не заменяет canonical kind. Checker печатает complete baseline через `--print-baseline-manifest` и с optional `--baseline-manifest` проверяет actual delta без исполнения Product code. `tools/check_product.py` отдельно проверяет composition; native checks исполняются только с explicit option и positive timeout. Product behavior для immutable evidence запускается только в отдельной разрешённой копии; lifecycle `OD-*`, Product Acceptance и Release Authorization не объединяются.\n".encode("utf-8"),
-        "tools/README.md": "# Инструменты Workspace\n\n`project_profile.py` — canonical parser/serializer Project Profile. `check_workspace.py` проверяет `SDLC_TRANSITION: v1` и читает required evidence kind, owner-gate policy и exact required owner decision kind из одной transition row `docs/technical/phase-gates.md`; hidden transition-to-kind mapping и WPLAN gate-name override отсутствуют. Checker read-only печатает complete TSV через `--print-baseline-manifest` и принимает его через optional `--baseline-manifest`, не исполняя Product. `check_product.py` проверяет Product composition и запускает declared native checks только явно. Checker не вызывает другой checker автоматически и не принимает owner gate.\n".encode("utf-8"),
+        "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` read-only проверяет короткий WORK_CONTRACT, условия действий и совместимое чтение прежнего SDLC_TRANSITION по `docs/technical/phase-gates.md`; Результат задачи проверяется отдельно через --check-result, регистрация — через --registration-input; роль и PASS не создают полномочий. Checker печатает complete baseline через `--print-baseline-manifest` и с optional `--baseline-manifest` проверяет actual delta без исполнения Product code. `tools/check_product.py` отдельно проверяет composition; native checks исполняются только с explicit option и positive timeout. Product behavior для immutable evidence запускается только в отдельной разрешённой копии; lifecycle `OD-*`, Product Acceptance и Release Authorization не объединяются.\n".encode("utf-8"),
+        "tools/README.md": "# Инструменты Workspace\n\n`project_profile.py` — canonical parser/serializer Project Profile. `check_workspace.py` проверяет `WORK_CONTRACT: v1` и условия действий из `docs/technical/phase-gates.md`, сохраняя чтение прежнего `SDLC_TRANSITION: v1`; hidden transition-to-kind mapping и WPLAN gate-name override отсутствуют. Checker read-only печатает complete TSV через `--print-baseline-manifest` и принимает его через optional `--baseline-manifest`, не исполняя Product. `check_product.py` проверяет Product composition и запускает declared native checks только явно. Checker не вызывает другой checker автоматически и не принимает owner gate.\n".encode("utf-8"),
         "tests/README.md": "# Тесты Workspace\n\n`test_project_profile.py` проверяет развёрнутый контракт Profile; `test_check_workspace.py` — neutral executable SDLC/authority/actual-delta fixtures. Product tests принадлежат Product root и не создаются Project Start.\n".encode("utf-8"),
     }
     # Generated instance navigation is separate from Product documentation.
@@ -1371,7 +1357,7 @@ def _verify_staging_representation(root: Path, payload: dict, *, final: bool = F
     if active:
         raise StagingError("Project Start must not create active WPLAN")
     planning_text = (root / "plans" / "roadmap.md").read_text(encoding="utf-8") + (root / "plans" / "backlog.md").read_text(encoding="utf-8")
-    if "WROAD-000001" not in planning_text or "WROAD-000001-OWNER-PLANNING" not in planning_text:
+    if not re.search(r"(?m)^\| WROAD-000001 \| active \|", planning_text):
         raise StagingError("WROAD-only planning state mismatch")
     if "WBACK-000001" in planning_text or "WPLAN-000001" in planning_text:
         raise StagingError("Project Start created forbidden WBACK/WPLAN")
