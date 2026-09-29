@@ -83,7 +83,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         old_tree,new_tree=self.patch_tree(released),self.patch_tree(reference)
         changed={p for p in old_tree.keys()|new_tree.keys() if old_tree.get(p)!=new_tree.get(p)}
         actions={row['path']:row['action'] for row in preview['authorization_payload']['actions']}
-        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','sops/verify-work.md','tools/README.md'}
+        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md'}
         preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md'}
         # Explicit closed disposition: no copied private/history/route content.
         self.assertFalse(changed-{p for p in changed if actions.get(p)=='COPY'}-generated-preserved)
@@ -93,7 +93,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
             self.assertEqual(actions.get(relative),'COPY')
             self.assertEqual(before[relative],old_tree[relative])
             shutil.copy2(reference/relative,root/relative);applied.add(relative)
-        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','sops/verify-work.md','tools/README.md'}):
+        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md'}):
             self.assertEqual(before[relative],old_tree[relative])
             data=(reference/relative).read_bytes()
             if relative=='SYSTEM.md':
@@ -615,7 +615,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
             shutil.copytree(SOURCE, product)
             agents = product / "AGENTS.md"
             agents.write_text(re.sub(r"(?m)^SOT_MODE: .*\n", "", agents.read_text()))
-            probe = "import sys; from pathlib import Path; sys.path.insert(0, 'tools'); import bp_clean; error = bp_clean.product_unit_root_error(Path.cwd()); assert error is None, error"
+            probe = "import sys; from pathlib import Path; sys.path.insert(0, 'tools'); import clean_product; error = clean_product.product_unit_root_error(Path.cwd()); assert error is None, error"
             result = subprocess.run([sys.executable, "-B", "-c", probe],
                                     cwd=product, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -696,7 +696,7 @@ class EvidenceSourceTests(unittest.TestCase):
         self.assertFalse((root / '.codex').exists())
 
     def test_managed_codexlog_is_valid_and_retained(self):
-        import bp_clean
+        import clean_product
         helper, root = self.deployment()
         runtime = root / '.codex'
         runtime.mkdir()
@@ -706,14 +706,14 @@ class EvidenceSourceTests(unittest.TestCase):
         with (root / 'logs/quality.md').open('a') as stream:
             stream.write('\nSOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-2\n')
         before = raw.read_bytes(), raw.stat().st_mode
-        self.assertEqual(bp_clean.referenced_codex_paths(root), {raw})
-        bp_clean.remove_path_no_follow(runtime, frozenset({raw}))
+        self.assertEqual(clean_product.referenced_codex_paths(root), {raw})
+        clean_product.remove_path_no_follow(runtime, frozenset({raw}))
         self.assertEqual((raw.read_bytes(), raw.stat().st_mode), before)
         # Missing, escaping and out-of-range references cannot retain an unrelated file.
         (root / 'logs/quality.md').write_text('SOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-9\n'
             'SOURCE_REF: codexlog:.codex/missing.raw.log#lines=1-2\n'
             'SOURCE_REF: codexlog:.codex/../escape.raw.log#lines=1-2\n')
-        self.assertEqual(bp_clean.referenced_codex_paths(root), set())
+        self.assertEqual(clean_product.referenced_codex_paths(root), set())
 
     def test_generic_sops_do_not_require_raw_client_transport(self):
         _, root = self.deployment()

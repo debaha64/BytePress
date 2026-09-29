@@ -1488,7 +1488,10 @@ def main(argv=None) -> int:
     parser.add_argument("--registration-input", action="append", type=Path, default=[])
     parser.add_argument("--check-result", action="store_true")
     parser.add_argument("--format", choices=("text", "json"), default="text")
-    output_format = "text"
+    argv = list(sys.argv[1:] if argv is None else argv)
+    output_format = "json" if "--format=json" in argv or any(
+        a == "--format" and b == "json" for a, b in zip(argv, argv[1:])
+    ) else "text"
     try:
         args = parser.parse_args(argv)
         output_format = args.format
@@ -1503,7 +1506,7 @@ def main(argv=None) -> int:
         code = 0 if result["status"] == "PASS" else 1
     except (UsageError, ContractError, OSError, ValueError) as error:
         result, code = _error_result(error), 2
-    if output_format == "json" or (argv is not None and "--format" in argv and "json" in argv):
+    if output_format == "json":
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, default=str))
     else:
         print(f"WORKSPACE_CHECK: {result['status']}")

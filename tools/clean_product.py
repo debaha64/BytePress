@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import os
 import stat
 import sys
@@ -16,7 +17,7 @@ ZONE_IDENTIFIER_RE = re.compile(r".*:Zone\.Identifier$")
 LOCAL_SERVICE_DIR_NAMES = {".agents", ".codex"}
 PRODUCT_UNIT_FILE_MARKERS = (
     "AGENTS.md", "SYSTEM.md", "tools/check_workspace.py",
-    "tools/check_product.py", "tools/bp_clean.py",
+    "tools/check_product.py", "tools/clean_product.py",
 )
 PRODUCT_UNIT_DIRECTORY_MARKERS = ("tools",)
 DURABLE_RAW_LOG_RE = re.compile(r"^.+\.raw\.log$")
@@ -246,84 +247,49 @@ def unexpected_local_service_paths(repo, retained_codex_paths):
     return sorted(unexpected, key=lambda path: str(path.relative_to(repo)))
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Ограниченная очистка статической Product Unit BytePress")
     parser.add_argument("--repo", default=".")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--local-service", action="store_true")
-    args = parser.parse_args()
-
-    requested_repo = Path(args.repo).expanduser()
+    parser.add_argument("--format", choices=("text", "json"), default="text")
+    args = parser.parse_args(argv)
+    result = {"schema": "bytepress.product-clean.v1", "status": "DRY_RUN",
+              "paths": [], "removed": 0, "retained": []}
     try:
-        requested_mode = os.lstat(requested_repo).st_mode
-        repo = requested_repo.resolve(strict=True)
-    except OSError as error:
-        print(f"FAIL clean-boundary: корень Product Unit недоступен: {error}")
-        return 1
-    mode = "apply" if args.apply else "dry-run"
-    if args.apply and args.local_service:
-        mode += " with local-service"
-    if args.apply:
-        root_error = (
-            "--repo не должен быть symbolic link"
-            if stat.S_ISLNK(requested_mode)
-            else product_unit_root_error(repo)
-        )
-        if root_error:
-            print(f"bp_clean: режим {mode}")
-            print(f"FAIL exact-product-unit-root: {root_error}")
-            print("Удалено: 0")
-            return 1
-    try:
+        requested = Path(args.repo).expanduser()
+        requested_mode = requested.lstat().st_mode
+        repo = requested.resolve(strict=True)
+        if args.apply:
+            error = "--repo не должен быть symbolic link" if stat.S_ISLNK(requested_mode) else product_unit_root_error(repo)
+            if error:
+                raise ValueError(error)
         found = disposable_paths(repo)
         service = local_service_paths(repo)
-        retained_codex = referenced_codex_paths(repo) if args.local_service else set()
-    except OSError as error:
-        print(f"FAIL clean-boundary: невозможно безопасно прочитать Product Unit: {error}")
-        return 1
-    if args.local_service:
-        found.extend(service)
-    print(f"bp_clean: режим {mode}")
-    if service and not args.local_service:
-        print("Локальные служебные пути игнорируются и не удаляются:")
-        for path in service:
-            print(str(path.relative_to(repo)))
-    if not found:
-        print("Одноразовые пути не найдены.")
-        return 0
-
-    for path in found:
-        print(str(path.relative_to(repo)))
-
-    if args.apply:
-        try:
-            removed = apply_paths(found, retained_codex)
-        except OSError as error:
-            print(f"FAIL clean-apply: удаление завершилось с ошибкой: {error}")
-            return 1
-        print(f"Удалено: {removed}")
-        try:
+        retained = referenced_codex_paths(repo) if args.local_service else set()
+        result["retained"] = sorted(str(p.relative_to(repo)) for p in retained)
+        if args.local_service:
+            found.extend(service)
+        result["paths"] = sorted(str(p.relative_to(repo)) for p in found)
+        if args.apply:
+            result["removed"] = apply_paths(found, retained)
             remaining = disposable_paths(repo)
-            unexpected_service = (
-                unexpected_local_service_paths(repo, retained_codex)
-                if args.local_service
-                else []
-            )
-        except OSError as error:
-            print(f"FAIL clean-postcondition: невозможно проверить результат: {error}")
-            return 1
-        unexpected = sorted(
-            set(remaining + unexpected_service),
-            key=lambda path: str(path.relative_to(repo)),
-        )
-        if unexpected:
-            print("FAIL clean-postcondition: остались непредусмотренные одноразовые пути:")
-            for path in unexpected:
-                print(str(path.relative_to(repo)))
-            return 1
+            unexpected = unexpected_local_service_paths(repo, retained) if args.local_service else []
+            if remaining or unexpected:
+                raise ValueError("после очистки остались непредусмотренные одноразовые пути")
+            result["status"] = "APPLIED"
+    except (OSError, ValueError) as error:
+        result.update(status="STOP", error=str(error))
+    if args.format == "json":
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     else:
-        print("Ничего не удалено. Для удаления перечисленных путей повторите команду с --apply.")
-    return 0
+        print(f"PRODUCT_CLEAN: {result['status']}")
+        for path in result["paths"]:
+            print(path)
+        if "error" in result:
+            print(f"ERROR: {result['error']}")
+        print(f"Удалено: {result['removed']}")
+    return 1 if result["status"] == "STOP" else 0
 
 
 if __name__ == "__main__":

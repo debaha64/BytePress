@@ -328,7 +328,10 @@ def main(argv=None) -> int:
     parser.add_argument("--native-check")
     parser.add_argument("--timeout-seconds", type=int)
     parser.add_argument("--format", choices=("text", "json"), default="text")
-    output_format = "text"
+    argv = list(sys.argv[1:] if argv is None else argv)
+    output_format = "json" if "--format=json" in argv or any(
+        a == "--format" and b == "json" for a, b in zip(argv, argv[1:])
+    ) else "text"
     try:
         args = parser.parse_args(argv)
         output_format = args.format
@@ -344,7 +347,7 @@ def main(argv=None) -> int:
         )
     except (UsageError, InspectionError, OSError, ValueError) as error:
         result, code = _error_result(error), 2
-    if output_format == "json" or (argv is not None and "--format" in argv and "json" in argv):
+    if output_format == "json":
         print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     else:
         print(f"PRODUCT_CHECK: {result['status']}")

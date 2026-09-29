@@ -51,7 +51,7 @@ python3 -B tools/check_workspace.py --workspace <deployed-workspace>
 python3 -B tools/check_product.py --workspace <deployed-workspace>
 ```
 
-Команды выше выполняются из корня deployed Workspace. `tools/new_project.py` и source-only `tools/bp_clean.py` принадлежат исходной distribution и проверяются Product tests; downstream Workspace их не требует. Project Start не поставляет cleaner; если existing Workspace сохраняет private `tools/bp_workspace_clean.py`, его используют только по локальному cleanup contract.
+Команды выше выполняются из корня deployed Workspace. `tools/new_project.py` и source-only `tools/clean_product.py` принадлежат исходной distribution и проверяются Product tests; downstream Workspace их не требует. Project Start не поставляет cleaner; если existing Workspace сохраняет private `tools/clean_workspace.py`, его используют только по локальному cleanup contract.
 
 При изменении Harness, инструментов или тестов добавляется полный применимый регрессионный набор Product Unit. Project Start дополнительно проверяется `tests/test_new_project.py` и настоящими временными E2E для нового и существующего продукта с манифестами источника до и после. Для затронутого продуктового кода добавляются его тесты и проверка запуска; обычная несвязанная правка не требует безусловного полного набора.
 

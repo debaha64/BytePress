@@ -156,7 +156,7 @@ WPLAN Workspace перечисляет точные разрешённые по�
 | продуктовая приёмка | `WS_<Slug>/logs/decisions.md` | `sops/verify-work.md` |
 | терминология | `docs/terminology/glossary.md` | `sops/terminology.md` |
 | Создание Workspace через Project Start | `docs/technical/project-start.md` | `tools/new_project.py`, `tests/test_new_project.py` |
-| рабочие инструменты | `tools/README.md` | `tools/check_workspace.py`, `tools/check_product.py`, `tools/bp_clean.py`, `tools/project_profile.py`, `tools/new_project.py` |
+| рабочие инструменты | `tools/README.md` | `tools/check_workspace.py`, `tools/check_product.py`, `tools/clean_product.py`, `tools/project_profile.py`, `tools/new_project.py` |
 | нормативные контракты проверки | соответствующие Markdown-владельцы | `tests/README.md`, `tests/test_harness.py`, `tests/test_project_profile.py`, `tests/test_new_project.py` |
 | SDD/TDD и владение спецификацией | `docs/technical/task-flow.md` | `templates/specification.md`, `docs/technical/testing.md`, `tests/test_harness.py` |
 | Версия продукта | `VERSION`, `docs/product/product-passport.md` | `tests/test_harness.py` |

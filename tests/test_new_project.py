@@ -774,13 +774,13 @@ class ExistingProductTests(ProjectStartCase):
     def test_targeted_tas_like_src_and_plans_remain_product_only(self):
         """REQ-TAS/START-001; INV-004/006/013; SCN-010."""
         product = self.existing()
-        (product / "src/TAS.Core").mkdir(parents=True)
+        (product / "src/Example.Core").mkdir(parents=True)
         (product / "plans").mkdir()
         (product / "plans/strategy.md").write_text("Product-owned plan\n", encoding="utf-8")
-        (product / "src/TAS.Core/model.cs").write_text("namespace TAS.Core;\n", encoding="utf-8")
+        (product / "src/Example.Core/model.cs").write_text("namespace Example.Core;\n", encoding="utf-8")
         target = Path(self.apply(product_mode="existing", existing_product=product)["target_workspace"])
         copied = target / "Example"
-        self.assertTrue((copied / "src/TAS.Core/model.cs").is_file())
+        self.assertTrue((copied / "src/Example.Core/model.cs").is_file())
         self.assertTrue((copied / "plans/strategy.md").is_file())
         self.assertFalse((copied / "tools/check_workspace.py").exists())
         self.assertTrue((target / "tools/check_workspace.py").is_file())
@@ -1175,7 +1175,7 @@ class BootstrapStartTests(ProjectStartCase):
         commands = re.findall(r"```bash\n(.*?)```", sop, re.S)
         self.assertGreaterEqual(len(commands), 2)
         self.assertFalse((root / "tools/new_project.py").exists())
-        self.assertFalse((root / "tools/bp_clean.py").exists())
+        self.assertFalse((root / "tools/clean_product.py").exists())
         for block in commands:
             command = block.replace("<deployed-workspace>", shlex.quote(str(root)))
             command = command.replace("<path>", shlex.quote(str(root)))

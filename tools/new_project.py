@@ -27,6 +27,7 @@ from project_profile import (
     load_project_profile,
     parse_project_profile,
     serialize_project_profile,
+    validate_harness_version,
 )
 
 
@@ -391,6 +392,10 @@ def _read_version(source: Path) -> tuple[bytes, str]:
     if not value or value != value.strip() or "\n" in value or "\r" in value:
         raise InspectionError("VERSION должен содержать одну непустую version line")
     _reject_surrogates(value, "VERSION")
+    try:
+        validate_harness_version(value)
+    except ProjectProfileError as error:
+        raise InspectionError(str(error)) from error
     return data, value
 
 
@@ -771,7 +776,7 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
             "SoT не разрешает реализацию, owner acceptance, Product Acceptance, release или closeout.\n"
         ).encode("utf-8"),
         "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` read-only проверяет короткий WORK_CONTRACT, условия действий и совместимое чтение прежнего SDLC_TRANSITION по `docs/technical/phase-gates.md`; Результат задачи проверяется отдельно через --check-result, регистрация — через --registration-input; роль и PASS не создают полномочий. Checker печатает complete baseline через `--print-baseline-manifest` и с optional `--baseline-manifest` проверяет actual delta без исполнения Product code. `tools/check_product.py` отдельно проверяет composition; native checks исполняются только с explicit option и positive timeout. Product behavior для immutable evidence запускается только в отдельной разрешённой копии; lifecycle `OD-*`, Product Acceptance и Release Authorization не объединяются.\n".encode("utf-8"),
-        "tools/README.md": "# Инструменты Workspace\n\n`project_profile.py` — canonical parser/serializer Project Profile. `check_workspace.py` проверяет `WORK_CONTRACT: v1` и условия действий из `docs/technical/phase-gates.md`, сохраняя чтение прежнего `SDLC_TRANSITION: v1`; hidden transition-to-kind mapping и WPLAN gate-name override отсутствуют. Checker read-only печатает complete TSV через `--print-baseline-manifest` и принимает его через optional `--baseline-manifest`, не исполняя Product. `check_product.py` проверяет Product composition и запускает declared native checks только явно. Checker не вызывает другой checker автоматически и не принимает owner gate.\n".encode("utf-8"),
+        "tools/README.md": _read_source_file(source, "tools/README.md"),
         "tests/README.md": "# Тесты Workspace\n\n`test_project_profile.py` проверяет развёрнутый контракт Profile; `test_check_workspace.py` — neutral executable SDLC/authority/actual-delta fixtures. Product tests принадлежат Product root и не создаются Project Start.\n".encode("utf-8"),
     }
     # Generated instance navigation is separate from Product documentation.
@@ -812,7 +817,6 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "Старый Workspace snapshot, research, logs, отчёты/чаты, .txt, .md, .pdf, .zip или .tar.gz "
         "не становятся Existing Product автоматически. Для новой разработки используйте New Product "
         "и внешние reference materials первого research; старый Harness/history в Product root не импортируются. "
-        "Для TAS 0.0.2: New Product, старый TAS 0.0.1 как reference corpus. "
         "Project Start запускается из исходной distribution, не из tools этого Workspace.\n"
     ).encode("utf-8")
     files["docs/technical/README.md"] = _read_source_file(source, "docs/technical/README.md")

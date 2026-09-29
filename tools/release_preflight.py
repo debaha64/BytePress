@@ -831,7 +831,10 @@ def main(argv=None):
         print(format_report(result, args.format), end='')
         return 0 if result['verdict'] == 'PASS' else 2 if result['verdict'] == 'OWNER_ACTION_REQUIRED' else 1
     except (PreflightError, OSError, ValueError, KeyError, TypeError, UnicodeError):
-        print('FAIL: RELEASE_EVIDENCE_INPUT_OR_OBSERVATION; external_writes=0')
+        if args.format == 'machine':
+            print(json.dumps({'verdict': 'FAIL', 'external_writes': 0, 'error': 'RELEASE_EVIDENCE_INPUT_OR_OBSERVATION'}, sort_keys=True))
+        else:
+            print('FAIL: RELEASE_EVIDENCE_INPUT_OR_OBSERVATION; external_writes=0')
         return 1
 
 

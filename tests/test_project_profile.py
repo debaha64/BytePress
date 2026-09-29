@@ -11,6 +11,8 @@ from pathlib import Path
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SOURCE_ROOT / "tools"))
 
+import project_profile
+
 from project_profile import (  # noqa: E402
     ProjectProfileError,
     load_project_profile,
@@ -516,3 +518,15 @@ class NativeChecksTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class DeliveryVersionTests(unittest.TestCase):
+    def test_full_version_roundtrip_and_invalid_identifiers(self):
+        for value in ("0.5.4", "0.5.4-dev.1", "0.5.4-rc.2", "12.34.56-dev.123"):
+            with self.subTest(value=value):
+                self.assertEqual(project_profile.validate_harness_version(value), value)
+                raw = project_profile.serialize_project_profile("Example.profile", minimal_document(harness_version=value))
+                self.assertEqual(project_profile.parse_project_profile(raw, "Example.profile").harness_version, value)
+        for value in ("0.5.4_candidate-1", "0.5.4-dev.0", "0.5.4-rc.01", "0.5.4-dev", "0.5.4+build", "v0.5.4", "00.5.4"):
+            with self.subTest(value=value), self.assertRaises(project_profile.ProjectProfileError):
+                project_profile.validate_harness_version(value)

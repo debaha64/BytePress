@@ -24,14 +24,14 @@ import new_project
 
 
 EXPECTED_TOOL_FILES = {
-    "README.md", "bp_clean.py", "check_product.py", "check_workspace.py",
+    "README.md", "clean_product.py", "check_product.py", "check_workspace.py",
     "new_project.py", "project_profile.py", "release_preflight.py",
 }
 EXPECTED_TEST_FILES = {
     "README.md", "test_check_product.py", "test_check_workspace.py",
-    "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py",
+    "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py", "test_delivery_interfaces.py",
 }
-EXPECTED_DISTRIBUTION_FILES = 151
+EXPECTED_DISTRIBUTION_FILES = 152
 EXPECTED_DISTRIBUTION_DIRECTORIES = 14
 EXPECTED_DEPLOY_FILES = 115
 EXPECTED_DEPLOY_MANIFEST_SHA256 = "4367d56af0520cc38ff6c098e3ba753921f42bcde9c7db9cd528db2f3e9f69c2"

@@ -18,7 +18,7 @@ Workspace Update обновляет Harness в существующей рабо
 
 ## 0.5.2 → 0.5.3 Workspace Update
 
-Patch исправляет первый research, его authority и archive bootstrap, создаваемый SYSTEM registry и команды проверки Harness. Применяется [внешняя граница Update](../../sops/change-management.md#внешняя-граница-workspace-update); для точного обновления существующего Workspace, включая TAS, нужны следующие различия:
+Patch исправляет первый research, его authority и archive bootstrap, создаваемый SYSTEM registry и команды проверки Harness. Применяется [внешняя граница Update](../../sops/change-management.md#внешняя-граница-workspace-update); для точного обновления существующего Workspace, нужны следующие различия:
 
 1. Сохранить снимок, Product root, WROAD/WBACK/WPLAN, историю, research и private overlay; начальный `harness_version` оставить `0.5.2`. Для существующего Profile повторная смена владельца конфигурации не требуется.
 2. Создать отдельный reference Workspace из distribution `0.5.3`. По actual diff двух fresh deployments задать disposition для каждого changed path; COPY list недостаточен. По fixed copied manifest перенести изменённые checker/tests, phase-gates, SOP interview/project-management/research/change-management, active WPLAN и SYSTEM forms, этот guide. Private варианты объединить по смыслу, совпадающие copied files — по точным bytes/modes. Generated docs/technical/project-start.md получает GENERATED_MERGE; generated navigation также проверяется отдельно. Source-only new_project.py обновляется в distribution, в downstream его не переносить.
@@ -27,7 +27,7 @@ Patch исправляет первый research, его authority и archive bo
 5. Выполнить copied bytes/modes read-back, checker, применимые tests и preservation checks при версии `0.5.2`. Bootstrap проверить на отдельной копии: первый research имеет `AUTHORITY_REF: none`, без implementation OD, с непустой рабочей границей и защищённым Product. Старый implementation OD не используется как обход ошибки.
 6. Только после успешного read-back обновить текстовую проекцию версии SYSTEM, если она имеется, и последним переключить `harness_version` через canonical Profile serializer на `0.5.3`; повторить проверки. При отказе оставить прежнюю версию и промежуточные свидетельства.
 
-Код и данные TAS для этой проверки не требуются: нейтральная fixture воспроизводит Product/history/WROAD preservation и bootstrap. Обновление конкретного Workspace выполняется только по отдельной exact authorization внешней операции. Для новой разработки TAS 0.0.2 выбирайте [New Product](first-start.md), используя старый TAS 0.0.1 как внешний reference corpus. Successful clean Update заканчивается append-only evidence в обновлённом Workspace; первая дальнейшая задача открывает обычный WPLAN. Recovery передаёт evidence вне target и сохраняет прежний active WPLAN; его дальнейшая работа выполняется только по обычным полномочиям. В обычной поставке deployed cleaner отсутствует; локальный private cleaner сохраняет собственный contract. Команды [change-management](../../sops/change-management.md) не требуют source-only tools.
+Частные данные конкретного проекта для этой проверки не требуются: нейтральная fixture воспроизводит Product/history/WROAD preservation и bootstrap. Обновление конкретного Workspace выполняется только по отдельной exact authorization внешней операции. Successful clean Update заканчивается append-only evidence в обновлённом Workspace; первая дальнейшая задача открывает обычный WPLAN. Recovery передаёт evidence вне target и сохраняет прежний active WPLAN; его дальнейшая работа выполняется только по обычным полномочиям. В обычной поставке deployed cleaner отсутствует; локальный private cleaner сохраняет собственный contract. Команды [change-management](../../sops/change-management.md) не требуют source-only tools.
 
 ## Сохранение обратной связи
 
@@ -45,3 +45,12 @@ Patch исправляет первый research, его authority и archive bo
 5. Перед отдельно разрешённым закрытием подготовьте closing declarations существующего WPLAN, получите fresh complete baseline уже после Update, выполните same-ID move и terminal projection. Итоговая проверка — `tools/check_workspace.py --workspace <path> --baseline-manifest <closing-baseline>`. Новый WPLAN и фиктивный phase transition для closing не требуются.
 
 Успешный Update либо disposable replay не означают Product Acceptance, Release Authorization или независимую Validation принимающей команды.
+
+
+## Предварительная и окончательная поставки
+
+Полный идентификатор новой поставки из VERSION (`X.Y.Z-dev.N`, `X.Y.Z-rc.N` или `X.Y.Z`) переносится в Profile только после успешного read-back. [Соглашение версий](../technical/artifact-lifecycle.md#версии-и-product-поставки) не создаёт разрешение обновления или выпуска.
+
+Для исторического candidate-1 с VERSION `0.5.4` и будущей окончательной `0.5.4` сравните SHA-256 исходных поставок и полный состав. Затем выполните ту же процедуру Update с disposition для каждого отличия и проверкой сохранности; равная версия не разрешает пропустить обновление. Старые имя, версия и хэш candidate-1 сохраняются.
+
+В новой distribution `bp_clean.py` переименован в `clean_product.py`; оба являются source-only и не копируются в пользовательский Workspace. Если локальная автоматизация явно вызывала старое имя, обновите этот вызов. Workspace-private `bp_workspace_clean.py` при отдельно разрешённом обслуживании его владельца переименовывается в `clean_workspace.py`; generic Update его не создаёт и не заменяет. Алиасов нет. Исторические инструкции и замороженные старые поставки сохраняют прежние имена.

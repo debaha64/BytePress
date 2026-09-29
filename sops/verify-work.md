@@ -9,7 +9,7 @@
 Для внешних свидетельств до запуска фиксируют исходный манифест, очищают или явно контролируют `PYTHONPATH`, переходят в корень свежей поставки BytePress и подтверждают рабочий каталог и происхождение тестовых модулей, `new_project.py`, `project_profile.py`, `check_workspace.py`, `check_product.py` и инструмента очистки продукта. Все пути обязаны находиться внутри свежей копии и вне исходной Product Unit; иначе свидетельства недействительны. После запуска сверяют итоговый манифест и отсутствие остатков.
 
 ```bash
-python3 -B -c 'from pathlib import Path; paths = (Path("tools/check_workspace.py"), Path("tools/check_product.py"), Path("tools/bp_clean.py"), Path("tools/project_profile.py"), Path("tools/new_project.py")); [compile(path.read_text(encoding="utf-8"), str(path), "exec") for path in paths]'
+python3 -B -c 'from pathlib import Path; paths = (Path("tools/check_workspace.py"), Path("tools/check_product.py"), Path("tools/clean_product.py"), Path("tools/project_profile.py"), Path("tools/new_project.py")); [compile(path.read_text(encoding="utf-8"), str(path), "exec") for path in paths]'
 python3 -B -m unittest discover -s tests -p 'test_*.py'
 python3 -B <external-workspace>/tools/check_workspace.py --workspace <external-workspace>
 python3 -B <external-workspace>/tools/check_product.py --workspace <external-workspace>
@@ -17,7 +17,7 @@ python3 -B <external-workspace>/tools/check_product.py --workspace <external-wor
 
 Набор тестов продукта включает `test_project_profile.py`, `test_new_project.py`, `test_check_workspace.py`, `test_check_product.py`, квалификационные и остальные тесты BytePress. Проверки профиля, Project Start и проверяющих инструментов используют только нейтральные самостоятельно созданные заготовки и внешние временные копии Workspace. Они не создают корневой профиль исходной поставки и не исполняют код продукта до явного режима запуска его проверок.
 
-Для проверки Project Start обязательны настоящие сценарии `preview/apply` нового и существующего продукта, несовпадение разрешения, исключение VCS, промежуточное создание и восстановление, регрессия TAS и создание обоих проверяющих инструментов без прежнего имени. Рабочий каталог, тестовые модули, `new_project.py`, `project_profile.py`, исполняемые файлы проверки и очистки и импортированные модули должны находиться внутри соответствующего единственного свежего корня.
+Для проверки Project Start обязательны настоящие сценарии `preview/apply` нового и существующего продукта, несовпадение разрешения, исключение VCS, промежуточное создание и восстановление, сохранение вложенной структуры существующего продукта и создание обоих проверяющих инструментов без прежнего имени. Рабочий каталог, тестовые модули, `new_project.py`, `project_profile.py`, исполняемые файлы проверки и очистки и импортированные модули должны находиться внутри соответствующего единственного свежего корня.
 
 Набор выбирается по риску изменения:
 
