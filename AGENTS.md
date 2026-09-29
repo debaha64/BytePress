@@ -60,4 +60,4 @@ HARNESS_BLOCKER: <краткое описание>
 
 ## Feedback
 
-Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит records. Полномочия задаёт активный WPLAN.
+Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит записей. Полномочия задаёт активный WPLAN.

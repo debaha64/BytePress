@@ -7,12 +7,12 @@
 | Имя | Назначение и область | Чтение/запись |
 |---|---|---|
 | `check_workspace.py` | Workspace, Profile, маршрут, ссылки, исходный и фактический состав | Только чтение; не исполняет Product |
-| `check_product.py` | Состав Product из Profile; по явному запросу — объявленные проверки продукта | По умолчанию чтение; native-команда может писать в пределах разрешённого продукта |
-| `new_project.py` | Создание нового Workspace из distribution; остаётся в distribution | `preview` читает; `apply` создаёт целевой Workspace через промежуточный каталог |
-| `clean_product.py` | Временные остатки статической Product Unit BytePress; остаётся в distribution | По умолчанию чтение; `--apply` удаляет выбранные остатки |
+| `check_product.py` | Состав Product из Profile; по явному запросу — объявленные проверки продукта | По умолчанию чтение; команда продукта может писать в пределах разрешённого продукта |
+| `new_project.py` | Создание нового Workspace из поставки; остаётся в исходной поставке | `preview` читает; `apply` создаёт целевой Workspace через промежуточный каталог |
+| `clean_product.py` | Временные остатки статической Product Unit BytePress; остаётся в исходной поставке | По умолчанию чтение; `--apply` удаляет выбранные остатки |
 | `release_preflight.py` | Отдельная проверка выпускных свидетельств и последующее контрольное чтение | Чтение локальных входов и, когда разрешено контрактом, сети; внешних записей нет |
 
-`project_profile.py` — **библиотечный модуль**, не команда. Он владеет разбором schema v1, проверкой состава/версии и канонической сериализацией; процедурный договор — [SOP версий](../sops/semver.md). Проверяющие инструменты и Project Start используют его; `check_profile.py` и копии parser отсутствуют. `tests/test_*.py` — определения испытаний, не пользовательские команды. Запускатель продуктовых прогонов и приватные навыки конкретного Workspace в Product не поставляются.
+`project_profile.py` — **библиотечный модуль**, не команда. Он владеет разбором схемы v1, проверкой состава/версии и канонической сериализацией; процедурный договор — [SOP версий](../sops/semver.md). Проверяющие инструменты и Project Start используют его; `check_profile.py` и копии механизма разбора отсутствуют. `tests/test_*.py` — определения испытаний, не пользовательские команды. Запускатель продуктовых прогонов и приватные навыки конкретного Workspace в Product не поставляются.
 
 Обычные временные входы и исходные манифесты в примерах находятся в собственной области `temp/operation/` проверяемого Workspace; исполнитель создаёт её в границах разрешённой операции.
 
@@ -24,13 +24,13 @@
 |---|---|
 | `--workspace PATH` | Обязательный корень Workspace |
 | `--format text\|json` | По умолчанию text; JSON пригоден для прямых потребителей, включая ошибки аргументов |
-| `--print-baseline-manifest` | Только полный исходный TSV на stdout; несовместим с другими manifest, `--check-result`, регистрациями и JSON |
+| `--print-baseline-manifest` | Только полный исходный TSV на stdout; несовместим с другими манифестами, `--check-result`, регистрациями и JSON |
 | `--baseline-manifest FILE` | Полный состав до записей; проверка фактической дельты по точным разрешениям WPLAN |
-| `--preservation-manifest FILE` | Дополнительная независимая проверка сохранённых файлов/каталогов/префиксов; совместима с baseline |
-| `--registration-input FILE` | Повторяемый вход проверки уже разрешённой регистрации; требует baseline |
+| `--preservation-manifest FILE` | Дополнительная независимая проверка сохранённых файлов/каталогов/префиксов; совместима с исходной базой |
+| `--registration-input FILE` | Повторяемый вход проверки уже разрешённой регистрации; требует исходную базу |
 | `--check-result` | Проверяет обязательный результат WPLAN отдельно от использования разрешений |
 
-Baseline: заголовок `manifest<TAB>1<TAB>complete<TAB>.`, затем `type<TAB>mode<TAB>sha256-or--<TAB>relative-path`. Тип `f/d`, права восьмеричные. Preservation не имеет заголовка: те же четыре поля либо `prefix<TAB>число-байтов<TAB>sha256<TAB>relative-path`. Процедура — [change-management](../sops/change-management.md).
+Исходная база: заголовок `manifest<TAB>1<TAB>complete<TAB>.`, затем `type<TAB>mode<TAB>sha256-or--<TAB>relative-path`. Тип `f/d`, права восьмеричные. Манифест сохранности не имеет заголовка: те же четыре поля либо `prefix<TAB>число-байтов<TAB>sha256<TAB>relative-path`. Процедура — [change-management](../sops/change-management.md).
 
 JSON: `schema: generic.workspace-check.v1`, `status`, `checks[]` с `id/status/value|message`, `errors[]`, `fail_count`, `warn_count`, `archive_state`, `preservation`. Проверка `actual-delta` содержит фактическую дельту, `primary_delta`, проверенные регистрации и `unused_permissions`. Неиспользованное разрешение не является ошибкой. Коды: `0` PASS, `1` проверка выявила нарушение, `2` некорректный вызов/нечитаемый вход. Статус ошибки вызова — `STOP`.
 
@@ -42,7 +42,7 @@ python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-mani
 
 ### registration-input
 
-Это временный **вход проверки**, не команда записи и не источник полномочий. Разрешение принадлежит прямому запросу владельца и [task-intake](../sops/task-intake.md#узкая-регистрация). Checker читает уже записанный результат и вычитает только доказанную регистрацию из основной дельты. Без WPLAN оставшаяся дельта должна быть нулевой.
+Это временный **вход проверки**, не команда записи и не источник полномочий. Разрешение принадлежит прямому запросу владельца и [task-intake](../sops/task-intake.md#узкая-регистрация). Проверяющий инструмент читает уже записанный результат и вычитает только доказанную регистрацию из основной дельты. Без WPLAN оставшаяся дельта должна быть нулевой.
 
 Пример структуры входа будущей задачи:
 
@@ -61,20 +61,20 @@ python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-mani
 
 Перед разрешённой записью исполнитель читает реальные байты `plans/backlog.md` и сохраняет их в собственной области Workspace `temp/`; `expected_sha256` и `before_base64` вычисляются из **одного** чтения, не восстанавливаются из памяти или текста отчёта. Файл регистрации затем проверяет точное прежнее содержимое и допустимый суффикс по task-intake. Для следующей регистрации берутся байты непосредственно перед ней. Исходная база основной работы остаётся прежней.
 
-Для `kind: feedback` нужны `id: FB-NNNNNN`, `owner_request`, `source`, точный `original` и `recorded_at: YYYY-MM-DD`; `before_base64` не нужен, создаётся только новый record. Существующий текст Feedback не редактируется. Общий новый каталог `feedback/` проверяется один раз для последовательности.
+Для `kind: feedback` нужны `id: FB-NNNNNN`, `owner_request`, `source`, точный `original` и `recorded_at: YYYY-MM-DD`; `before_base64` не нужен, создаётся только новая запись. Существующий текст Feedback не редактируется. Общий новый каталог `feedback/` проверяется один раз для последовательности.
 
 ```bash
 python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /path/WS_Example/temp/operation/before.tsv --registration-input /path/WS_Example/temp/operation/registration-1.json
 python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /path/WS_Example/temp/operation/before.tsv --registration-input /path/WS_Example/temp/operation/registration-1.json --registration-input /path/WS_Example/temp/operation/registration-2.json --format json
 ```
 
-Входы передаются в порядке записей одного последовательного исполнителя. Это не блокировка и не протокол нескольких писателей. Несвежие байты/revision, повтор ID, неверный ROAD, изменение старого текста/маршрута, типа/прав, подмена оригинала Feedback, перестановка зависимых регистраций или незаявленная основная дельта дают FAIL. При конкурентной записи остановиться и перечитать фактическое состояние; не затирать его сохранённой копией.
+Входы передаются в порядке записей одного последовательного исполнителя. Это не блокировка и не протокол нескольких писателей. Несвежие байты/ревизия, повтор ID, неверный ROAD, изменение старого текста/маршрута, типа/прав, подмена оригинала Feedback, перестановка зависимых регистраций или незаявленная основная дельта дают FAIL. При конкурентной записи остановиться и перечитать фактическое состояние; не затирать его сохранённой копией.
 
 ## check_product.py
 
 Обязателен `--workspace PATH`; `--format text|json`. Без дополнительных флагов проверяет только состав. `--run-native-checks` разрешает выполнение объявленных Profile-команд и требует положительного целого `--timeout-seconds N`. `--native-check ID` выбирает одну объявленную проверку; без него выполняются все. `--native-check` и `--timeout-seconds` допустимы только с `--run-native-checks`.
 
-Запуск — прямой массив argv без shell, с ограниченными cwd и executable, закрытым stdin, перехваченным выводом и временем ожидания. JSON: `schema: generic.product-check.v1`, `status`, `mode`, `composition`, `native_validation`, `native_execution`, `fail_count`, `warn_count`; при ошибке — `error`. Коды `0` PASS, `1` FAIL проверки/команды, `2` ошибка вызова/входа. Разные состав и выполнение не сливаются в одну неявную операцию.
+Запуск — прямой массив argv без оболочки, с ограниченными рабочим каталогом и исполняемым файлом, закрытым stdin, перехваченным выводом и временем ожидания. JSON: `schema: generic.product-check.v1`, `status`, `mode`, `composition`, `native_validation`, `native_execution`, `fail_count`, `warn_count`; при ошибке — `error`. Коды `0` PASS, `1` FAIL проверки/команды, `2` ошибка вызова/входа. Разные состав и выполнение не сливаются в одну неявную операцию.
 
 ```bash
 python3 -B tools/check_product.py --workspace /path/WS_Example --format json
@@ -90,28 +90,28 @@ python3 -B /distribution/tools/new_project.py preview --source-distribution /dis
 python3 -B /distribution/tools/new_project.py apply --source-distribution /distribution --destination-parent /work --slug Example --display-name 'Новый продукт' --wroad 'Создать продукт' --product new --authorization-sha256 <preview_sha256>
 ```
 
-Результат всегда JSON: preview содержит `operation`, `state: PREVIEW_READY`, `authorization_payload`, `preview_sha256`, `warnings`, `vcs_exclusions`, `human_readable`; apply — состояние материализации и привязку к тому же digest. Ошибки JSON с `state/error` идут в stderr. Коды: `0` успех; `2` INPUT_ERROR или ошибка синтаксиса argparse; `3` ABORTED до записи (вход/разрешение); `4` ABORTED при материализации; `5` RECOVERY_REQUIRED; `6` INTERNAL_ERROR. Для синтаксиса argparse stderr текстовый. Успешный повтор exact apply восстанавливается по существующему маркеру; чужое состояние не перезаписывается.
+Результат всегда JSON: preview содержит `operation`, `state: PREVIEW_READY`, `authorization_payload`, `preview_sha256`, `warnings`, `vcs_exclusions`, `human_readable`; apply — состояние материализации и привязку к той же контрольной сумме. Ошибки JSON с `state/error` идут в stderr. Коды: `0` успех; `2` INPUT_ERROR или ошибка синтаксиса argparse; `3` ABORTED до записи (вход/разрешение); `4` ABORTED при материализации; `5` RECOVERY_REQUIRED; `6` INTERNAL_ERROR. Для синтаксиса argparse stderr текстовый. Успешный точный повтор apply восстанавливается по существующему маркеру; чужое состояние не перезаписывается.
 
-Полный договор, состав COPY/GENERATED и Product preservation: [Project Start](../docs/technical/project-start.md). Source-only cleaner и generator в новый Workspace не копируются.
+Полный договор, состав COPY/GENERATED и сохранность продукта: [Project Start](../docs/technical/project-start.md). Принадлежащие только исходной поставке инструмент очистки и генератор в новый Workspace не копируются.
 
 ## clean_product.py
 
-`--repo PATH` задаёт корень статической Product Unit BytePress, по умолчанию `.`. `--apply` включает удаление. `--local-service` отдельно включает ограниченную очистку служебных `.agents/.codex`; долговечные raw-трассы и прикреплённые исторические журналы сохраняются. Обычный запуск служебные каталоги не очищает и трасс не требует. `--format text|json` выбирает представление; JSON содержит `schema: bytepress.product-clean.v1`, `status: DRY_RUN|APPLIED|STOP`, `paths`, `removed`, `retained` и при отказе `error`. Коды `0` успешный scan/apply, `1` STOP, `2` ошибка аргументов. `--repo` не является синонимом `--workspace`: это другой объект очистки.
+`--repo PATH` задаёт корень статической Product Unit BytePress, по умолчанию `.`. `--apply` включает удаление. `--local-service` отдельно включает ограниченную очистку служебных `.agents/.codex`; долговечные исходные трассы и прикреплённые исторические журналы сохраняются. Обычный запуск служебные каталоги не очищает и трасс не требует. `--format text|json` выбирает представление; JSON содержит `schema: bytepress.product-clean.v1`, `status: DRY_RUN|APPLIED|STOP`, `paths`, `removed`, `retained` и при отказе `error`. Коды `0` успешная проверка/очистка, `1` STOP, `2` ошибка аргументов. `--repo` не является синонимом `--workspace`: это другой объект очистки.
 
 ```bash
 python3 -B /copy/BytePress/tools/clean_product.py --repo /copy/BytePress --format json
 python3 -B /copy/BytePress/tools/clean_product.py --repo /copy/BytePress --apply
 ```
 
-Apply проверяет точный Product root и не следует по ссылкам. Допустимые остатки и их защита принадлежат [жизненному циклу артефактов](../docs/technical/artifact-lifecycle.md). Очистка не исправляет нарушения checker и не принимает результат.
+Apply проверяет точный корень продукта и не следует по ссылкам. Допустимые остатки и их защита принадлежат [жизненному циклу артефактов](../docs/technical/artifact-lifecycle.md). Очистка не исправляет нарушения, найденные проверяющим инструментом и не принимает результат.
 
 ## release_preflight.py
 
-Операции `preflight` и `readback` требуют `--contract FILE`; обе принимают `--timeout N` (положительное конечное число секунд, default `30`) и `--format owner|engineering|machine` (default owner). `preflight` принимает необязательный `--human-policy FILE`. `readback` требует `--before FILE` и `--delta FILE`; контракт before должен совпасть с текущим.
+Операции `preflight` и `readback` требуют `--contract FILE`; обе принимают `--timeout N` (положительное конечное число секунд, по умолчанию `30`) и `--format owner|engineering|machine` (по умолчанию owner). `preflight` принимает необязательный `--human-policy FILE`. `readback` требует `--before FILE` и `--delta FILE`; контракт before должен совпасть с текущим.
 
 ```bash
 python3 -B tools/release_preflight.py preflight --contract /path/WS_Example/temp/operation/contract.json --format machine
 python3 -B tools/release_preflight.py readback --contract /path/WS_Example/temp/operation/contract.json --before /path/WS_Example/temp/operation/before.json --delta /path/WS_Example/temp/operation/delta.json --timeout 30 --format engineering
 ```
 
-Machine — JSON с `verdict`, результатом проверок и происхождением наблюдений; ошибочный вход возвращает JSON `verdict: FAIL`, `external_writes: 0`, `error`. Точные входные схемы и достаточность свидетельств принадлежат [release-evidence](../docs/technical/release-evidence.md). Коды `0` PASS, `1` FAIL, `2` OWNER_ACTION_REQUIRED; синтаксическая ошибка также `2`, но с диагностикой stderr и без результата verdict. Текст ошибки не раскрывает аргументы с возможными credentials. `--timeout` ограничивает сетевое наблюдение, `--timeout-seconds` у Product checker — выполнение процесса; имена сохранены для действующих потребителей. Ни один результат не разрешает внешнюю запись.
+Machine — JSON с `verdict`, результатом проверок и происхождением наблюдений; ошибочный вход возвращает JSON `verdict: FAIL`, `external_writes: 0`, `error`. Точные входные схемы и достаточность свидетельств принадлежат [release-evidence](../docs/technical/release-evidence.md). Коды `0` PASS, `1` FAIL, `2` OWNER_ACTION_REQUIRED; синтаксическая ошибка также `2`, но с диагностикой stderr и без результата verdict. Текст ошибки не раскрывает аргументы с возможными учётными данными. `--timeout` ограничивает сетевое наблюдение, `--timeout-seconds` у инструмента проверки продукта — выполнение процесса; имена сохранены для действующих потребителей. Ни один результат не разрешает внешнюю запись.

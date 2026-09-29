@@ -121,6 +121,6 @@ Verification Engineer независимо читает спецификацию
 
 ## Проверка закрывающей дельты
 
-По [Actual delta](change-management.md#actual-delta) closing проверяется тем же `--baseline-manifest` после same-ID move и конечной route projection. Fresh baseline берётся после подготовки closing declarations и до closing mutations. Затем отдельный fresh baseline неизменённого terminal tree проверяет zero-delta. External terminal comparison не является обязательным обходным путём и не заменяет canonical checker.
+По [Actual delta](change-management.md#actual-delta) закрывающая дельта проверяется тем же `--baseline-manifest` после переноса с тем же ID и фиксации конечного маршрута. Свежая исходная база берётся после подготовки закрывающих объявлений и до закрывающих изменений. Затем отдельная свежая база неизменённого конечного дерева проверяет нулевую дельту. Внешнее сравнение конечного состояния не является обязательным обходным способом и не заменяет канонический проверяющий инструмент.
 
 Временные области выбираются по [жизненному циклу артефактов](../docs/technical/artifact-lifecycle.md#временные-данные). Перед тестами создать собственный каталог в Workspace temp и передать его абсолютный путь как `TMPDIR` только процессам проверки. Исходные Product tools не запускаются и не импортируются.

@@ -56,8 +56,8 @@
 
 ## Входной Product Acceptance
 
-Release Readiness потребляет существующий accepted `PA-*`, в том числе из предыдущего WPLAN, по [границам Product Acceptance](../docs/technical/phase-gates.md#границы-product-acceptance). Новый release WPLAN не требует повторной приёмки того же exact результата и не меняет provenance PA.
+Release Readiness потребляет существующий `PA-*` со значением accepted, в том числе из предыдущего WPLAN, по [границам Product Acceptance](../docs/technical/phase-gates.md#границы-product-acceptance). Новый WPLAN выпуска не требует повторной приёмки того же точного результата и не меняет происхождение PA.
 
-До external writes выпускная процедура связывает exact candidate из PA и qualification evidence с подготовленным артефактом и целевыми refs по [release-evidence](../docs/technical/release-evidence.md): проверяет идентичность кандидата и равенство свойств выбранного способа переноса. Candidate mismatch останавливает маршрут; PA прежнего результата не принимает изменённый Product. Это обязанность release-readiness, а не generic Workspace checker. Release Authorization остаётся отдельным решением владельца.
+До внешних записей выпускная процедура связывает точного кандидата из PA и квалификационных свидетельств с подготовленным артефактом и целевыми ссылками по [release-evidence](../docs/technical/release-evidence.md): проверяет идентичность кандидата и равенство свойств выбранного способа переноса. Несовпадение кандидата останавливает маршрут; PA прежнего результата не принимает изменённый Product. Это обязанность release-readiness, а не универсального инструмента Workspace. Release Authorization остаётся отдельным решением владельца.
 
-Узкая регистрация по [task-intake](task-intake.md#узкая-регистрация) не является исполняемым проходом и не требует routine snapshot. Остальные правила снимков сохраняются.
+Узкая регистрация по [task-intake](task-intake.md#узкая-регистрация) не является исполняемым проходом и не требует обычного снимка. Остальные правила снимков сохраняются.

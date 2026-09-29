@@ -84,8 +84,8 @@ class WorkspaceUpdateTests(unittest.TestCase):
         old_tree,new_tree=self.patch_tree(released),self.patch_tree(reference)
         changed={p for p in old_tree.keys()|new_tree.keys() if old_tree.get(p)!=new_tree.get(p)}
         actions={row['path']:row['action'] for row in preview['authorization_payload']['actions']}
-        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}
-        preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md'}
+        generated={'README.md','AGENTS.md','docs/user/first-start.md','docs/architecture/architecture.md','docs/architecture/domain-model.md','tests/README.md','SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}
+        preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md','plans/roadmap.md','research/00-index.md','logs/README.md','logs/terminology.md','logs/history.md'}
         # Explicit closed disposition: no copied private/history/route content.
         self.assertFalse(changed-{p for p in changed if actions.get(p)=='COPY'}-generated-preserved)
         version=(SOURCE/'VERSION').read_text().strip()
@@ -94,11 +94,11 @@ class WorkspaceUpdateTests(unittest.TestCase):
             self.assertEqual(actions.get(relative),'COPY')
             self.assertEqual(before.get(relative),old_tree.get(relative))
             shutil.copy2(reference/relative,root/relative);applied.add(relative)
-        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}):
+        for relative in sorted(changed & {'README.md','AGENTS.md','docs/user/first-start.md','docs/architecture/architecture.md','docs/architecture/domain-model.md','tests/README.md','SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}):
             self.assertEqual(before.get(relative),old_tree.get(relative))
             data=(reference/relative).read_bytes()
             if relative=='SYSTEM.md':
-                data=data.replace(f'deployed Harness version: `{version}`'.encode(),b'deployed Harness version: `0.5.3`')
+                data=data.replace(f'развёрнутая версия Harness: `{version}`'.encode(),'развёрнутая версия Harness: `0.5.3`'.encode())
             (root/relative).write_bytes(data);applied.add(relative)
         after=self.patch_tree(root)
         self.assertEqual({p:v for p,v in before.items() if p not in applied},
@@ -109,7 +109,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         for relative in applied-{'SYSTEM.md'}:
             self.assertEqual(after[relative],new_tree[relative])
         self.assertEqual((root/'SYSTEM.md').read_bytes(),(reference/'SYSTEM.md').read_bytes().replace(
-            f'deployed Harness version: `{version}`'.encode(),b'deployed Harness version: `0.5.3`'))
+            f'развёрнутая версия Harness: `{version}`'.encode(),'развёрнутая версия Harness: `0.5.3`'.encode()))
         # The successful read-back above is the prerequisite for both version projections.
         (root/'SYSTEM.md').write_bytes((reference/'SYSTEM.md').read_bytes())
         document=json.loads((root/'Example.profile').read_text());document['harness_version']=version
@@ -169,7 +169,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                     document = json.loads(profile.read_bytes()); document['harness_version'] = version
                     profile.write_bytes(project_profile.serialize_project_profile(profile.name, document))
                     system = root / 'SYSTEM.md'
-                    system.write_bytes(system.read_bytes().replace(b'deployed Harness version: `0.5.2`', f'deployed Harness version: `{version}`'.encode()))
+                    system.write_bytes(system.read_bytes().replace('развёрнутая версия Harness: `0.5.2`'.encode(), f'развёрнутая версия Harness: `{version}`'.encode()))
                     self.assert_pass(self.run_checker(root))
                     self.assertEqual(json.loads(profile.read_bytes())['harness_version'], version)
                     self.assertEqual((root / 'Example/VERSION').read_bytes(), b'9.7-product-policy\n')
@@ -215,6 +215,14 @@ class WorkspaceUpdateTests(unittest.TestCase):
             "feedback/README.md": ("GENERATED_MERGE", "Create empty index only if absent; preserve private index."),
             "Example.profile": ("GENERATED_MERGE", "Preserve composition and SoT; version cutover last."),
             "SYSTEM.md": ("GENERATED_MERGE", "Merge generated contract; preserve stronger private rules."),
+            "docs/architecture/architecture.md": ("GENERATED_MERGE", "Обновить редакторский текст, сохранив частную архитектуру."),
+            "docs/architecture/domain-model.md": ("GENERATED_MERGE", "Обновить редакторский текст, сохранив идентичность проекта."),
+            "tests/README.md": ("GENERATED_MERGE", "Обновить описание существующих проверок."),
+            "plans/roadmap.md": ("PRESERVE", "Сохранить действующее направление проекта."),
+            "research/00-index.md": ("PRESERVE", "Сохранить реестр исследований проекта."),
+            "logs/README.md": ("PRESERVE", "Сохранить навигацию существующих журналов."),
+            "logs/terminology.md": ("PRESERVE", "Сохранить факты терминологического журнала."),
+            "logs/history.md": ("PRESERVE", "Сохранить историю проекта без редакторской миграции."),
             "docs/architecture/project-profile.md": ("GENERATED_MERGE", "Merge the version owner link while preserving project identity."),
             "docs/technical/project-start.md": ("GENERATED_MERGE", "Rendered Project Start contract, not a COPY action."),
             "sops/verify-work.md": ("GENERATED_MERGE", "Rendered deployed verification contract with source-only commands adapted."),
@@ -359,7 +367,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 index.write_bytes(index.read_bytes() + self.completed_index_addition())
             elif path == "SYSTEM.md":
                 private = (root / path).read_bytes()[len(old_system):]
-                merged = (reference / path).read_bytes().replace(f"deployed Harness version: `{CURRENT_VERSION}`".encode(), b"deployed Harness version: `0.5.2`")
+                merged = (reference / path).read_bytes().replace(f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode(), "развёрнутая версия Harness: `0.5.2`".encode())
                 (root / path).write_bytes(merged + private)
             else:
                 shutil.copy2(reference / path, root / path)
@@ -390,7 +398,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 continue
             self.assertEqual(actual.read_bytes(), expected.read_bytes(), path)
             self.assertEqual(actual.stat().st_mode & 0o7777, expected.stat().st_mode & 0o7777, path)
-        expected_system = (reference / "SYSTEM.md").read_bytes().replace(f"deployed Harness version: `{CURRENT_VERSION}`".encode(), b"deployed Harness version: `0.5.2`")
+        expected_system = (reference / "SYSTEM.md").read_bytes().replace(f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode(), "развёрнутая версия Harness: `0.5.2`".encode())
         self.assertTrue((root / "SYSTEM.md").read_bytes().startswith(expected_system))
         self.assert_pass(self.run_checker(root))  # New checker, previous version claim.
 
@@ -414,7 +422,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         document = json.loads(profile)
         document["harness_version"] = CURRENT_VERSION
         system = root / "SYSTEM.md"
-        system.write_bytes(system.read_bytes().replace(b"deployed Harness version: `0.5.2`", f"deployed Harness version: `{CURRENT_VERSION}`".encode()))
+        system.write_bytes(system.read_bytes().replace("развёрнутая версия Harness: `0.5.2`".encode(), f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode()))
         (root / "Example.profile").write_bytes(project_profile.serialize_project_profile("Example.profile", document))
         self.assert_pass(self.run_checker(root))
         self.assertEqual({k: self.protected(root)[k] for k in before}, before)
