@@ -41,7 +41,7 @@ Patch исправляет первый research, его authority и archive bo
 1. Проверьте exact released 0.5.3 и candidate 0.5.4, backup и полный disposition по двум свежим reference deployments. Существующие Product, project docs/research/history, Feedback, WROAD/WBACK/WPLAN и частные данные сохраняются.
 2. Перенесите только изменившиеся Harness contracts по disposition. Generated `docs/technical/project-start.md` требует reviewed merge; private owners сохраняют проектный смысл и режимы доступа. Source-only `new_project.py` в downstream не переносится.
 3. Оставьте старый active WPLAN с его counted headings, ALLOWED_SURFACES и PRESERVE без переписывания во время Update. Новый checker принимает эту форму; новый WPLAN template использует только CREATE/UPDATE/REMOVE без counts.
-4. Выполните read-back обновлёнными target/tools при прежнем `harness_version`; проверьте bytes/types/modes всех сохранённых данных и same identity active WPLAN. Только после PASS обновите связанную текстовую version projection и последним `harness_version` canonical serializer на 0.5.4, затем повторите проверки.
+4. Выполните read-back обновлёнными target/tools при прежнем `harness_version`; проверьте bytes/types/modes всех сохранённых данных и same identity active WPLAN. Только после PASS обновите связанную текстовую version projection и последним `harness_version` canonical serializer на полное значение VERSION новой поставки, затем повторите проверки.
 5. Перед отдельно разрешённым закрытием подготовьте closing declarations существующего WPLAN, получите fresh complete baseline уже после Update, выполните same-ID move и terminal projection. Итоговая проверка — `tools/check_workspace.py --workspace <path> --baseline-manifest <closing-baseline>`. Новый WPLAN и фиктивный phase transition для closing не требуются.
 
 Успешный Update либо disposable replay не означают Product Acceptance, Release Authorization или независимую Validation принимающей команды.
@@ -49,8 +49,6 @@ Patch исправляет первый research, его authority и archive bo
 
 ## Предварительная и окончательная поставки
 
-Полный идентификатор новой поставки из VERSION (`X.Y.Z-dev.N`, `X.Y.Z-rc.N` или `X.Y.Z`) переносится в Profile только после успешного read-back. [Соглашение версий](../technical/artifact-lifecycle.md#версии-и-product-поставки) не создаёт разрешение обновления или выпуска.
+Укажите полное значение VERSION новой поставки по [SOP версий](../../sops/semver.md#развёрнутая-версия). Исполнитель подтвердит его после проверки обновлённого Workspace.
 
-Для исторического candidate-1 с VERSION `0.5.4` и будущей окончательной `0.5.4` сравните SHA-256 исходных поставок и полный состав. Затем выполните ту же процедуру Update с disposition для каждого отличия и проверкой сохранности; равная версия не разрешает пропустить обновление. Старые имя, версия и хэш candidate-1 сохраняются.
-
-В новой distribution `bp_clean.py` переименован в `clean_product.py`; оба являются source-only и не копируются в пользовательский Workspace. Если локальная автоматизация явно вызывала старое имя, обновите этот вызов. Workspace-private `bp_workspace_clean.py` при отдельно разрешённом обслуживании его владельца переименовывается в `clean_workspace.py`; generic Update его не создаёт и не заменяет. Алиасов нет. Исторические инструкции и замороженные старые поставки сохраняют прежние имена.
+Если номер совпадает, попросите исполнителя сравнить точное содержимое исходных поставок и выполнить [процедуру Update](../../sops/change-management.md#workspace-update). Исторические исключения, включая candidate-1, описаны у [владельца договора](../../sops/semver.md#исторические-исключения).

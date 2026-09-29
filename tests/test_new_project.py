@@ -271,7 +271,7 @@ class NewProductTests(ProjectStartCase):
             document,
             {
                 "display_name": "Пример продукта",
-                "harness_version": "0.5.4",
+                "harness_version": (SOURCE_ROOT / "VERSION").read_text().strip(),
                 "schema_version": 1,
                 "sot_mode": "sot_files",
             },
@@ -704,7 +704,7 @@ class NewProductTests(ProjectStartCase):
         profile_path = root / "Example.profile"
         profile_path.write_bytes(new_project.serialize_project_profile(profile_path.name, {
             "schema_version": 1,
-            "harness_version": "0.5.4",
+            "harness_version": (SOURCE_ROOT / "VERSION").read_text().strip(),
             "sot_mode": "sot_files",
             "display_name": "Example Product",
             "product_parts": {"Core": {"responsibility": "Neutral core"}},
@@ -1179,7 +1179,7 @@ class BootstrapStartTests(ProjectStartCase):
         for block in commands:
             command = block.replace("<deployed-workspace>", shlex.quote(str(root)))
             command = command.replace("<path>", shlex.quote(str(root)))
-            command = command.replace("<external-complete-baseline.tsv>", shlex.quote(str(self.base / "baseline.tsv")))
+            command = command.replace("<workspace-temp>/baseline.tsv", shlex.quote(str(self.base / "baseline.tsv")))
             result = subprocess.run(["bash", "-e", "-c", command], cwd=root, text=True, capture_output=True,
                                     env={**os.environ, "PYTHONPATH": "", "PYTHONDONTWRITEBYTECODE": "1"}, timeout=30)
             self.assertEqual(result.returncode, 0, command + result.stdout + result.stderr)

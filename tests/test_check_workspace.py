@@ -1869,11 +1869,54 @@ ACTION: research
 
 
 
+    def test_temp_copy_links_do_not_change_live_workspace_verdict(self):
+        root=self.fixture(active=True);self.short(root)
+        path=root/'temp/isolated/docs/input.md';path.parent.mkdir(parents=True)
+        path.write_text('[deliberate invalid test input](missing.md)\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_result_owned_by_plan_or_subject_and_legacy_reference(self):
+        for place in ('plan', 'plan-fragment', 'research', 'legacy'):
+            root=self.fixture(active=True); plan=self.short(root)
+            text=plan.read_text().replace('- [ ]','- [x]')
+            if place in {'plan', 'plan-fragment'}: target=plan
+            elif place == 'research': target=root/'research/result.md'
+            else: target=root/'logs/quality.md'
+            record='\n\n## RESULT-OWNED\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: python3 -B -m unittest; 2 tests\nEXPECTED: valid input accepted and missing input refused\nACTUAL: 2 tests passed, no skips\n'
+            plan.write_text(text+'\nRESULT_REF: '+('' if place == 'plan-fragment' else target.relative_to(root).as_posix())+'#RESULT-OWNED\n')
+            with target.open('a') as stream: stream.write(record)
+            self.assert_pass(self.run_checker(root,'--check-result'))
+            target.write_text(target.read_text().replace('ACTUAL: 2 tests passed, no skips','ACTUAL: PASS').replace('CHECKS: python3 -B -m unittest; 2 tests','CHECKS: PASS').replace('EXPECTED: valid input accepted and missing input refused','EXPECTED: PASS'))
+            self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_legacy_result_link_to_bare_pass_is_not_evidence(self):
+        root=self.fixture(active=True);plan=self.short(root)
+        plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#LEGACY-RESULT\n')
+        (root/'research/result.md').write_text('PASS\n')
+        (root/'logs/quality.md').write_text('## LEGACY-RESULT\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n\n'
+            +'The legacy record describes the supposed result and points to a file that contains only a verdict. '
+            +'[Source](../research/result.md)\n')
+        self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_result_missing_wrong_owner_and_bare_pass_refused(self):
+        for record in ('', '## R1\nWPLAN_ID: WPLAN-000002\nVERDICT: PASS\nCHECKS: tests\nEXPECTED: acceptance\nACTUAL: accepted\n', '## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n'):
+            root=self.fixture(active=True); plan=self.short(root)
+            plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#R1\n')
+            (root/'logs/quality.md').write_text(record)
+            self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_completed_appendix_is_not_another_active_plan(self):
+        root=self.fixture(active=True); self.short(root)
+        appendix=root/'plans/completed/WPLAN-000099'; appendix.mkdir()
+        (appendix/'WPLAN-000099-evidence.md').write_text('# Large evidence\n')
+        result=self.run_checker(root); self.assert_pass(result)
+        self.assertEqual(next(c['value']['active_wplan_count'] for c in result[1]['checks'] if c['id']=='active-wplan'),1)
+
     def test_short_same_id_completion_requires_result(self):
         root=self.fixture(active=True)
         p=self.short(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
         self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
-        (root/'logs/quality.md').write_text('EVIDENCE_ID: RESULT-1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n')
+        (root/'logs/quality.md').write_text('EVIDENCE_ID: RESULT-1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: fixture read-back\nEXPECTED: completed same ID\nACTUAL: completed same ID observed\n')
         p.write_text(p.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#RESULT-1\n')
         baseline=self.write_baseline_manifest(root)
         p.write_text(p.read_text().replace('Статус: active','Статус: completed'))

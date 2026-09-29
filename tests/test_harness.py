@@ -31,10 +31,10 @@ EXPECTED_TEST_FILES = {
     "README.md", "test_check_product.py", "test_check_workspace.py",
     "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py", "test_delivery_interfaces.py",
 }
-EXPECTED_DISTRIBUTION_FILES = 152
+EXPECTED_DISTRIBUTION_FILES = 153
 EXPECTED_DISTRIBUTION_DIRECTORIES = 14
-EXPECTED_DEPLOY_FILES = 115
-EXPECTED_DEPLOY_MANIFEST_SHA256 = "4367d56af0520cc38ff6c098e3ba753921f42bcde9c7db9cd528db2f3e9f69c2"
+EXPECTED_DEPLOY_FILES = 116
+EXPECTED_DEPLOY_MANIFEST_SHA256 = "a8eeaf1c2e601ccefc97c0df569a1a50f336e5af3bedcf3b2bfa7c61123680ea"
 DISPOSABLE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 DISPOSABLE_SUFFIXES = (".pyc", ".pyo", ".tmp", ".temp", ".orig")
 
@@ -233,7 +233,8 @@ class BytePressQualificationTests(unittest.TestCase):
         directories = [path for path in root.rglob("*") if path.is_dir() and not path.is_symlink()]
         self.assertEqual(len(files), EXPECTED_DISTRIBUTION_FILES)
         self.assertEqual(len(directories) + 1, EXPECTED_DISTRIBUTION_DIRECTORIES)
-        self.assertEqual((root / "VERSION").read_bytes(), b"0.5.4\n")
+        self.assertEqual((root / "VERSION").read_bytes(), (SOURCE_ROOT / "VERSION").read_bytes())
+        new_project._read_version(root)
         self.assertEqual({path.name for path in (root / "tools").iterdir() if path.is_file()}, EXPECTED_TOOL_FILES)
         self.assertEqual({path.name for path in (root / "tests").iterdir() if path.is_file()}, EXPECTED_TEST_FILES)
         for forbidden in ("plans", "logs", "research", "src"):

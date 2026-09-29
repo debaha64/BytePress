@@ -121,6 +121,7 @@ sops/record-terminology.md
 sops/release-management.md
 sops/research.md
 sops/sdlc.md
+sops/semver.md
 sops/sot.md
 sops/start-session.md
 sops/system-diagnostics.md
@@ -690,6 +691,8 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "`feedback/` хранит пользовательский опыт по [модели Feedback](docs/technical/feedback.md); "
         "`plans/` управляет работой. Feedback не создаёт WBACK/WPLAN автоматически.\n\n"
         "## Invariants\n\n"
+        "Версии BytePress Harness и связанные имена определяет [SOP версий](sops/semver.md); "
+        "версия пользовательского продукта независима.\n\n"
         "1. Workspace управляет работой над Product Unit; Product Unit не хранит текущий Workspace route.\n"
         "2. Число active WPLAN вычисляется: ноль означает отсутствие исполнения; первая запись нового исполняемого прохода создаёт WPLAN. Узкая регистрация допустима по task-intake.\n"
         "3. `sot_files` не читает Git. Product code/checks не исполняются при discovery Profile.\n"
@@ -754,8 +757,9 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
             f"Fixed Product root и delivery boundary равны `{slug}/`.\n\n"
             "Project Start создал minimal Profile с полями `schema_version`, `harness_version`, `sot_mode`, `display_name`; "
             "optional `product_parts` и `product_native_checks` отсутствуют. Parsing Profile не исполняет Product code или declared commands.\n\n"
+            "Полный идентификатор Harness и порядок его изменения определяет [SOP версий](../../sops/semver.md).\n\n"
             "Для actual-delta проверки caller до mutation получает complete TSV командой "
-            "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <external-manifest>`; "
+            "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <workspace-temp>/baseline.tsv`; "
             "active WPLAN связывает exact CREATE/UPDATE/REMOVE с фактическими path/type/content/POSIX-mode изменениями.\n"
         ).encode("utf-8"),
         "docs/technical/README.md": "# Техническая документация Workspace\n\nТехнические контракты этого каталога применяются через root WPLAN и не создают owner authority.\n".encode("utf-8"),

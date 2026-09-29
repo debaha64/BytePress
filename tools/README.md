@@ -1,6 +1,6 @@
 # Справочник команд Harness
 
-Команды запускаются через `python3 -B`. `--help` показывает синтаксис; stdout содержит результат, диагностический stderr не является результатом проверки. Технический PASS не принимает продукт и не разрешает запись. Product-инструменты защищённого исходника проверяются только на свежей внешней копии по [verify-work](../sops/verify-work.md).
+Команды запускаются через `python3 -B`. `--help` показывает синтаксис; stdout содержит результат, диагностический stderr не является результатом проверки. Технический PASS не принимает продукт и не разрешает запись. Product-инструменты защищённого исходника проверяются только на свежей одноразовой копии в Workspace temp/ по [verify-work](../sops/verify-work.md).
 
 ## Команды, модули и испытательные средства
 
@@ -12,7 +12,9 @@
 | `clean_product.py` | Временные остатки статической Product Unit BytePress; остаётся в distribution | По умолчанию чтение; `--apply` удаляет выбранные остатки |
 | `release_preflight.py` | Отдельная проверка выпускных свидетельств и последующее контрольное чтение | Чтение локальных входов и, когда разрешено контрактом, сети; внешних записей нет |
 
-`project_profile.py` — **библиотечный модуль**, не команда. Он владеет разбором schema v1, проверкой состава/версии и канонической сериализацией. Проверяющие инструменты и Project Start используют его; `check_profile.py` и копии parser отсутствуют. `tests/test_*.py` — определения испытаний, не пользовательские команды. Запускатель продуктовых прогонов и приватные навыки конкретного Workspace в Product не поставляются.
+`project_profile.py` — **библиотечный модуль**, не команда. Он владеет разбором schema v1, проверкой состава/версии и канонической сериализацией; процедурный договор — [SOP версий](../sops/semver.md). Проверяющие инструменты и Project Start используют его; `check_profile.py` и копии parser отсутствуют. `tests/test_*.py` — определения испытаний, не пользовательские команды. Запускатель продуктовых прогонов и приватные навыки конкретного Workspace в Product не поставляются.
+
+Обычные временные входы и исходные манифесты в примерах находятся в собственной области `temp/operation/` проверяемого Workspace; исполнитель создаёт её в границах разрешённой операции.
 
 ## check_workspace.py
 
@@ -34,8 +36,8 @@ JSON: `schema: generic.workspace-check.v1`, `status`, `checks[]` с `id/status/v
 
 ```bash
 python3 -B tools/check_workspace.py --workspace /path/WS_Example --format json
-python3 -B tools/check_workspace.py --workspace /path/WS_Example --print-baseline-manifest > /outside/before.tsv
-python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /outside/before.tsv --check-result
+python3 -B tools/check_workspace.py --workspace /path/WS_Example --print-baseline-manifest > /path/WS_Example/temp/operation/before.tsv
+python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /path/WS_Example/temp/operation/before.tsv --check-result
 ```
 
 ### registration-input
@@ -57,13 +59,13 @@ python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-mani
 }
 ```
 
-Перед разрешённой записью исполнитель читает реальные байты `plans/backlog.md` и сохраняет их во внешней временной области; `expected_sha256` и `before_base64` вычисляются из **одного** чтения, не восстанавливаются из памяти или текста отчёта. Файл регистрации затем проверяет точное прежнее содержимое и допустимый суффикс по task-intake. Для следующей регистрации берутся байты непосредственно перед ней. Исходная база основной работы остаётся прежней.
+Перед разрешённой записью исполнитель читает реальные байты `plans/backlog.md` и сохраняет их в собственной области Workspace `temp/`; `expected_sha256` и `before_base64` вычисляются из **одного** чтения, не восстанавливаются из памяти или текста отчёта. Файл регистрации затем проверяет точное прежнее содержимое и допустимый суффикс по task-intake. Для следующей регистрации берутся байты непосредственно перед ней. Исходная база основной работы остаётся прежней.
 
 Для `kind: feedback` нужны `id: FB-NNNNNN`, `owner_request`, `source`, точный `original` и `recorded_at: YYYY-MM-DD`; `before_base64` не нужен, создаётся только новый record. Существующий текст Feedback не редактируется. Общий новый каталог `feedback/` проверяется один раз для последовательности.
 
 ```bash
-python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /outside/before.tsv --registration-input /outside/registration-1.json
-python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /outside/before.tsv --registration-input /outside/registration-1.json --registration-input /outside/registration-2.json --format json
+python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /path/WS_Example/temp/operation/before.tsv --registration-input /path/WS_Example/temp/operation/registration-1.json
+python3 -B tools/check_workspace.py --workspace /path/WS_Example --baseline-manifest /path/WS_Example/temp/operation/before.tsv --registration-input /path/WS_Example/temp/operation/registration-1.json --registration-input /path/WS_Example/temp/operation/registration-2.json --format json
 ```
 
 Входы передаются в порядке записей одного последовательного исполнителя. Это не блокировка и не протокол нескольких писателей. Несвежие байты/revision, повтор ID, неверный ROAD, изменение старого текста/маршрута, типа/прав, подмена оригинала Feedback, перестановка зависимых регистраций или незаявленная основная дельта дают FAIL. При конкурентной записи остановиться и перечитать фактическое состояние; не затирать его сохранённой копией.
@@ -108,8 +110,8 @@ Apply проверяет точный Product root и не следует по �
 Операции `preflight` и `readback` требуют `--contract FILE`; обе принимают `--timeout N` (положительное конечное число секунд, default `30`) и `--format owner|engineering|machine` (default owner). `preflight` принимает необязательный `--human-policy FILE`. `readback` требует `--before FILE` и `--delta FILE`; контракт before должен совпасть с текущим.
 
 ```bash
-python3 -B tools/release_preflight.py preflight --contract /outside/contract.json --format machine
-python3 -B tools/release_preflight.py readback --contract /outside/contract.json --before /outside/before.json --delta /outside/delta.json --timeout 30 --format engineering
+python3 -B tools/release_preflight.py preflight --contract /path/WS_Example/temp/operation/contract.json --format machine
+python3 -B tools/release_preflight.py readback --contract /path/WS_Example/temp/operation/contract.json --before /path/WS_Example/temp/operation/before.json --delta /path/WS_Example/temp/operation/delta.json --timeout 30 --format engineering
 ```
 
 Machine — JSON с `verdict`, результатом проверок и происхождением наблюдений; ошибочный вход возвращает JSON `verdict: FAIL`, `external_writes: 0`, `error`. Точные входные схемы и достаточность свидетельств принадлежат [release-evidence](../docs/technical/release-evidence.md). Коды `0` PASS, `1` FAIL, `2` OWNER_ACTION_REQUIRED; синтаксическая ошибка также `2`, но с диагностикой stderr и без результата verdict. Текст ошибки не раскрывает аргументы с возможными credentials. `--timeout` ограничивает сетевое наблюдение, `--timeout-seconds` у Product checker — выполнение процесса; имена сохранены для действующих потребителей. Ни один результат не разрешает внешнюю запись.

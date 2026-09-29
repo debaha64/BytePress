@@ -522,11 +522,11 @@ if __name__ == "__main__":
 
 class DeliveryVersionTests(unittest.TestCase):
     def test_full_version_roundtrip_and_invalid_identifiers(self):
-        for value in ("0.5.4", "0.5.4-dev.1", "0.5.4-rc.2", "12.34.56-dev.123"):
+        for value in ("0.0.0", "0.5.4", "0.5.4-dev.1", "0.5.4-dev.2", "0.5.4-rc.2", "12.34.56-dev.123"):
             with self.subTest(value=value):
                 self.assertEqual(project_profile.validate_harness_version(value), value)
                 raw = project_profile.serialize_project_profile("Example.profile", minimal_document(harness_version=value))
                 self.assertEqual(project_profile.parse_project_profile(raw, "Example.profile").harness_version, value)
-        for value in ("0.5.4_candidate-1", "0.5.4-dev.0", "0.5.4-rc.01", "0.5.4-dev", "0.5.4+build", "v0.5.4", "00.5.4"):
+        for value in ("0.5.4-dev-2", "0.5.4-rc-2", "0.5.4_candidate-1", "0.5.4-dev.0", "0.5.4-rc.01", "0.5.4-dev", "0.5.4+build", "v0.5.4", "00.5.4", "0.05.4", "0.5.04", "0.5.4-dev.01", "0.5.4-rc.0", "0.5.4-alpha.1", "0.5.4-dev.2+build", "0.5.4\n", " 0.5.4", 1, None):
             with self.subTest(value=value), self.assertRaises(project_profile.ProjectProfileError):
                 project_profile.validate_harness_version(value)

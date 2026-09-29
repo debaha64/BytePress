@@ -15,6 +15,7 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import test_check_workspace as fixtures
@@ -83,7 +84,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         old_tree,new_tree=self.patch_tree(released),self.patch_tree(reference)
         changed={p for p in old_tree.keys()|new_tree.keys() if old_tree.get(p)!=new_tree.get(p)}
         actions={row['path']:row['action'] for row in preview['authorization_payload']['actions']}
-        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md'}
+        generated={'SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}
         preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md'}
         # Explicit closed disposition: no copied private/history/route content.
         self.assertFalse(changed-{p for p in changed if actions.get(p)=='COPY'}-generated-preserved)
@@ -91,10 +92,10 @@ class WorkspaceUpdateTests(unittest.TestCase):
         applied=set()
         for relative in sorted(changed-generated-preserved):
             self.assertEqual(actions.get(relative),'COPY')
-            self.assertEqual(before[relative],old_tree[relative])
+            self.assertEqual(before.get(relative),old_tree.get(relative))
             shutil.copy2(reference/relative,root/relative);applied.add(relative)
-        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md'}):
-            self.assertEqual(before[relative],old_tree[relative])
+        for relative in sorted(changed & {'SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}):
+            self.assertEqual(before.get(relative),old_tree.get(relative))
             data=(reference/relative).read_bytes()
             if relative=='SYSTEM.md':
                 data=data.replace(f'deployed Harness version: `{version}`'.encode(),b'deployed Harness version: `0.5.3`')
@@ -145,6 +146,35 @@ class WorkspaceUpdateTests(unittest.TestCase):
                          (reference / "docs/technical/project-start.md").read_bytes())
 
 
+    def test_prerelease_update_delivers_sop_and_cuts_over_after_readback(self):
+        for version in ('0.5.4-dev.2', '0.5.4-rc.3'):
+            with self.subTest(version=version), tempfile.TemporaryDirectory(prefix='semver-update-') as directory:
+                distribution = Path(directory) / 'BytePress'
+                shutil.copytree(SOURCE, distribution)
+                (distribution / 'VERSION').write_text(version + '\n')
+                source_before = project_start.tree_manifest(distribution)
+                with mock.patch.dict(globals(), SOURCE=distribution, CURRENT_VERSION=version):
+                    root = self.patch_old_workspace()
+                    (root / 'Example/VERSION').write_bytes(b'9.7-product-policy\n')
+                    protected = self.protected(root)
+                    reference, preview = self.patch_reference()
+                    rows = self.patch_disposition(reference, preview)
+                    self.assertEqual(next(r['disposition'] for r in rows if r['path'] == 'sops/semver.md'), 'COPY')
+                    authority = self.authorize_update(root, reference, rows)
+                    self.apply_patch_contracts(root, reference, preview, authorization=authority, rows=rows)
+                    profile = root / 'Example.profile'
+                    self.assertEqual(json.loads(profile.read_bytes())['harness_version'], '0.5.2')
+                    self.patch_readback(root, reference, rows, protected)
+                    self.assertEqual((root / 'sops/semver.md').read_bytes(), (distribution / 'sops/semver.md').read_bytes())
+                    document = json.loads(profile.read_bytes()); document['harness_version'] = version
+                    profile.write_bytes(project_profile.serialize_project_profile(profile.name, document))
+                    system = root / 'SYSTEM.md'
+                    system.write_bytes(system.read_bytes().replace(b'deployed Harness version: `0.5.2`', f'deployed Harness version: `{version}`'.encode()))
+                    self.assert_pass(self.run_checker(root))
+                    self.assertEqual(json.loads(profile.read_bytes())['harness_version'], version)
+                    self.assertEqual((root / 'Example/VERSION').read_bytes(), b'9.7-product-policy\n')
+                    self.assertEqual(project_start.tree_manifest(distribution), source_before)
+
     def patch_reference(self):
         temporary = tempfile.TemporaryDirectory(prefix="bytepress-patch-reference-")
         self.addCleanup(temporary.cleanup)
@@ -162,6 +192,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
             stream.write("\nPrivate system meaning preserved.\n")
         (root / "Example/private.txt").write_bytes(b"neutral Product code and data\n")
         (root / "Example/private.txt").chmod(0o640)
+        index = root / "plans/completed/README.md"
+        index.write_bytes(index.read_bytes() + b"\nPRIVATE INDEX ROW\n")
+        index.chmod(0o640)
         (root / "logs/history.md").write_bytes(b"immutable history\n")
         (root / "plans/completed/WPLAN-000099-history.md").write_bytes(b"completed history\n")
         return root
@@ -182,6 +215,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
             "feedback/README.md": ("GENERATED_MERGE", "Create empty index only if absent; preserve private index."),
             "Example.profile": ("GENERATED_MERGE", "Preserve composition and SoT; version cutover last."),
             "SYSTEM.md": ("GENERATED_MERGE", "Merge generated contract; preserve stronger private rules."),
+            "docs/architecture/project-profile.md": ("GENERATED_MERGE", "Merge the version owner link while preserving project identity."),
             "docs/technical/project-start.md": ("GENERATED_MERGE", "Rendered Project Start contract, not a COPY action."),
             "sops/verify-work.md": ("GENERATED_MERGE", "Rendered deployed verification contract with source-only commands adapted."),
             "docs/user/README.md": ("GENERATED_MERGE", "Rendered instance navigation."),
@@ -190,6 +224,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
             "logs/sessions.md": ("PRESERVE", "Existing session facts are immutable; do not import a new empty form."),
             "plans/backlog.md": ("PRESERVE", "Existing queue and route are project state; the new checker reads old forms."),
             "tools/README.md": ("GENERATED_MERGE", "Document the deployed short-form checker and legacy reader."),
+            "plans/completed/README.md": ("GENERATED_MERGE", "Merge appendix navigation without replacing completed plans or private rows."),
         }
         rows = []
         for path in sorted(self.changed_deployed_paths(reference)):
@@ -220,14 +255,14 @@ class WorkspaceUpdateTests(unittest.TestCase):
 
     def authorize_update(self, root, reference, rows):
         """Simulated owner response to exact prepared backup/disposition in a neutral test."""
-        before = self.patch_tree(root)
+        before = project_start.tree_manifest(root)
         self.assertTrue(all(value[0] in {"file", "directory"} for value in before.values()))
         with tempfile.NamedTemporaryFile(dir=root.parent, suffix=".tar.gz", delete=False) as stream:
             backup = Path(stream.name)
-        with tarfile.open(backup, "w:gz") as archive:
+        with tarfile.open(backup, "w:gz", format=tarfile.USTAR_FORMAT) as archive:
             for relative in [".", *sorted(before)]:
                 archive.add(root / relative, arcname=str(Path(root.name) / relative), recursive=False)
-        self.assertEqual(self.patch_tree(root), before, "Workspace changed while creating backup")
+        self.assertEqual(project_start.tree_manifest(root), before, "Workspace changed while creating backup")
         return {"snapshot": str(backup), "snapshot_sha256": hashlib.sha256(backup.read_bytes()).hexdigest(),
                 "digest": self.update_digest(root, reference, rows)}
 
@@ -249,7 +284,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 relative = Path(item.name).relative_to(root.name).as_posix()
                 observed[relative] = ("directory" if item.isdir() else "file", item.mode,
                                      "" if item.isdir() else hashlib.sha256(archive.extractfile(item).read()).hexdigest())
-        self.assertEqual(observed, self.patch_tree(root), "Backup must match frozen target bytes/types/modes")
+        self.assertEqual(observed, project_start.tree_manifest(root), "Backup must match frozen target bytes/types/modes")
 
     def patch_tree(self, root):
         """Permanent target surface; sot_files service projections are never traversed."""
@@ -294,7 +329,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         released = self.released_workspace()
         # Stop before writes if a copied contract has an unreviewed private overlay.
         for row in rows:
-            if row["disposition"] != "PRESERVE" and row["path"] not in {"SYSTEM.md", "Example.profile"}:
+            if row["disposition"] != "PRESERVE" and row["path"] not in {"SYSTEM.md", "Example.profile", "plans/completed/README.md"}:
                 path = row["path"]
                 if path in {"feedback", "feedback/README.md"}:
                     continue  # Existing user data is preserved, never a copied contract overlay.
@@ -319,7 +354,10 @@ class WorkspaceUpdateTests(unittest.TestCase):
                     else:
                         shutil.copy2(reference / path, root / path)
                 continue
-            if path == "SYSTEM.md":
+            if path == "plans/completed/README.md":
+                index = root / path
+                index.write_bytes(index.read_bytes() + self.completed_index_addition())
+            elif path == "SYSTEM.md":
                 private = (root / path).read_bytes()[len(old_system):]
                 merged = (reference / path).read_bytes().replace(f"deployed Harness version: `{CURRENT_VERSION}`".encode(), b"deployed Harness version: `0.5.2`")
                 (root / path).write_bytes(merged + private)
@@ -345,6 +383,10 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 self.assertTrue(actual.is_dir() if expected.is_dir() else actual.is_file())
                 if path not in protected and actual.is_file():
                     self.assertEqual(actual.read_bytes(), expected.read_bytes())
+                continue
+            if path == "plans/completed/README.md":
+                self.assertTrue(actual.read_bytes().endswith(self.completed_index_addition()))
+                self.assertEqual(actual.stat().st_mode & 0o7777, protected[path][0])
                 continue
             self.assertEqual(actual.read_bytes(), expected.read_bytes(), path)
             self.assertEqual(actual.stat().st_mode & 0o7777, expected.stat().st_mode & 0o7777, path)
@@ -488,10 +530,22 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 self.command(root, "remote", "set-head", "origin", "main")
         return root
 
+    def completed_index_addition(self):
+        text = (SOURCE / "templates/workspace-plan-completed-readme.md").read_bytes()
+        marker = "Крупные технические приложения".encode()
+        return b"\n\n" + marker + text.split(marker, 1)[1]
+
     def protected(self, root):
+        def history_bytes(path):
+            data = path.read_bytes()
+            if path.relative_to(root).as_posix() == "plans/completed/README.md":
+                addition = self.completed_index_addition()
+                if data.endswith(addition):
+                    data = data[:-len(addition)]
+            return data
         paths = ("Example", "plans", "research", "skills", "logs")
         result = {
-            p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(p.read_bytes()).hexdigest())
+            p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(history_bytes(p)).hexdigest())
             for prefix in paths for p in (root / prefix).rglob("*") if p.is_file()
         }
         folder = root / "feedback"
@@ -593,21 +647,18 @@ class WorkspaceUpdateTests(unittest.TestCase):
         env = {**os.environ, "PATH": "", "PYTHONPATH": ""}
         self.assert_pass(self.run_checker(root, env=env))
 
-    def test_snapshot_service_exclusions_preserve_private_content(self):
+    def test_checker_scope_exclusions_preserve_private_content(self):
         root = self.migration("sot_files", service=True)
-        for name in (".agents", ".codex"):
-            (root / name).mkdir()
-        archive = root.parent / "fixture.tar.gz"
-        with tarfile.open(archive, "w:gz") as target:
-            for path in (root, *sorted(root.rglob("*"))):
-                rel = path.relative_to(root)
-                if rel.parts and rel.parts[0] in {".git", ".agents", ".codex"}:
-                    continue
-                target.add(path, arcname=str(Path(root.name) / rel), recursive=False)
-        with tarfile.open(archive) as source:
-            names = source.getnames()
-        self.assertFalse(any(set(Path(name).parts) & {".git", ".agents", ".codex"} for name in names))
-        self.assertIn(root.name + "/skills/private.md", names)
+        for name in (".agents", ".codex", "temp"):
+            (root / name).mkdir(exist_ok=True)
+            (root / name / 'private.data').write_text('preserve')
+        before=project_start.tree_manifest(root)
+        baseline=subprocess.check_output([sys.executable, '-B', str(root/'tools/check_workspace.py'),
+            '--workspace', str(root), '--print-baseline-manifest'], text=True)
+        paths=[line.split('\t')[-1] for line in baseline.splitlines()[1:]]
+        self.assertFalse(any(Path(p).parts[0] in {'.git','.agents','.codex','temp'} for p in paths))
+        self.assertIn('skills/private.md',paths)
+        self.assertEqual(project_start.tree_manifest(root),before)
 
     def test_static_product_cleaner_needs_no_workspace_sot_owner(self):
         with tempfile.TemporaryDirectory() as temporary:

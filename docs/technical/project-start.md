@@ -12,7 +12,7 @@ Project Start создаёт отдельный Workspace из поставки 
 
 Новый корень продукта пуст. Существующий продукт копируется как непрозрачное содержимое обычных файлов с сохранением байтов, скрытых путей и POSIX-режимов доступа. Исключаются только точно разрешённые каталоги `.git`, действительные файлы gitfile и каталоги `.hg/.svn`. Другие типы объектов VCS, символические и жёсткие ссылки и специальные узлы дают отказ. Источники поставки и продукта неизменны; код, скрипты, хуки и действия менеджеров пакетов не запускаются.
 
-Созданный Project Profile содержит ровно `schema_version = 1`, `harness_version` из `VERSION`, `sot_mode = sot_files` и заданный владельцем `display_name`. Поля `product_parts` и `product_native_checks` отсутствуют. Плановый контур содержит только `WROAD-000001 active` и `WROAD-000001-OWNER-PLANNING`; WBACK/WPLAN, состояние Git/GitHub, приёмка и выпуск не создаются.
+Созданный Project Profile содержит ровно `schema_version = 1`, `harness_version` из `VERSION` по [SOP версий](../../sops/semver.md#развёрнутая-версия), `sot_mode = sot_files` и заданный владельцем `display_name`. Поля `product_parts` и `product_native_checks` отсутствуют. Плановый контур содержит только `WROAD-000001 active` и `WROAD-000001-OWNER-PLANNING`; WBACK/WPLAN, состояние Git/GitHub, приёмка и выпуск не создаются.
 
 ## Существующий продукт
 
@@ -39,3 +39,5 @@ Project Start материализует в generated `SYSTEM.md` canonical mach
 `FB-REQ-11` / `FB-SCN-11`: оба варианта Project Start копируют `docs/technical/feedback.md`, `docs/user/feedback.md`, `sops/feedback.md`, `templates/feedback-record.md` по фиксированному пофайловому manifest. Generated AGENTS/SYSTEM/README и пользовательский индекс дают ссылки на capability. Создаётся `feedback/README.md` только с навигацией ID/тема/ссылка, без records, состояния очереди и чужих данных. Каталог `feedback/` принадлежит Workspace; New Product остаётся пустым, Existing Product сохраняет opaque bytes/types/modes. Приём текста применяется по [SOP](../../sops/feedback.md) только в действующей рабочей границе; Project Start не создаёт Feedback records, WBACK или WPLAN.
 
 [Workspace Update](../../sops/change-management.md#feedback-при-workspace-update) сохраняет existing feedback data и обновляет static/copied/generated contracts отдельно. Отсутствие Feedback directory в static distribution намеренно; новый Workspace получает механизм и пустой индекс, без пользовательского corpus.
+
+[SOP версий](../../sops/semver.md) входит в фиксированный копируемый состав Project Start. Генератор сохраняет полный идентификатор Harness, а существующий продукт и его версию переносит без изменения.

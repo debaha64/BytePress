@@ -345,7 +345,9 @@ def _reference_evidence_fields(workspace: Path, reference: str) -> dict[str, str
     matches = []
     token_pattern = re.compile(rf"(?<![A-Za-z0-9_-]){re.escape(token)}(?![A-Za-z0-9_-])")
     for block in re.split(r"\n\s*\n", text):
-        if token_pattern.search(block):
+        # Ссылка на собственный итог не является самим блоком результата.
+        candidate = re.sub(r"(?m)^[A-Z_]*REFS?:.*$", "", block)
+        if token_pattern.search(candidate):
             matches.append(_machine_fields(block))
     if len(matches) != 1:
         raise ContractError(f"EVIDENCE_REFS token must resolve to one structured evidence block: {reference}")
@@ -494,6 +496,47 @@ def _check_work_contract(workspace: Path, plan_path: Path):
     return {"contract": "v1", "action": action}
 
 
+def _result_basis(workspace: Path, reference: str, evidence: dict[str, str]):
+    """Проверяет наличие основания; достоверность наблюдений оценивает проверяющий."""
+    markers = {"", "pass", "fail", "none", "pending", "true", "not-applicable", "not-performed"}
+    keys = ("CHECKS", "EXPECTED", "ACTUAL")
+    if any(key in evidence for key in keys):
+        if not all(evidence.get(key, "").strip().lower() not in markers for key in keys):
+            raise ContractError("task result requires checks, expected and actual observations")
+        return
+    # Совместимость с прежними подробными записями: основание находится в
+    # разделе указанного результата, а не в произвольном PASS всего файла.
+    relative, _, token = reference.partition("#")
+    text = (workspace / relative).read_text(encoding="utf-8")
+    heading = re.search(rf"(?m)^(#{{1,6}}) [^\n]*{re.escape(token)}[^\n]*$", text)
+    if heading:
+        section = text[heading.end():]
+        boundary = re.search(rf"(?m)^#{{1,{len(heading[1])}}} ", section)
+        if boundary: section = section[:boundary.start()]
+        prose = re.sub(r"(?m)^[A-Z_]+:.*$", "", section).strip()
+        # Исторические записи содержат команды/измерения либо ссылку на
+        # подробное свидетельство. Одних типизированных полей недостаточно.
+        links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", prose)
+        local = [link.split('#', 1)[0] for link in links if not re.match(r"[a-z]+:", link)]
+        has_source = False
+        for value in local:
+            candidate = (workspace / relative).parent.joinpath(value)
+            if not value or not candidate.is_file() or candidate.resolve() == (workspace / relative).resolve():
+                continue
+            try:
+                candidate.resolve().relative_to(workspace)
+                body = candidate.read_text(encoding="utf-8").strip()
+            except (OSError, ValueError):
+                continue
+            words = set(re.findall(r"[\w-]+", body.lower()))
+            if words and not words.issubset(markers):
+                has_source = True
+        has_measurement = bool(re.search(r"(?:[0-9]+/[0-9]+|python3? .{4,}|Ran [0-9]+ tests)", prose))
+        if len(prose) >= 80 and (has_source or has_measurement):
+            return
+    raise ContractError("task result has no sufficient verification basis")
+
+
 def _check_task_result(workspace: Path, plan_path: Path | None = None):
     plans = [plan_path] if plan_path else _active_plan_paths(workspace)
     if not plans:
@@ -530,9 +573,12 @@ def _check_task_result(workspace: Path, plan_path: Path | None = None):
         if len(sections) != 1 or not re.search(r"(?m)^- \[x\] .+", sections[0]) or re.search(r"(?m)^- \[ \]", sections[0]):
             raise ContractError("mandatory task result is not complete")
         reference = _single_field(text, "RESULT_REF")
+        if reference.startswith("#"):
+            reference = plans[0].relative_to(workspace).as_posix() + reference
         evidence = _reference_evidence_fields(workspace, reference)
         if evidence.get("WPLAN_ID") != _single_field(text, "WPLAN ID") or evidence.get("VERDICT") != "PASS":
             raise ContractError("task result evidence scope/verdict mismatch")
+        _result_basis(workspace, reference, evidence)
     return {"assertions": checked}
 
 
@@ -1324,16 +1370,20 @@ def _markdown_targets(text: str):
 
 
 def _excluded(relative: PurePosixPath, product_name: str):
-    prefixes = (product_name, *SERVICE_NAMES, "plans/completed", "research/archives")
+    prefixes = (product_name, *SERVICE_NAMES, "temp", "plans/completed", "research/archives")
     return any(relative.parts[:len(PurePosixPath(value).parts)] == PurePosixPath(value).parts for value in prefixes)
 
 
 def _check_links(workspace: Path, product_name: str):
     issues = []
-    for path in workspace.rglob("*.md"):
+    paths = []
+    for current, directories, files in os.walk(workspace, followlinks=False):
+        base = Path(current)
+        directories[:] = [name for name in directories
+                          if not _excluded(PurePosixPath((base / name).relative_to(workspace).as_posix()), product_name)]
+        paths.extend(base / name for name in files if name.endswith(".md"))
+    for path in paths:
         relative = PurePosixPath(path.relative_to(workspace).as_posix())
-        if _excluded(relative, product_name):
-            continue
         for target in _markdown_targets(path.read_text(encoding="utf-8")):
             if not target or target.startswith(("http://", "https://", "mailto:", "codexlog:")):
                 continue
