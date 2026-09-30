@@ -28,7 +28,7 @@
 
 ## Передача
 
-Если результат допускается к следующему gate, передать его и evidence `Product Acceptance Coordinator`. При changes requested передать замечания владельцу для terminal disposition текущей итерации и отдельно разрешённого corrective WPLAN по [project-management](../sops/project-management.md#доработка-после-owner-review); обратный phase transition не выполнять.
+Если результат допускается к следующему gate, передать его и evidence `Product Acceptance Coordinator`. При changes requested продолжить исправления в прежней границе незавершённого WPLAN по [project-management](../sops/project-management.md#доработка-после-owner-review). Новая граница требует решения до записи; completed history не переоткрывается.
 
 ## Связанные SOP
 

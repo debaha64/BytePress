@@ -27,6 +27,7 @@ from project_profile import (
     load_project_profile,
     parse_project_profile,
     serialize_project_profile,
+    validate_harness_version,
 )
 
 
@@ -120,6 +121,7 @@ sops/record-terminology.md
 sops/release-management.md
 sops/research.md
 sops/sdlc.md
+sops/semver.md
 sops/sot.md
 sops/start-session.md
 sops/system-diagnostics.md
@@ -391,6 +393,10 @@ def _read_version(source: Path) -> tuple[bytes, str]:
     if not value or value != value.strip() or "\n" in value or "\r" in value:
         raise InspectionError("VERSION должен содержать одну непустую version line")
     _reject_surrogates(value, "VERSION")
+    try:
+        validate_harness_version(value)
+    except ProjectProfileError as error:
+        raise InspectionError(str(error)) from error
     return data, value
 
 
@@ -648,13 +654,13 @@ def _generated_readme(slug: str, display_name: str, license_bytes: bytes) -> byt
     prefix = (
         f"# Workspace {display_name}\n\n"
         f"`WS_{slug}` — управляемый Workspace продукта `{slug}`. "
-        "Project Profile хранит composition, а Product root является самостоятельной delivery boundary.\n\n"
+        "Project Profile хранит состав проекта, а корень продукта задаёт самостоятельную границу поставки.\n\n"
         "## Начальное состояние\n\n"
         "- `WROAD-000001 active`;\n"
-        "- active WBACK/WPLAN count `0/0`;\n"
-        "- checkpoint `WROAD-000001-OWNER-PLANNING`;\n"
-        "- initial SoT `sot_files`.\n\n"
-        "Product architecture, первый WBACK/WPLAN, лицензия продукта и переход SoT требуют отдельных решений владельца.\n\n"
+        "- активных WBACK/WPLAN: `0/0`;\n"
+        "- контрольная отметка: `WROAD-000001-OWNER-PLANNING`;\n"
+        "- начальный SoT: `sot_files`.\n\n"
+        "Архитектура продукта, первый WBACK/WPLAN, лицензия продукта и переход SoT требуют отдельных решений владельца.\n\n"
         "[После Project Start](docs/user/after-project-start.md) поможет выбрать первую задачу. [Документация](docs/README.md) объясняет модель и проверки.\n\n"
         "[Обратная связь о продукте](docs/user/feedback.md); записи команды — [Feedback](feedback/README.md).\n\n"
         "## Лицензия BytePress Harness\n\n"
@@ -666,32 +672,34 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
     readme = _generated_readme(slug, display_name, license_bytes)
     agents = (
         f"# AGENTS.md — рабочая карта Workspace {slug}\n\n"
-        f"Workspace root: `WS_{slug}`. Product root и delivery boundary: `{slug}/`.\n\n"
-        f"Единственный machine owner composition и SoT — `{slug}.profile`; начальный mode — `sot_files`. "
-        "Git CLI не вызывается до отдельного owner-gated перехода.\n\n"
-        "Человек управляет, агенты исполняют. Прочитайте `SYSTEM.md`, Project Profile и root `plans/`; "
-        "technical PASS не является Product Acceptance.\n"
+        f"Корень Workspace: `WS_{slug}`. Корень продукта и граница поставки: `{slug}/`.\n\n"
+        f"Единственный машинный источник состава проекта и SoT — `{slug}.profile`; начальный режим — `sot_files`. "
+        "Git CLI не вызывается до отдельно разрешённого владельцем перехода.\n\n"
+        "Человек управляет, агенты исполняют. Прочитайте `SYSTEM.md`, Project Profile и корневой `plans/`; "
+        "технический PASS не является Product Acceptance.\n"
         "\nОбработка обратной связи: [SOP Feedback](sops/feedback.md).\n"
     ).encode("utf-8")
     system = (
         f"# SYSTEM.md — Workspace {slug}\n\n"
-        "## Composition\n\n"
-        f"- root Project Profile: `{slug}.profile`;\n"
-        f"- fixed Product root/delivery boundary: `{slug}/`;\n"
-        f"- deployed Harness version: `{version}`;\n"
-        "- configured SoT owner: Project Profile;\n"
-        "- planning authority: root `WROAD -> WBACK -> WPLAN`.\n\n"
+        "## Состав\n\n"
+        f"- корневой Project Profile: `{slug}.profile`;\n"
+        f"- фиксированный корень продукта и граница поставки: `{slug}/`;\n"
+        f"- развёрнутая версия Harness: `{version}`;\n"
+        "- источник настроенного SoT: Project Profile;\n"
+        "- управление работой: корневой `WROAD -> WBACK -> WPLAN`.\n\n"
         "## Feedback\n\n"
         "`feedback/` хранит пользовательский опыт по [модели Feedback](docs/technical/feedback.md); "
         "`plans/` управляет работой. Feedback не создаёт WBACK/WPLAN автоматически.\n\n"
-        "## Invariants\n\n"
-        "1. Workspace управляет работой над Product Unit; Product Unit не хранит текущий Workspace route.\n"
-        "2. В non-executing checkpoint active WPLAN count равен `0`; первая permanent mutation нового прохода создаёт active WPLAN.\n"
-        "3. `sot_files` не читает Git. Product code/checks не исполняются при discovery Profile.\n"
-        "4. Technical PASS, owner acceptance, Product Acceptance и Release Authorization являются разными фактами.\n"
+        "## Инварианты\n\n"
+        "Версии BytePress Harness и связанные имена определяет [SOP версий](sops/semver.md); "
+        "версия пользовательского продукта независима.\n\n"
+        "1. Workspace управляет работой над Product Unit; Product Unit не хранит текущий маршрут Workspace.\n"
+        "2. Число активных WPLAN вычисляется: ноль означает отсутствие исполнения; первая запись нового исполняемого прохода создаёт WPLAN. Узкая регистрация допустима по task-intake.\n"
+        "3. `sot_files` не читает Git. Код и проверки продукта не исполняются при обнаружении Profile.\n"
+        "4. Технический PASS, принятие владельцем, Product Acceptance и Release Authorization являются разными фактами.\n"
         "5. Отдельная внешняя операция [Workspace Update](sops/change-management.md#внешняя-граница-workspace-update) "
-        "из новой distribution действует только над frozen/quiescent Workspace по exact owner authorization; "
-        "она не открывает ordinary project work или Product mutation без WPLAN.\n"
+        "из новой поставки действует только над замороженным Workspace без текущих записей, по точному разрешению владельца; "
+        "она не разрешает обычную проектную работу или изменение продукта без WPLAN.\n"
     ).encode("utf-8")
     system_form = _read_source_file(source, "templates/system.md").decode("utf-8")
     registry_marker = "registry:protected-surfaces\n"
@@ -706,24 +714,10 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         raise InspectionError("workspace-roadmap template contract mismatch")
     roadmap = roadmap_template.replace(
         road_separator,
-        road_separator + f"| WROAD-000001 | active | {wroad} | Owner planning: определить первый WBACK/WPLAN. |\n",
+        road_separator + f"| WROAD-000001 | active | {wroad} | Планирование владельцем: определить первый WBACK/WPLAN. |\n",
     ).replace("WS_<Slug>", f"WS_{slug}")
     backlog_template = _read_source_file(source, "templates/workspace-backlog.md").decode("utf-8")
-    old_route = """```text
-<WROAD> active
--> <WBACK> active
--> <WPLAN active|absent at non-executing checkpoint>
-```"""
-    new_route = """```text
-WROAD-000001 active
-active WBACK count 0
-active WPLAN count 0
-```
-
-NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
-    if backlog_template.count(old_route) != 1:
-        raise InspectionError("workspace-backlog template contract mismatch")
-    backlog = backlog_template.replace(old_route, new_route).replace("WS_<Slug>", f"WS_{slug}")
+    backlog = backlog_template.replace("WS_<Slug>", f"WS_{slug}")
     completed = _read_source_file(source, "templates/workspace-plan-completed-readme.md")
     files = {
         "README.md": readme,
@@ -732,61 +726,62 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
         "plans/roadmap.md": roadmap.encode("utf-8"),
         "plans/backlog.md": backlog.encode("utf-8"),
         "plans/completed/README.md": completed,
-        "logs/README.md": "# Журналы Workspace\n\nТипизированные записи ведутся append-only; Project Start не синтезирует owner acceptance.\n".encode("utf-8"),
+        "logs/README.md": "# Журналы Workspace\n\nТипизированные записи добавляются в конец; Project Start не создаёт принятие владельцем.\n".encode("utf-8"),
         "logs/decisions.md": "# Решения владельца\n\nProject Start не создаёт синтетического решения владельца.\n".encode("utf-8"),
         "logs/changes.md": (f"# Изменения Workspace\n\n- Project Start материализовал `WS_{slug}` из Harness `{version}`.\n").encode("utf-8"),
         "logs/quality.md": "# Качество Workspace\n\n- Начальная структурная проверка Project Start: PASS.\n- Product Acceptance: не выполнялась.\n".encode("utf-8"),
-        "logs/sessions.md": "# Сессии Workspace\n\n- Initial checkpoint: WROAD-000001-OWNER-PLANNING.\n".encode("utf-8"),
+        "logs/sessions.md": "# Сессии Workspace\n\nОтдельная запись нужна только для самостоятельного факта передачи или прерывания.\n".encode("utf-8"),
         "logs/risks.md": "# Риски Workspace\n\nТекущие риски не зарегистрированы.\n".encode("utf-8"),
-        "logs/terminology.md": "# Терминология Workspace\n\nБудущие изменения ведутся append-only.\n".encode("utf-8"),
-        "logs/history.md": "# История Workspace\n\nProject Start создал начальную composition Workspace.\n".encode("utf-8"),
-        "research/00-index.md": "# Исследования Workspace\n\nАктивные исследования отсутствуют. Следующий research ID: `01`.\n".encode("utf-8"),
-        "docs/README.md": "# Документация Workspace\n\n`docs/` хранит принадлежащие Workspace архитектурные, технические, терминологические и пользовательские документы. Документация продукта принадлежит Product root.\n".encode("utf-8"),
+        "logs/terminology.md": "# Терминология Workspace\n\nБудущие изменения добавляются в конец.\n".encode("utf-8"),
+        "logs/history.md": "# История Workspace\n\nProject Start создал начальный состав Workspace.\n".encode("utf-8"),
+        "research/00-index.md": "# Исследования Workspace\n\nАктивные исследования отсутствуют. Следующий ID исследования: `01`.\n".encode("utf-8"),
+        "docs/README.md": "# Документация Workspace\n\n`docs/` хранит принадлежащие Workspace архитектурные, технические, терминологические и пользовательские документы. Документация продукта принадлежит его корню.\n".encode("utf-8"),
         "docs/architecture/README.md": "# Архитектура Workspace\n\n- [architecture.md](architecture.md)\n- [domain-model.md](domain-model.md)\n- [project-profile.md](project-profile.md)\n".encode("utf-8"),
         "docs/architecture/architecture.md": (
             f"# Архитектура Workspace {slug}\n\n"
-            f"`WS_{slug}/` содержит Workspace Harness, root `{slug}.profile` и единственный Product root `{slug}/`. "
-            "Workspace управляет работой, а Product Unit остаётся самостоятельной delivery boundary и не хранит текущий маршрут.\n\n"
-            "Planning, logs и Workspace research принадлежат root Workspace. Product code, tests, docs и выбранная продуктом лицензия принадлежат Product root.\n"
+            f"`WS_{slug}/` содержит Workspace Harness, корневой `{slug}.profile` и единственный корень продукта `{slug}/`. "
+            "Workspace управляет работой, а Product Unit остаётся самостоятельной границей поставки и не хранит текущий маршрут.\n\n"
+            "Планы, журналы и внутренние исследования принадлежат корню Workspace. Код, тесты, документация и выбранная лицензия продукта принадлежат его корню.\n"
         ).encode("utf-8"),
         "docs/architecture/domain-model.md": (
             f"# Доменная модель Workspace {slug}\n\n"
-            f"- `Project Profile` — root `{slug}.profile`, machine owner composition и `sot_mode`.\n"
-            f"- `Product Unit` — самостоятельный продукт в fixed Product root `{slug}/`.\n"
-            "- `WROAD -> WBACK -> WPLAN` — Workspace-owned planning authority.\n"
-            "- `Product Part` — только явно объявленная optional часть; наличие каталога само по себе её не создаёт.\n\n"
-            "Authorization digest Project Start связывает одну exact materialization, но не является planning authority или owner acceptance.\n"
+            f"- `Project Profile` — корневой `{slug}.profile`, машинный источник состава проекта и `sot_mode`.\n"
+            f"- `Product Unit` — самостоятельный продукт в фиксированном корне `{slug}/`.\n"
+            "- `WROAD -> WBACK -> WPLAN` — принадлежащий Workspace контур управления работой.\n"
+            "- `Product Part` — только явно объявленная необязательная часть; наличие каталога само по себе её не создаёт.\n\n"
+            "Контрольная сумма разрешения Project Start определяет одно точное создание среды, но не даёт полномочий на проектную работу и не означает принятие владельцем.\n"
         ).encode("utf-8"),
         "docs/architecture/project-profile.md": (
             "# Project Profile и ввод-вывод Workspace\n\n"
-            f"Root `{slug}.profile` сериализован canonical owner `project_profile.py`; Slug выводится из filename stem. "
-            f"Fixed Product root и delivery boundary равны `{slug}/`.\n\n"
-            "Project Start создал minimal Profile с полями `schema_version`, `harness_version`, `sot_mode`, `display_name`; "
-            "optional `product_parts` и `product_native_checks` отсутствуют. Parsing Profile не исполняет Product code или declared commands.\n\n"
-            "Для actual-delta проверки caller до mutation получает complete TSV командой "
-            "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <external-manifest>`; "
-            "active WPLAN связывает exact CREATE/UPDATE/PRESERVE/REMOVE с фактическими path/type/content/POSIX-mode изменениями.\n"
+            f"Корневой `{slug}.profile` сериализован каноническим `project_profile.py`; Slug выводится из имени файла без расширения. "
+            f"Фиксированный корень продукта и граница поставки равны `{slug}/`.\n\n"
+            "Project Start создал минимальный Profile с полями `schema_version`, `harness_version`, `sot_mode`, `display_name`; "
+            "Необязательные `product_parts` и `product_native_checks` отсутствуют. Разбор Profile не исполняет код продукта или объявленные команды.\n\n"
+            "Полный идентификатор Harness и порядок его изменения определяет [SOP версий](../../sops/semver.md).\n\n"
+            "Для проверки фактических изменений вызывающая сторона заранее получает полный TSV командой "
+            "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <workspace-temp>/baseline.tsv`; "
+            "активный WPLAN связывает точные CREATE/UPDATE/REMOVE с фактическими изменениями путей, типов, содержимого и POSIX-прав.\n"
         ).encode("utf-8"),
-        "docs/technical/README.md": "# Техническая документация Workspace\n\nТехнические контракты этого каталога применяются через root WPLAN и не создают owner authority.\n".encode("utf-8"),
+        "docs/technical/README.md": "# Техническая документация Workspace\n\nТехнические контракты этого каталога применяются через корневой WPLAN и не создают полномочий владельца.\n".encode("utf-8"),
         "docs/terminology/README.md": "# Терминология Workspace\n\nКанонический словарь: [glossary.md](glossary.md).\n".encode("utf-8"),
         "docs/user/README.md": "# Пользовательская документация Workspace\n\n- [Первый старт](first-start.md)\n- [Режим источника истины](source-of-truth-mode.md)\n".encode("utf-8"),
         "docs/user/first-start.md": (
             f"# Первый старт Workspace {slug}\n\n"
-            f"Project Start завершён. Прочитайте root `README.md`, `AGENTS.md`, `SYSTEM.md`, `{slug}.profile` и `plans/`. "
-            "Текущий checkpoint — `WROAD-000001-OWNER-PLANNING`; первый WBACK/WPLAN требует отдельного решения владельца.\n"
-            "New Product создаёт пустой Product root; Existing Product переносит сам Product root. "
-            "Исторические материалы остаются внешними inputs первого research. "
+            f"Project Start завершён. Прочитайте корневые `README.md`, `AGENTS.md`, `SYSTEM.md`, `{slug}.profile` и `plans/`. "
+            "Текущая контрольная отметка — `WROAD-000001-OWNER-PLANNING`; первый WBACK/WPLAN требует отдельного решения владельца.\n"
+            "New Product создаёт пустой корень продукта; Existing Product переносит корень самого продукта. "
+            "Исторические материалы остаются внешними входными материалами первого исследования. "
             "[Выбор операции](README.md#как-выбрать) отделяет эти случаи от Workspace Update.\n"
         ).encode("utf-8"),
         "docs/user/source-of-truth-mode.md": (
             "# Режим источника истины\n\n"
-            f"Текущий устойчивый `sot_mode` Workspace хранится только в root `{slug}.profile`; начальное значение — `sot_files`. "
-            "Иной режим и любые Git/GitHub actions требуют отдельного owner-gated перехода.\n\n"
-            "SoT не разрешает реализацию, owner acceptance, Product Acceptance, release или closeout.\n"
+            f"Текущий устойчивый `sot_mode` Workspace хранится только в корневом `{slug}.profile`; начальное значение — `sot_files`. "
+            "Иной режим и любые действия Git/GitHub требуют отдельно разрешённого владельцем перехода.\n\n"
+            "SoT не разрешает реализацию, принятие владельцем, Product Acceptance, выпуск или завершение маршрута.\n"
         ).encode("utf-8"),
-        "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` read-only читает required evidence kind, owner-gate policy и exact required owner decision kind из одной transition row `docs/technical/phase-gates.md`; WPLAN хранит только projections, а gate name или generic positive record не заменяет canonical kind. Checker печатает complete baseline через `--print-baseline-manifest` и с optional `--baseline-manifest` проверяет actual delta без исполнения Product code. `tools/check_product.py` отдельно проверяет composition; native checks исполняются только с explicit option и positive timeout. Product behavior для immutable evidence запускается только в отдельной разрешённой копии; lifecycle `OD-*`, Product Acceptance и Release Authorization не объединяются.\n".encode("utf-8"),
-        "tools/README.md": "# Инструменты Workspace\n\n`project_profile.py` — canonical parser/serializer Project Profile. `check_workspace.py` проверяет `SDLC_TRANSITION: v1` и читает required evidence kind, owner-gate policy и exact required owner decision kind из одной transition row `docs/technical/phase-gates.md`; hidden transition-to-kind mapping и WPLAN gate-name override отсутствуют. Checker read-only печатает complete TSV через `--print-baseline-manifest` и принимает его через optional `--baseline-manifest`, не исполняя Product. `check_product.py` проверяет Product composition и запускает declared native checks только явно. Checker не вызывает другой checker автоматически и не принимает owner gate.\n".encode("utf-8"),
-        "tests/README.md": "# Тесты Workspace\n\n`test_project_profile.py` проверяет развёрнутый контракт Profile; `test_check_workspace.py` — neutral executable SDLC/authority/actual-delta fixtures. Product tests принадлежат Product root и не создаются Project Start.\n".encode("utf-8"),
+        "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` без записи проверяет короткий WORK_CONTRACT, условия действий и совместимость прежнего SDLC_TRANSITION по `docs/technical/phase-gates.md`. Результат задачи проверяется через --check-result, регистрация — через --registration-input; роль и PASS не создают полномочий. Инструмент выводит полную исходную базу через `--print-baseline-manifest`, а с `--baseline-manifest` проверяет фактические изменения без исполнения кода продукта. `tools/check_product.py` отдельно проверяет состав; проверки средствами продукта запускаются только с явной опцией и положительным временем ожидания. Поведение продукта для неизменяемых свидетельств проверяется только на отдельной разрешённой копии. Жизненные циклы `OD-*`, Product Acceptance и Release Authorization остаются раздельными.\n".encode("utf-8"),
+        "tools/README.md": _read_source_file(source, "tools/README.md"),
+        "tests/README.md": "# Тесты Workspace\n\n`test_project_profile.py` проверяет развёрнутый контракт Profile; `test_check_workspace.py` — нейтральные исполняемые заготовки для SDLC, полномочий и фактических изменений. Тесты продукта принадлежат его корню и не создаются Project Start.\n".encode("utf-8"),
     }
     # Generated instance navigation is separate from Product documentation.
     files["docs/README.md"] = (
@@ -820,14 +815,13 @@ NON_EXECUTING_CHECKPOINT: `WROAD-000001-OWNER-PLANNING`."""
         "- [Подготовка GitHub](github-repository-preparation.md).\n"
         "- [Обратная связь](feedback.md).\n"
         "\n## Как выбрать\n\n"
-        "Project Start — New Product создаёт новую среду с пустым Product root. "
-        "Project Start — Existing Product создаёт новую среду с точной копией реального Product root. "
+        "Project Start — New Product создаёт новую среду с пустым корнем продукта. "
+        "Project Start — Existing Product создаёт новую среду с точной копией реального корня продукта. "
         "Workspace Update обновляет Harness существующей среды, сохраняя Product, состояние проекта и историю.\n\n"
-        "Старый Workspace snapshot, research, logs, отчёты/чаты, .txt, .md, .pdf, .zip или .tar.gz "
+        "Старый снимок Workspace, исследования, журналы, отчёты, чаты и файлы .txt, .md, .pdf, .zip или .tar.gz "
         "не становятся Existing Product автоматически. Для новой разработки используйте New Product "
-        "и внешние reference materials первого research; старый Harness/history в Product root не импортируются. "
-        "Для TAS 0.0.2: New Product, старый TAS 0.0.1 как reference corpus. "
-        "Project Start запускается из исходной distribution, не из tools этого Workspace.\n"
+        "и внешние исходные материалы первого исследования; старый Harness и история в корень продукта не импортируются. "
+        "Project Start запускается из исходной поставки, а не из tools этого Workspace.\n"
     ).encode("utf-8")
     files["docs/technical/README.md"] = _read_source_file(source, "docs/technical/README.md")
     files["docs/user/source-of-truth-mode.md"] = _read_source_file(source, "docs/user/source-of-truth-mode.md")
@@ -1371,7 +1365,7 @@ def _verify_staging_representation(root: Path, payload: dict, *, final: bool = F
     if active:
         raise StagingError("Project Start must not create active WPLAN")
     planning_text = (root / "plans" / "roadmap.md").read_text(encoding="utf-8") + (root / "plans" / "backlog.md").read_text(encoding="utf-8")
-    if "WROAD-000001" not in planning_text or "WROAD-000001-OWNER-PLANNING" not in planning_text:
+    if not re.search(r"(?m)^\| WROAD-000001 \| active \|", planning_text):
         raise StagingError("WROAD-only planning state mismatch")
     if "WBACK-000001" in planning_text or "WPLAN-000001" in planning_text:
         raise StagingError("Project Start created forbidden WBACK/WPLAN")

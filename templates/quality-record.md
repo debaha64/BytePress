@@ -1,27 +1,17 @@
-# Запись качества
+# Форма технического результата
 
-Применение: [sops/record-quality.md](../sops/record-quality.md).
+Применение: [запись качества](../sops/record-quality.md). Раздел WPLAN либо запись у предметного владельца; отдельный файл не обязателен.
 
 ```text
-RECORD_ID: QUALITY-000001
-WPLAN_ID: <WPLAN-ID | none>
-EVIDENCE_KIND: <canonical required evidence kind | not-applicable>
-DATE: YYYY-MM-DD
-SUMMARY: <краткий факт>
+## RESULT-<ID>
+WPLAN_ID: <WPLAN-ID>
+VERDICT: <PASS | FAIL>
+CHECKS: <воспроизводимые команды или действия проверки>
+EXPECTED: <проверяемое ожидаемое поведение>
+ACTUAL: <наблюдение, количество тестов, отказы и пропуски>
 SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 ```
 
-- Факт/результат: {{summary}}
-- Изменённые поверхности: {{paths}}
-- Свидетельство: {{reference}}
-- Непроверенные области: {{limits}}
-- Следующий шаг: {{next}}
+Область и ограничения: <границы проверки, непроверенное и следующий вопрос владельца>.
 
-- Класс изменения и прослеживаемость: {{S0/S1/S2; REQ/INV/SCN}}
-- Verification: {{result/reference}}
-- Validation: {{status/reference}}
-- Product Acceptance: {{status/reference}}
-- Release Authorization: {{status/reference}}
-- GUI, если применим: {{визуальный результат либо ready-for-owner-check}}
-
-Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.
+`RESULT_REF: #RESULT-<ID>` ссылается на собственный раздел; для предметного результата используется полный путь относительно Workspace с якорем. Дополнительные SOURCE_REF, EVIDENCE_KIND, Validation или решения добавляются только при применимом факте. Полный результат в quality не дублируется.

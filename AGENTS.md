@@ -2,7 +2,7 @@
 
 ## Назначение
 
-Короткая карта агента для поставляемой BytePress Harness `0.5.3`. Этот каталог является статической Product Unit BytePress и не изображает уже инициализированный Workspace.
+Короткая карта агента для поставляемой BytePress Harness; версия — в `VERSION`. Этот каталог является статической Product Unit BytePress и не изображает уже инициализированный Workspace.
 
 ```text
 Человек управляет, агенты исполняют.
@@ -60,4 +60,4 @@ HARNESS_BLOCKER: <краткое описание>
 
 ## Feedback
 
-Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит records. Полномочия задаёт активный WPLAN.
+Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит записей. Полномочия задаёт активный WPLAN.

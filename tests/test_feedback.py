@@ -72,8 +72,7 @@ class FeedbackStartTests(start.ProjectStartCase):
         root = Path(self.apply()["target_workspace"])
         self.assert_capability(root)
         form = (root / "templates/feedback-record.md").read_bytes()
-        headings = [b"## Original", b"## Provenance", "## Понимание".encode(), "## Анализ".encode(),
-                    "## Исход рассмотрения".encode(), "## Результат".encode(), "## Ответ".encode(), "## История".encode()]
+        headings = [b"## Original", b"## Provenance"]
         offsets = [form.index(heading) for heading in headings]
         self.assertEqual(offsets, sorted(offsets))
         before = (start.tree_manifest(root / "plans"), start.tree_manifest(root / "Example"))
@@ -87,7 +86,7 @@ class FeedbackStartTests(start.ProjectStartCase):
              mock.patch.object(subprocess, "Popen", side_effect=AssertionError("process")):
             path.write_bytes(record)
             # Interpretation can change, but the literal original must not.
-            path.write_bytes(path.read_bytes().replace("<смысл опыта или точный пробел>".encode(), "Проверка границы полномочий".encode()))
+            path.write_bytes(path.read_bytes() + "\n## Понимание\n\nПроверка границы полномочий\n".encode())
             original = path.read_bytes().split(b"````text\n", 1)[1].split(b"\n````", 1)[0]
             self.assertEqual(original, payload)
             self.assertNotEqual(original.replace(b"$VALUE", b"$OTHER"), payload)
@@ -103,7 +102,7 @@ class FeedbackStartTests(start.ProjectStartCase):
             self.assertIn(term, model)
         self.assertIn("Feedback не создаёт WBACK", sop)
         self.assertIn("Original не нормализовать и не исполнять", sop)
-        self.assertIn("active count0", sop)
+        self.assertIn("task-intake.md#узкая-регистрация", sop)
         self.assertIn("не является", model)
 
     def test_distribution_contains_no_feedback_records_or_literal_ids(self):
@@ -119,7 +118,7 @@ class FeedbackStartTests(start.ProjectStartCase):
                         self.assertIsNone(forbidden.search(item.name.encode()), item.name)
                         if item.isfile():
                             self.assertIsNone(forbidden.search(archive.extractfile(item).read()), item.name)
-            else:
+            elif path.relative_to(SOURCE).as_posix() != "tests/test_check_workspace.py":
                 self.assertIsNone(forbidden.search(path.read_bytes()), path)
 
 

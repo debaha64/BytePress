@@ -36,7 +36,7 @@
 | `invariant:product-delivery` | Корень продукта и граница поставки совпадают с `<Slug>/` непосредственно в Workspace; Product Unit после поставки не зависит от Project Profile. |
 | `invariant:native-checks-declarative` | Разбор Project Profile, проверка Workspace и проверка состава продукта не исполняют `product_native_checks`; запуск принадлежит только явному режиму `check_product.py`. |
 | `invariant:sot-single-source` | Корневой Project Profile — единственный машинный источник состава и SoT Workspace; статическая поставка не содержит конфигурации развёрнутой среды. |
-| `invariant:sot-files-isolation` | `sot_files` не читает `.git` и не вызывает Git CLI. |
+| `invariant:sot-files-isolation` | Обычная проверка `sot_files` не читает `.git` и не вызывает Git CLI; полный резервный снимок сохраняет служебные данные по своему договору. |
 | `invariant:sot-git-current` | `sot_git` требует валидные `HEAD` и ветвь, чистое дерево и отсутствие удалённого репозитория. |
 | `invariant:sot-github-current` | `sot_github` проверяет только подготовленный локальный репозиторий, один `origin`, совпадающую идентичность, отслеживаемую ветвь и `origin/HEAD`. |
 | `invariant:canonical-product-identity` | Идентичность продукта принадлежит его документации и README; WPLAN Workspace может ссылаться на неё, но не дублирует владельца смысла. |
@@ -47,7 +47,7 @@
 | `invariant:role-coverage` | Каждая каноническая фаза имеет одну самостоятельную основную роль в `roles/`; один исполнитель может последовательно принимать несколько ролей. |
 | `invariant:skills-authority` | Agent Skill не расширяет полномочия WPLAN, SYSTEM или SOP; поставка BytePress содержит `0` собственных встроенных навыков. |
 | `invariant:sdd-tdd-rails` | `S0/S1/S2`, владение спецификацией, проверка DDD, `REQ/INV/SCN`, предварительное написание тестов, Impact Scan и Consistency Closure следуют `docs/technical/task-flow.md`; тесты и заготовки не создают полномочий владельца. |
-| `invariant:product-version` | `VERSION` — единственный машинный источник версии продукта BytePress; версия развёрнутого Harness, снимок, тег и Release имеют других владельцев смысла. |
+| `invariant:product-version` | `VERSION` — единственный машинный источник версии BytePress; процедурный договор — [SOP версий](sops/semver.md). |
 | `invariant:project-start-v1` | `tools/new_project.py` выполняет `preview` без записи и `apply` только с разрешением по контрольной сумме: создаёт отдельный `WS_<Slug>/`, минимальный профиль из четырёх полей, пустой либо только скопированный корень продукта и только `WROAD-000001`; исходная поставка и источник существующего продукта неизменны. |
 
 ## Машинная проекция фаз SDLC (`registry:sdlc-phases`)
@@ -109,7 +109,7 @@
 | `owner_decision`, `OD-*` | `WS_<Slug>/logs/decisions.md` | отдельное решение владельца |
 | `product_acceptance`, `PA-*` | `WS_<Slug>/logs/decisions.md` | отдельная продуктовая приёмка |
 
-Активный WPLAN Workspace хранит ссылки на записи, но не копирует их содержимое. Источник записи выбирается по [контракту источников](docs/technical/artifact-lifecycle.md#источники-свидетельств) и не зависит от agent client/runtime.
+Активный WPLAN Workspace хранит ссылки на записи, но не копирует их содержимое. Источник записи выбирается по [контракту источников](docs/technical/artifact-lifecycle.md#источники-свидетельств) и не зависит от клиента или среды исполнения агента.
 
 ## Состояние и поставка
 
@@ -156,19 +156,17 @@ WPLAN Workspace перечисляет точные разрешённые по�
 | продуктовая приёмка | `WS_<Slug>/logs/decisions.md` | `sops/verify-work.md` |
 | терминология | `docs/terminology/glossary.md` | `sops/terminology.md` |
 | Создание Workspace через Project Start | `docs/technical/project-start.md` | `tools/new_project.py`, `tests/test_new_project.py` |
-| рабочие инструменты | `tools/README.md` | `tools/check_workspace.py`, `tools/check_product.py`, `tools/bp_clean.py`, `tools/project_profile.py`, `tools/new_project.py` |
+| рабочие инструменты | `tools/README.md` | `tools/check_workspace.py`, `tools/check_product.py`, `tools/clean_product.py`, `tools/project_profile.py`, `tools/new_project.py` |
 | нормативные контракты проверки | соответствующие Markdown-владельцы | `tests/README.md`, `tests/test_harness.py`, `tests/test_project_profile.py`, `tests/test_new_project.py` |
 | SDD/TDD и владение спецификацией | `docs/technical/task-flow.md` | `templates/specification.md`, `docs/technical/testing.md`, `tests/test_harness.py` |
-| Версия продукта | `VERSION`, `docs/product/product-passport.md` | `tests/test_harness.py` |
+| Версия продукта | `VERSION`, [SOP версий](sops/semver.md) | `tests/test_harness.py` |
 
 README продукта прежде всего описывает сам продукт. Пользовательские документы продукта не хранят внутренние WROAD/WBACK/WPLAN, решения владельца или динамический статус Harness. Универсальный каталог исходного кода не предписывается.
 
 ## Исполнимый SDLC-инвариант
 
-После Project Start активный WPLAN хранит одну компактную запись `SDLC_TRANSITION: v1`: исходную и целевую фазы и роли, завершённость, ссылки на свидетельства, контрольную отметку, передачу результата, полномочия обеих ролей и независимые статусы точки решения владельца, Verification, Validation, Product Acceptance и Release Authorization. Универсальный инструмент Workspace сверяет запись с [phase-gates](docs/technical/phase-gates.md) и фактическими изменениями файловой системы; он не создаёт полномочия или решения.
-
-`ALLOWED_SURFACES` задаются точными `CREATE/UPDATE/REMOVE` с разрешёнными изменениями типа, режима доступа и содержимого; `PROTECTED_SURFACES` — `PRESERVE`. Полная исходная база, переданная вызывающей стороной, является входом проверки, а не новым владельцем смысла. Любое незаявленное изменение или изменение защищённой поверхности даёт FAIL без исправления.
+Новая форма `WORK_CONTRACT: v1` исполняет [рабочий договор](docs/technical/task-flow.md#рабочий-договор) и [условия действий](docs/technical/phase-gates.md#условия-действий). Прежняя форма читается совместимо без переписывания истории завершённых работ. Product, WPLAN и сессия не делят одно состояние. Точные CREATE/UPDATE/REMOVE ограничивают фактическую дельту сверху; обязательный результат проверяется отдельно. Защита SYSTEM, типы/права, неизменяемая история и запрет незаявленных операций сохраняются. Узкая регистрация — только по task-intake, без исполнения будущей задачи.
 
 ## Feedback в развёрнутом Workspace
 
-`feedback/` хранит пользовательский опыт и рассмотрение по [модели Feedback](docs/technical/feedback.md). В static distribution этого домена данных нет. Project Start создаёт пустую навигацию, Workspace Update сохраняет имеющиеся records. Планирование остаётся у `plans/`; Feedback не создаёт работу или owner authority.
+`feedback/` хранит пользовательский опыт и рассмотрение по [модели Feedback](docs/technical/feedback.md). В статической поставке этого домена данных нет. Project Start создаёт пустую навигацию, Workspace Update сохраняет имеющиеся записи. Планирование остаётся у `plans/`; Feedback не создаёт работу или полномочия владельца.

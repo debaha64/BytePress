@@ -12,11 +12,11 @@ Project Start создаёт отдельный Workspace из поставки 
 
 Новый корень продукта пуст. Существующий продукт копируется как непрозрачное содержимое обычных файлов с сохранением байтов, скрытых путей и POSIX-режимов доступа. Исключаются только точно разрешённые каталоги `.git`, действительные файлы gitfile и каталоги `.hg/.svn`. Другие типы объектов VCS, символические и жёсткие ссылки и специальные узлы дают отказ. Источники поставки и продукта неизменны; код, скрипты, хуки и действия менеджеров пакетов не запускаются.
 
-Созданный Project Profile содержит ровно `schema_version = 1`, `harness_version` из `VERSION`, `sot_mode = sot_files` и заданный владельцем `display_name`. Поля `product_parts` и `product_native_checks` отсутствуют. Плановый контур содержит только `WROAD-000001 active` и `WROAD-000001-OWNER-PLANNING`; WBACK/WPLAN, состояние Git/GitHub, приёмка и выпуск не создаются.
+Созданный Project Profile содержит ровно `schema_version = 1`, `harness_version` из `VERSION` по [SOP версий](../../sops/semver.md#развёрнутая-версия), `sot_mode = sot_files` и заданный владельцем `display_name`. Поля `product_parts` и `product_native_checks` отсутствуют. Плановый контур содержит только `WROAD-000001 active` и `WROAD-000001-OWNER-PLANNING`; WBACK/WPLAN, состояние Git/GitHub, приёмка и выпуск не создаются.
 
 ## Существующий продукт
 
-Вход `--existing-product` — корень самого продукта. Он копируется непосредственно в `<Slug>/`, без добавления ещё одного каталога с именем источника. Это сохраняет границу поставки, в том числе для TAS. Правила безопасности и исключения VCS выше одинаковы для верхнего и вложенного содержимого.
+Вход `--existing-product` — корень самого продукта. Он копируется непосредственно в `<Slug>/`, без добавления ещё одного каталога с именем источника. Это сохраняет границу поставки. Правила безопасности и исключения VCS выше одинаковы для верхнего и вложенного содержимого.
 
 ## Восстановление
 
@@ -30,12 +30,14 @@ Workspace README заканчивается полным текстом лице
 
 ## Защищённые поверхности нового Workspace
 
-Project Start материализует в generated `SYSTEM.md` canonical machine-readable `registry:protected-surfaces` по [форме SYSTEM](../../templates/system.md). В таблице `Path | Protection` Product root из Slug имеет policy `pre-implementation`, обязательные системные поверхности — `exact-wplan`. Checker читает единственный registry owner SYSTEM, проверяет обязательные уникальные bounded строки и применяет защиту Product к pre-implementation WPLAN. Нового config file и второго registry owner нет. Формы и инструмент генерации являются прямыми потребителями; созданный SYSTEM владеет реестром данного Workspace.
+Project Start создаёт в `SYSTEM.md` канонический машинный реестр `registry:protected-surfaces` по [форме SYSTEM](../../templates/system.md). В таблице `Path | Protection` корень продукта из Slug имеет политику `pre-implementation`, обязательные системные поверхности — `exact-wplan`. Проверяющий инструмент читает единственного владельца реестра SYSTEM, проверяет обязательные уникальные строки с точными границами и применяет защиту Product к WPLAN до реализации. Новый файл конфигурации и второй владелец реестра не вводятся. Формы и инструмент генерации являются прямыми потребителями; созданный SYSTEM владеет реестром данного Workspace.
 
-`REQ-BP-START-001`: New Product создаёт пустой Product root; Existing Product копирует реальный Product root с сохранением bytes/types/modes. Historical input corpus остаётся внешним входом первого research и автоматически не импортируется. [Выбор трёх операций](../user/README.md#как-выбрать) отделяет эти варианты от Workspace Update существующей среды.
+`REQ-BP-START-001`: New Product создаёт пустой корень продукта; Existing Product копирует реальный корень продукта с сохранением байтов, типов и прав. Исторические материалы остаются внешним входом первого исследования и автоматически не импортируется. [Выбор трёх операций](../user/README.md#как-выбрать) отделяет эти варианты от Workspace Update существующей среды.
 
 ## Feedback
 
-`FB-REQ-11` / `FB-SCN-11`: оба варианта Project Start копируют `docs/technical/feedback.md`, `docs/user/feedback.md`, `sops/feedback.md`, `templates/feedback-record.md` по фиксированному пофайловому manifest. Generated AGENTS/SYSTEM/README и пользовательский индекс дают ссылки на capability. Создаётся `feedback/README.md` только с навигацией ID/тема/ссылка, без records, состояния очереди и чужих данных. Каталог `feedback/` принадлежит Workspace; New Product остаётся пустым, Existing Product сохраняет opaque bytes/types/modes. Приём текста применяется по [SOP](../../sops/feedback.md) только в действующей рабочей границе; Project Start не создаёт Feedback records, WBACK или WPLAN.
+`FB-REQ-11` / `FB-SCN-11`: оба варианта Project Start копируют `docs/technical/feedback.md`, `docs/user/feedback.md`, `sops/feedback.md`, `templates/feedback-record.md` по фиксированному пофайловому манифесту. Создаваемые AGENTS/SYSTEM/README и пользовательский индекс дают ссылки на механизм. Создаётся `feedback/README.md` только с навигацией ID/тема/ссылка, без записей, состояния очереди и чужих данных. Каталог `feedback/` принадлежит Workspace; New Product остаётся пустым, Existing Product сохраняет непрозрачное содержимое, типы и права. Приём текста применяется по [SOP](../../sops/feedback.md) только в действующей рабочей границе; Project Start не создаёт записи Feedback, WBACK или WPLAN.
 
-[Workspace Update](../../sops/change-management.md#feedback-при-workspace-update) сохраняет existing feedback data и обновляет static/copied/generated contracts отдельно. Отсутствие Feedback directory в static distribution намеренно; новый Workspace получает механизм и пустой индекс, без пользовательского corpus.
+[Workspace Update](../../sops/change-management.md#feedback-при-workspace-update) сохраняет существующие данные Feedback и отдельно обновляет статические, копируемые и создаваемые договоры. Каталог данных Feedback намеренно отсутствует в статической поставке; новый Workspace получает механизм и пустой индекс без пользовательских материалов.
+
+[SOP версий](../../sops/semver.md) входит в фиксированный копируемый состав Project Start. Генератор сохраняет полный идентификатор Harness, а существующий продукт и его версию переносит без изменения.

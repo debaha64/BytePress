@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import argparse
 import hashlib
 import importlib.util
@@ -139,8 +141,23 @@ def _check_core(workspace: Path):
 
 
 def _active_ids(text: str, prefix: str):
-    pattern = re.compile(rf"(?m)^.*\b({prefix}-\d{{6}})\b.*\bactive\b.*$")
-    return set(pattern.findall(text))
+    ids = set()
+    for line in text.splitlines():
+        projection = re.fullmatch(rf"(?:->\s*)?({prefix}-\d{{6}})\s+active", line.strip())
+        if projection:
+            ids.add(projection.group(1))
+        if not line.startswith("|"):
+            continue
+        cells = [value.strip().strip("`") for value in line.strip().strip("|").split("|")]
+        if not cells or not re.fullmatch(rf"{prefix}-\d{{6}}", cells[0]):
+            continue
+        status_index = 2 if prefix == "WBACK" and len(cells) > 2 and re.fullmatch(r"WROAD-\d{6}", cells[1]) else 1
+        if len(cells) > status_index and cells[status_index] == "active":
+            ids.add(cells[0])
+    for record_id, block in re.findall(rf"(?ms)^## ({prefix}-\d{{6}})\s*\n(.*?)(?=^## |\Z)", text):
+        if _line_value(block, "Статус") == "active":
+            ids.add(record_id)
+    return ids
 
 
 def _field(text: str, label: str):
@@ -292,7 +309,7 @@ def _owner_decision_record(
 ) -> dict[str, str]:
     plan_id = _single_field(text, "WPLAN ID")
     plan_back = _single_field(text, "WBACK")
-    if reference not in _owner_decision_refs(text):
+    if _field(text, "WORK_CONTRACT") is None and reference not in _owner_decision_refs(text):
         raise ContractError("owner decision must be projected by OWNER_DECISION_REFS")
     record = _record_by_id(workspace, reference)
     expected = {
@@ -313,8 +330,6 @@ def _owner_decision_record(
 
 
 def _implementation_authority(workspace: Path, text: str, authority_ref: str) -> dict[str, str]:
-    if _line_value(text, "ALLOWED_SURFACES") == "none":
-        raise ContractError("implementation authority requires non-empty ALLOWED_SURFACES")
     record = _owner_decision_record(workspace, text, authority_ref, "implementation")
     if record.get("EVIDENCE_REF") != _line_value(text, "INTERVIEW_EVIDENCE_REF"):
         raise ContractError("AUTHORITY_REF EVIDENCE_REF mismatch")
@@ -330,7 +345,9 @@ def _reference_evidence_fields(workspace: Path, reference: str) -> dict[str, str
     matches = []
     token_pattern = re.compile(rf"(?<![A-Za-z0-9_-]){re.escape(token)}(?![A-Za-z0-9_-])")
     for block in re.split(r"\n\s*\n", text):
-        if token_pattern.search(block):
+        # Ссылка на собственный итог не является самим блоком результата.
+        candidate = re.sub(r"(?m)^[A-Z_]*REFS?:.*$", "", block)
+        if token_pattern.search(candidate):
             matches.append(_machine_fields(block))
     if len(matches) != 1:
         raise ContractError(f"EVIDENCE_REFS token must resolve to one structured evidence block: {reference}")
@@ -431,11 +448,147 @@ def _status_reference(workspace: Path, values: dict[str, str], prefix: str, inac
         _scoped_marker_reference(workspace, reference, plan_id, "RELEASE_AUTHORIZATION", status)
 
 
-def _check_sdlc_transition(workspace: Path):
-    plans = _raw_sorted((workspace / "plans/active").glob("WPLAN-*.md"))
+def _check_work_contract(workspace: Path, plan_path: Path):
+    text = plan_path.read_text(encoding="utf-8")
+    if _single_field(text, "WORK_CONTRACT") != "v1":
+        raise ContractError("unsupported WORK_CONTRACT")
+    for label in ("Цель", "OWNER_REQUEST", "Текущая контрольная отметка"):
+        value = _line_value(text, label)
+        if not value.strip() or value in {"none", "pending"} or "<" in value:
+            raise ContractError(f"work contract requires concrete {label}")
+    if _single_field(text, "Статус") not in {"active", "completed"}:
+        raise ContractError("invalid WPLAN status")
+    action = _single_field(text, "ACTION")
+    policy_text = (workspace / "docs/technical/phase-gates.md").read_text(encoding="utf-8")
+    rows = re.findall(r"(?m)^\| `([a-z][a-z-]*)` \| `(none|implementation|product_acceptance|release_authorization|decommissioning_authorization|retirement_authorization)` \|$", policy_text)
+    policy = dict(rows)
+    if len(policy) != len(rows):
+        raise ContractError("duplicate action condition")
+    if action not in policy:
+        raise ContractError("ACTION missing from action conditions")
+    required = policy[action]
+    if required in {"implementation", "decommissioning_authorization", "retirement_authorization"}:
+        reference = _single_field(text, "AUTHORITY_REF")
+        _owner_decision_record(workspace, text, reference, required)
+    elif required == "release_authorization":
+        _scoped_marker_reference(workspace, _single_field(text, "AUTHORITY_REF"),
+                                 _single_field(text, "WPLAN ID"), "RELEASE_AUTHORIZATION", "authorized")
+    elif required == "product_acceptance":
+        _product_acceptance_record(workspace, _single_field(text, "AUTHORITY_REF"), "accepted")
+    elif _field(text, "AUTHORITY_REF") not in {None, "", "none"}:
+        raise ContractError("ACTION does not consume implementation authority")
+    declarations = _plan_surface_declarations(workspace, plan_path)
+    if not any(declarations.get(a) for a in ("CREATE", "UPDATE", "REMOVE")):
+        raise ContractError("WPLAN requires exact mutation permissions")
+    # Optional projections are checked if present; a PASS or role is never authority.
+    for prefix, inactive, active in (
+        ("VERIFICATION", {"pending", "unverified"}, {"pass", "fail"}),
+        ("VALIDATION", {"not-performed"}, {"pass", "fail"}),
+        ("PRODUCT_ACCEPTANCE", {"not-performed"}, {"accepted", "rejected"}),
+        ("RELEASE_AUTHORIZATION", {"not-performed"}, {"authorized", "denied"}),
+    ):
+        if _field(text, prefix + "_STATUS") is not None:
+            values = {prefix + "_STATUS": _single_field(text, prefix + "_STATUS"),
+                      prefix + "_REF": _single_field(text, prefix + "_REF")}
+            _status_reference(workspace, values, prefix, inactive, active, _single_field(text, "WPLAN ID"))
+    if _single_field(text, "Статус") == "completed":
+        _check_task_result(workspace, plan_path)
+    return {"contract": "v1", "action": action}
+
+
+def _result_basis(workspace: Path, reference: str, evidence: dict[str, str]):
+    """Проверяет наличие основания; достоверность наблюдений оценивает проверяющий."""
+    markers = {"", "pass", "fail", "none", "pending", "true", "not-applicable", "not-performed"}
+    keys = ("CHECKS", "EXPECTED", "ACTUAL")
+    if any(key in evidence for key in keys):
+        if not all(evidence.get(key, "").strip().lower() not in markers for key in keys):
+            raise ContractError("task result requires checks, expected and actual observations")
+        return
+    # Совместимость с прежними подробными записями: основание находится в
+    # разделе указанного результата, а не в произвольном PASS всего файла.
+    relative, _, token = reference.partition("#")
+    text = (workspace / relative).read_text(encoding="utf-8")
+    heading = re.search(rf"(?m)^(#{{1,6}}) [^\n]*{re.escape(token)}[^\n]*$", text)
+    if heading:
+        section = text[heading.end():]
+        boundary = re.search(rf"(?m)^#{{1,{len(heading[1])}}} ", section)
+        if boundary: section = section[:boundary.start()]
+        prose = re.sub(r"(?m)^[A-Z_]+:.*$", "", section).strip()
+        # Исторические записи содержат команды/измерения либо ссылку на
+        # подробное свидетельство. Одних типизированных полей недостаточно.
+        links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", prose)
+        local = [link.split('#', 1)[0] for link in links if not re.match(r"[a-z]+:", link)]
+        has_source = False
+        for value in local:
+            candidate = (workspace / relative).parent.joinpath(value)
+            if not value or not candidate.is_file() or candidate.resolve() == (workspace / relative).resolve():
+                continue
+            try:
+                candidate.resolve().relative_to(workspace)
+                body = candidate.read_text(encoding="utf-8").strip()
+            except (OSError, ValueError):
+                continue
+            words = set(re.findall(r"[\w-]+", body.lower()))
+            if words and not words.issubset(markers):
+                has_source = True
+        has_measurement = bool(re.search(r"(?:[0-9]+/[0-9]+|python3? .{4,}|Ran [0-9]+ tests)", prose))
+        if len(prose) >= 80 and (has_source or has_measurement):
+            return
+    raise ContractError("task result has no sufficient verification basis")
+
+
+def _check_task_result(workspace: Path, plan_path: Path | None = None):
+    plans = [plan_path] if plan_path else _active_plan_paths(workspace)
     if not plans:
         return "NOT_APPLICABLE"
     text = plans[0].read_text(encoding="utf-8")
+    sections = re.findall(r"(?ms)^### REQUIRED\s*\n(.*?)(?=^#{1,3} |\Z)", text)
+    if len(sections) > 1:
+        raise ContractError("duplicate REQUIRED result section")
+    checked = 0
+    for section in sections:
+        for line in section.splitlines():
+            if not line.strip():
+                continue
+            match = re.fullmatch(r"\d+\. `([^`]+)` — `(absent|file:0[0-7]{3}|directory:0[0-7]{3}|sha256:[0-9a-f]{64})`\.", line)
+            if not match:
+                raise ContractError("invalid REQUIRED result assertion")
+            relative, expected = match.groups()
+            node = workspace.joinpath(*_declared_path(relative).parts)
+            if expected == "absent":
+                if node.exists() or node.is_symlink():
+                    raise ContractError(f"required absence not achieved: {relative}")
+            else:
+                kind, value = expected.split(":", 1)
+                _regular(node, "d" if kind == "directory" else "f", relative)
+                if kind == "sha256":
+                    satisfied = _sha(node) == value
+                else:
+                    satisfied = stat.S_IMODE(node.stat().st_mode) == int(value, 8)
+                if not satisfied:
+                    raise ContractError(f"required result mismatch: {relative}")
+            checked += 1
+    if _field(text, "WORK_CONTRACT"):
+        sections = re.findall(r"(?ms)^## Обязательный результат\s*\n(.*?)(?=^#{1,2} |\Z)", text)
+        if len(sections) != 1 or not re.search(r"(?m)^- \[x\] .+", sections[0]) or re.search(r"(?m)^- \[ \]", sections[0]):
+            raise ContractError("mandatory task result is not complete")
+        reference = _single_field(text, "RESULT_REF")
+        if reference.startswith("#"):
+            reference = plans[0].relative_to(workspace).as_posix() + reference
+        evidence = _reference_evidence_fields(workspace, reference)
+        if evidence.get("WPLAN_ID") != _single_field(text, "WPLAN ID") or evidence.get("VERDICT") != "PASS":
+            raise ContractError("task result evidence scope/verdict mismatch")
+        _result_basis(workspace, reference, evidence)
+    return {"assertions": checked}
+
+
+def _check_sdlc_transition(workspace: Path, plan_path: Path | None = None):
+    plans = [plan_path] if plan_path is not None else _active_plan_paths(workspace)
+    if not plans:
+        return "NOT_APPLICABLE"
+    text = plans[0].read_text(encoding="utf-8")
+    if _field(text, "WORK_CONTRACT") is not None:
+        return _check_work_contract(workspace, plans[0])
     values = {field: _single_field(text, field) for field in TRANSITION_FIELDS}
     if values["SDLC_TRANSITION"] != "v1":
         raise ContractError("unsupported SDLC_TRANSITION")
@@ -466,11 +619,9 @@ def _check_sdlc_transition(workspace: Path):
     if values["TRANSITION_CHECKPOINT"] != plan_checkpoint:
         raise ContractError("transition checkpoint mismatch")
     # Work scope and the decision required by this transition have separate owners.
-    raw_surfaces = _line_value(text, "ALLOWED_SURFACES")
-    if raw_surfaces == "none":
-        raise ContractError("active WPLAN requires non-empty ALLOWED_SURFACES")
-    for surface in raw_surfaces.split(","):
-        _declared_path(surface.strip())
+    declarations = _plan_surface_declarations(workspace, plans[0])
+    if not any(declarations.get(action) for action in ("CREATE", "UPDATE", "REMOVE")):
+        raise ContractError("WPLAN requires non-empty CREATE/UPDATE/REMOVE mutation surfaces")
     _owner_decision_refs(text)
     implementation_work = source == "implementation"
     implementation_gate = required_decision_kind == "implementation" and values["OWNER_GATE_STATUS"] == "satisfied"
@@ -604,31 +755,32 @@ def _check_route(workspace: Path):
     if len(plans) > 1:
         raise ContractError(f"active WPLAN count > 1: {len(plans)}")
     declared_counts = re.findall(r"(?m)^active WPLAN count\s+(\d+)\s*$", backlog)
-    if declared_counts != [str(len(plans))]:
+    if declared_counts and declared_counts != [str(len(plans))]:
         raise ContractError("active WPLAN count projection mismatch")
     nonexecuting = _checkpoint_values(backlog, "NON_EXECUTING_CHECKPOINT")
     current = _checkpoint_values(backlog, "CHECKPOINT")
     if not plans:
-        if len(nonexecuting) != 1 or current:
+        if len(nonexecuting) > 1 or current:
             raise ContractError("нулевой active WPLAN требует одну non-executing checkpoint")
-        return {"active_wplan_count": 0, "checkpoint": nonexecuting[0]}
-    if nonexecuting or len(current) != 1:
-        raise ContractError("active WPLAN требует одну executing checkpoint")
+        return {"active_wplan_count": 0, "checkpoint": nonexecuting[0] if nonexecuting else None}
     path = plans[0]
     text = path.read_text(encoding="utf-8")
+    short = _field(text, "WORK_CONTRACT") is not None
+    if nonexecuting or (not short and len(current) != 1) or len(current) > 1:
+        raise ContractError("active WPLAN требует одну executing checkpoint")
     plan_id = _field(text, "WPLAN ID")
     road_id = _field(text, "WROAD")
     back_id = _field(text, "WBACK")
-    plan_checkpoint = _field(text, "Текущая контрольная отметка")
+    plan_checkpoint = _line_value(text, "Текущая контрольная отметка") if short else _field(text, "Текущая контрольная отметка")
     if not plan_id or not path.name.startswith(plan_id + "-"):
         raise ContractError("active WPLAN filename/ID mismatch")
     if road_id not in road_ids:
         raise ContractError("active WPLAN WROAD mismatch")
     if back_id not in _active_ids(backlog, "WBACK"):
         raise ContractError("active WPLAN WBACK mismatch")
-    if plan_checkpoint != current[0]:
+    if current and plan_checkpoint != current[0]:
         raise ContractError("active WPLAN checkpoint mismatch")
-    return {"active_wplan_count": 1, "checkpoint": current[0], "wplan": plan_id}
+    return {"active_wplan_count": 1, "checkpoint": plan_checkpoint, "wplan": plan_id}
 
 
 def _declared_path(value: str) -> PurePosixPath:
@@ -646,11 +798,22 @@ def _declared_path(value: str) -> PurePosixPath:
     return path
 
 
-def _plan_surface_declarations(workspace: Path):
+def _active_plan_paths(workspace: Path):
     plans = _raw_sorted((workspace / "plans/active").glob("WPLAN-*.md"))
+    if len(plans) > 1:
+        raise ContractError("ambiguous active WPLAN declaration owner")
+    return plans
+
+
+def _plan_surface_declarations(workspace: Path, plan_path: Path | None = None):
+    plans = [plan_path] if plan_path is not None else _active_plan_paths(workspace)
     if not plans:
         return None
+    _regular(plans[0], "f", "WPLAN declaration owner")
     text = plans[0].read_text(encoding="utf-8")
+    plan_id = _single_field(text, "WPLAN ID")
+    if not re.fullmatch(r"WPLAN-\d{6}", plan_id) or not plans[0].name.startswith(plan_id + "-"):
+        raise ContractError("WPLAN declaration owner filename/ID mismatch")
     declarations = {}
     lines = text.splitlines()
     index = 0
@@ -662,7 +825,13 @@ def _plan_surface_declarations(workspace: Path):
         if not heading:
             index += 1
             continue
-        action, declared_count = heading.groups()
+        action, _legacy_count = heading.groups()
+        # Legacy PRESERVE is accepted as historical text, never mutation authority.
+        if action == "PRESERVE":
+            index += 1
+            while index < len(lines) and not re.match(r"^#{1,3}\s+", lines[index]):
+                index += 1
+            continue
         if action in declarations:
             raise ContractError(f"duplicate plan surface section: {action}")
         rows = []
@@ -671,6 +840,8 @@ def _plan_surface_declarations(workspace: Path):
             row = re.match(r"^\d+\.\s+`([^`]+)`(?:\s+[—-]\s+`([^`]+)`)?", lines[index])
             if row:
                 raw, contract = row.groups()
+                if raw.endswith("/**"):
+                    raise ContractError(f"{action} requires exact path: {raw}")
                 rows.append({
                     "path": _declared_path(raw),
                     "tree": raw.endswith("/**"),
@@ -678,8 +849,6 @@ def _plan_surface_declarations(workspace: Path):
                     "raw": raw,
                 })
             index += 1
-        if declared_count is not None and len(rows) != int(declared_count):
-            raise ContractError(f"{action} declared count mismatch")
         if len({(row["path"], row["tree"]) for row in rows}) != len(rows):
             raise ContractError(f"duplicate path in {action}")
         declarations[action] = rows
@@ -700,7 +869,7 @@ def _plan_surface_declarations(workspace: Path):
 
 
 
-def _check_protected_surfaces(workspace: Path, product_name: str):
+def _check_protected_surfaces(workspace: Path, product_name: str, plan_path: Path | None = None):
     text = (workspace / "SYSTEM.md").read_text(encoding="utf-8")
     sections = re.split(r"(?m)^registry:protected-surfaces\s*$", text)
     if len(sections) != 2:
@@ -723,19 +892,22 @@ def _check_protected_surfaces(workspace: Path, product_name: str):
                      ("AGENTS.md", "SYSTEM.md", "sops/**", "roles/**", "skills/**", "templates/**", "tools/**")})
     if any(rows.get(path) != policy for path, policy in required.items()):
         raise ContractError("protected-surfaces registry missing required path/policy")
-    plans = _raw_sorted((workspace / "plans/active").glob("WPLAN-*.md"))
+    plans = [plan_path] if plan_path is not None else _active_plan_paths(workspace)
     if plans:
         plan = plans[0].read_text(encoding="utf-8")
         phases = [phase for phase, _role in _phase_role_projection(workspace)]
-        source = _single_field(plan, "FROM_PHASE")
+        short = _field(plan, "WORK_CONTRACT") is not None
+        source = _single_field(plan, "ACTION" if short else "FROM_PHASE")
         # Completed approval hands Product work to implementation only after its owner gate.
-        entered = (source == "approval" and _single_field(plan, "TO_PHASE") == "implementation"
+        entered = (not short and source == "approval" and _single_field(plan, "TO_PHASE") == "implementation"
                    and _single_field(plan, "TRANSITION_STATE") == "complete"
                    and _single_field(plan, "OWNER_GATE_STATUS") == "satisfied")
-        if source in phases and phases.index(source) < phases.index("implementation") and not entered:
-            surfaces = [value.strip() for value in _line_value(plan, "ALLOWED_SURFACES").split(",") if value != "none"]
-            declarations = _plan_surface_declarations(workspace) or {}
-            surfaces.extend(row["raw"] for action in ("CREATE", "UPDATE", "REMOVE") for row in declarations.get(action, []))
+        # Вид и область решения отдельно проверяются контрактом действия.
+        protected_work = (source not in {"implementation", "decommissioning", "retired"} if short
+                          else source in phases and phases.index(source) < phases.index("implementation") and not entered)
+        if protected_work:
+            declarations = _plan_surface_declarations(workspace, plans[0]) or {}
+            surfaces = [row["raw"] for action in ("CREATE", "UPDATE", "REMOVE") for row in declarations.get(action, [])]
             for surface in surfaces:
                 path = _declared_path(surface)
                 for protected, policy in rows.items():
@@ -850,13 +1022,131 @@ def _actual_update_aspects(before, after):
     return aspects
 
 
-def check_actual_delta(workspace: Path, baseline_manifest: Path):
+def _delta_declaration_owner(workspace: Path, baseline, current):
+    plans = _active_plan_paths(workspace)
+    if plans:
+        return plans[0]
+    baseline_plans = [relative for relative in baseline
+                      if PurePosixPath(relative).parent == PurePosixPath("plans/active")
+                      and PurePosixPath(relative).match("WPLAN-*.md")]
+    if len(baseline_plans) > 1:
+        raise ContractError("ambiguous closing WPLAN declaration owner in complete baseline")
+    if not baseline_plans:
+        if baseline == current:
+            return None
+        raise ContractError("non-zero actual delta has no active or baseline closing WPLAN declaration owner")
+    relative = baseline_plans[0]
+    name = PurePosixPath(relative).name
+    if baseline[relative][0] != "f" or not re.fullmatch(r"WPLAN-\d{6}-.+\.md", name):
+        raise ContractError("invalid baseline active WPLAN identity/type")
+    completed = workspace / "plans/completed" / name
+    _regular(completed, "f", "same-ID/same-basename completed WPLAN")
+    text = completed.read_text(encoding="utf-8")
+    if _single_field(text, "WPLAN ID") != name[:12] or _single_field(text, "Статус") != "completed":
+        raise ContractError("closing WPLAN identity/status mismatch")
+    return completed
+
+
+def _registration_delta(workspace: Path, baseline, current, inputs):
+    virtual = dict(current)
+    accepted = []
+    new_feedback_directory = False
+    for request_path in reversed(inputs or []):
+        _regular(Path(request_path), "f", "registration input")
+        request = json.loads(Path(request_path).read_text(encoding="utf-8"))
+        if not isinstance(request, dict):
+            raise ContractError("registration input must be a JSON object")
+        for key in ("kind", "id", "owner_request", "source"):
+            value = request.get(key)
+            if not isinstance(value, str) or not value.strip() or any(c in value for c in "\r\n"):
+                raise ContractError(f"registration requires single-line {key}")
+        record_id, kind = request["id"], request["kind"]
+        if record_id in accepted:
+            raise ContractError("registration ID conflict")
+        if kind == "backlog":
+            if not re.fullmatch(r"WBACK-\d{6}", record_id):
+                raise ContractError("invalid registration WBACK ID")
+            try:
+                before = base64.b64decode(request["before_base64"], validate=True)
+            except (KeyError, ValueError, binascii.Error) as error:
+                raise ContractError("registration requires original bytes") from error
+            if hashlib.sha256(before).hexdigest() != request.get("expected_sha256"):
+                raise ContractError("stale registration revision")
+            old = before.decode("utf-8")
+            if re.search(r"(?<![A-Z0-9-])" + re.escape(record_id) + r"(?![A-Z0-9-])", old):
+                raise ContractError("registration ID conflict")
+            for key in ("wroad", "result"):
+                value = request.get(key)
+                if not isinstance(value, str) or not value.strip() or any(c in value for c in "\r\n"):
+                    raise ContractError(f"registration requires single-line {key}")
+            if request["wroad"] not in _active_ids((workspace / "plans/roadmap.md").read_text(), "WROAD"):
+                raise ContractError("registration WROAD mismatch")
+            suffix = (f"\n## {record_id}\n\nWROAD: {request['wroad']}\nСтатус: pending\n"
+                      f"Источник: {request['source']}\nЗапрос владельца: {request['owner_request']}\n"
+                      f"Результат: {request['result']}\n").encode("utf-8")
+            relative = "plans/backlog.md"
+            expected = ("f", baseline[relative][1], hashlib.sha256(before + suffix).hexdigest())
+            if virtual.get(relative) != expected:
+                raise ContractError("registration changed previous content/route, type/mode or is incomplete")
+            virtual[relative] = ("f", expected[1], hashlib.sha256(before).hexdigest())
+        elif kind == "feedback":
+            if not re.fullmatch(r"FB-\d{6}", record_id):
+                raise ContractError("invalid registration Feedback ID")
+            relative = f"feedback/{record_id}.md"
+            if relative in baseline:
+                raise ContractError("registration ID conflict")
+            original, date = request.get("original"), request.get("recorded_at")
+            if not isinstance(original, str) or not original or not isinstance(date, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+                raise ContractError("Feedback requires original and recorded_at")
+            fence = "`" * max(4, 1 + max((len(x) for x in re.findall(r"`+", original)), default=0))
+            payload = (f"# {record_id}\n\nID: {record_id}\nrecorded_at: {date}\nstate: open\n"
+                       f"Источник: {request['source']}\nЗапрос владельца: {request['owner_request']}\n\n"
+                       f"## Original\n\n{fence}text\n{original}\n{fence}\n").encode("utf-8")
+            if virtual.get(relative) != ("f", 0o644, hashlib.sha256(payload).hexdigest()):
+                raise ContractError("Feedback differs from exact original registration")
+            del virtual[relative]
+            if "feedback" not in baseline:
+                new_feedback_directory = True
+        else:
+            raise ContractError("unsupported registration kind")
+        accepted.append(record_id)
+    if new_feedback_directory:
+        # Общий каталог принадлежит всей последовательности регистраций.
+        if virtual.get("feedback") != ("d", 0o755, "-"):
+            raise ContractError("invalid Feedback directory")
+        del virtual["feedback"]
+    return virtual, list(reversed(accepted))
+
+
+def check_actual_delta(workspace: Path, baseline_manifest: Path, registration_inputs=None):
     workspace = workspace.resolve(strict=True)
-    declarations = _plan_surface_declarations(workspace)
-    if not declarations:
-        raise ContractError("actual delta requires active WPLAN CREATE/UPDATE/PRESERVE/REMOVE declarations")
     baseline = _load_baseline_manifest(workspace, Path(baseline_manifest))
     current = _filesystem_manifest(workspace)
+    _active_plan_paths(workspace)
+    total = {
+        "CREATE": len(set(current) - set(baseline)),
+        "REMOVE": len(set(baseline) - set(current)),
+        "UPDATE": sum(baseline[p] != current[p] for p in set(baseline) & set(current)),
+    }
+    current, registrations = _registration_delta(workspace, baseline, current, registration_inputs)
+    owner = _delta_declaration_owner(workspace, baseline, current)
+    if owner is None:
+        return {**total, "primary_delta": {"CREATE": 0, "UPDATE": 0, "REMOVE": 0}, "registrations": registrations}
+    declarations = _plan_surface_declarations(workspace, owner)
+    if not declarations:
+        raise ContractError("actual delta requires WPLAN CREATE/UPDATE/REMOVE declarations")
+    for action, rows in declarations.items():
+        for row in rows:
+            contract = row["contract"] or ""
+            valid = (bool(re.fullmatch(r"(?:file|directory):0[0-7]{3}", contract)) if action == "CREATE"
+                     else contract in {"file", "directory"} if action == "REMOVE"
+                     else bool(contract) and set(contract.split(",")) <= {"content", "mode", "type"})
+            if not valid:
+                raise ContractError(f"invalid {action} capability contract: {row['raw']}")
+    # Closing must retain the same phase/authority and Product protection checks.
+    _check_sdlc_transition(workspace, owner)
+    profile, _profile_path, _product = _discover_profile(workspace, _load_profile_module(workspace))
+    _check_protected_surfaces(workspace, profile.slug, owner)
     actual = {
         "CREATE": sorted(set(current) - set(baseline), key=lambda value: value.encode("utf-8")),
         "REMOVE": sorted(set(baseline) - set(current), key=lambda value: value.encode("utf-8")),
@@ -890,24 +1180,13 @@ def check_actual_delta(workspace: Path, baseline_manifest: Path):
                 aspects = _actual_update_aspects(baseline[relative], current[relative])
                 if not aspects or not aspects <= allowed:
                     raise ContractError(f"UPDATE type/mode/content outside contract: {relative}")
-    for action in ("CREATE", "UPDATE", "REMOVE"):
-        rows = declarations.get(action, [])
-        if hits[action] != set(range(len(rows))):
-            raise ContractError(f"declared {action} has no matching actual delta")
+    result = {**total, "primary_delta": {action: len(actual[action]) for action in ("CREATE", "UPDATE", "REMOVE")}}
+    result["unused_permissions"] = {action: [row["raw"] for index, row in enumerate(declarations.get(action, []))
+                                             if index not in hits[action]] for action in hits}
+    if registrations:
+        result["registrations"] = registrations
+    return result
 
-    union = set(baseline) | set(current)
-    preserve_rows = declarations.get("PRESERVE", [])
-    for row in preserve_rows:
-        covered = [relative for relative in union if _surface_covers(row, relative)]
-        if not covered:
-            raise ContractError(f"protected surface absent from complete baseline/current: {row['raw']}")
-        changed = [relative for relative in covered if baseline.get(relative) != current.get(relative)]
-        if changed:
-            raise ContractError(f"protected surface changed: {row['raw']}: {changed[:5]}")
-    return {
-        "CREATE": len(actual["CREATE"]), "UPDATE": len(actual["UPDATE"]),
-        "REMOVE": len(actual["REMOVE"]), "PROTECTED": len(preserve_rows),
-    }
 
 
 def _git(workspace: Path, *arguments):
@@ -1091,16 +1370,20 @@ def _markdown_targets(text: str):
 
 
 def _excluded(relative: PurePosixPath, product_name: str):
-    prefixes = (product_name, *SERVICE_NAMES, "plans/completed", "research/archives")
+    prefixes = (product_name, *SERVICE_NAMES, "temp", "plans/completed", "research/archives")
     return any(relative.parts[:len(PurePosixPath(value).parts)] == PurePosixPath(value).parts for value in prefixes)
 
 
 def _check_links(workspace: Path, product_name: str):
     issues = []
-    for path in workspace.rglob("*.md"):
+    paths = []
+    for current, directories, files in os.walk(workspace, followlinks=False):
+        base = Path(current)
+        directories[:] = [name for name in directories
+                          if not _excluded(PurePosixPath((base / name).relative_to(workspace).as_posix()), product_name)]
+        paths.extend(base / name for name in files if name.endswith(".md"))
+    for path in paths:
         relative = PurePosixPath(path.relative_to(workspace).as_posix())
-        if _excluded(relative, product_name):
-            continue
         for target in _markdown_targets(path.read_text(encoding="utf-8")):
             if not target or target.startswith(("http://", "https://", "mailto:", "codexlog:")):
                 continue
@@ -1178,7 +1461,7 @@ def check_preservation_manifest(workspace: Path, manifest: Path):
             raise ContractError(f"content mismatch: {relative}")
 
 
-def inspect_workspace(workspace_value, preservation_manifest=None, baseline_manifest=None):
+def inspect_workspace(workspace_value, preservation_manifest=None, baseline_manifest=None, registration_inputs=None, check_result=False):
     workspace = _workspace_root(workspace_value)
     module = _load_profile_module(workspace)
     checks = []
@@ -1207,6 +1490,8 @@ def inspect_workspace(workspace_value, preservation_manifest=None, baseline_mani
         checks.append({"id": "checkpoint", "status": "PASS"})
     perform("sdlc-transition", lambda: _check_sdlc_transition(workspace))
     perform("plan-surfaces", lambda: _check_plan_surfaces(workspace))
+    if check_result:
+        perform("task-result", lambda: _check_task_result(workspace))
     perform("documentation-impact", lambda: _check_documentation_impact(workspace))
     if state["profile"] is not None:
         perform("protected-surfaces", lambda: _check_protected_surfaces(workspace, state["profile"].slug))
@@ -1223,7 +1508,7 @@ def inspect_workspace(workspace_value, preservation_manifest=None, baseline_mani
         value = perform("preservation-manifest", lambda: check_preservation_manifest(workspace, Path(preservation_manifest)))
         preservation = "PASS" if value is None and checks[-1]["status"] == "PASS" else "FAIL"
     if baseline_manifest is not None:
-        perform("actual-delta", lambda: check_actual_delta(workspace, Path(baseline_manifest)))
+        perform("actual-delta", lambda: check_actual_delta(workspace, Path(baseline_manifest), registration_inputs))
     return {
         "schema": "generic.workspace-check.v1",
         "status": "PASS" if not errors else "FAIL",
@@ -1250,21 +1535,28 @@ def main(argv=None) -> int:
     parser.add_argument("--preservation-manifest", type=Path)
     parser.add_argument("--baseline-manifest", type=Path)
     parser.add_argument("--print-baseline-manifest", action="store_true")
+    parser.add_argument("--registration-input", action="append", type=Path, default=[])
+    parser.add_argument("--check-result", action="store_true")
     parser.add_argument("--format", choices=("text", "json"), default="text")
-    output_format = "text"
+    argv = list(sys.argv[1:] if argv is None else argv)
+    output_format = "json" if "--format=json" in argv or any(
+        a == "--format" and b == "json" for a, b in zip(argv, argv[1:])
+    ) else "text"
     try:
         args = parser.parse_args(argv)
         output_format = args.format
+        if args.registration_input and not args.baseline_manifest:
+            raise UsageError("--registration-input requires --baseline-manifest")
         if args.print_baseline_manifest:
-            if args.preservation_manifest is not None or args.baseline_manifest is not None or args.format != "text":
+            if args.preservation_manifest is not None or args.baseline_manifest is not None or args.format != "text" or args.check_result:
                 raise UsageError("--print-baseline-manifest cannot be combined with manifests or --format json")
             sys.stdout.write(baseline_manifest_text(args.workspace))
             return 0
-        result = inspect_workspace(args.workspace, args.preservation_manifest, args.baseline_manifest)
+        result = inspect_workspace(args.workspace, args.preservation_manifest, args.baseline_manifest, args.registration_input, args.check_result)
         code = 0 if result["status"] == "PASS" else 1
     except (UsageError, ContractError, OSError, ValueError) as error:
         result, code = _error_result(error), 2
-    if output_format == "json" or (argv is not None and "--format" in argv and "json" in argv):
+    if output_format == "json":
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, default=str))
     else:
         print(f"WORKSPACE_CHECK: {result['status']}")

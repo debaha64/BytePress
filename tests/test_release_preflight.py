@@ -822,3 +822,14 @@ class ExactPRTests(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
+
+class MachineFailureTests(unittest.TestCase):
+    def test_machine_input_failure_is_structured_without_secret_echo(self):
+        tool = Path(__file__).resolve().parents[1] / 'tools/release_preflight.py'
+        result = subprocess.run([sys.executable, '-B', str(tool), 'preflight', '--contract', '/absent/secret-token', '--format', 'machine'], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload['verdict'], 'FAIL')
+        self.assertEqual(payload['external_writes'], 0)
+        self.assertNotIn('secret-token', result.stdout + result.stderr)
