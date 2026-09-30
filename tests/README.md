@@ -16,15 +16,15 @@
 
 ## Запуск и происхождение
 
-Канонический запуск из корня свежей внешней копии поставки BytePress:
+Канонический запуск из корня свежей одноразовой копии в Workspace temp/ поставки BytePress:
 
 ```bash
 python3 -B -m unittest discover -s tests -p 'test_*.py'
 ```
 
-Для свидетельств о защищённом исходнике сначала контролируют `PYTHONPATH` и подтверждают свежий корень, рабочий каталог, тестовые модули, `new_project.py`, `project_profile.py`, происхождение исполняемых файлов и модулей обоих проверяющих инструментов и очистки продукта. Затем `new_project.py` создаёт внешний Workspace, а развёрнутые `check_workspace.py` и `check_product.py` запускаются из его `tools/`. Переменная `BYTEPRESS_LIVE_SOURCE_ROOT` передаёт точный путь исходного продукта для отрицательных проверок происхождения.
+Для свидетельств о защищённом исходнике сначала контролируют `PYTHONPATH` и подтверждают свежий корень, рабочий каталог, тестовые модули, `new_project.py`, `project_profile.py`, происхождение исполняемых файлов и модулей обоих проверяющих инструментов и очистки продукта. Затем `new_project.py` создаёт отдельный Workspace в разрешённой временной области, а развёрнутые `check_workspace.py` и `check_product.py` запускаются из его `tools/`. Переменная `BYTEPRESS_LIVE_SOURCE_ROOT` передаёт точный путь исходного продукта для отрицательных проверок происхождения.
 
-Изменение поведения требует предварительного написания тестов: принятые `REQ/INV/SCN` → содержательный RED → минимальная реализация → целевой GREEN → зависимые проверки и полная регрессия. Нейтральная заготовка не создаёт требования, точку контроля, маршрут или полномочия владельца. Временные проверки используют `mktemp -d` или временный каталог вне поставки; постоянный `fixtures/` не создаётся. Порядок и критерии принадлежат [verify-work](../sops/verify-work.md).
+Изменение поведения требует предварительного написания тестов: принятые `REQ/INV/SCN` → содержательный RED → минимальная реализация → целевой GREEN → зависимые проверки и полная регрессия. Нейтральная заготовка не создаёт требования, точку контроля, маршрут или полномочия владельца. Временные runtime/test fixtures создаются в собственной области Workspace temp/ вне исходного Product и удаляются после проверки. Поставляемые `tests/fixtures/deployed-<version>.*` — намеренные замороженные regression fixtures выпущенных поставок, описанные ниже. Порядок и критерии принадлежат [verify-work](../sops/verify-work.md).
 
 ## Существенные границы регрессии
 
@@ -38,9 +38,11 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 
 `test_harness.py` проверяет граф README и документации, непосредственные индексы, ссылки и якоря и только утверждённые устаревшие формы из глоссария. В граф входят README и все поставляемые темы `docs/`; SOP, формы, роли и внутренние создаваемые артефакты не считаются потерянными пользовательскими темами. Отрицательные заготовки проверяют сломанный якорь, потерянную тему, устаревший заголовок SoT и допустимые фрагменты кода и цитат. Навигация Project Start и отсутствие удалённых путей проверяются в действительно созданном Workspace. Ясность и полнота смысла остаются предметом чтения человеком.
 
-## Released fixture для Workspace Update
+## Released fixtures для Workspace Update
 
 `fixtures/deployed-0.5.2.tar.gz` — замороженный результат fresh Project Start настоящей released distribution 0.5.2: нейтральный WS_Example, пустой Product, только начальные generated записи. Это не копия исторического пользовательского Workspace. Все 142 deployed файла сохранены для полной проверки changed paths; source-only generator и пользовательская история в fixture не входят. `fixtures/deployed-0.5.2.json` хранит exact source snapshot/Product/generator hashes, архивный digest и полный tree manifest с modes. Tests проверяют manifest перед применением; путь к пользовательскому ~/code и изменение VERSION текущего generator не используются. Квалификация связывает этот fixture с byte-exact released source и fresh deployed output.
+
+`fixtures/deployed-0.5.3.tar.gz` и `fixtures/deployed-0.5.3.json` — второй замороженный набор, полученный из released distribution 0.5.3. Он сохраняет нейтральный deployed Workspace и его source/Product/generator identity, архивный digest и полный manifest с POSIX modes для регрессии обновления 0.5.3 → 0.5.4, совместимости legacy WPLAN и terminal actual-delta. Оба released набора являются постоянными тестовыми входами; их временные распакованные копии создаются вне Product и удаляются после проверки.
 
 Patch driver находится только в test_workspace_update.py и механически проверяет контракт existing change-management SOP. Это не shipped updater. RED ловит ложный old checker и пропуск TRANSFORM project-start; negative cases проверяют authority/quiescence/freeze, каждый missing disposition и отказ read-back до version cutover. Rework regression сохраняет старый WPLAN и OD, требует fresh OD нового WPLAN и оставляет backward transition запрещённым.
 
@@ -52,3 +54,5 @@ Patch driver находится только в test_workspace_update.py и ме
 ## Источники и recovery Update
 
 `test_workspace_update.py` проверяет ES-REQ-01..04 и RU-REQ-01..06: реальные Project Start формы и generic CHANGE/QUALITY/DECISION без client runtime, research → requirements, сохранение managed codexlog, один Harness-blocked active WPLAN при recovery, отказ неподходящему состоянию, exact Product/route/research/history/Feedback и failure до/после version cutover. Tests-first RED относится к старым deployed contracts и guard existing manual Update driver. Нейтральные fixtures не являются реальными owner decisions или field validation.
+
+Перед запуском передать `TMPDIR=<абсолютный путь собственной области Workspace temp>` только тестовому процессу. Стандартный tempfile использует этот путь; глобальное окружение не меняется. Не удалять чужие временные данные.

@@ -15,12 +15,14 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import test_check_workspace as fixtures
 import test_new_project as project_start
 
 SOURCE = Path(__file__).resolve().parents[1]
+CURRENT_VERSION = (SOURCE / "VERSION").read_text().strip()
 sys.path.insert(0, str(SOURCE / "tools"))
 import project_profile
 
@@ -32,11 +34,11 @@ class WorkspaceUpdateTests(unittest.TestCase):
     assert_fail = fixtures.WorkspaceCheckerTests.assert_fail
     maxDiff = None
 
-    def released_workspace(self):
-        """Frozen output of the real released 0.5.2 generator, never VERSION spoofing."""
+    def released_workspace(self, version="0.5.2"):
+        """Frozen output of a real released generator, never VERSION spoofing."""
         directory = SOURCE / "tests/fixtures"
-        provenance = json.loads((directory / "deployed-0.5.2.json").read_text())
-        archive = directory / "deployed-0.5.2.tar.gz"
+        provenance = json.loads((directory / f"deployed-{version}.json").read_text())
+        archive = directory / f"deployed-{version}.tar.gz"
         self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(), provenance["archive_sha256"])
         temporary = tempfile.TemporaryDirectory(prefix="bytepress-released-052-")
         self.addCleanup(temporary.cleanup)
@@ -66,6 +68,67 @@ class WorkspaceUpdateTests(unittest.TestCase):
                          provenance["checker_sha256"])
         return root
 
+    def test_released_053_update_preserves_legacy_active_and_closes(self):
+        """AD-SCN-11: real released baseline, exact recovery read-back, cutover last."""
+        released = self.released_workspace('0.5.3')
+        root = self.released_workspace('0.5.3')
+        plan = fixtures.open_first_research(root)
+        plan.write_text(plan.read_text().replace('### UPDATE', '### UPDATE — 1') +
+                        '\n### PRESERVE — 1\n\n1. `Example/**`.\n')
+        for relative in ('Example/private.txt', 'docs/project-private.md', 'feedback/private.md'):
+            path=root/relative; path.write_text('private project data\n'); path.chmod(0o640)
+        self.assert_pass(self.run_checker(root))
+        before=self.patch_tree(root)
+        original_plan=plan.read_bytes()
+        reference,preview=self.patch_reference()
+        old_tree,new_tree=self.patch_tree(released),self.patch_tree(reference)
+        changed={p for p in old_tree.keys()|new_tree.keys() if old_tree.get(p)!=new_tree.get(p)}
+        actions={row['path']:row['action'] for row in preview['authorization_payload']['actions']}
+        generated={'README.md','AGENTS.md','docs/user/first-start.md','docs/architecture/architecture.md','docs/architecture/domain-model.md','tests/README.md','SYSTEM.md','Example.profile','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}
+        preserved={'logs/changes.md','logs/sessions.md','plans/backlog.md','plans/roadmap.md','research/00-index.md','logs/README.md','logs/terminology.md','logs/history.md'}
+        # Explicit closed disposition: no copied private/history/route content.
+        self.assertFalse(changed-{p for p in changed if actions.get(p)=='COPY'}-generated-preserved)
+        version=(SOURCE/'VERSION').read_text().strip()
+        applied=set()
+        for relative in sorted(changed-generated-preserved):
+            self.assertEqual(actions.get(relative),'COPY')
+            self.assertEqual(before.get(relative),old_tree.get(relative))
+            shutil.copy2(reference/relative,root/relative);applied.add(relative)
+        for relative in sorted(changed & {'README.md','AGENTS.md','docs/user/first-start.md','docs/architecture/architecture.md','docs/architecture/domain-model.md','tests/README.md','SYSTEM.md','docs/technical/project-start.md','docs/user/README.md','sops/verify-work.md','tools/README.md','plans/completed/README.md','docs/architecture/project-profile.md'}):
+            self.assertEqual(before.get(relative),old_tree.get(relative))
+            data=(reference/relative).read_bytes()
+            if relative=='SYSTEM.md':
+                data=data.replace(f'развёрнутая версия Harness: `{version}`'.encode(),'развёрнутая версия Harness: `0.5.3`'.encode())
+            (root/relative).write_bytes(data);applied.add(relative)
+        after=self.patch_tree(root)
+        self.assertEqual({p:v for p,v in before.items() if p not in applied},
+                         {p:v for p,v in after.items() if p not in applied})
+        self.assertEqual(plan.read_bytes(),original_plan)
+        self.assertEqual(json.loads((root/'Example.profile').read_text())['harness_version'],'0.5.3')
+        self.assert_pass(self.run_checker(root))
+        for relative in applied-{'SYSTEM.md'}:
+            self.assertEqual(after[relative],new_tree[relative])
+        self.assertEqual((root/'SYSTEM.md').read_bytes(),(reference/'SYSTEM.md').read_bytes().replace(
+            f'развёрнутая версия Harness: `{version}`'.encode(),'развёрнутая версия Harness: `0.5.3`'.encode()))
+        # The successful read-back above is the prerequisite for both version projections.
+        (root/'SYSTEM.md').write_bytes((reference/'SYSTEM.md').read_bytes())
+        document=json.loads((root/'Example.profile').read_text());document['harness_version']=version
+        (root/'Example.profile').write_bytes(project_profile.serialize_project_profile('Example.profile',document))
+        self.assert_pass(self.run_checker(root))
+        self.assertEqual(plan.read_bytes(),original_plan)
+        fixture=fixtures.WorkspaceCheckerTests()
+        try:
+            fixture.ad_plan(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n'
+                '### UPDATE\n\n1. `plans/backlog.md` — `content`.\n\n'
+                '### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+            baseline=fixture.write_baseline_manifest(root)
+            plan.write_text(plan.read_text().replace('Статус: active','Статус: completed'))
+            plan.rename(root/'plans/completed'/plan.name)
+            (root/'plans/backlog.md').write_text('WROAD-000001 active\nWBACK-000001 done\nactive WPLAN count 0\nNON_EXECUTING_CHECKPOINT: WROAD-000001-OWNER-PLANNING\n')
+            self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        finally:
+            fixture.doCleanups()
+
     def test_patch_old_fixture_uses_released_checker_bytes(self):
         released = self.released_workspace()
         old = self.patch_old_workspace()
@@ -82,6 +145,35 @@ class WorkspaceUpdateTests(unittest.TestCase):
         self.assertEqual((old / "docs/technical/project-start.md").read_bytes(),
                          (reference / "docs/technical/project-start.md").read_bytes())
 
+
+    def test_prerelease_update_delivers_sop_and_cuts_over_after_readback(self):
+        for version in ('0.5.4-dev.2', '0.5.4-rc.3'):
+            with self.subTest(version=version), tempfile.TemporaryDirectory(prefix='semver-update-') as directory:
+                distribution = Path(directory) / 'BytePress'
+                shutil.copytree(SOURCE, distribution)
+                (distribution / 'VERSION').write_text(version + '\n')
+                source_before = project_start.tree_manifest(distribution)
+                with mock.patch.dict(globals(), SOURCE=distribution, CURRENT_VERSION=version):
+                    root = self.patch_old_workspace()
+                    (root / 'Example/VERSION').write_bytes(b'9.7-product-policy\n')
+                    protected = self.protected(root)
+                    reference, preview = self.patch_reference()
+                    rows = self.patch_disposition(reference, preview)
+                    self.assertEqual(next(r['disposition'] for r in rows if r['path'] == 'sops/semver.md'), 'COPY')
+                    authority = self.authorize_update(root, reference, rows)
+                    self.apply_patch_contracts(root, reference, preview, authorization=authority, rows=rows)
+                    profile = root / 'Example.profile'
+                    self.assertEqual(json.loads(profile.read_bytes())['harness_version'], '0.5.2')
+                    self.patch_readback(root, reference, rows, protected)
+                    self.assertEqual((root / 'sops/semver.md').read_bytes(), (distribution / 'sops/semver.md').read_bytes())
+                    document = json.loads(profile.read_bytes()); document['harness_version'] = version
+                    profile.write_bytes(project_profile.serialize_project_profile(profile.name, document))
+                    system = root / 'SYSTEM.md'
+                    system.write_bytes(system.read_bytes().replace('развёрнутая версия Harness: `0.5.2`'.encode(), f'развёрнутая версия Harness: `{version}`'.encode()))
+                    self.assert_pass(self.run_checker(root))
+                    self.assertEqual(json.loads(profile.read_bytes())['harness_version'], version)
+                    self.assertEqual((root / 'Example/VERSION').read_bytes(), b'9.7-product-policy\n')
+                    self.assertEqual(project_start.tree_manifest(distribution), source_before)
 
     def patch_reference(self):
         temporary = tempfile.TemporaryDirectory(prefix="bytepress-patch-reference-")
@@ -100,6 +192,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
             stream.write("\nPrivate system meaning preserved.\n")
         (root / "Example/private.txt").write_bytes(b"neutral Product code and data\n")
         (root / "Example/private.txt").chmod(0o640)
+        index = root / "plans/completed/README.md"
+        index.write_bytes(index.read_bytes() + b"\nPRIVATE INDEX ROW\n")
+        index.chmod(0o640)
         (root / "logs/history.md").write_bytes(b"immutable history\n")
         (root / "plans/completed/WPLAN-000099-history.md").write_bytes(b"completed history\n")
         return root
@@ -120,10 +215,24 @@ class WorkspaceUpdateTests(unittest.TestCase):
             "feedback/README.md": ("GENERATED_MERGE", "Create empty index only if absent; preserve private index."),
             "Example.profile": ("GENERATED_MERGE", "Preserve composition and SoT; version cutover last."),
             "SYSTEM.md": ("GENERATED_MERGE", "Merge generated contract; preserve stronger private rules."),
+            "docs/architecture/architecture.md": ("GENERATED_MERGE", "Обновить редакторский текст, сохранив частную архитектуру."),
+            "docs/architecture/domain-model.md": ("GENERATED_MERGE", "Обновить редакторский текст, сохранив идентичность проекта."),
+            "tests/README.md": ("GENERATED_MERGE", "Обновить описание существующих проверок."),
+            "plans/roadmap.md": ("PRESERVE", "Сохранить действующее направление проекта."),
+            "research/00-index.md": ("PRESERVE", "Сохранить реестр исследований проекта."),
+            "logs/README.md": ("PRESERVE", "Сохранить навигацию существующих журналов."),
+            "logs/terminology.md": ("PRESERVE", "Сохранить факты терминологического журнала."),
+            "logs/history.md": ("PRESERVE", "Сохранить историю проекта без редакторской миграции."),
+            "docs/architecture/project-profile.md": ("GENERATED_MERGE", "Merge the version owner link while preserving project identity."),
             "docs/technical/project-start.md": ("GENERATED_MERGE", "Rendered Project Start contract, not a COPY action."),
+            "sops/verify-work.md": ("GENERATED_MERGE", "Rendered deployed verification contract with source-only commands adapted."),
             "docs/user/README.md": ("GENERATED_MERGE", "Rendered instance navigation."),
             "docs/user/first-start.md": ("GENERATED_MERGE", "Rendered instance onboarding."),
             "logs/changes.md": ("PRESERVE", "Initial Project Start fact is historical; never import reference history."),
+            "logs/sessions.md": ("PRESERVE", "Existing session facts are immutable; do not import a new empty form."),
+            "plans/backlog.md": ("PRESERVE", "Existing queue and route are project state; the new checker reads old forms."),
+            "tools/README.md": ("GENERATED_MERGE", "Document the deployed short-form checker and legacy reader."),
+            "plans/completed/README.md": ("GENERATED_MERGE", "Merge appendix navigation without replacing completed plans or private rows."),
         }
         rows = []
         for path in sorted(self.changed_deployed_paths(reference)):
@@ -154,14 +263,14 @@ class WorkspaceUpdateTests(unittest.TestCase):
 
     def authorize_update(self, root, reference, rows):
         """Simulated owner response to exact prepared backup/disposition in a neutral test."""
-        before = self.patch_tree(root)
+        before = project_start.tree_manifest(root)
         self.assertTrue(all(value[0] in {"file", "directory"} for value in before.values()))
         with tempfile.NamedTemporaryFile(dir=root.parent, suffix=".tar.gz", delete=False) as stream:
             backup = Path(stream.name)
-        with tarfile.open(backup, "w:gz") as archive:
+        with tarfile.open(backup, "w:gz", format=tarfile.USTAR_FORMAT) as archive:
             for relative in [".", *sorted(before)]:
                 archive.add(root / relative, arcname=str(Path(root.name) / relative), recursive=False)
-        self.assertEqual(self.patch_tree(root), before, "Workspace changed while creating backup")
+        self.assertEqual(project_start.tree_manifest(root), before, "Workspace changed while creating backup")
         return {"snapshot": str(backup), "snapshot_sha256": hashlib.sha256(backup.read_bytes()).hexdigest(),
                 "digest": self.update_digest(root, reference, rows)}
 
@@ -183,7 +292,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 relative = Path(item.name).relative_to(root.name).as_posix()
                 observed[relative] = ("directory" if item.isdir() else "file", item.mode,
                                      "" if item.isdir() else hashlib.sha256(archive.extractfile(item).read()).hexdigest())
-        self.assertEqual(observed, self.patch_tree(root), "Backup must match frozen target bytes/types/modes")
+        self.assertEqual(observed, project_start.tree_manifest(root), "Backup must match frozen target bytes/types/modes")
 
     def patch_tree(self, root):
         """Permanent target surface; sot_files service projections are never traversed."""
@@ -228,7 +337,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         released = self.released_workspace()
         # Stop before writes if a copied contract has an unreviewed private overlay.
         for row in rows:
-            if row["disposition"] != "PRESERVE" and row["path"] not in {"SYSTEM.md", "Example.profile"}:
+            if row["disposition"] != "PRESERVE" and row["path"] not in {"SYSTEM.md", "Example.profile", "plans/completed/README.md"}:
                 path = row["path"]
                 if path in {"feedback", "feedback/README.md"}:
                     continue  # Existing user data is preserved, never a copied contract overlay.
@@ -253,9 +362,12 @@ class WorkspaceUpdateTests(unittest.TestCase):
                     else:
                         shutil.copy2(reference / path, root / path)
                 continue
-            if path == "SYSTEM.md":
+            if path == "plans/completed/README.md":
+                index = root / path
+                index.write_bytes(index.read_bytes() + self.completed_index_addition())
+            elif path == "SYSTEM.md":
                 private = (root / path).read_bytes()[len(old_system):]
-                merged = (reference / path).read_bytes().replace(b"deployed Harness version: `0.5.3`", b"deployed Harness version: `0.5.2`")
+                merged = (reference / path).read_bytes().replace(f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode(), "развёрнутая версия Harness: `0.5.2`".encode())
                 (root / path).write_bytes(merged + private)
             else:
                 shutil.copy2(reference / path, root / path)
@@ -280,9 +392,13 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 if path not in protected and actual.is_file():
                     self.assertEqual(actual.read_bytes(), expected.read_bytes())
                 continue
+            if path == "plans/completed/README.md":
+                self.assertTrue(actual.read_bytes().endswith(self.completed_index_addition()))
+                self.assertEqual(actual.stat().st_mode & 0o7777, protected[path][0])
+                continue
             self.assertEqual(actual.read_bytes(), expected.read_bytes(), path)
             self.assertEqual(actual.stat().st_mode & 0o7777, expected.stat().st_mode & 0o7777, path)
-        expected_system = (reference / "SYSTEM.md").read_bytes().replace(b"deployed Harness version: `0.5.3`", b"deployed Harness version: `0.5.2`")
+        expected_system = (reference / "SYSTEM.md").read_bytes().replace(f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode(), "развёрнутая версия Harness: `0.5.2`".encode())
         self.assertTrue((root / "SYSTEM.md").read_bytes().startswith(expected_system))
         self.assert_pass(self.run_checker(root))  # New checker, previous version claim.
 
@@ -304,9 +420,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
         fixtures.open_first_research(probe)
         self.assert_pass(self.run_checker(probe))
         document = json.loads(profile)
-        document["harness_version"] = "0.5.3"
+        document["harness_version"] = CURRENT_VERSION
         system = root / "SYSTEM.md"
-        system.write_bytes(system.read_bytes().replace(b"deployed Harness version: `0.5.2`", b"deployed Harness version: `0.5.3`"))
+        system.write_bytes(system.read_bytes().replace("развёрнутая версия Harness: `0.5.2`".encode(), f"развёрнутая версия Harness: `{CURRENT_VERSION}`".encode()))
         (root / "Example.profile").write_bytes(project_profile.serialize_project_profile("Example.profile", document))
         self.assert_pass(self.run_checker(root))
         self.assertEqual({k: self.protected(root)[k] for k in before}, before)
@@ -315,7 +431,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
         # Successful deployment evidence is appended after cutover, under the same bounded operation.
         original_log = (root / "logs/changes.md").read_bytes()
         with (root / "logs/changes.md").open("a") as stream:
-            stream.write("\nWorkspace Update 0.5.2 -> 0.5.3: owner-authorized disposition/read-back PASS.\n")
+            stream.write(f"\nWorkspace Update 0.5.2 -> {CURRENT_VERSION}: owner-authorized disposition/read-back PASS.\n")
         self.assertTrue((root / "logs/changes.md").read_bytes().startswith(original_log))
         fixtures.open_first_research(root)
         self.assert_pass(self.run_checker(root))
@@ -422,10 +538,22 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 self.command(root, "remote", "set-head", "origin", "main")
         return root
 
+    def completed_index_addition(self):
+        text = (SOURCE / "templates/workspace-plan-completed-readme.md").read_bytes()
+        marker = "Крупные технические приложения".encode()
+        return b"\n\n" + marker + text.split(marker, 1)[1]
+
     def protected(self, root):
+        def history_bytes(path):
+            data = path.read_bytes()
+            if path.relative_to(root).as_posix() == "plans/completed/README.md":
+                addition = self.completed_index_addition()
+                if data.endswith(addition):
+                    data = data[:-len(addition)]
+            return data
         paths = ("Example", "plans", "research", "skills", "logs")
         result = {
-            p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(p.read_bytes()).hexdigest())
+            p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(history_bytes(p)).hexdigest())
             for prefix in paths for p in (root / prefix).rglob("*") if p.is_file()
         }
         folder = root / "feedback"
@@ -527,21 +655,18 @@ class WorkspaceUpdateTests(unittest.TestCase):
         env = {**os.environ, "PATH": "", "PYTHONPATH": ""}
         self.assert_pass(self.run_checker(root, env=env))
 
-    def test_snapshot_service_exclusions_preserve_private_content(self):
+    def test_checker_scope_exclusions_preserve_private_content(self):
         root = self.migration("sot_files", service=True)
-        for name in (".agents", ".codex"):
-            (root / name).mkdir()
-        archive = root.parent / "fixture.tar.gz"
-        with tarfile.open(archive, "w:gz") as target:
-            for path in (root, *sorted(root.rglob("*"))):
-                rel = path.relative_to(root)
-                if rel.parts and rel.parts[0] in {".git", ".agents", ".codex"}:
-                    continue
-                target.add(path, arcname=str(Path(root.name) / rel), recursive=False)
-        with tarfile.open(archive) as source:
-            names = source.getnames()
-        self.assertFalse(any(set(Path(name).parts) & {".git", ".agents", ".codex"} for name in names))
-        self.assertIn(root.name + "/skills/private.md", names)
+        for name in (".agents", ".codex", "temp"):
+            (root / name).mkdir(exist_ok=True)
+            (root / name / 'private.data').write_text('preserve')
+        before=project_start.tree_manifest(root)
+        baseline=subprocess.check_output([sys.executable, '-B', str(root/'tools/check_workspace.py'),
+            '--workspace', str(root), '--print-baseline-manifest'], text=True)
+        paths=[line.split('\t')[-1] for line in baseline.splitlines()[1:]]
+        self.assertFalse(any(Path(p).parts[0] in {'.git','.agents','.codex','temp'} for p in paths))
+        self.assertIn('skills/private.md',paths)
+        self.assertEqual(project_start.tree_manifest(root),before)
 
     def test_static_product_cleaner_needs_no_workspace_sot_owner(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -549,7 +674,7 @@ class WorkspaceUpdateTests(unittest.TestCase):
             shutil.copytree(SOURCE, product)
             agents = product / "AGENTS.md"
             agents.write_text(re.sub(r"(?m)^SOT_MODE: .*\n", "", agents.read_text()))
-            probe = "import sys; from pathlib import Path; sys.path.insert(0, 'tools'); import bp_clean; error = bp_clean.product_unit_root_error(Path.cwd()); assert error is None, error"
+            probe = "import sys; from pathlib import Path; sys.path.insert(0, 'tools'); import clean_product; error = clean_product.product_unit_root_error(Path.cwd()); assert error is None, error"
             result = subprocess.run([sys.executable, "-B", "-c", probe],
                                     cwd=product, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -630,7 +755,7 @@ class EvidenceSourceTests(unittest.TestCase):
         self.assertFalse((root / '.codex').exists())
 
     def test_managed_codexlog_is_valid_and_retained(self):
-        import bp_clean
+        import clean_product
         helper, root = self.deployment()
         runtime = root / '.codex'
         runtime.mkdir()
@@ -640,14 +765,14 @@ class EvidenceSourceTests(unittest.TestCase):
         with (root / 'logs/quality.md').open('a') as stream:
             stream.write('\nSOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-2\n')
         before = raw.read_bytes(), raw.stat().st_mode
-        self.assertEqual(bp_clean.referenced_codex_paths(root), {raw})
-        bp_clean.remove_path_no_follow(runtime, frozenset({raw}))
+        self.assertEqual(clean_product.referenced_codex_paths(root), {raw})
+        clean_product.remove_path_no_follow(runtime, frozenset({raw}))
         self.assertEqual((raw.read_bytes(), raw.stat().st_mode), before)
         # Missing, escaping and out-of-range references cannot retain an unrelated file.
         (root / 'logs/quality.md').write_text('SOURCE_REF: codexlog:.codex/managed.raw.log#lines=1-9\n'
             'SOURCE_REF: codexlog:.codex/missing.raw.log#lines=1-2\n'
             'SOURCE_REF: codexlog:.codex/../escape.raw.log#lines=1-2\n')
-        self.assertEqual(bp_clean.referenced_codex_paths(root), set())
+        self.assertEqual(clean_product.referenced_codex_paths(root), set())
 
     def test_generic_sops_do_not_require_raw_client_transport(self):
         _, root = self.deployment()
@@ -748,9 +873,9 @@ class RecoveryUpdateTests(unittest.TestCase):
         helper.apply_patch_contracts(root, reference, preview, authorization=authorization, rows=rows)
         helper.patch_readback(root, reference, rows, before)
         old_system = (root / 'SYSTEM.md').read_bytes()
-        document = json.loads(old_profile); document['harness_version'] = '0.5.3'
+        document = json.loads(old_profile); document['harness_version'] = CURRENT_VERSION
         try:
-            (root / 'SYSTEM.md').write_bytes(old_system.replace(b'`0.5.2`', b'`0.5.3`'))
+            (root / 'SYSTEM.md').write_bytes(old_system.replace(b'`0.5.2`', f'`{CURRENT_VERSION}`'.encode()))
             (root / 'Example.profile').write_bytes(project_profile.serialize_project_profile('Example.profile', document))
             # Failure is injected after the cutover, before final successful read-back.
             (root / 'tools/check_workspace.py').write_text('raise SystemExit(1)\n')

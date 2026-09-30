@@ -4,6 +4,7 @@ Tests-first contracts for the generic Workspace checker.  Every fixture is
 neutral, self-created and non-authoritative.
 """
 
+import base64
 import hashlib
 import json
 import os
@@ -64,7 +65,7 @@ def open_first_research(root):
         "RELEASE_AUTHORIZATION_STATUS": "not-performed", "RELEASE_AUTHORIZATION_REF": "none",
     }
     plan = root / "plans/active/WPLAN-000001-example.md"
-    plan.write_text("# First research\n\n" + "".join(f"{key}: {value}\n" for key, value in fields.items()))
+    plan.write_text("# First research\n\n" + "".join(f"{key}: {value}\n" for key, value in fields.items()) + "\n### UPDATE\n\n1. `logs/quality.md` — `content`.\n")
     domain = root / "research/01_bootstrap"
     domain.mkdir()
     for name in ("00-index.md", "01-evidence.md", "results.md"):
@@ -84,6 +85,158 @@ def grant_implementation(root):
 
 class WorkspaceCheckerTests(unittest.TestCase):
     maxDiff = None
+
+    def ad_plan(self, root, declarations, *, legacy=False):
+        plan = root / 'plans/active/WPLAN-000001-example.md'
+        text = plan.read_text().split('\n### CREATE')[0].split('\n### UPDATE')[0]
+        if not legacy:
+            text = re.sub(r'(?m)^ALLOWED_SURFACES:.*\n', '', text)
+        plan.write_text(text + '\n' + declarations + '\n')
+        return plan
+
+    def ad_closing_fixture(self, *, legacy=False):
+        root = self.fixture(active=True)
+        count = ' — 1' if legacy else ''
+        plan = self.ad_plan(root,
+            f'### CREATE{count}\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n'
+            f'### UPDATE{count}\n\n1. `plans/backlog.md` — `content`.\n\n'
+            f'### REMOVE{count}\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.\n', legacy=legacy)
+        if legacy:
+            with plan.open('a') as stream:
+                stream.write('\n### PRESERVE — 1\n\n1. `Example/**`.\n')
+        baseline = self.write_baseline_manifest(root)
+        plan.write_text(plan.read_text().replace('Статус: active', 'Статус: completed'))
+        completed = root / 'plans/completed' / plan.name
+        plan.rename(completed)
+        (root / 'plans/backlog.md').write_text('WROAD-000001 active\nWBACK-000001 done\n'
+            'active WPLAN count 0\nNON_EXECUTING_CHECKPOINT: WROAD-000001-OWNER-PLANNING\n')
+        return root, baseline, completed
+
+    def test_ad_normal_active_exact_delta_without_legacy_fields(self):
+        root = self.fixture(active=True)
+        self.ad_plan(root, '### CREATE\n\n1. `docs/new.md` — `file:0644`.\n\n### UPDATE\n\n### REMOVE')
+        baseline = self.write_baseline_manifest(root)
+        (root / 'docs/new.md').write_text('new\n')
+        self.assert_pass(self.run_checker(root, '--baseline-manifest', baseline))
+
+    def test_ad_unexpected_mutation_fails_unused_permission_passes(self):
+        for unexpected in (True, False):
+            with self.subTest(unexpected=unexpected):
+                root = self.fixture(active=True)
+                self.ad_plan(root, '### CREATE\n\n1. `docs/new.md` — `file:0644`.')
+                baseline = self.write_baseline_manifest(root)
+                if unexpected:
+                    (root / 'docs/other.md').write_text('undeclared\n')
+                result = self.run_checker(root, '--baseline-manifest', baseline)
+                if unexpected: self.assert_fail(result, 'actual-delta')
+                else: self.assert_pass(result)
+
+    def test_ad_wrong_create_update_remove_contracts_fail(self):
+        for action, contract in (('CREATE','file:0600'),('CREATE','directory:0644'),
+                                 ('UPDATE','content'),('REMOVE','directory')):
+            with self.subTest(action=action,contract=contract):
+                root = self.fixture(active=True)
+                node = root / 'docs/node'
+                if action != 'CREATE':
+                    node.write_text('before\n')
+                self.ad_plan(root, f'### {action}\n\n1. `docs/node` — `{contract}`.')
+                baseline = self.write_baseline_manifest(root)
+                if action == 'CREATE': node.write_text('after\n')
+                elif action == 'UPDATE': node.chmod(0o600)
+                else: node.unlink()
+                self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline), 'actual-delta')
+
+    def test_ad_terminal_closing_same_id_passes(self):
+        root, baseline, _completed = self.ad_closing_fixture()
+        self.assert_pass(self.run_checker(root))
+        result = self.run_checker(root, '--baseline-manifest', baseline)
+        self.assert_pass(result)
+        delta = next(c['value'] for c in result[1]['checks'] if c['id'] == 'actual-delta')
+        self.assertEqual({k:delta[k] for k in ('CREATE','UPDATE','REMOVE')}, {'CREATE':1,'UPDATE':1,'REMOVE':1})
+
+    def test_ad_closing_wrong_missing_or_duplicate_identity_fails(self):
+        for variant in ('different-basename','different-record-id','missing','baseline-owner-not-file'):
+            with self.subTest(variant=variant):
+                root, baseline, completed = self.ad_closing_fixture()
+                if variant == 'different-basename': completed.rename(completed.with_name('WPLAN-000002-other.md'))
+                elif variant == 'different-record-id': completed.write_text(completed.read_text().replace('WPLAN ID: WPLAN-000001','WPLAN ID: WPLAN-000002'))
+                elif variant == 'missing': completed.unlink()
+                else:
+                    path=Path(baseline); rows=path.read_text().splitlines()
+                    rows=['d\t0755\t-\tplans/active/WPLAN-000001-example.md' if row.endswith('\tplans/active/WPLAN-000001-example.md') else row for row in rows]
+                    path.write_text('\n'.join(rows)+'\n')
+                self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline), 'actual-delta')
+
+    def test_ad_ambiguous_closing_owner_fails(self):
+        root, baseline, _completed = self.ad_closing_fixture()
+        path=Path(baseline)
+        with path.open('a') as stream:
+            stream.write('f\t0644\t'+'0'*64+'\tplans/active/WPLAN-000002-other.md\n')
+        result=self.run_checker(root, '--baseline-manifest', baseline)
+        self.assert_fail(result, 'actual-delta')
+        self.assertIn('ambiguous', str(result[1]['errors']))
+
+    def test_ad_zero_active_zero_delta_passes(self):
+        root=self.fixture()
+        # Historical completed files must never be selected as latest owner.
+        (root/'plans/completed/WPLAN-999999-history.md').write_text('# Immutable history\n')
+        baseline=self.write_baseline_manifest(root)
+        result=self.run_checker(root, '--baseline-manifest', baseline)
+        self.assert_pass(result)
+        delta=next(c['value'] for c in result[1]['checks'] if c['id']=='actual-delta')
+        self.assertEqual({k:delta[k] for k in ('CREATE','UPDATE','REMOVE')}, {'CREATE':0,'UPDATE':0,'REMOVE':0})
+
+    def test_ad_zero_active_nonzero_delta_fails(self):
+        root=self.fixture()
+        baseline=self.write_baseline_manifest(root)
+        (root/'docs/unowned.md').write_text('unowned\n')
+        self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline), 'actual-delta')
+
+    def test_ad_product_protection_without_allowed_surfaces(self):
+        for action,contract in (('CREATE','file:0644'),('UPDATE','content'),('REMOVE','file')):
+            with self.subTest(action=action):
+                root=self.fixture(decisions=False)
+                open_first_research(root)
+                self.ad_plan(root, f'### {action}\n\n1. `Example/private.txt` — `{contract}`.')
+                result=self.run_checker(root)
+                self.assert_fail(result,'protected-surfaces')
+                self.assertIn('pre-implementation Product surface is protected',str(result[1]['errors']))
+
+    def test_ad_legacy_counted_headings_and_fields_are_compatible(self):
+        root,baseline,_completed=self.ad_closing_fixture(legacy=True)
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+
+    def test_ad_legacy_fields_do_not_grant_mutation_authority(self):
+        root=self.fixture(active=True)
+        self.ad_plan(root,'### UPDATE — 900\n\n1. `logs/sessions.md` — `content`.\n\n'
+            '### PRESERVE — 1\n\n1. `Example/**`.',legacy=True)
+        set_plan_fields(root,ALLOWED_SURFACES='docs/unowned.md')
+        baseline=self.write_baseline_manifest(root)
+        with (root/'logs/sessions.md').open('a') as stream: stream.write('changed\n')
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        (root/'docs/unowned.md').write_text('unowned\n')
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline),'actual-delta')
+
+    def test_ad_template_has_only_uncounted_mutation_sections(self):
+        text=(SOURCE_ROOT/'templates/workspace-plan-active.md').read_text()
+        self.assertNotIn('ALLOWED_SURFACES',text)
+        self.assertNotRegex(text,r'(?m)^### (?:Grouped )?PRESERVE')
+        self.assertEqual(re.findall(r'(?m)^### (CREATE|UPDATE|REMOVE)$',text),['CREATE','UPDATE','REMOVE'])
+        self.assertNotRegex(text,r'(?m)^### (CREATE|UPDATE|REMOVE).*count')
+
+    def test_ad_closing_cannot_bypass_preimplementation_protection(self):
+        root=self.fixture(decisions=False); open_first_research(root)
+        plan=self.ad_plan(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n'
+            '2. `Example/forbidden.md` — `file:0644`.\n\n### UPDATE\n\n1. `plans/backlog.md` — `content`.\n\n'
+            '### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+        baseline=self.write_baseline_manifest(root)
+        plan.write_text(plan.read_text().replace('Статус: active','Статус: completed'))
+        plan.rename(root/'plans/completed'/plan.name)
+        (root/'plans/backlog.md').write_text('WROAD-000001 active\nWBACK-000001 done\nactive WPLAN count 0\nNON_EXECUTING_CHECKPOINT: WROAD-000001-OWNER-PLANNING\n')
+        (root/'Example/forbidden.md').write_text('forbidden\n')
+        result=self.run_checker(root,'--baseline-manifest',baseline)
+        self.assert_fail(result,'actual-delta')
+        self.assertIn('pre-implementation Product surface is protected',str(result[1]['errors']))
 
     def test_changes_requested_new_plan_requires_fresh_implementation_od(self):
         """REQ-BP-REWORK-001: close an iteration without PA; retain WBACK and provenance."""
@@ -184,11 +337,11 @@ class WorkspaceCheckerTests(unittest.TestCase):
 
     def test_bootstrap_preimplementation_product_allowances_fail(self):
         """REQ-BP-BOOT-002: allowances cannot open Product before the gate."""
-        for surface in ("Example", "Example/**", "Example/src/code.py", "Example/./data"):
+        for surface in ("Example", "Example/src/code.py", "Example/./data"):
             with self.subTest(surface=surface):
                 root = self.fixture(decisions=False)
                 open_first_research(root)
-                set_plan_fields(root, ALLOWED_SURFACES=surface)
+                self.ad_plan(root, f"### UPDATE\n\n1. `{surface}` — `content`.")
                 result = self.run_checker(root)
                 self.assert_fail(result)
                 self.assertIn("pre-implementation Product surface is protected", str(result[1]["errors"]))
@@ -196,8 +349,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
             with self.subTest(declaration=action):
                 root = self.fixture(decisions=False)
                 plan = open_first_research(root)
-                with plan.open("a") as stream:
-                    stream.write(f"\n### {action} — 1\n\n1. `Example/private.txt` — `{contract}`.\n")
+                self.ad_plan(root, f"### {action} — 1\n\n1. `Example/private.txt` — `{contract}`.")
                 result = self.run_checker(root)
                 self.assert_fail(result)
                 self.assertIn("pre-implementation Product surface is protected", str(result[1]["errors"]))
@@ -205,10 +357,10 @@ class WorkspaceCheckerTests(unittest.TestCase):
     def test_bootstrap_empty_work_scope_fails_without_od(self):
         root = self.fixture(decisions=False)
         open_first_research(root)
-        set_plan_fields(root, ALLOWED_SURFACES="none")
+        self.ad_plan(root, "### CREATE\n\n### UPDATE\n\n### REMOVE")
         result = self.run_checker(root)
         self.assert_fail(result, "sdlc-transition")
-        self.assertIn("active WPLAN requires non-empty ALLOWED_SURFACES", str(result[1]["errors"]))
+        self.assertIn("WPLAN requires non-empty CREATE/UPDATE/REMOVE mutation surfaces", str(result[1]["errors"]))
 
     def test_bootstrap_implementation_requires_valid_current_od(self):
         """REQ-BP-BOOT-003: none fails; fresh current approval passes."""
@@ -247,7 +399,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         self.assert_fail(self.run_checker(root), "sdlc-transition")
         set_plan_fields(root, OWNER_GATE_STATUS="satisfied", OWNER_GATE_REF="OD-000001")
         self.assert_pass(self.run_checker(root))
-        set_plan_fields(root, ALLOWED_SURFACES="Example/**")
+        self.ad_plan(root, "### UPDATE\n\n1. `Example` — `mode`.")
         self.assert_fail(self.run_checker(root), "protected-surfaces")
         row = next(row for row in self.phase_gate_rows(root) if row[0] == "approval")
         self.materialize_transition(root, row)
@@ -463,7 +615,8 @@ class WorkspaceCheckerTests(unittest.TestCase):
                 "PRODUCT_ACCEPTANCE_STATUS: not-performed\n"
                 "PRODUCT_ACCEPTANCE_REF: none\n"
                 "RELEASE_AUTHORIZATION_STATUS: not-performed\n"
-                "RELEASE_AUTHORIZATION_REF: none\n",
+                "RELEASE_AUTHORIZATION_REF: none\n"
+                "\n### UPDATE\n\n1. `logs/sessions.md` — `content`.\n",
                 encoding="utf-8",
             )
         else:
@@ -1084,8 +1237,8 @@ class WorkspaceCheckerTests(unittest.TestCase):
                 line + "\n" for line in text.splitlines() if line.startswith("| `intent` |")
             ),
             "unknown-policy": lambda text: text.replace("`none` | `none` |", "`unknown` | `none` |", 1),
-            "empty-decision-kind": lambda text: text.replace("| `none` |\n", "|  |\n", 1),
-            "unsupported-decision-kind": lambda text: text.replace("| `none` |\n", "| `arbitrary` |\n", 1),
+            "empty-decision-kind": lambda text: text.replace("`none` | `none` |\n", "`none` |  |\n", 1),
+            "unsupported-decision-kind": lambda text: text.replace("`none` | `none` |\n", "`none` | `arbitrary` |\n", 1),
             "policy-kind-mismatch": lambda text: text.replace(
                 "`owner-decision` | `implementation` |", "`owner-decision` | `none` |", 1
             ),
@@ -1251,6 +1404,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         """REQ-SDLC-DELTA-001; INV-SDLC-006; SCN-SDLC-010/011."""
         root = self.fixture(active=True)
         plan = root / "plans/active/WPLAN-000001-example.md"
+        self.ad_plan(root, "", legacy=True)
         with plan.open("a", encoding="utf-8") as stream:
             stream.write("\n### CREATE — 1\n\n1. `docs/allowed.md` — `file:0644`.\n")
         baseline = self.write_baseline_manifest(root)
@@ -1276,6 +1430,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
                 else:
                     (candidate / "docs/node").write_text("node\n", encoding="utf-8")
                     declaration = "### UPDATE — 1\n\n1. `docs/node` — `content`.\n"
+                self.ad_plan(candidate, "", legacy=True)
                 with candidate_plan.open("a", encoding="utf-8") as stream:
                     stream.write("\n" + declaration)
                 candidate_baseline = self.write_baseline_manifest(candidate)
@@ -1437,6 +1592,395 @@ class WorkspaceCheckerTests(unittest.TestCase):
         self.assertNotIn("BytePress", source)
         self.assertNotRegex(source, r"\b134\b|\b137\b")
 
+
+class WorkModelTests(unittest.TestCase):
+    fixture = WorkspaceCheckerTests.fixture
+    run_checker = WorkspaceCheckerTests.run_checker
+    assert_pass = WorkspaceCheckerTests.assert_pass
+    assert_fail = WorkspaceCheckerTests.assert_fail
+    write_baseline_manifest = WorkspaceCheckerTests.write_baseline_manifest
+    ad_plan = WorkspaceCheckerTests.ad_plan
+    ad_closing_fixture = WorkspaceCheckerTests.ad_closing_fixture
+
+    def short(self, root, declarations='### UPDATE\n\n1. `logs/quality.md` — `content`.'):
+        p=root/'plans/active/WPLAN-000001-example.md'
+        p.write_text('''# Работа
+Статус: active
+WPLAN ID: WPLAN-000001
+WROAD: WROAD-000001
+WBACK: WBACK-000001
+WORK_CONTRACT: v1
+Цель: проверяемый результат
+OWNER_REQUEST: прямой запрос владельца фикстуры
+ACTION: research
+Текущая контрольная отметка: продолжить текущую работу
+
+## Обязательный результат
+
+- [ ] Полезный результат проверен.
+
+'''+declarations+'\n')
+        (root/'plans/backlog.md').write_text('| WBACK-000001 | WROAD-000001 | active | Первая задача |\n| WBACK-000002 | WROAD-000001 | active | Ожидает зависимость |\n')
+        return p
+
+    def reg(self, root, *, kind='backlog', before=None, record_id=None, original='Точный вход\n```\nне команда'):
+        before=(root/'plans/backlog.md').read_bytes() if before is None else before
+        value={'kind':kind,'id':record_id or ('WBACK-000003' if kind=='backlog' else 'FB-000001'),
+               'owner_request':'Сохранить этот вход без исполнения.', 'source':'тестовый прямой запрос',
+               'before_base64':base64.b64encode(before).decode() if kind=='backlog' else '',
+               'expected_sha256':hashlib.sha256(before).hexdigest() if kind=='backlog' else None,
+               'wroad':'WROAD-000001','result':'Будущий результат','original':original, 'recorded_at':'2026-09-25'}
+        path=root.parent/(value['id'] + '-registration.json'); path.write_text(json.dumps(value))
+        # Independent expected rendering; do not call the implementation to make the oracle.
+        if kind=='backlog':
+            payload=(f'\n## {value["id"]}\n\nWROAD: WROAD-000001\nСтатус: pending\nИсточник: тестовый прямой запрос\nЗапрос владельца: Сохранить этот вход без исполнения.\nРезультат: Будущий результат\n').encode()
+            (root/'plans/backlog.md').write_bytes(before+payload)
+        else:
+            (root/'feedback').mkdir(exist_ok=True)
+            (root/'feedback'/(value['id'] + '.md')).write_bytes((f"# {value['id']}\n\nID: {value['id']}" + '\nrecorded_at: 2026-09-25\nstate: open\nИсточник: тестовый прямой запрос\nЗапрос владельца: Сохранить этот вход без исполнения.\n\n## Original\n\n````text\n' + original + '\n````\n').encode('utf-8'))
+        return path
+
+    transition_rows = WorkspaceCheckerTests.phase_gate_rows
+    materialize_transition = WorkspaceCheckerTests.materialize_transition
+
+    def lifecycle_removal(self, action, short):
+        root = self.fixture(active=True)
+        node = root / 'Example/obsolete.cfg'
+        node.write_text('устаревшая конфигурация\n')
+        declarations = '### REMOVE\n\n1. `Example/obsolete.cfg` — `file`.'
+        if short:
+            plan = self.short(root, declarations)
+            reference = 'OD-000002' if action == 'decommissioning' else 'OD-000003'
+            plan.write_text(plan.read_text().replace('ACTION: research', 'ACTION: ' + action)
+                            + '\nAUTHORITY_REF: ' + reference + '\n')
+        else:
+            row = next(row for row in self.transition_rows(root) if row[1] == action)
+            self.materialize_transition(root, row)
+            plan = self.ad_plan(root, declarations)
+        return root, node, plan
+
+    def test_lifecycle_removal_old_and_short_before_after(self):
+        for action in ('decommissioning', 'retired'):
+            for short in (False, True):
+                for status in ('active', 'applied'):
+                    with self.subTest(action=action, short=short, status=status):
+                        root, node, _ = self.lifecycle_removal(action, short)
+                        decisions = root / 'logs/decisions.md'
+                        decisions.write_text(decisions.read_text().replace('STATUS: active', 'STATUS: ' + status))
+                        baseline = self.write_baseline_manifest(root)
+                        self.assert_pass(self.run_checker(root, '--baseline-manifest', baseline))
+                        node.unlink()
+                        result = self.run_checker(root, '--baseline-manifest', baseline)
+                        self.assert_pass(result)
+                        delta = next(c['value'] for c in result[1]['checks'] if c['id'] == 'actual-delta')
+                        self.assertEqual(delta['REMOVE'], 1)
+
+    def test_lifecycle_decision_kind_scope_status_old_and_short(self):
+        for action in ('decommissioning', 'retired'):
+            kind = 'decommissioning_authorization' if action == 'decommissioning' else 'retirement_authorization'
+            other = 'retirement_authorization' if action == 'decommissioning' else 'decommissioning_authorization'
+            for short in (False, True):
+                for field, wrong in (('DECISION_KIND', 'implementation'), ('DECISION_KIND', other),
+                                     ('WPLAN_ID', 'WPLAN-999999'), ('ROUTE_REF', 'WBACK-999999'),
+                                     ('STATUS', 'revoked'), ('DECISION_VALUE', 'rejected')):
+                    with self.subTest(action=action, short=short, field=field, wrong=wrong):
+                        root, node, _ = self.lifecycle_removal(action, short)
+                        p = root / 'logs/decisions.md'
+                        blocks = p.read_text().split('\n\n')
+                        for i, block in enumerate(blocks):
+                            if 'DECISION_KIND: ' + kind + '\n' in block:
+                                blocks[i] = re.sub(r'(?m)^' + field + r':.*$', field + ': ' + wrong, block)
+                        p.write_text('\n\n'.join(blocks))
+                        baseline = self.write_baseline_manifest(root)
+                        node.unlink()
+                        self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline), 'sdlc-transition')
+
+    def test_lifecycle_removal_preserves_exact_boundary_old_and_short(self):
+        for action in ('decommissioning', 'retired'):
+            for short in (False, True):
+                with self.subTest(action=action, short=short):
+                    root, node, _ = self.lifecycle_removal(action, short)
+                    other = root / 'Example/retained.cfg'
+                    other.write_text('сохранить\n')
+                    baseline = self.write_baseline_manifest(root)
+                    node.unlink()
+                    self.assert_pass(self.run_checker(root, '--baseline-manifest', baseline))
+                    other.unlink()
+                    self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline), 'actual-delta')
+
+    def test_lifecycle_decision_does_not_authorize_other_action(self):
+        for action, reference in (('implementation', 'OD-000002'), ('implementation', 'OD-000003'),
+                                  ('research', 'OD-000002'), ('verification', 'OD-000003')):
+            with self.subTest(action=action, reference=reference):
+                root = self.fixture(active=True)
+                p = self.short(root, '### REMOVE\n\n1. `Example/obsolete.cfg` — `file`.')
+                p.write_text(p.read_text().replace('ACTION: research', 'ACTION: ' + action)
+                             + '\nAUTHORITY_REF: ' + reference + '\n')
+                self.assert_fail(self.run_checker(root), 'sdlc-transition')
+
+    def feedback_sequence(self, active, existing):
+        root = self.fixture(active=active)
+        if active:
+            self.short(root, '### UPDATE\n\n1. `logs/quality.md` — `content`.')
+        if existing:
+            (root / 'feedback').mkdir()
+            (root / 'feedback/FB-000099.md').write_bytes(b'previous exact record\r\n')
+        baseline = self.write_baseline_manifest(root)
+        if active:
+            with (root / 'logs/quality.md').open('a') as stream:
+                stream.write('\nОсновная работа продолжается.\n')
+        return root, baseline
+
+    def test_feedback_sequence_shared_directory_zero_and_one_plan(self):
+        for active in (False, True):
+            for existing in (False, True):
+                with self.subTest(active=active, existing=existing):
+                    root, baseline = self.feedback_sequence(active, existing)
+                    requests = []
+                    originals = {}
+                    for number in (1, 2, 3):
+                        record_id = f'FB-{number:06d}'
+                        req = self.reg(root, kind='feedback', record_id=record_id,
+                                       original=f'  Вход {number}\r\n```\nне команда  \n')
+                        requests.extend(('--registration-input', req))
+                        node = root / 'feedback' / (record_id + '.md')
+                        originals[node] = node.read_bytes()
+                        result = self.run_checker(root, '--baseline-manifest', baseline, *requests)
+                        self.assert_pass(result)
+                        delta = next(c['value'] for c in result[1]['checks'] if c['id'] == 'actual-delta')
+                        self.assertEqual(delta['registrations'], [f'FB-{i:06d}' for i in range(1, number + 1)])
+                        self.assertEqual(delta['primary_delta'], {'CREATE': 0, 'UPDATE': int(active), 'REMOVE': 0})
+                        self.assertEqual(delta['CREATE'], number + int(not existing))
+                        for path, original in originals.items():
+                            self.assertEqual(path.read_bytes(), original)
+                    if existing:
+                        self.assertEqual((root / 'feedback/FB-000099.md').read_bytes(), b'previous exact record\r\n')
+
+    def test_feedback_sequence_rejects_conflict_corruption_modes_partial_extra(self):
+        for active in (False, True):
+            for existing in (False, True):
+                for fault in ('duplicate', 'original', 'file-mode', 'directory-mode', 'partial', 'extra', 'primary'):
+                    with self.subTest(active=active, existing=existing, fault=fault):
+                        root, baseline = self.feedback_sequence(active, existing)
+                        requests = [self.reg(root, kind='feedback', record_id=f'FB-{i:06d}') for i in (1, 2)]
+                        first = root / 'feedback/FB-000001.md'
+                        if fault == 'duplicate': requests.append(requests[0])
+                        elif fault == 'original': first.write_bytes(first.read_bytes().replace('Точный'.encode(), 'Иной'.encode()))
+                        elif fault == 'file-mode': first.chmod(0o600)
+                        elif fault == 'directory-mode': (root / 'feedback').chmod(0o700)
+                        elif fault == 'partial': first.write_bytes(first.read_bytes()[:-4])
+                        elif fault == 'extra': (root / 'feedback/unrelated.md').write_text('не разрешено\n')
+                        elif fault == 'primary': (root / 'Example/unrelated.cfg').write_text('не разрешено\n')
+                        args = [value for req in requests for value in ('--registration-input', req)]
+                        self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline, *args), 'actual-delta')
+
+    def test_feedback_sequence_preserves_previous_records_and_rejects_existing_id(self):
+        for fault in ('previous', 'existing-id'):
+            root, baseline = self.feedback_sequence(False, True)
+            requests = [self.reg(root, kind='feedback', record_id=f'FB-{i:06d}') for i in (1, 2)]
+            if fault == 'previous':
+                (root / 'feedback/FB-000099.md').write_text('изменённая история\n')
+            else:
+                requests.append(self.reg(root, kind='feedback', record_id='FB-000099'))
+            args = [value for req in requests for value in ('--registration-input', req)]
+            self.assert_fail(self.run_checker(root, '--baseline-manifest', baseline, *args), 'actual-delta')
+
+    def test_old_resume_and_terminal_same_id(self):
+        root, baseline, _ = self.ad_closing_fixture(legacy=True)
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',self.write_baseline_manifest(root)))
+
+    def test_unused_permission_passes_but_required_absence_fails(self):
+        root=self.fixture(active=True)
+        self.ad_plan(root,'### REMOVE\n\n1. `docs/obsolete.md` — `file`.')
+        (root/'docs/obsolete.md').write_text('old')
+        p=root/'plans/active/WPLAN-000001-example.md'
+        p.write_text(p.read_text()+'\n### REQUIRED\n\n1. `docs/obsolete.md` — `absent`.\n')
+        baseline=self.write_baseline_manifest(root)
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--check-result'),'task-result')
+        (root/'docs/obsolete.md').unlink()
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline,'--check-result'))
+
+    def test_short_form_sessions_and_two_plans(self):
+        root=self.fixture(active=True); p=self.short(root)
+        for _ in range(2): self.assert_pass(self.run_checker(root))
+        shutil.copy2(p,p.with_name('WPLAN-000002-second.md'))
+        self.assert_fail(self.run_checker(root),'active-wplan')
+
+    def test_zero_without_projection(self):
+        root=self.fixture(); (root/'plans/backlog.md').write_text('# Задачи\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_registration_zero_and_one_with_main_change(self):
+        for active in (False,True):
+            with self.subTest(active=active):
+                root=self.fixture(active=active)
+                if active: self.short(root,'### UPDATE\n\n1. `plans/backlog.md` — `content`.')
+                baseline=self.write_baseline_manifest(root)
+                if active:
+                    p=root/'plans/backlog.md'; p.write_text(p.read_text().replace('Первая задача','Уточнена основная задача'))
+                request=self.reg(root)
+                self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',request))
+                self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline),'actual-delta') if not active else None
+                p=root/'plans/backlog.md'; p.write_text(p.read_text().replace('WROAD-000001','WROAD-000002',1))
+                self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',request),'actual-delta')
+
+    def test_registration_collision_stale_partial_and_missing_source(self):
+        for case in ('collision','stale','partial','source'):
+            with self.subTest(case=case):
+                root=self.fixture(active=True); self.short(root); baseline=self.write_baseline_manifest(root)
+                req=self.reg(root,record_id='WBACK-000001' if case=='collision' else None)
+                data=json.loads(req.read_text())
+                if case=='stale': data['expected_sha256']='0'*64
+                if case=='source': data['owner_request']=''
+                req.write_text(json.dumps(data))
+                if case=='partial':
+                    p=root/'plans/backlog.md'; p.write_bytes(p.read_bytes()[:-8])
+                self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',req),'actual-delta')
+
+    def test_feedback_original_and_product_write(self):
+        root=self.fixture(); baseline=self.write_baseline_manifest(root); req=self.reg(root,kind='feedback')
+        result=self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',req)
+        self.assert_pass(result)
+        delta=next(c['value'] for c in result[1]['checks'] if c['id']=='actual-delta')
+        self.assertEqual(delta['CREATE'],2)
+        self.assertEqual(delta['primary_delta'], {'CREATE':0,'UPDATE':0,'REMOVE':0})
+        (root/'Example/evil').write_text('not authorized')
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',req),'actual-delta')
+
+    def test_role_pass_future_task_cannot_grant_product(self):
+        for action in ('research','implementation'):
+            root=self.fixture(active=True,decisions=False)
+            p=self.short(root,'### CREATE\n\n1. `Example/evil` — `file:0644`.')
+            p.write_text(p.read_text().replace('ACTION: research','ACTION: '+action)+'\nРоль: Developer\nVERIFICATION_STATUS: pass\n')
+            self.assert_fail(self.run_checker(root))
+
+    def test_atomic_replace_interruption_keeps_old_or_complete(self):
+        root=self.fixture(); target=root/'plans/backlog.md'; before=target.read_bytes()
+        req=self.reg(root); complete=target.read_bytes(); target.write_bytes(before)
+        staged=root.parent/'pending-write'; staged.write_bytes(complete[:10])
+        self.assertEqual(target.read_bytes(),before)
+        staged.write_bytes(complete)
+        if target.read_bytes()!=before: self.fail('stale input')
+        os.chmod(staged,0o644); os.replace(staged,target)
+        self.assertEqual(target.read_bytes(),complete)
+        self.assertEqual(target.stat().st_mode & 0o777,0o644)
+
+
+
+    def test_temp_copy_links_do_not_change_live_workspace_verdict(self):
+        root=self.fixture(active=True);self.short(root)
+        path=root/'temp/isolated/docs/input.md';path.parent.mkdir(parents=True)
+        path.write_text('[deliberate invalid test input](missing.md)\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_result_owned_by_plan_or_subject_and_legacy_reference(self):
+        for place in ('plan', 'plan-fragment', 'research', 'legacy'):
+            root=self.fixture(active=True); plan=self.short(root)
+            text=plan.read_text().replace('- [ ]','- [x]')
+            if place in {'plan', 'plan-fragment'}: target=plan
+            elif place == 'research': target=root/'research/result.md'
+            else: target=root/'logs/quality.md'
+            record='\n\n## RESULT-OWNED\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: python3 -B -m unittest; 2 tests\nEXPECTED: valid input accepted and missing input refused\nACTUAL: 2 tests passed, no skips\n'
+            plan.write_text(text+'\nRESULT_REF: '+('' if place == 'plan-fragment' else target.relative_to(root).as_posix())+'#RESULT-OWNED\n')
+            with target.open('a') as stream: stream.write(record)
+            self.assert_pass(self.run_checker(root,'--check-result'))
+            target.write_text(target.read_text().replace('ACTUAL: 2 tests passed, no skips','ACTUAL: PASS').replace('CHECKS: python3 -B -m unittest; 2 tests','CHECKS: PASS').replace('EXPECTED: valid input accepted and missing input refused','EXPECTED: PASS'))
+            self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_legacy_result_link_to_bare_pass_is_not_evidence(self):
+        root=self.fixture(active=True);plan=self.short(root)
+        plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#LEGACY-RESULT\n')
+        (root/'research/result.md').write_text('PASS\n')
+        (root/'logs/quality.md').write_text('## LEGACY-RESULT\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n\n'
+            +'The legacy record describes the supposed result and points to a file that contains only a verdict. '
+            +'[Source](../research/result.md)\n')
+        self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_result_missing_wrong_owner_and_bare_pass_refused(self):
+        for record in ('', '## R1\nWPLAN_ID: WPLAN-000002\nVERDICT: PASS\nCHECKS: tests\nEXPECTED: acceptance\nACTUAL: accepted\n', '## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n'):
+            root=self.fixture(active=True); plan=self.short(root)
+            plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#R1\n')
+            (root/'logs/quality.md').write_text(record)
+            self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+
+    def test_completed_appendix_is_not_another_active_plan(self):
+        root=self.fixture(active=True); self.short(root)
+        appendix=root/'plans/completed/WPLAN-000099'; appendix.mkdir()
+        (appendix/'WPLAN-000099-evidence.md').write_text('# Large evidence\n')
+        result=self.run_checker(root); self.assert_pass(result)
+        self.assertEqual(next(c['value']['active_wplan_count'] for c in result[1]['checks'] if c['id']=='active-wplan'),1)
+
+    def test_short_same_id_completion_requires_result(self):
+        root=self.fixture(active=True)
+        p=self.short(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+        self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+        (root/'logs/quality.md').write_text('EVIDENCE_ID: RESULT-1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: fixture read-back\nEXPECTED: completed same ID\nACTUAL: completed same ID observed\n')
+        p.write_text(p.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#RESULT-1\n')
+        baseline=self.write_baseline_manifest(root)
+        p.write_text(p.read_text().replace('Статус: active','Статус: completed'))
+        target=root/'plans/completed'/p.name;p.rename(target)
+        self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+        target.write_text(target.read_text().replace('- [x]','- [ ]'))
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline),'actual-delta')
+
+    def test_unused_malformed_permission_fails(self):
+        root=self.fixture(active=True)
+        self.ad_plan(root,'### CREATE\n\n1. `docs/optional` — `nonsense`.')
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',self.write_baseline_manifest(root)),'actual-delta')
+
+    def test_duplicate_action_policy_fails(self):
+        root=self.fixture(active=True);self.short(root)
+        p=root/'docs/technical/phase-gates.md';p.write_text(p.read_text()+'\n| `research` | `none` |\n')
+        self.assert_fail(self.run_checker(root),'sdlc-transition')
+
+    def test_process_interruption_before_and_after_replace(self):
+        for after in (False,True):
+            root=self.fixture(); target=root/'plans/backlog.md'; before=target.read_bytes()
+            self.reg(root); complete=target.read_bytes();target.write_bytes(before)
+            stage=root.parent/'entry.tmp';stage.write_bytes(complete)
+            command='import os,sys; '+('os.replace(sys.argv[1],sys.argv[2]); ' if after else '')+'os._exit(73)'
+            run=subprocess.run([sys.executable,'-B','-c',command,str(stage),str(target)])
+            self.assertEqual(run.returncode,73)
+            self.assertEqual(target.read_bytes(),complete if after else before)
+
+    def test_registration_input_is_object_and_preserves_feedback_mode(self):
+        root=self.fixture();baseline=self.write_baseline_manifest(root);req=self.reg(root,kind='feedback')
+        (root/'feedback/FB-000001.md').chmod(0o600)
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',req),'actual-delta')
+        req.write_text('[]')
+        self.assert_fail(self.run_checker(root,'--baseline-manifest',baseline,'--registration-input',req),'actual-delta')
+
+
+    def test_registered_backlog_form_can_be_used_by_later_authorized_work(self):
+        root=self.fixture(active=True);self.short(root)
+        (root/'plans/backlog.md').write_text('## WBACK-000001\n\nWROAD: WROAD-000001\nСтатус: active\nРезультат: разрешённая задача\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_status_words_in_task_text_never_activate_task(self):
+        for backlog in (
+            '| WBACK-000001 | WROAD-000001 | done | old active work |\n',
+            'Пояснение: WBACK-000001 active только в примере\n',
+            '## WBACK-000001\n\nWROAD: WROAD-000001\nСтатус: pending\nИсточник: WBACK-000001 active в цитате\n',
+        ):
+            root=self.fixture(active=True);self.short(root)
+            (root/'plans/backlog.md').write_text(backlog)
+            self.assert_fail(self.run_checker(root),'active-wplan')
+
+    def test_rework_reuses_same_unfinished_plan_and_original_authority(self):
+        root=self.fixture(active=True)
+        target=root/'Example/value.txt';target.write_text('draft\n')
+        plan=self.short(root,'### UPDATE\n\n1. `Example/value.txt` — `content`.')
+        plan.write_text(plan.read_text().replace('ACTION: research','ACTION: implementation')+'\nAUTHORITY_REF: OD-000001\n')
+        authority=(root/'logs/decisions.md').read_bytes(); plan_bytes=plan.read_bytes()
+        baseline=self.write_baseline_manifest(root)
+        for content in ('first result\n','corrected result\n'):
+            target.write_text(content)
+            self.assert_pass(self.run_checker(root,'--baseline-manifest',baseline))
+            self.assertEqual(plan.read_bytes(),plan_bytes)
+            self.assertEqual((root/'logs/decisions.md').read_bytes(),authority)
+            self.assertEqual(len(list((root/'plans/active').glob('WPLAN-*.md'))),1)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

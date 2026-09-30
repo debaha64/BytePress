@@ -13,7 +13,7 @@ Project Profile описывает состав Workspace и режим исто
 | Поле | Значение |
 |---|---|
 | `schema_version` | обязательное целое число `1` |
-| `harness_version` | обязательная непустая версия успешно развёрнутого Harness |
+| `harness_version` | обязательный полный идентификатор развёрнутого Harness по [SOP версий](../../sops/semver.md#развёрнутая-версия) |
 | `sot_mode` | обязательное `sot_files`, `sot_git` либо `sot_github` |
 | `display_name` | обязательная непустая строка для человека; в путях не участвует |
 | `product_parts` | необязательный объект `{PartSlug: {responsibility}}` |

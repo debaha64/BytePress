@@ -37,6 +37,15 @@ class ProjectProfileError(ValueError):
     """Project Profile syntax, schema or composition is invalid."""
 
 
+def validate_harness_version(value: str) -> str:
+    """Полный идентификатор будущей поставки; не доказательство её содержимого."""
+    if not isinstance(value, str) or not re.fullmatch(
+        r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:dev|rc)\.[1-9][0-9]*)?", value
+    ):
+        raise ProjectProfileError("версия должна иметь форму X.Y.Z, X.Y.Z-dev.N или X.Y.Z-rc.N; N >= 1")
+    return value
+
+
 @dataclass(frozen=True)
 class ProductPart:
     responsibility: str
@@ -239,7 +248,7 @@ def parse_project_profile(data: bytes, profile_name: str) -> ProjectProfile:
     schema_version = document["schema_version"]
     if type(schema_version) is not int or schema_version != 1:
         raise ProjectProfileError("schema_version v1 должен быть integer 1")
-    harness_version = _nonempty_text(document["harness_version"], "harness_version")
+    harness_version = validate_harness_version(document["harness_version"])
     sot_mode = document["sot_mode"]
     if not isinstance(sot_mode, str) or sot_mode not in SOT_MODES:
         raise ProjectProfileError("sot_mode не поддерживается schema v1")
