@@ -1071,9 +1071,6 @@ class CliTests(ProjectStartCase):
         self.assertEqual(json.loads(success.stdout)["state"], "OWNER_PLANNING")
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
 
 class BootstrapStartTests(ProjectStartCase):
     """REQ-BP-BOOT-001..005 and generated registry/documented bootstrap contracts."""
@@ -1185,5 +1182,129 @@ class BootstrapStartTests(ProjectStartCase):
             self.assertEqual(result.returncode, 0, command + result.stdout + result.stderr)
         self.assertTrue((self.base / "baseline.tsv").read_text().startswith("manifest\t1\tcomplete\t."))
 
+
+class Candidate055Tests(ProjectStartCase):
+    """REQ-189-01/03: generated navigation and native filesystem boundaries."""
+
+    def test_map_names_project_and_reads_current_owners(self):
+        preview = self.preview(display_name='Частный продукт Максима')
+        self.apply(preview, display_name='Частный продукт Максима')
+        text = (self.destination / 'WS_Example/AGENTS.md').read_text(encoding='utf-8')
+        self.assertIn('Частный продукт Максима', text)
+        self.assertIn('WS_Example', text)
+        self.assertIn('Example/', text)
+        self.assertNotIn('начальный режим', text)
+        self.assertNotIn('`sot_files`', text)
+        self.assertLess(text.index('Example.profile'), text.index('SYSTEM.md'))
+        for owner in ('sops/start-session.md', 'sops/project-management.md',
+                      'sops/change-management.md', 'sops/verify-work.md',
+                      'sops/clean-exit.md', 'plans/active/'):
+            self.assertIn(owner, text)
+
+    def test_platform_without_pathconf_still_previews(self):
+        with mock.patch.object(new_project.os, 'pathconf', side_effect=AttributeError, create=True):
+            preview = self.preview()
+        self.assertEqual(preview['authorization_payload']['inputs']['slug'], 'Example')
+
+    def test_windows_mode_projection_is_readonly_not_posix(self):
+        with mock.patch.object(new_project, 'os', wraps=os) as native:
+            native.name = 'nt'
+            self.assertEqual(new_project._target_mode('0644', 'file'), '0666')
+            self.assertEqual(new_project._target_mode('0440', 'file'), '0444')
+            self.assertEqual(new_project._target_mode('0755', 'directory'), '0777')
+            self.assertEqual(new_project._target_mode('0555', 'directory'), '0555')
+        with mock.patch.object(new_project, 'os', wraps=os) as posix:
+            posix.name = 'posix'
+            self.assertEqual(new_project._target_mode('0750', 'directory'), '0750')
+
+    def test_windows_no_replace_error_keeps_occupied_target(self):
+        staging = self.base / 'staging'; staging.mkdir()
+        target = self.base / 'target'; target.mkdir()
+        (target / 'private').write_bytes(b'owner')
+        before = tree_manifest(target)
+        with mock.patch.object(new_project, '_commit_primitive', return_value=('windows-directory-rename-no-replace', None)), mock.patch.object(new_project.os, 'rename', side_effect=FileExistsError('occupied')):
+            with self.assertRaises(OSError):
+                new_project._commit_staging(staging, target)
+        self.assertEqual(tree_manifest(target), before)
+        self.assertTrue(staging.is_dir())
+
+    def test_ntfs_reparse_directory_is_not_traversed(self):
+        from types import SimpleNamespace
+        entry = mock.Mock()
+        entry.name = 'junction'; entry.path = str(self.destination / 'junction')
+        entry.stat.return_value = SimpleNamespace(st_file_attributes=0x400, st_mode=stat.S_IFDIR | 0o777)
+        entry.is_symlink.return_value = False
+        with mock.patch.object(new_project.os, 'scandir') as scan:
+            scan.return_value.__enter__.return_value = [entry]
+            with self.assertRaisesRegex(new_project.InspectionError, 'reparse'):
+                new_project._scan_tree(self.destination, 'Product', reject_hardlinks=True)
+        entry.is_dir.assert_not_called()
+
+
+    @unittest.skipUnless(os.name == 'nt', 'native Windows read-only deletion')
+    def test_windows_readonly_product_abort_and_retry(self):
+        existing = self.existing('частный продукт')
+        path = existing / 'read-only.txt'; path.write_bytes('данные'.encode('utf-8')); path.chmod(0o444)
+        self.addCleanup(lambda: path.chmod(0o666))
+        inputs = {'product_mode': 'existing', 'existing_product': existing}
+        preview = self.preview(**inputs)
+        before = tree_manifest(existing)
+        with mock.patch.object(new_project, '_verify_staging_representation', side_effect=new_project.StagingError('probe abort')):
+            with self.assertRaises(new_project.ApplyAborted): self.apply(preview, **inputs)
+        self.assertEqual(tree_manifest(existing), before)
+        self.assertFalse(self.staging_paths())
+        self.apply(preview, **inputs)
+        copied = self.destination / 'WS_Example/Example/read-only.txt'
+        self.addCleanup(lambda: copied.chmod(0o666) if copied.exists() else None)
+        self.assertEqual(copied.read_bytes(), path.read_bytes())
+        self.assertFalse(copied.stat().st_mode & stat.S_IWRITE)
+
+    def test_owned_cleanup_rejects_hardlinks_before_mutation(self):
+        """REQ-190-02: внешний файл и весь остаток сохраняются до RecoveryRequired."""
+        preview = self.preview()
+        payload, digest = preview['authorization_payload'], preview['preview_sha256']
+        for relative in ('AGENTS.md', new_project.TRANSACTION_MARKER, new_project.TRANSACTION_MARKER_TEMP):
+            with self.subTest(relative=relative):
+                staging = self.base / ('owned-' + str(len(list(self.base.iterdir())))); staging.mkdir()
+                new_project._atomic_marker(staging, new_project._marker_document(payload, digest, 'STAGING'))
+                target = staging / relative
+                data = target.read_bytes() if target.exists() else b'private data\n'
+                if target.exists(): target.unlink()
+                external = self.base / ('private-' + str(len(list(self.base.iterdir()))))
+                external.write_bytes(data); external.chmod(0o444)
+                self.addCleanup(lambda p=external: p.chmod(0o666) if p.exists() else None)
+                os.link(external, target)
+                def metadata(path):
+                    info = path.stat()
+                    return tuple(getattr(info, field) for field in
+                                 ('st_dev', 'st_ino', 'st_nlink', 'st_mode', 'st_size', 'st_mtime_ns', 'st_ctime_ns'))
+                before_external = metadata(external)
+                before_tree = tree_manifest(staging)
+                before_metadata = {p.relative_to(staging): metadata(p) for p in [staging, *staging.rglob('*')]}
+                with mock.patch.object(new_project, 'os', wraps=os) as native, \
+                     mock.patch.object(new_project.shutil, 'rmtree', wraps=shutil.rmtree) as remove:
+                    native.name = 'nt'
+                    with self.assertRaisesRegex(new_project.RecoveryRequired, 'hardlink'):
+                        new_project._cleanup_owned_staging(staging, payload, digest)
+                    native.chmod.assert_not_called()
+                    remove.assert_not_called()
+                self.assertEqual(external.read_bytes(), data)
+                self.assertEqual(metadata(external), before_external)
+                self.assertEqual(tree_manifest(staging), before_tree)
+                self.assertEqual({p.relative_to(staging): metadata(p) for p in [staging, *staging.rglob('*')]}, before_metadata)
+
+    def test_owned_cleanup_removes_ordinary_readonly_file(self):
+        """REQ-190-03: собственный обычный read-only файл по-прежнему очищается."""
+        preview = self.preview()
+        payload, digest = preview['authorization_payload'], preview['preview_sha256']
+        staging = self.base / 'owned-readonly'; staging.mkdir()
+        new_project._atomic_marker(staging, new_project._marker_document(payload, digest, 'STAGING'))
+        owned = staging / 'AGENTS.md'; owned.write_bytes(b'owned'); owned.chmod(0o444)
+        with mock.patch.object(new_project, 'os', wraps=os) as native:
+            native.name = 'nt'
+            new_project._cleanup_owned_staging(staging, payload, digest)
+        self.assertFalse(staging.exists())
+
+
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

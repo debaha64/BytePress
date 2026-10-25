@@ -56,3 +56,5 @@ Patch driver находится только в test_workspace_update.py и ме
 `test_workspace_update.py` проверяет ES-REQ-01..04 и RU-REQ-01..06: реальные Project Start формы и generic CHANGE/QUALITY/DECISION без client runtime, research → requirements, сохранение managed codexlog, один Harness-blocked active WPLAN при recovery, отказ неподходящему состоянию, exact Product/route/research/history/Feedback и failure до/после version cutover. Tests-first RED относится к старым deployed contracts и guard existing manual Update driver. Нейтральные fixtures не являются реальными owner decisions или field validation.
 
 Перед запуском передать `TMPDIR=<абсолютный путь собственной области Workspace temp>` только тестовому процессу. Стандартный tempfile использует этот путь; глобальное окружение не меняется. Не удалять чужие временные данные.
+
+REQ-189-01/03 проверяет Candidate055Tests в test_new_project.py; REQ-189-02 — явное объединение частной карты в test_workspace_update.py. Linux-проекция Windows-ветвей не считается нативным прогоном; отдельный пакет проверяет точный кандидат на Windows.

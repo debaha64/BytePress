@@ -81,6 +81,7 @@ docs/user/feedback.md
 docs/user/github-repository-preparation.md
 docs/user/migration-0.5.1-to-0.5.2.md
 docs/user/workspace-update.md
+docs/user/windows.md
 roles/01-concept-developer.md
 roles/02-discussion-facilitator.md
 roles/03-interviewer.md
@@ -180,7 +181,7 @@ tools/release_preflight.py
 """.split()
 )
 VERIFICATION_PLAN = (
-    {"id": "staging-representation", "expected": "all authorized paths, bytes, types and POSIX modes exact"},
+    {"id": "staging-representation", "expected": "all authorized paths, bytes, types and platform-representable modes exact"},
     {"id": "profile-four-fields", "expected": "schema_version, harness_version, sot_mode and display_name only"},
     {"id": "workspace-composition", "expected": "one WS_<Slug>, one profile and one direct-child Product root"},
     {"id": "wroad-only", "expected": "WROAD-000001 active; active WBACK/WPLAN counts 0/0; OWNER-PLANNING"},
@@ -229,6 +230,14 @@ def _sha256(data: bytes) -> str:
 
 def _mode(info) -> str:
     return f"{stat.S_IMODE(info.st_mode):04o}"
+
+
+def _target_mode(mode: str, kind: str) -> str:
+    """Native Windows chmod preserves read-only, not POSIX access bits."""
+    if os.name == "nt":
+        writable = bool(int(mode, 8) & stat.S_IWRITE)
+        return ("0777" if writable else "0555") if kind == "directory" else ("0666" if writable else "0444")
+    return mode
 
 
 def _reject_surrogates(value: str, label: str) -> None:
@@ -350,6 +359,8 @@ def _scan_tree(root: Path, label: str, *, reject_hardlinks: bool) -> list[dict]:
                 raise InspectionError(f"{label} entry недоступен: {relative}: {error}") from error
             if entry.is_symlink():
                 raise InspectionError(f"{label}: symlink запрещён: {relative}")
+            if getattr(info, "st_file_attributes", 0) & 0x400:
+                raise InspectionError(f"{label}: reparse point запрещён: {relative}")
             if entry.is_dir(follow_symlinks=False):
                 rows.append({"path": relative, "type": "directory", "mode": _mode(info)})
                 pending.append(path)
@@ -564,13 +575,13 @@ def _inspect_existing(existing_product, exclusions: tuple[str, ...]) -> dict:
 def _target_component_checks(destination: Path, target: Path) -> None:
     try:
         name_max = os.pathconf(destination, "PC_NAME_MAX")
-    except (OSError, ValueError):
+    except (AttributeError, OSError, ValueError):
         name_max = None
     if name_max is not None and name_max >= 0 and len(os.fsencode(target.name)) > name_max:
         raise InspectionError("target Workspace basename не представим на destination filesystem")
     try:
         path_max = os.pathconf(destination, "PC_PATH_MAX")
-    except (OSError, ValueError):
+    except (AttributeError, OSError, ValueError):
         path_max = None
     if path_max is not None and path_max >= 0 and len(os.fsencode(target)) >= path_max:
         raise InspectionError("target Workspace path не представим на destination filesystem")
@@ -580,11 +591,11 @@ def _target_action_representation_checks(destination: Path, target: Path, action
     """Reject limits that the destination reports without requiring a write probe."""
     try:
         name_max = os.pathconf(destination, "PC_NAME_MAX")
-    except (OSError, ValueError):
+    except (AttributeError, OSError, ValueError):
         name_max = None
     try:
         path_max = os.pathconf(destination, "PC_PATH_MAX")
-    except (OSError, ValueError):
+    except (AttributeError, OSError, ValueError):
         path_max = None
     for item in actions:
         relative = PurePosixPath(item["path"])
@@ -670,15 +681,8 @@ def _generated_readme(slug: str, display_name: str, license_bytes: bytes) -> byt
 
 def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad: str, version: str, license_bytes: bytes) -> dict[str, bytes]:
     readme = _generated_readme(slug, display_name, license_bytes)
-    agents = (
-        f"# AGENTS.md — рабочая карта Workspace {slug}\n\n"
-        f"Корень Workspace: `WS_{slug}`. Корень продукта и граница поставки: `{slug}/`.\n\n"
-        f"Единственный машинный источник состава проекта и SoT — `{slug}.profile`; начальный режим — `sot_files`. "
-        "Git CLI не вызывается до отдельно разрешённого владельцем перехода.\n\n"
-        "Человек управляет, агенты исполняют. Прочитайте `SYSTEM.md`, Project Profile и корневой `plans/`; "
-        "технический PASS не является Product Acceptance.\n"
-        "\nОбработка обратной связи: [SOP Feedback](sops/feedback.md).\n"
-    ).encode("utf-8")
+    agents = (_read_source_file(source, "templates/agents.md").decode("utf-8")
+              .replace("](../", "](").replace("{{SLUG}}", slug).replace("{{DISPLAY_NAME}}", display_name)).encode("utf-8")
     system = (
         f"# SYSTEM.md — Workspace {slug}\n\n"
         "## Состав\n\n"
@@ -760,11 +764,11 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
             "Полный идентификатор Harness и порядок его изменения определяет [SOP версий](../../sops/semver.md).\n\n"
             "Для проверки фактических изменений вызывающая сторона заранее получает полный TSV командой "
             "`python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <workspace-temp>/baseline.tsv`; "
-            "активный WPLAN связывает точные CREATE/UPDATE/REMOVE с фактическими изменениями путей, типов, содержимого и POSIX-прав.\n"
+            "активный WPLAN связывает точные CREATE/UPDATE/REMOVE с фактическими изменениями путей, типов, содержимого и представимых прав платформы.\n"
         ).encode("utf-8"),
         "docs/technical/README.md": "# Техническая документация Workspace\n\nТехнические контракты этого каталога применяются через корневой WPLAN и не создают полномочий владельца.\n".encode("utf-8"),
         "docs/terminology/README.md": "# Терминология Workspace\n\nКанонический словарь: [glossary.md](glossary.md).\n".encode("utf-8"),
-        "docs/user/README.md": "# Пользовательская документация Workspace\n\n- [Первый старт](first-start.md)\n- [Режим источника истины](source-of-truth-mode.md)\n".encode("utf-8"),
+        "docs/user/README.md": "# Пользовательская документация Workspace\n\n- [Первый старт](first-start.md)\n- [Режим источника истины](source-of-truth-mode.md)\n- [Нативная Windows](windows.md)\n".encode("utf-8"),
         "docs/user/first-start.md": (
             f"# Первый старт Workspace {slug}\n\n"
             f"Project Start завершён. Прочитайте корневые `README.md`, `AGENTS.md`, `SYSTEM.md`, `{slug}.profile` и `plans/`. "
@@ -814,6 +818,7 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
         "- [Переход 0.5.1 → 0.5.2](migration-0.5.1-to-0.5.2.md).\n"
         "- [Подготовка GitHub](github-repository-preparation.md).\n"
         "- [Обратная связь](feedback.md).\n"
+        "- [Нативная Windows](windows.md).\n"
         "\n## Как выбрать\n\n"
         "Project Start — New Product создаёт новую среду с пустым корнем продукта. "
         "Project Start — Existing Product создаёт новую среду с точной копией реального корня продукта. "
@@ -927,6 +932,8 @@ def _build_actions(distribution: dict, slug: str, display_name: str, wroad: str,
                 )
     file_paths = [item["path"] for item in actions if item["type"] == "file"]
     _add_parent_directories(actions, file_paths, explicit_directories)
+    for item in actions:
+        item["mode"] = _target_mode(item["mode"], item["type"])
     actions = sorted(actions, key=lambda item: (item["path"], item["type"], item["action"]))
     paths = [item["path"] for item in actions]
     if len(paths) != len(set(paths)):
@@ -1205,8 +1212,12 @@ def _safe_owned_tree(root: Path, payload: dict, digest: str) -> None:
             path = Path(base) / name
             relative = path.relative_to(root).as_posix()
             info = os.lstat(path)
+            if getattr(info, "st_file_attributes", 0) & 0x400:
+                raise RecoveryRequired(f"owned staging contains reparse point: {relative}")
             if stat.S_ISLNK(info.st_mode) or not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
                 raise RecoveryRequired(f"owned staging contains unsupported node: {relative}")
+            if stat.S_ISREG(info.st_mode) and info.st_nlink > 1:
+                raise RecoveryRequired(f"owned staging contains hardlink: {relative}")
             if relative not in allowed:
                 raise RecoveryRequired(f"owned staging contains unknown entry: {relative}")
 
@@ -1214,6 +1225,13 @@ def _safe_owned_tree(root: Path, payload: dict, digest: str) -> None:
 def _cleanup_owned_staging(root: Path, payload: dict, digest: str) -> None:
     _safe_owned_tree(root, payload, digest)
     try:
+        if os.name == "nt":
+            # Only the validated owned staging is writable; source/target stay intact.
+            for base, _, filenames in os.walk(root, followlinks=False):
+                for name in filenames:
+                    path = Path(base) / name
+                    if not path.stat().st_mode & stat.S_IWRITE:
+                        os.chmod(path, stat.S_IREAD | stat.S_IWRITE)
         shutil.rmtree(root)
     except OSError as error:
         raise RecoveryRequired(f"owned staging cleanup failed: {error}") from error
@@ -1330,7 +1348,7 @@ def _verify_staging_representation(root: Path, payload: dict, *, final: bool = F
     expected = _expected_manifest_from_actions(payload["actions"])
     actual = _actual_materialized_manifest(root)
     if actual != expected:
-        raise StagingError("materialized path/type/content/POSIX-mode manifest mismatch")
+        raise StagingError("materialized path/type/content/platform-mode manifest mismatch")
     slug = payload["inputs"]["slug"]
     profile_path = root / f"{slug}.profile"
     profile = parse_project_profile(profile_path.read_bytes(), profile_path.name)

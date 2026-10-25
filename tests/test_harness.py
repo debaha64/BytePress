@@ -31,10 +31,10 @@ EXPECTED_TEST_FILES = {
     "README.md", "test_check_product.py", "test_check_workspace.py",
     "test_harness.py", "test_new_project.py", "test_project_profile.py", "test_release_preflight.py", "test_workspace_update.py", "test_feedback.py", "test_delivery_interfaces.py",
 }
-EXPECTED_DISTRIBUTION_FILES = 153
+EXPECTED_DISTRIBUTION_FILES = 154
 EXPECTED_DISTRIBUTION_DIRECTORIES = 14
-EXPECTED_DEPLOY_FILES = 116
-EXPECTED_DEPLOY_MANIFEST_SHA256 = "a8eeaf1c2e601ccefc97c0df569a1a50f336e5af3bedcf3b2bfa7c61123680ea"
+EXPECTED_DEPLOY_FILES = 117
+EXPECTED_DEPLOY_MANIFEST_SHA256 = "47835da334ba120f58e4bd0ae80e54683d6790dd6fd671997c4ed9f738d01f5b"
 DISPOSABLE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 DISPOSABLE_SUFFIXES = (".pyc", ".pyo", ".tmp", ".temp", ".orig")
 
