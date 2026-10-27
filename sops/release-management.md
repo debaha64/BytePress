@@ -67,11 +67,11 @@ Release Readiness потребляет существующий `PA-*` со зн
 
 Полнота и сохранность принадлежат [artifact-lifecycle](../docs/technical/artifact-lifecycle.md#обычный-снимок), имя — [SemVer](semver.md#имена-снимков-и-поставок), момент передачи — [clean-exit](clean-exit.md#закрытие-маршрута-и-снимок). Выполните все записи и проверки до упаковки; остановите параллельные записи. Полный обход включает скрытые файлы и пустые каталоги, служебные данные и всё оставшееся temp; фильтров проверки изменений здесь нет.
 
-Используйте существующие Python standard library и tar: POSIX tar с поддержкой --format ustar либо нативный Windows bsdtar. Формат всегда явно USTAR UTF-8, без PAX/GNU расширений. Сохраните следующий единственный исполняемый пример вне Workspace как snapshot.py. Запустите python3 -B snapshot.py /absolute/WS_Example /absolute/backup.tar.gz /absolute/fresh-restore; [Windows](../docs/user/windows.md#снимок-и-проба-восстановления) задаёт платформенный вызов того же примера. Все три пути должны быть абсолютными; архив и отсутствующая область восстановления находятся вне Workspace. Имеющийся архив не заменяется.
+Используйте существующие Python standard library и tar: POSIX tar с поддержкой --format ustar либо нативный Windows bsdtar. Формат всегда явно USTAR UTF-8, без PAX/GNU расширений. Заранее создайте один новый пустой внешний каталог операции и сохраните в нём следующий единственный исполняемый пример как snapshot.py. Запустите python3 -B /absolute/snapshot-operation/snapshot.py /absolute/WS_Example /absolute/backup.tar.gz /absolute/snapshot-operation; [Windows](../docs/user/windows.md#снимок-и-проба-восстановления) задаёт платформенный вызов того же примера. Все пути абсолютные. Workspace, итоговый архив и каталог операции не вложены друг в друга; родитель архива существует. В каталоге операции перед запуском только собственный snapshot.py: посторонний состав вызывает отказ без очистки. Имеющийся архив не заменяется. Восстановление и временный архив создаются только внутри операции.
 
 На POSIX сохраняются поддерживаемые типы, байты, POSIX-права, целый mtime и связи hardlinks; symlink хранится ссылкой без обхода цели. На Windows сохраняются обычные файлы/каталоги, байты, целый mtime и read-only файлов; reparse points и hardlinks отклоняются, как в прежнем Windows-примере. ACL, ADS, xattrs и владение не заявляются сохранёнными. Непредставимость или невозможность полного резервирования означает отказ всего снимка с путём и причиной, а не сокращение состава. Для такого источника нужен подходящий способ полного резервирования по решению владельца; менять обещанную сохранность автоматически нельзя.
 
-Пример предварительно проверяет представимость, независимо сопоставляет физический состав USTAR с исходником, распаковывает в свежую область штатным tar и сравнивает пути, типы, байты и сохраняемые свойства. rc0 отдельно не доказывает полноту. Исходник повторно проверяется по составу и признакам изменений. Только прошедший проверку архив получает итоговое имя; после PASS не записывайте ничего в Workspace. Каталог пробы остаётся для осмотра вне источника. Сумма и состав передаются отчётом без записи обратно.
+Пример предварительно проверяет представимость, независимо сопоставляет физический состав USTAR с исходником, распаковывает в свежую область штатным tar и сравнивает пути, типы, байты и сохраняемые свойства. rc0 отдельно не доказывает полноту. Исходник повторно проверяется по составу и признакам изменений. Только прошедший проверку архив получает итоговое имя; после PASS не записывайте ничего в Workspace. После PASS сценарий, временный архив и fresh restore удаляются вместе с собственным каталогом операции; рядом остаётся только итоговый архив. При FAIL новый итоговый архив не выдаётся либо удаляется, а один каталог операции сохраняет сценарий, проверяемый архив (возможен неполный), область restore и result.txt с точной причиной. Сообщите его абсолютный путь; чужие файлы рядом не трогайте. Сумма и состав передаются отчётом без записи обратно. Отказ предусловий занятого пути не даёт права удалить его или включить в свою диагностику.
 
 <!-- full-snapshot-python -->
 ```python
@@ -202,31 +202,50 @@ def physical_headers(archive, root, expected):
     return len(names)
 
 
-def snapshot(root, out, restore):
-    if not all(p.is_absolute() for p in (root, out, restore)):
+def remove_operation(work):
+    def writable_retry(function, path, error):
+        if not Path(path).is_symlink():
+            os.chmod(path, 0o700)
+        function(path)
+    shutil.rmtree(work, onerror=writable_retry)
+
+
+def snapshot(root, out, work):
+    if not all(p.is_absolute() for p in (root, out, work)):
         fail(root, 'нужны абсолютные пути')
     if root.is_symlink() or not root.is_dir():
         fail(root, 'ожидался каталог Workspace')
-    root, out, restore = (p.resolve() for p in (root, out, restore))
-    if out.exists() or restore.exists():
-        fail(out if out.exists() else restore, 'путь уже занят')
-    if root == out or root in out.parents or root == restore or root in restore.parents:
-        fail(root, 'результаты должны находиться вне Workspace')
-    before = inventory(root)
-    preflight(root, before)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    charset = ['--options', 'hdrcharset=UTF-8'] if os.name == 'nt' else []
+    if work.is_symlink() or not work.is_dir():
+        fail(work, 'нужен заранее назначенный каталог операции со snapshot.py')
+    root, out, work = (p.resolve() for p in (root, out, work))
+    if any(a == b or a in b.parents or b in a.parents for a, b in
+           ((root, work), (root, out), (work, out))):
+        fail(work, 'Workspace, архив и каталог операции должны быть независимы')
+    script = work / 'snapshot.py'
+    if set(work.iterdir()) != {script} or script.is_symlink() or not script.is_file():
+        fail(work, 'посторонний состав; разрешён только собственный snapshot.py')
+    if script.stat().st_nlink != 1 or Path(__file__).resolve() != script:
+        fail(script, 'ожидался собственный сценарий этой операции')
+    if out.exists() or out.is_symlink():
+        fail(out, 'путь уже занят')
+    if not out.parent.is_dir():
+        fail(out.parent, 'каталог результата должен существовать')
+    script_bytes = script.read_bytes()
+    stage, restore = work / 'archive.tar.gz', work / 'restore'
     published = False
-    descriptor, temporary = tempfile.mkstemp(prefix='.snapshot-', suffix='.tar.gz', dir=out.parent)
-    stage = Path(temporary)
+    output_identity = None
     try:
-        with os.fdopen(descriptor, 'wb') as stream:
+        stage.touch(exist_ok=False)
+        restore.mkdir()
+        before = inventory(root)
+        preflight(root, before)
+        charset = ['--options', 'hdrcharset=UTF-8'] if os.name == 'nt' else []
+        with stage.open('wb') as stream:
             subprocess.run(['tar', '--format', 'ustar', *charset, '-czf', '-', '-C', str(root.parent), root.name], stdout=stream, check=True)
         compare(before[1], inventory(root)[1], root, 'источник изменился при упаковке')
         expected = {root.name if p == '.' else root.name + '/' + p for p in before[0]}
         count = physical_headers(stage, root, expected)
         digest = hashlib.sha256(stage.read_bytes()).hexdigest()
-        restore.mkdir(parents=True)
         subprocess.run(['tar', *charset, '-xzpf', str(stage), '-C', str(restore)], check=True)
         if os.name == 'nt':
             with tarfile.open(stage, encoding='utf-8', errors='strict') as archive:
@@ -241,19 +260,38 @@ def snapshot(root, out, restore):
         if hashlib.sha256(stage.read_bytes()).hexdigest() != digest:
             fail(stage, 'архив изменился при проверке')
         with out.open('xb') as destination:
+            output_info = os.fstat(destination.fileno())
+            output_identity = (output_info.st_dev, output_info.st_ino)
             published = True
             with stage.open('rb') as source:
                 shutil.copyfileobj(source, destination)
         compare(before[1], inventory(root)[1], root, 'источник изменился при передаче')
         if hashlib.sha256(out.read_bytes()).hexdigest() != digest:
             fail(out, 'итоговые байты отличаются')
-        print('PASS', out.name, digest, 'USTAR/PAX0', 'objects', count)
-    except BaseException:
+        files = sum(row[0] == 'file' for row in before[0].values())
+        directories = sum(row[0] == 'directory' for row in before[0].values())
+        # Счётчик объектов получен из независимо проверенных физических заголовков.
+        remove_operation(work)
+        print('PASS', out, digest, 'USTAR/PAX0', 'objects', count,
+              'files', files, 'directories', directories)
+    except BaseException as error:
+        # Предусловия не дают права удалять занятые чужие пути.
+        work.mkdir(exist_ok=True)
+        if not script.exists():
+            script.write_bytes(script_bytes)
         if published:
-            out.unlink()
-        raise
-    finally:
-        stage.unlink()
+            info = out.lstat()
+            if (info.st_dev, info.st_ino) == output_identity and not out.is_symlink():
+                if not stage.exists():
+                    shutil.copyfile(out, stage)
+                out.unlink()
+            else:
+                error = RuntimeError(str(error) + '; итоговый путь заменён извне, не удалён')
+        stage.touch(exist_ok=True)
+        restore.mkdir(exist_ok=True)
+        message = f'FAIL: {error}\nДиагностика: {work}\nАрхив archive.tar.gz может быть неполным; это не итоговый снимок.\n'
+        (work / 'result.txt').write_text(message, encoding='utf-8')
+        raise RuntimeError(message) from error
 
 
 if __name__ == '__main__':

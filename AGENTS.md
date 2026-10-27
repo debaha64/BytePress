@@ -61,3 +61,8 @@ HARNESS_BLOCKER: <краткое описание>
 ## Feedback
 
 Обработка пользовательского опыта: [SOP Feedback](sops/feedback.md). После Project Start записи принадлежат `feedback/` Workspace; поставка не содержит записей. Полномочия задаёт активный WPLAN.
+
+
+## Внешние Agent Skills
+
+Поставка содержит 0 Agent Skills. После Project Start пользователь отдельно разрешает установку; [skills/README.md](skills/README.md) задаёт проектную копию `skills/`, техническую проекцию `.agents/skills/` и копируемый запрос. В созданном Workspace карта направляет к применимым установленным навыкам; их наличие не расширяет WPLAN.

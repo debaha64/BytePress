@@ -40,12 +40,14 @@ python -X utf8 -B tools/check_product.py --workspace .
 
 После всех записей и проверок остановите записи в Workspace. Откройте [общую процедуру полного снимка](../../sops/release-management.md#полный-снимок-и-восстановление): она явно выбирает USTAR UTF-8, проверяет физические заголовки, полный состав и свежее восстановление. Свойства и границы сохранности принадлежат [artifact-lifecycle](../technical/artifact-lifecycle.md#обычный-снимок); имя — SOP SemVer, момент передачи — clean-exit. WSL и GNU tar не нужны: используется существующий нативный Windows tar (bsdtar) и Python standard library.
 
-Сохраните единственный Python-блок общей процедуры как snapshot.py вне Workspace. Не меняйте его для Windows. Укажите три абсолютных пути: существующий Workspace, новый архив вне него и отсутствующий каталог пробы восстановления. Если Python и tar уже доступны, установка не требуется.
+Создайте один новый пустой внешний каталог операции, например `C:\BytePressLab\snapshot-operation`. Сохраните в нём единственный Python-блок общей процедуры как `snapshot.py`; других файлов перед запуском нет. Не меняйте сценарий для Windows. Передайте существующий Workspace, новый итоговый архив и этот каталог операции. Каталог результата должен существовать. Если Python и tar уже доступны, установка не требуется.
 
 ```powershell
-python -X utf8 -B C:\BytePressLab\snapshot.py C:\BytePressLab\WS_Notes C:\BytePressSnapshots\Notes-backup.tar.gz C:\BytePressRestore\probe1
-if ($LASTEXITCODE -ne 0) { throw 'Снимок или восстановление не прошли проверку' }
+python -X utf8 -B C:\BytePressLab\snapshot-operation\snapshot.py C:\BytePressLab\WS_Notes C:\BytePressSnapshots\Notes-backup.tar.gz C:\BytePressLab\snapshot-operation
+if ($LASTEXITCODE -ne 0) { throw 'Проверка не пройдена; см. каталог диагностики' }
 ```
+
+После PASS каталог операции, сценарий, restore и временный архив удалены; остаётся итоговый архив. После FAIL сохраняется один этот диагностический каталог с `snapshot.py`, `archive.tar.gz`, `restore/`, `result.txt` (архив может быть неполным); нового итогового архива нет. Агент сообщает точный путь и причину. Посторонние пути рядом не удаляются. Символ `_` в `WS_Notes` допустим: в тексте Windows-путь оформляется кодом, без обратной косой черты перед underscore.
 
 Для имён заголовков и извлечения общий пример передаёт bsdtar явный --options hdrcharset=UTF-8. После извлечения он восстанавливает read-only файлов по заголовкам USTAR: сам bsdtar на проверенной Windows этот признак не восстанавливает. ACL, ADS, владелец и xattrs не объявляются сохранёнными. Неподдерживаемые ссылки/reparse points и жёсткие ссылки Windows вызывают явный отказ с путём; объект не пропускается. Не принимайте rc0 и наличие файла за полноту.
 

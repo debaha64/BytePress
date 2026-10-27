@@ -236,7 +236,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
         }
         rows = []
         for path in sorted(self.changed_deployed_paths(reference)):
-            if actions.get(path) == "COPY":
+            if path == "skills/README.md":
+                kind, reason = "GENERATED_MERGE", "Preserve external skill navigation, license and provenance."
+            elif actions.get(path) == "COPY":
                 kind, reason = "COPY", "Exact copied Harness contract without private overlay."
             else:
                 self.assertIn(path, generated, "Changed generated contract needs explicit disposition: " + path)
@@ -567,7 +569,8 @@ class WorkspaceUpdateTests(unittest.TestCase):
         paths = ("Example", "plans", "research", "skills", "logs")
         result = {
             p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(history_bytes(p)).hexdigest())
-            for prefix in paths for p in (root / prefix).rglob("*") if p.is_file()
+            for prefix in paths for p in (root / prefix).rglob("*")
+            if p.is_file() and p.relative_to(root).as_posix() != "skills/README.md"
         }
         folder = root / "feedback"
         if folder.exists():
@@ -691,6 +694,44 @@ class WorkspaceUpdateTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-B", "-c", probe],
                                     cwd=product, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_update_preserves_installed_external_skills_and_projection(self):
+        """REQ-195-01: private skills/README merge, files and .agents remain exact."""
+        root = self.released_workspace()
+        for name in ('simple-first', 'decision-interview', 'translate-to-technical-russian', 'private-external'):
+            folder = root / 'skills' / name
+            folder.mkdir()
+            (folder / 'SKILL.md').write_bytes(('fixture ' + name + '\n').encode())
+            (folder / 'references').mkdir()
+            (folder / 'references/data.txt').write_bytes(b'private resource')
+            target = root / '.agents/skills' / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(folder, target)
+        (root / 'skills/SkillPack-LICENSE').write_bytes(b'fixture license; not SkillPack source')
+        private = b'\nExternal SkillPack provenance and private skill navigation.\n'
+        catalog = root / 'skills/README.md'
+        catalog.write_bytes(catalog.read_bytes() + private)
+        before = project_start.tree_manifest(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        authority = self.authorize_update(root, reference, rows)
+        with self.assertRaisesRegex(AssertionError, 'Private contract overlay'):
+            self.apply_patch_contracts(root, reference, preview, authorization=authority, rows=rows)
+        self.assertEqual(before, project_start.tree_manifest(root))
+        row = next(row for row in rows if row['path'] == 'skills/README.md')
+        self.assertEqual(row['disposition'], 'GENERATED_MERGE')
+        merged = (reference / 'skills/README.md').read_bytes() + private
+        row['merged_sha256'] = hashlib.sha256(merged).hexdigest()
+        row['preserved_sha256'] = hashlib.sha256(private).hexdigest()
+        reviewed = {'skills/README.md': {'before': catalog.read_bytes(), 'after': merged, 'private': private}}
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=self.authorize_update(root, reference, rows), rows=rows, reviewed_merges=reviewed)
+        after = project_start.tree_manifest(root)
+        for path, value in before.items():
+            if path.startswith(('skills/', '.agents/')) and path != 'skills/README.md':
+                self.assertEqual(value, after[path], path)
+        self.assertTrue(catalog.read_bytes().endswith(private))
+        self.assert_pass(self.run_checker(root))
 
     def test_generated_agents_merge_preserves_private_meaning_and_project(self):
         """REQ-189-02: explicit reviewed merge, never COPY over private rules."""

@@ -869,6 +869,57 @@ def _plan_surface_declarations(workspace: Path, plan_path: Path | None = None):
 
 
 
+def _check_skill_projections(workspace: Path):
+    """Compare opted-in Codex projections with project-owned canonical files."""
+    service = workspace / '.agents'
+    projected_root = service / 'skills'
+    if not service.exists() and not service.is_symlink():
+        return {'projected': 0}
+    _regular(service, 'd', '.agents')
+    if not projected_root.exists() and not projected_root.is_symlink():
+        return {'projected': 0}
+    _regular(projected_root, 'd', '.agents/skills')
+
+    def tree(base):
+        result = {}
+        def visit(path):
+            info = path.lstat()
+            relative = path.relative_to(base).as_posix()
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+                raise ContractError(f'{path.relative_to(workspace)}: ссылка внутри копии навыка')
+            if stat.S_ISDIR(info.st_mode):
+                result[relative] = ('directory', None)
+                for child in sorted(path.iterdir()):
+                    visit(child)
+            elif stat.S_ISREG(info.st_mode):
+                result[relative] = ('file', _sha(path))
+            else:
+                raise ContractError(f'{path.relative_to(workspace)}: недопустимый тип навыка')
+        visit(base)
+        return result
+
+    count = 0
+    for projected in sorted(projected_root.iterdir()):
+        canonical = workspace / 'skills' / projected.name
+        _regular(canonical, 'd', f'skills/{projected.name}')
+        _regular(canonical / 'SKILL.md', 'f', f'skills/{projected.name}/SKILL.md')
+        if projected.is_symlink():
+            target = os.readlink(projected)
+            if Path(target).is_absolute() or projected.resolve() != canonical.resolve():
+                raise ContractError(f'.agents/skills/{projected.name}: ссылка не на проектную копию')
+            actual = tree(canonical)  # compatible previous relative projection
+        else:
+            _regular(projected, 'd', f'.agents/skills/{projected.name}')
+            actual = tree(projected)
+        expected = tree(canonical)
+        for relative in sorted(expected.keys() | actual.keys()):
+            if expected.get(relative) != actual.get(relative):
+                raise ContractError(f'.agents/skills/{projected.name}/{relative}: '
+                                    f'расхождение с skills/{projected.name}/{relative}')
+        count += 1
+    return {'projected': count}
+
+
 def _check_protected_surfaces(workspace: Path, product_name: str, plan_path: Path | None = None):
     text = (workspace / "SYSTEM.md").read_text(encoding="utf-8")
     sections = re.split(r"(?m)^registry:protected-surfaces\s*$", text)
@@ -1502,6 +1553,7 @@ def inspect_workspace(workspace_value, preservation_manifest=None, baseline_mani
     if state["profile"] is not None:
         perform("protected-surfaces", lambda: _check_protected_surfaces(workspace, state["profile"].slug))
         perform("workspace-sot", lambda: _check_sot(workspace, state["profile"]))
+    perform("skill-projections", lambda: _check_skill_projections(workspace))
     perform("research-registry", lambda: _check_research_registry(workspace))
     archive = perform("research-archives", lambda: _check_research(workspace))
     if archive is not None:

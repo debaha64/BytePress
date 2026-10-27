@@ -1998,5 +1998,62 @@ ACTION: research
             self.assertEqual((root/'logs/decisions.md').read_bytes(),authority)
             self.assertEqual(len(list((root/'plans/active').glob('WPLAN-*.md'))),1)
 
+class ExternalSkillProjectionTests(unittest.TestCase):
+    """REQ-195-01: только соответствие подключённой проекции, не installer."""
+    def prepare(self):
+        helper = WorkspaceCheckerTests()
+        self.addCleanup(helper.doCleanups)
+        root = helper.fixture()
+        if os.name == 'nt':
+            # This pre-existing synthetic fixture uses text-mode writes; Profile is canonical LF.
+            profile = root / 'Example.profile'
+            profile.write_bytes(profile.read_bytes().replace(b'\r\n', b'\n'))
+        canonical = root / 'skills/external'
+        canonical.mkdir()
+        (canonical / 'SKILL.md').write_bytes(b'---\nname: external\ndescription: fixture\n---\n')
+        (canonical / 'references').mkdir()
+        (canonical / 'references/data.txt').write_bytes(b'exact resource\n')
+        projected = root / '.agents/skills/external'
+        projected.parent.mkdir(parents=True)
+        shutil.copytree(canonical, projected)
+        return helper, root, canonical, projected
+
+    def test_regular_projected_skill_and_resources(self):
+        helper, root, canonical, projected = self.prepare()
+        helper.assert_pass(helper.run_checker(root))
+        shutil.rmtree(root / '.agents')
+        helper.assert_pass(helper.run_checker(root))  # portable skills-only is valid
+
+    def test_projection_byte_drift_reports_path(self):
+        helper, root, canonical, projected = self.prepare()
+        (projected / 'references/data.txt').write_bytes(b'drift')
+        result = helper.run_checker(root)
+        helper.assert_fail(result, 'skill-projections')
+        self.assertIn('external/references/data.txt', str(result))
+
+    def test_projection_missing_extra_and_canonical_missing(self):
+        for kind in ('missing', 'extra', 'canonical-missing'):
+            with self.subTest(kind=kind):
+                helper, root, canonical, projected = self.prepare()
+                if kind == 'missing': (projected / 'SKILL.md').unlink()
+                elif kind == 'extra': (projected / 'extra.txt').write_bytes(b'extra')
+                else: shutil.rmtree(canonical)
+                helper.assert_fail(helper.run_checker(root), 'skill-projections')
+
+    def test_projection_refuses_resource_symlink(self):
+        if os.name == 'nt': self.skipTest('POSIX symlink without special Windows rights')
+        helper, root, canonical, projected = self.prepare()
+        (projected / 'references/data.txt').unlink()
+        (projected / 'references/data.txt').symlink_to(canonical / 'references/data.txt')
+        helper.assert_fail(helper.run_checker(root), 'skill-projections')
+
+    def test_projection_preserves_legacy_relative_link(self):
+        if os.name == 'nt': self.skipTest('POSIX symlink without special Windows rights')
+        helper, root, canonical, projected = self.prepare()
+        shutil.rmtree(projected)
+        projected.symlink_to('../../skills/external', target_is_directory=True)
+        helper.assert_pass(helper.run_checker(root))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -37,7 +37,8 @@ class SnapshotRouteTests(unittest.TestCase):
         self.ro.chmod(0o444)
         os.utime(self.ro, (1700000000.125, 1700000000.125))
         self.out = self.base / 'backup.tar.gz'
-        self.restore = self.base / 'restored'
+        self.work = self.base / 'operation'
+        self.restore = self.work / 'restore'
 
     def cleanup(self):
         for p in self.base.rglob('*'):
@@ -46,23 +47,26 @@ class SnapshotRouteTests(unittest.TestCase):
         self.temp.cleanup()
 
     def execute(self):
-        with mock.patch.object(sys, 'argv', ['snapshot', str(self.root), str(self.out), str(self.restore)]):
-            exec(compile(recipe(), 'release-management.md', 'exec'), {'__name__': '__main__'})
+        self.work.mkdir()
+        script = self.work / 'snapshot.py'
+        script.write_text(recipe(), encoding='utf-8')
+        with mock.patch.object(sys, 'argv', [str(script), str(self.root), str(self.out), str(self.work)]):
+            exec(compile(recipe(), str(script), 'exec'), {'__name__': '__main__', '__file__': str(script)})
 
     def rejected(self, reason):
         with self.assertRaises(Exception) as caught:
             self.execute()
         self.assertIn(reason, str(caught.exception))
         self.assertFalse(self.out.exists())
+        self.assertEqual({p.name for p in self.work.iterdir()}, {'snapshot.py', 'archive.tar.gz', 'restore', 'result.txt'})
+        self.assertIn(str(self.work), (self.work / 'result.txt').read_text(encoding='utf-8'))
 
     def test_full_hidden_empty_unicode_readonly(self):
         before = self.ro.read_bytes(), self.ro.stat().st_mode, self.ro.stat().st_mtime_ns
         self.execute()
         self.assertEqual(before, (self.ro.read_bytes(), self.ro.stat().st_mode, self.ro.stat().st_mtime_ns))
-        restored = self.restore / self.root.name
-        self.assertTrue((restored / 'пусто').is_dir())
-        self.assertEqual((restored / '.скрытый').read_bytes(), 'точные байты\n'.encode())
-        self.assertFalse((restored / self.ro.name).stat().st_mode & 0o222)
+        self.assertFalse(self.work.exists())
+        self.assertEqual({p.name for p in self.base.iterdir()}, {self.root.name, self.out.name})
         with tarfile.open(self.out) as t:
             self.assertEqual(len(t.getmembers()), 4)
 
@@ -119,16 +123,44 @@ class SnapshotRouteTests(unittest.TestCase):
         with mock.patch('subprocess.run', side_effect=omit):
             self.rejected('.')
 
+    def test_success_preserves_foreign_neighbor(self):
+        foreign = self.base / 'foreign.txt'
+        foreign.write_bytes(b'owner data')
+        self.execute()
+        self.assertFalse(self.work.exists())
+        self.assertEqual(foreign.read_bytes(), b'owner data')
+        self.assertEqual({p.name for p in self.base.iterdir()}, {self.root.name, self.out.name, foreign.name})
+
+    def test_foreign_operation_content_refused_without_cleanup(self):
+        namespace = {'__name__': 'snapshot_recipe', '__file__': str(self.work / 'snapshot.py')}
+        exec(compile(recipe(), 'release-management.md', 'exec'), namespace)
+        self.work.mkdir()
+        script = self.work / 'snapshot.py'; script.write_text(recipe(), encoding='utf-8')
+        foreign = self.work / 'foreign.txt'; foreign.write_bytes(b'private')
+        before = {p.name: p.read_bytes() for p in self.work.iterdir()}
+        with self.assertRaisesRegex(RuntimeError, 'посторонний состав'):
+            namespace['snapshot'](self.root, self.out, self.work)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.work.iterdir()})
+        self.assertFalse(self.out.exists())
+
+    def test_failure_keeps_one_diagnostic_and_foreign_neighbor(self):
+        foreign = self.base / 'foreign.txt'; foreign.write_bytes(b'owner data')
+        name = 'я' * 60
+        (self.root / name).write_bytes(b'x')
+        self.rejected(name)
+        self.assertEqual({p.name for p in self.base.iterdir()}, {self.root.name, self.work.name, foreign.name})
+        self.assertEqual(foreign.read_bytes(), b'owner data')
+
     @unittest.skipIf(os.name == 'nt', 'POSIX links and modes')
     def test_posix_links_modes_and_hardlink_relation(self):
         (self.root / '.скрытый').chmod(0o640)
         os.symlink('.скрытый', self.root / 'symbolic')
         os.link(self.root / '.скрытый', self.root / 'hard')
         self.execute()
-        restored = self.restore / self.root.name
-        self.assertEqual(os.readlink(restored / 'symbolic'), '.скрытый')
-        self.assertEqual((restored / 'hard').stat().st_ino, (restored / '.скрытый').stat().st_ino)
-        self.assertEqual(stat.S_IMODE((restored / 'hard').stat().st_mode), 0o640)
+        self.assertFalse(self.work.exists())
+        with tarfile.open(self.out) as t:
+            self.assertEqual(t.getmember(self.root.name + '/symbolic').linkname, '.скрытый')
+            self.assertEqual(t.getmember(self.root.name + '/hard').mode, 0o640)
 
     @unittest.skipIf(os.name == 'nt', 'POSIX special type')
     def test_special_object_rejected_with_path(self):
