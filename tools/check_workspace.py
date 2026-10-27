@@ -1288,9 +1288,15 @@ def _check_research_registry(workspace: Path):
     next_id = int(match.group(1))
     used = []
     for path in (workspace / "research").iterdir():
-        domain = re.match(r"^(\d+)_", path.name)
-        if domain:
-            used.append(int(domain.group(1)))
+        if path.name == "00-index.md":
+            _regular(path, "f", "research/00-index.md")
+            continue
+        numbered = re.match(r"^(\d+)(?:[_-]|\.)", path.name)
+        if numbered:
+            relative = "research/" + path.name
+            if path.is_symlink() or not path.is_dir() or not re.match(r"\d+_", path.name):
+                raise ContractError(f"{relative}: numbered research должен быть каталогом NN_slug")
+            used.append(int(numbered.group(1)))
     archives = workspace / "research/archives"
     if archives.is_dir() and not archives.is_symlink():
         for path in archives.iterdir():

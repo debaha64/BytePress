@@ -880,6 +880,22 @@ class WorkspaceCheckerTests(unittest.TestCase):
         )
         self.assert_pass(self.run_checker(root))
 
+    def test_numbered_research_files_rejected_with_path(self):
+        for name in ('01-topic.md', '01_topic.md', '00-other.md', '01.md'):
+            with self.subTest(name=name):
+                root = self.fixture()
+                (root / 'research' / name).write_text('# misplaced formal research\n')
+                result = self.run_checker(root)
+                self.assert_fail(result, 'research-registry')
+                self.assertIn(name, str(result))
+
+    def test_research_root_index_and_nonnumbered_support_preserved(self):
+        root = self.fixture()
+        (root / 'research/README.md').write_text('# support\n')
+        (root / 'research/01_topic').mkdir()
+        (root / 'research/00-index.md').write_text('Следующий research ID: `02`.\n')
+        self.assert_pass(self.run_checker(root))
+
     def test_active_wplan_consistency_and_checkpoint(self):
         root = self.fixture(active=True)
         self.assert_pass(self.run_checker(root))

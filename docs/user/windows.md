@@ -38,58 +38,15 @@ python -X utf8 -B tools/check_product.py --workspace .
 
 ## Снимок и проба восстановления
 
-После всех записей и проверок остановите записи в Workspace. Используйте существующий bsdtar; частный навык Workspace BytePress с GNU tar не является зависимостью этого сценария. Ниже ограниченный файловый резерв: весь состав обычных файлов и каталогов, включая скрытые, байты, mtime в целых секундах и read-only файлов. ACL, владелец, ADS, xattrs не сохраняются этим договором. Ссылки, точки повторной обработки (reparse points) и жёсткие ссылки требуют отдельного подходящего резервирования; пример отказывается их упаковывать. Полное имя выбирайте по договору своего проекта, существующий архив не заменяйте. На Windows кодировка имён заголовков явно задаётся как UTF-8 при упаковке и извлечении через `--options hdrcharset=UTF-8`; иначе bsdtar 3.5.2 может использовать текущую OEM-кодировку. Параметр описан в [libarchive 3.5.2](https://github.com/libarchive/libarchive/blob/v3.5.2/libarchive/archive_write_set_options.3). После извлечения Python восстанавливает read-only обычных файлов по режимам USTAR: bsdtar на проверенной Windows сам этот признак не восстановил. ACL этим не создаются. Проверка состава и восстановления обязательна; несовпадение вызывает отказ.
+После всех записей и проверок остановите записи в Workspace. Откройте [общую процедуру полного снимка](../../sops/release-management.md#полный-снимок-и-восстановление): она явно выбирает USTAR UTF-8, проверяет физические заголовки, полный состав и свежее восстановление. Свойства и границы сохранности принадлежат [artifact-lifecycle](../technical/artifact-lifecycle.md#обычный-снимок); имя — SOP SemVer, момент передачи — clean-exit. WSL и GNU tar не нужны: используется существующий нативный Windows tar (bsdtar) и Python standard library.
 
-Укажите три абсолютных пути: существующий Workspace, новый архив вне него и отсутствующий каталог пробы восстановления. Выполните из терминала приложения следующий блок. Он проверяет восстановление до сообщения PASS; каталог пробы сохраняется для осмотра, исходный Workspace после снимка не изменяется.
+Сохраните единственный Python-блок общей процедуры как snapshot.py вне Workspace. Не меняйте его для Windows. Укажите три абсолютных пути: существующий Workspace, новый архив вне него и отсутствующий каталог пробы восстановления. Если Python и tar уже доступны, установка не требуется.
 
 ```powershell
-$Workspace = 'C:\BytePressLab\WS_Notes'
-$Archive = 'C:\BytePressSnapshots\Notes-backup.tar.gz'
-$Restore = 'C:\BytePressRestore\probe1'
-@'
-import hashlib, os, pathlib, stat, subprocess, sys, tarfile
-root, out, restore = map(lambda x: pathlib.Path(x).absolute(), sys.argv[1:])
-assert root.is_dir() and not out.exists() and not restore.exists()
-assert root != out.parent and root not in out.parents and root not in restore.parents
-out.parent.mkdir(parents=True, exist_ok=True)
-def manifest(base):
-    result = {}
-    def walk(path):
-        info = path.lstat()
-        assert not getattr(info, 'st_file_attributes', 0) & 0x400, path
-        assert not path.is_symlink(), path
-        isdir = stat.S_ISDIR(info.st_mode)
-        assert isdir or stat.S_ISREG(info.st_mode) and info.st_nlink == 1, path
-        result[path.relative_to(base).as_posix()] = (
-            'directory' if isdir else 'file', int(info.st_mtime),
-            None if isdir else bool(info.st_mode & stat.S_IWRITE),
-            None if isdir else hashlib.sha256(path.read_bytes()).hexdigest())
-        if isdir:
-            for child in sorted(path.iterdir()): walk(child)
-    walk(base)
-    return result
-before = manifest(root)
-charset = ['--options', 'hdrcharset=UTF-8'] if os.name == 'nt' else []
-with out.open('xb') as stream:
-    subprocess.run(['tar', '--format', 'ustar', *charset, '-czf', '-', '-C', str(root.parent), root.name], stdout=stream, check=True)
-assert manifest(root) == before, 'source changed during packing'
-with tarfile.open(out) as archive:
-    members = archive.getmembers()
-    names = [m.name.rstrip('/') for m in members]
-    assert len(names) == len(set(names))
-    expected = {root.name if p == '.' else root.name + '/' + p for p in before}
-    assert set(names) == expected and all(m.isfile() or m.isdir() for m in members)
-restore.mkdir(parents=True)
-subprocess.run(['tar', *charset, '-xzf', str(out), '-C', str(restore)], check=True)
-if os.name == 'nt':
-    for member in members:
-        if member.isfile():
-            os.chmod(restore / member.name, 0o666 if member.mode & 0o222 else 0o444)
-assert manifest(restore / root.name) == before, 'restoration differs'
-assert manifest(root) == before, 'source changed during verification'
-print('PASS', out.name, hashlib.sha256(out.read_bytes()).hexdigest(), 'objects', len(before))
-'@ | python -X utf8 -B - $Workspace $Archive $Restore
-if ($LASTEXITCODE -ne 0) { throw 'snapshot or restoration failed; keep evidence' }
+python -X utf8 -B C:\BytePressLab\snapshot.py C:\BytePressLab\WS_Notes C:\BytePressSnapshots\Notes-backup.tar.gz C:\BytePressRestore\probe1
+if ($LASTEXITCODE -ne 0) { throw 'Снимок или восстановление не прошли проверку' }
 ```
 
-После отказа не считайте архив проверенным. Сохраните сообщение и исходный Workspace; повтор выбирает новый путь после выяснения причины. Снимок и проверка восстановления не означают приёмку продукта.
+Для имён заголовков и извлечения общий пример передаёт bsdtar явный --options hdrcharset=UTF-8. После извлечения он восстанавливает read-only файлов по заголовкам USTAR: сам bsdtar на проверенной Windows этот признак не восстанавливает. ACL, ADS, владелец и xattrs не объявляются сохранёнными. Неподдерживаемые ссылки/reparse points и жёсткие ссылки Windows вызывают явный отказ с путём; объект не пропускается. Не принимайте rc0 и наличие файла за полноту.
+
+После отказа сохраняйте исходный Workspace и сообщение; непроверенный результат не считается снимком. После PASS исходный Workspace не изменяется. Нативный автоматический запуск не подтверждает запуск агента в настольном приложении или продуктовую приёмку.

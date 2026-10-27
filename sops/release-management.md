@@ -36,7 +36,7 @@
 
 ## Снимок и публичные файлы выпуска
 
-Обычный снимок задачи создаётся только после постоянных изменений и последней записи в Workspace, без обычного сопроводительного файла `.sha256`. Контрольная сумма передаётся в отчёте владельцу. Безопасный tar с единственным корнем и свежая распаковка с сохранением режимов доступа проверяются по выбранному способу переноса.
+Обычный снимок задачи создаётся только после постоянных изменений и последней записи в Workspace, без обычного сопроводительного файла `.sha256`. Контрольная сумма передаётся в отчёте владельцу. Упаковка и свежая распаковка выполняются по разделу [полного снимка](#полный-снимок-и-восстановление).
 
 Кандидат на приёмку хранит точную идентичность и контрольную сумму в свидетельствах. Публичный файл выпуска требует равенства загруженных байтов, контрольной суммы и отдельного выпускного сопроводительного файла; затем проверяется внутренний формат архива. PA-*, Release Authorization, публикация и контрольное чтение остаются отдельными фактами.
 
@@ -61,3 +61,201 @@ Release Readiness потребляет существующий `PA-*` со зн
 До внешних записей выпускная процедура связывает точного кандидата из PA и квалификационных свидетельств с подготовленным артефактом и целевыми ссылками по [release-evidence](../docs/technical/release-evidence.md): проверяет идентичность кандидата и равенство свойств выбранного способа переноса. Несовпадение кандидата останавливает маршрут; PA прежнего результата не принимает изменённый Product. Это обязанность release-readiness, а не универсального инструмента Workspace. Release Authorization остаётся отдельным решением владельца.
 
 Узкая регистрация по [task-intake](task-intake.md#узкая-регистрация) не является исполняемым проходом и не требует обычного снимка. Остальные правила снимков сохраняются.
+
+
+## Полный снимок и восстановление
+
+Полнота и сохранность принадлежат [artifact-lifecycle](../docs/technical/artifact-lifecycle.md#обычный-снимок), имя — [SemVer](semver.md#имена-снимков-и-поставок), момент передачи — [clean-exit](clean-exit.md#закрытие-маршрута-и-снимок). Выполните все записи и проверки до упаковки; остановите параллельные записи. Полный обход включает скрытые файлы и пустые каталоги, служебные данные и всё оставшееся temp; фильтров проверки изменений здесь нет.
+
+Используйте существующие Python standard library и tar: POSIX tar с поддержкой --format ustar либо нативный Windows bsdtar. Формат всегда явно USTAR UTF-8, без PAX/GNU расширений. Сохраните следующий единственный исполняемый пример вне Workspace как snapshot.py. Запустите python3 -B snapshot.py /absolute/WS_Example /absolute/backup.tar.gz /absolute/fresh-restore; [Windows](../docs/user/windows.md#снимок-и-проба-восстановления) задаёт платформенный вызов того же примера. Все три пути должны быть абсолютными; архив и отсутствующая область восстановления находятся вне Workspace. Имеющийся архив не заменяется.
+
+На POSIX сохраняются поддерживаемые типы, байты, POSIX-права, целый mtime и связи hardlinks; symlink хранится ссылкой без обхода цели. На Windows сохраняются обычные файлы/каталоги, байты, целый mtime и read-only файлов; reparse points и hardlinks отклоняются, как в прежнем Windows-примере. ACL, ADS, xattrs и владение не заявляются сохранёнными. Непредставимость или невозможность полного резервирования означает отказ всего снимка с путём и причиной, а не сокращение состава. Для такого источника нужен подходящий способ полного резервирования по решению владельца; менять обещанную сохранность автоматически нельзя.
+
+Пример предварительно проверяет представимость, независимо сопоставляет физический состав USTAR с исходником, распаковывает в свежую область штатным tar и сравнивает пути, типы, байты и сохраняемые свойства. rc0 отдельно не доказывает полноту. Исходник повторно проверяется по составу и признакам изменений. Только прошедший проверку архив получает итоговое имя; после PASS не записывайте ничего в Workspace. Каталог пробы остаётся для осмотра вне источника. Сумма и состав передаются отчётом без записи обратно.
+
+<!-- full-snapshot-python -->
+```python
+import gzip
+import hashlib
+import os
+from pathlib import Path
+import shutil
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+
+
+def fail(path, reason):
+    raise RuntimeError(f"{path}: {reason}")
+
+
+def inventory(base):
+    values, guards, hardlinks = {}, {}, {}
+    def visit(path):
+        info = path.lstat()
+        relative = path.relative_to(base).as_posix()
+        if any(ord(c) < 32 or c == "\\" or ord(c) == 127 for c in relative):
+            fail(path, "неподдерживаемое имя")
+        if getattr(info, 'st_file_attributes', 0) & 0x400:
+            fail(path, "reparse point требует полного подходящего резервирования")
+        mode = stat.S_IMODE(info.st_mode)
+        if stat.S_ISLNK(info.st_mode):
+            kind, content = 'symlink', os.readlink(path)
+            if mode != 0o777 or any(ord(c) < 32 or c == "\\" for c in content):
+                fail(path, "непредставимые свойства symlink")
+        elif stat.S_ISDIR(info.st_mode):
+            kind, content = 'directory', None
+        elif stat.S_ISREG(info.st_mode):
+            kind = 'file'
+            with path.open('rb') as stream:
+                content = hashlib.file_digest(stream, 'sha256').hexdigest()
+            if os.name == 'nt' and info.st_nlink != 1:
+                fail(path, "Windows hardlink требует полного подходящего резервирования")
+            if info.st_nlink > 1:
+                hardlinks.setdefault((info.st_dev, info.st_ino), []).append(relative)
+        else:
+            fail(path, "неподдерживаемый тип объекта USTAR")
+        properties = (bool(mode & 0o222) if kind == 'file' else None) if os.name == 'nt' else mode
+        values[relative] = (kind, content, properties, int(info.st_mtime))
+        guards[relative] = (info.st_dev, info.st_ino, info.st_size, info.st_mode,
+                            info.st_mtime_ns, info.st_ctime_ns, info.st_nlink)
+        if kind == 'directory':
+            for child in sorted(path.iterdir()):
+                visit(child)
+    visit(base)
+    groups = sorted(sorted(group) for group in hardlinks.values() if len(group) > 1)
+    return values, guards, groups
+
+
+def compare(expected, observed, base, reason):
+    for path in sorted(set(expected) | set(observed)):
+        if expected.get(path) != observed.get(path):
+            fail(base / path, reason)
+
+
+def preflight(root, before):
+    for relative, (kind, content, mode, mtime) in before[0].items():
+        path = root / relative
+        info = path.lstat()
+        name = root.name if relative == '.' else root.name + '/' + relative
+        header = tarfile.TarInfo(name + ('/' if kind == 'directory' else ''))
+        header.type = {'file': tarfile.REGTYPE, 'directory': tarfile.DIRTYPE,
+                       'symlink': tarfile.SYMTYPE}[kind]
+        header.mode = stat.S_IMODE(info.st_mode)
+        header.uid, header.gid, header.mtime = info.st_uid, info.st_gid, mtime
+        header.size = info.st_size if kind == 'file' else 0
+        if kind == 'symlink':
+            header.linkname = content
+        try:
+            header.tobuf(format=tarfile.USTAR_FORMAT, encoding='utf-8', errors='strict')
+        except (ValueError, UnicodeError) as exc:
+            fail(path, 'непредставимо в USTAR: ' + str(exc))
+
+
+def physical_headers(archive, root, expected):
+    names, kinds = set(), {}
+    with gzip.open(archive, 'rb') as stream:
+        while True:
+            block = stream.read(512)
+            if block == bytes(512):
+                if stream.read(512) != bytes(512):
+                    fail(archive, 'неполный USTAR trailer')
+                while tail := stream.read(1024 * 1024):
+                    if any(tail):
+                        fail(archive, 'данные после USTAR trailer')
+                break
+            if len(block) != 512 or block[257:265] != b'ustar\0' + b'00':
+                fail(archive, 'ожидался физический USTAR без PAX/GNU')
+            if sum(block[:148]) + 256 + sum(block[156:]) != int(block[148:156].strip(b'\0 ') or b'0', 8):
+                fail(archive, 'неверная checksum USTAR')
+            kind = block[156:157]
+            if kind not in (b'0', b'\0', b'1', b'2', b'5'):
+                fail(archive, 'расширение или тип вне USTAR: ' + repr(kind))
+            name = block[:100].split(b'\0', 1)[0]
+            prefix = block[345:500].split(b'\0', 1)[0]
+            name = ((prefix + b'/' if prefix else b'') + name).decode('utf-8', 'strict').rstrip('/')
+            parts = name.split('/')
+            if parts[0] != root.name or any(p in ('', '.', '..') or '\\' in p for p in parts) or name in names:
+                fail(name, 'небезопасный или повторный USTAR путь')
+            for index in range(1, len(parts)):
+                if kinds.get('/'.join(parts[:index])) != b'5':
+                    fail(name, 'родитель не является ранее объявленным каталогом')
+            size = int(block[124:136].strip(b'\0 ') or b'0', 8)
+            if kind == b'1':
+                target = block[157:257].split(b'\0', 1)[0].decode('utf-8', 'strict')
+                if kinds.get(target) not in (b'0', b'\0'):
+                    fail(name, 'небезопасная цель hardlink')
+            if kind not in (b'0', b'\0') and size:
+                fail(name, 'неверный размер специального USTAR объекта')
+            names.add(name)
+            kinds[name] = kind
+            remaining = ((size + 511) // 512) * 512
+            while remaining:
+                data = stream.read(min(remaining, 1024 * 1024))
+                if not data:
+                    fail(name, 'обрезанное содержимое USTAR')
+                remaining -= len(data)
+    for name in sorted(expected ^ names):
+        fail(name, 'состав USTAR отличается от полного источника')
+    return len(names)
+
+
+def snapshot(root, out, restore):
+    if not all(p.is_absolute() for p in (root, out, restore)):
+        fail(root, 'нужны абсолютные пути')
+    if root.is_symlink() or not root.is_dir():
+        fail(root, 'ожидался каталог Workspace')
+    root, out, restore = (p.resolve() for p in (root, out, restore))
+    if out.exists() or restore.exists():
+        fail(out if out.exists() else restore, 'путь уже занят')
+    if root == out or root in out.parents or root == restore or root in restore.parents:
+        fail(root, 'результаты должны находиться вне Workspace')
+    before = inventory(root)
+    preflight(root, before)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    charset = ['--options', 'hdrcharset=UTF-8'] if os.name == 'nt' else []
+    published = False
+    descriptor, temporary = tempfile.mkstemp(prefix='.snapshot-', suffix='.tar.gz', dir=out.parent)
+    stage = Path(temporary)
+    try:
+        with os.fdopen(descriptor, 'wb') as stream:
+            subprocess.run(['tar', '--format', 'ustar', *charset, '-czf', '-', '-C', str(root.parent), root.name], stdout=stream, check=True)
+        compare(before[1], inventory(root)[1], root, 'источник изменился при упаковке')
+        expected = {root.name if p == '.' else root.name + '/' + p for p in before[0]}
+        count = physical_headers(stage, root, expected)
+        digest = hashlib.sha256(stage.read_bytes()).hexdigest()
+        restore.mkdir(parents=True)
+        subprocess.run(['tar', *charset, '-xzpf', str(stage), '-C', str(restore)], check=True)
+        if os.name == 'nt':
+            with tarfile.open(stage, encoding='utf-8', errors='strict') as archive:
+                for member in archive:
+                    if member.isfile():
+                        os.chmod(restore / member.name, 0o666 if member.mode & 0o222 else 0o444)
+        restored = inventory(restore / root.name)
+        compare(before[0], restored[0], restore / root.name, 'восстановление отличается')
+        if before[2] != restored[2]:
+            fail(restore / root.name, 'связи hardlinks отличаются')
+        compare(before[1], inventory(root)[1], root, 'источник изменился при проверке')
+        if hashlib.sha256(stage.read_bytes()).hexdigest() != digest:
+            fail(stage, 'архив изменился при проверке')
+        with out.open('xb') as destination:
+            published = True
+            with stage.open('rb') as source:
+                shutil.copyfileobj(source, destination)
+        compare(before[1], inventory(root)[1], root, 'источник изменился при передаче')
+        if hashlib.sha256(out.read_bytes()).hexdigest() != digest:
+            fail(out, 'итоговые байты отличаются')
+        print('PASS', out.name, digest, 'USTAR/PAX0', 'objects', count)
+    except BaseException:
+        if published:
+            out.unlink()
+        raise
+    finally:
+        stage.unlink()
+
+
+if __name__ == '__main__':
+    snapshot(*(Path(p) for p in sys.argv[1:]))
+```
