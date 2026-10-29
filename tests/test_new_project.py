@@ -1186,6 +1186,32 @@ class BootstrapStartTests(ProjectStartCase):
 class Candidate055Tests(ProjectStartCase):
     """REQ-189-01/03: generated navigation and native filesystem boundaries."""
 
+    def test_known_problems_delivered_for_new_and_existing(self):
+        """REQ-199-03/04: real preview/apply, exact delivery and navigation."""
+        for mode in ('new', 'existing'):
+            with self.subTest(mode=mode):
+                destination = self.base / mode; destination.mkdir()
+                updates = {'destination_parent': destination, 'product_mode': mode}
+                if mode == 'existing':
+                    product = self.base / 'neutral-product'; product.mkdir()
+                    (product / 'private.txt').write_bytes(b'neutral product data')
+                    updates['existing_product'] = product
+                preview = self.preview(**updates)
+                self.apply(preview, **updates)
+                workspace = destination / 'WS_Example'
+                catalog = workspace / 'sops/known-problems.md'
+                self.assertEqual(catalog.read_bytes(), (SOURCE_ROOT / 'sops/known-problems.md').read_bytes())
+                self.assertIn('Мнимая проблема', catalog.read_text())
+                self.assertNotIn('research archive `37`', catalog.read_text())
+                for relative in ('AGENTS.md', 'sops/README.md', 'sops/project-management.md'):
+                    self.assertIn('known-problems.md', (workspace / relative).read_text())
+                for tool in ('check_workspace.py', 'check_product.py'):
+                    result = subprocess.run([sys.executable, '-B', str(workspace / 'tools' / tool),
+                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                if mode == 'existing':
+                    self.assertEqual((workspace / 'Example/private.txt').read_bytes(), b'neutral product data')
+
     def test_map_names_project_and_reads_current_owners(self):
         preview = self.preview(display_name='Частный продукт Максима')
         self.apply(preview, display_name='Частный продукт Максима')

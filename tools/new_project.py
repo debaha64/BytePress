@@ -112,6 +112,7 @@ sops/change-management.md
 sops/clean-exit.md
 sops/feedback.md
 sops/interview.md
+sops/known-problems.md
 sops/managed-agent-pass.md
 sops/project-management.md
 sops/record-change.md

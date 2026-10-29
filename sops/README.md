@@ -7,6 +7,7 @@
 - [Управление изменениями](change-management.md).
 - [Чистое завершение](clean-exit.md).
 - [Интервью](interview.md).
+- [Известные проблемы](known-problems.md) — причинные классы, признаки и реакция.
 - [Управляемый проход агента](managed-agent-pass.md) — сохранённый вход к управлению проектом для поставки Project Start.
 - [Управление проектом](project-management.md).
 - [Запись изменений](record-change.md).

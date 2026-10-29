@@ -1520,8 +1520,13 @@ def _check_links(workspace: Path, product_name: str):
             if lines:
                 valid = int(lines[1]) <= int(lines[2]) <= len(candidate.read_text(encoding="utf-8").splitlines())
             else:
-                pattern = rf"(?<![A-Za-z0-9_-]){re.escape(fragment)}(?![A-Za-z0-9_-])"
-                valid = fragment in _anchors(candidate) or bool(re.search(pattern, source))
+                # Historical references may use a complete heading's original case
+                # or an explicit EVIDENCE_ID. A prose occurrence is not an address.
+                headings = [match[1] for match in re.finditer(
+                    r"(?m)^#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", source)]
+                declarations = [match[1] for match in re.finditer(
+                    r"(?m)^EVIDENCE_ID:[ \t]*(\S+)[ \t]*$", source)]
+                valid = fragment in _anchors(candidate) or fragment in headings or fragment in declarations
             if not valid:
                 issues.append(f"{address}: missing fragment")
 

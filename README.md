@@ -100,7 +100,7 @@ python -X utf8 -B tools/check_workspace.py --workspace .
 python -X utf8 -B tools/check_product.py --workspace .
 ```
 
-Ожидаются `WORKSPACE_CHECK: PASS` и `PRODUCT_CHECK: PASS`. Результат самой задачи проверяется дополнительно.
+Ожидаются `WORKSPACE_CHECK: PASS` и `PRODUCT_CHECK: PASS`. Результат самой задачи проверяется дополнительно. [Каталог известных проблем](sops/known-problems.md) помогает распознать повторяющуюся причину и выбрать реакцию в разрешённой границе.
 
 ## Обновление
 

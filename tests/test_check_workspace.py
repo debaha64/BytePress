@@ -1946,6 +1946,60 @@ ACTION: research
         (root/'logs/sessions.md').write_text('```text\nSOURCE_REF: logs/missing.md#absent\n```\nSOURCE_REF: https://example.invalid/source#source\nSOURCE_REF: codexlog:.codex/example.raw.log#lines=1-2\n')
         self.assert_pass(self.run_checker(root))
 
+    def test_source_ref_exact_declarations(self):
+        """REQ-199-01/02: an address is a declaration, never a prose match."""
+        cases = [
+            ('## owner-answer\nNeutral answer.\n', 'owner-answer', True),
+            ('## Other\n## owner-answer\n## owner-answer\n', 'owner-answer-1', True),
+            ('## OWNER-TOKEN\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('### OWNER-TOKEN ###\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('EVIDENCE_ID: OWNER-TOKEN\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('## other-answer\n', 'owner-answer', False),
+            ('## other-answer\nThe old owner-answer heading was removed.\n', 'owner-answer', False),
+            ('## Note about owner-answer\n', 'owner-answer', False),
+            ('## owner-answer extra\n', 'owner-answer', False),
+            ('## other-answer\nThe old OWNER-TOKEN was removed.\n', 'OWNER-TOKEN', False),
+            ('## Note about OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('EVIDENCE_ID: OTHER-OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('EVIDENCE_ID: OWNER-TOKEN extra\n', 'OWNER-TOKEN', False),
+            ('The declaration EVIDENCE_ID: OWNER-TOKEN was removed.\n', 'OWNER-TOKEN', False),
+            ('OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('SOURCE_REF: #OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('```text\n## owner-answer\n```\n', 'owner-answer', False),
+            ('~~~text\nEVIDENCE_ID: OWNER-TOKEN\n~~~\n', 'OWNER-TOKEN', False),
+        ]
+        for body, token, valid in cases:
+            for self_reference in (False, True):
+                with self.subTest(body=body, token=token, self_reference=self_reference):
+                    root = self.fixture(active=True); self.short(root)
+                    source = root / 'logs/sessions.md'
+                    source.write_text(body)
+                    reference = ('#' if self_reference else 'logs/sessions.md#') + token
+                    record = source if self_reference else root / 'logs/quality.md'
+                    with record.open('a') as stream:
+                        stream.write('\nSOURCE_REF: ' + reference + '\n')
+                    number = len(record.read_text().splitlines())
+                    result = self.run_checker(root)
+                    if valid:
+                        self.assert_pass(result)
+                    else:
+                        self.assert_fail(result, 'markdown-links')
+                        address = record.relative_to(root).as_posix() + ':' + str(number)
+                        self.assertIn(address + ' SOURCE_REF -> ' + reference + ': missing fragment', str(result[1]['errors']))
+
+    def test_source_ref_line_ranges(self):
+        """REQ-199-01: line addresses keep their physical-file contract."""
+        for fragment, valid in [('lines=1-3', True), ('lines=3-3', True),
+                                ('lines=3-2', False), ('lines=1-4', False),
+                                ('lines=0-1', False), ('lines=01-2', False)]:
+            with self.subTest(fragment=fragment):
+                root = self.fixture(active=True); self.short(root)
+                (root / 'logs/sessions.md').write_text('one\n```text\nthree\n')
+                (root / 'logs/quality.md').write_text('SOURCE_REF: logs/sessions.md#' + fragment + '\n')
+                result = self.run_checker(root)
+                if valid: self.assert_pass(result)
+                else: self.assert_fail(result, 'markdown-links')
+
     def test_closing_check_result_selects_exact_baseline_plan(self):
         for complete in (True, False):
             with self.subTest(complete=complete):
