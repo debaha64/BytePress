@@ -1891,6 +1891,88 @@ ACTION: research
         path.write_text('[deliberate invalid test input](missing.md)\n')
         self.assert_pass(self.run_checker(root))
 
+
+    def test_result_section_layout_and_diagnostics(self):
+        record = ('## RESULT-TARGET\n\nExplanatory text is allowed.\n\n'
+                  'WPLAN_ID: WPLAN-000001\n\nVERDICT: PASS\n\n'
+                  'CHECKS: fixture checker, positive and negative cases\n\n'
+                  'EXPECTED: valid evidence with paragraphs\n\nACTUAL: all expected cases observed\n')
+        for fault, expected in ((None, None), ('WPLAN_ID', 'missing field WPLAN_ID'),
+                                ('VERDICT', 'missing field VERDICT'), ('CHECKS', 'missing field CHECKS'), ('EXPECTED', 'missing field EXPECTED'), ('ACTUAL', 'missing field ACTUAL'), ('empty-verdict','missing field VERDICT'),
+                                ('wrong-owner', 'WPLAN_ID mismatch'), ('wrong-verdict', 'VERDICT mismatch'),
+                                ('foreign-pass', 'missing field VERDICT')):
+            with self.subTest(fault=fault):
+                root=self.fixture(active=True); plan=self.short(root)
+                plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#RESULT-TARGET\n')
+                body=record
+                if fault in {'WPLAN_ID','VERDICT','CHECKS','EXPECTED','ACTUAL'}:
+                    body=re.sub(r'(?m)^'+fault+r':.*\n','',body)
+                if fault == 'empty-verdict': body=body.replace('VERDICT: PASS','VERDICT:')
+                if fault == 'wrong-owner': body=body.replace('WPLAN-000001','WPLAN-000002')
+                if fault == 'wrong-verdict': body=body.replace('VERDICT: PASS','VERDICT: FAIL')
+                if fault == 'foreign-pass': body=body.replace('VERDICT: PASS\n','')
+                body+='\n## OTHER-RESULT\nWPLAN_ID: WPLAN-000099\nVERDICT: PASS\n'
+                (root/'logs/quality.md').write_text(body)
+                result=self.run_checker(root,'--check-result')
+                if expected:
+                    self.assert_fail(result,'task-result'); self.assertIn(expected,str(result[1]['errors']))
+                    self.assertIn('logs/quality.md#RESULT-TARGET',str(result[1]['errors']))
+                else: self.assert_pass(result)
+
+    def test_result_heading_anchor_and_legacy_token_compatibility(self):
+        for title, token in (('## Result target','result-target'), ('EVIDENCE_ID: RESULT-TARGET','RESULT-TARGET'), ('## RESULT-TARGET\n```text','RESULT-TARGET')):
+            root=self.fixture(active=True); plan=self.short(root)
+            plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#'+token+'\n')
+            (root/'logs/quality.md').write_text(title+'\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: neutral fixture cases\nEXPECTED: exact owner evidence\nACTUAL: expected owner observed\n')
+            self.assert_pass(self.run_checker(root,'--check-result'))
+
+    def test_local_source_ref_missing_file_and_fragment(self):
+        for reference, expected in (('logs/sessions.md#owner-answer',None),
+                                    ('logs/sessions.md#OWNER-TOKEN',None),
+                                    ('#owner-answer',None),
+                                    ('logs/missing.md#owner-answer','missing file'),
+                                    ('logs/sessions.md#absent','missing fragment'),
+                                    ('logs/sessions.md#OWNER','missing fragment')):
+            with self.subTest(reference=reference):
+                root=self.fixture(active=True); self.short(root)
+                (root/'logs/sessions.md').write_text('## owner-answer\nNeutral owner response.\n\nEVIDENCE_ID: OWNER-TOKEN\n\nSOURCE_REF: '+reference+'\n')
+                result=self.run_checker(root)
+                if expected:
+                    self.assert_fail(result,'markdown-links')
+                    self.assertIn('SOURCE_REF',str(result[1]['errors'])); self.assertIn(reference,str(result[1]['errors']))
+                    self.assertIn(expected,str(result[1]['errors']))
+                else:self.assert_pass(result)
+        root=self.fixture(active=True); self.short(root)
+        (root/'logs/sessions.md').write_text('```text\nSOURCE_REF: logs/missing.md#absent\n```\nSOURCE_REF: https://example.invalid/source#source\nSOURCE_REF: codexlog:.codex/example.raw.log#lines=1-2\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_closing_check_result_selects_exact_baseline_plan(self):
+        for complete in (True, False):
+            with self.subTest(complete=complete):
+                root=self.fixture(active=True)
+                plan=self.short(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+                body='EVIDENCE_ID: RESULT-TARGET\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: fixture read-back\nEXPECTED: exact completed plan\nACTUAL: completed plan observed\n'
+                (root/'logs/quality.md').write_text(body)
+                plan.write_text(plan.read_text().replace('- [ ]','- [x]' if complete else '- [ ]')+'\nRESULT_REF: logs/quality.md#RESULT-TARGET\n')
+                (root/'plans/completed/WPLAN-000099-other.md').write_text('# Other\nWPLAN_ID: WPLAN-000099\nVERDICT: PASS\n')
+                baseline=self.write_baseline_manifest(root)
+                plan.write_text(plan.read_text().replace('Статус: active','Статус: completed'))
+                plan.rename(root/'plans/completed'/plan.name)
+                result=self.run_checker(root,'--baseline-manifest',baseline,'--check-result')
+                if complete:
+                    self.assert_pass(result)
+                    value=next(c['value'] for c in result[1]['checks'] if c['id']=='task-result')
+                    self.assertIsInstance(value,dict)
+                else:self.assert_fail(result,'task-result')
+
+    def test_result_legacy_basis_cannot_come_from_neighbour(self):
+        root=self.fixture(active=True); plan=self.short(root)
+        plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#R1\n')
+        (root/'logs/quality.md').write_text('## R10\nA substantive historical explanation containing commands and measurements: python3 -B verify.py produced 8/8 cases, independently checked.\n\n## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n')
+        self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+        (root/'logs/quality.md').write_text('## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n\nA substantive historical explanation containing the actual measured outcome and a command preserved below for reproduction.\n```text\npython3 -B verify.py: 8/8 passed\n```\n')
+        self.assert_pass(self.run_checker(root,'--check-result'))
+
     def test_result_owned_by_plan_or_subject_and_legacy_reference(self):
         for place in ('plan', 'plan-fragment', 'research', 'legacy'):
             root=self.fixture(active=True); plan=self.short(root)
