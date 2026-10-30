@@ -109,7 +109,9 @@ WROAD хранит направление; WBACK — известную рабо
 
 ## Где процедура
 
-- Приём задачи, WROAD/WBACK/WPLAN и исследовательское свидетельство: [../../sops/project-management.md](../../sops/project-management.md).
+- Приём задачи: [task-intake](../../sops/task-intake.md).
+- Маршрут WROAD/WBACK/WPLAN: [управление проектом](../../sops/project-management.md).
+- Исследовательское свидетельство: [исследования](../../sops/research.md).
 - SDLC-фазы и точки контроля: [../../sops/sdlc.md](../../sops/sdlc.md).
 - Проверки и записи качества: [../../sops/verify-work.md](../../sops/verify-work.md), [../../sops/record-quality.md](../../sops/record-quality.md).
 - Чистое завершение (`clean-exit`): [../../sops/clean-exit.md](../../sops/clean-exit.md).

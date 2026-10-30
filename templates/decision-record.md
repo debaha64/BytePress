@@ -31,4 +31,4 @@ SOURCE_REF: <workspace-relative-path>#<anchor-or-lines>
 
 `PA-*` и Release Authorization имеют отдельные контракты; `decommissioning_authorization` и `retirement_authorization` — виды OD-*.
 
-Источник и transport выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); placeholder заменяется существующим локальным источником факта.
+Источник и способ ссылки выбираются по [контракту свидетельств](../docs/technical/artifact-lifecycle.md#источники-свидетельств); заполнитель заменяется существующим локальным источником факта.

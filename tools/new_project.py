@@ -395,15 +395,15 @@ def _read_version(source: Path) -> tuple[bytes, str]:
     try:
         data = path.read_bytes()
     except OSError as error:
-        raise InspectionError("source distribution VERSION недоступен") from error
+        raise InspectionError("VERSION исходной поставки недоступен") from error
     if data.startswith(b"\xef\xbb\xbf") or not data.endswith(b"\n") or data.endswith(b"\n\n"):
-        raise InspectionError("VERSION должен быть UTF-8 без BOM с одной terminal LF")
+        raise InspectionError("VERSION должен быть UTF-8 без BOM с одной завершающей LF")
     try:
         value = data[:-1].decode("utf-8")
     except UnicodeDecodeError as error:
         raise InspectionError("VERSION не является UTF-8") from error
     if not value or value != value.strip() or "\n" in value or "\r" in value:
-        raise InspectionError("VERSION должен содержать одну непустую version line")
+        raise InspectionError("VERSION должен содержать одну непустую строку версии")
     _reject_surrogates(value, "VERSION")
     try:
         validate_harness_version(value)
@@ -445,14 +445,14 @@ def _inspect_distribution(source_distribution) -> dict:
 def _normalize_exclusion(value: str) -> str:
     _text_input(value, "VCS exclusion")
     if "\\" in value:
-        raise InputError("VCS exclusion должен использовать POSIX separators")
+        raise InputError("Исключение VCS должно использовать разделители POSIX")
     path = PurePosixPath(value)
     if path.is_absolute() or ".." in path.parts or path.as_posix() != value:
-        raise InputError(f"VCS exclusion должен быть normalized relative path: {value!r}")
+        raise InputError(f"Исключение VCS должно быть нормализованным относительным путём: {value!r}")
     if not path.parts or any(part in {"", "."} for part in path.parts):
         raise InputError(f"VCS exclusion недопустим: {value!r}")
     if path.name not in VCS_NAMES:
-        raise InputError(f"VCS exclusion не является .git/.hg/.svn entry: {value!r}")
+        raise InputError(f"Исключение VCS не является объектом .git/.hg/.svn: {value!r}")
     return value
 
 
@@ -481,14 +481,14 @@ def _classify_vcs(existing: Path, manifest: list[dict]) -> list[dict]:
         elif name == ".git" and item["type"] == "file":
             data = (existing / Path(*PurePosixPath(relative).parts)).read_bytes()
             if not _valid_gitfile(data):
-                raise InspectionError(f"malformed regular .git gitfile: {relative}")
+                raise InspectionError(f"Некорректный обычный файл .git (gitfile): {relative}")
             classification = "gitfile"
         elif name == ".hg" and item["type"] == "directory":
             classification = "hg-directory"
         elif name == ".svn" and item["type"] == "directory":
             classification = "svn-directory"
         else:
-            raise InspectionError(f"unsupported VCS metadata type: {relative} ({item['type']})")
+            raise InspectionError(f"Неподдерживаемый тип метаданных VCS: {relative} ({item['type']})")
         row = {"path": relative, "classification": classification}
         if classification == "gitfile":
             row["sha256"] = item["sha256"]
@@ -531,7 +531,7 @@ def _recognized_root_profiles(existing: Path, manifest: list[dict]) -> None:
             parse_project_profile((existing / path.name).read_bytes(), path.name)
         except ProjectProfileError:
             continue
-        raise InspectionError(f"existing Product содержит recognized root Project Profile: {path.name}")
+        raise InspectionError(f"Существующий продукт содержит распознанный корневой Project Profile: {path.name}")
 
 
 def _inspect_existing(existing_product, exclusions: tuple[str, ...]) -> dict:
@@ -784,7 +784,16 @@ def _workspace_generated_files(source: Path, slug: str, display_name: str, wroad
             "Иной режим и любые действия Git/GitHub требуют отдельно разрешённого владельцем перехода.\n\n"
             "SoT не разрешает реализацию, принятие владельцем, Product Acceptance, выпуск или завершение маршрута.\n"
         ).encode("utf-8"),
-        "sops/verify-work.md": "# Проверка Workspace\n\n`tools/check_workspace.py` без записи проверяет короткий WORK_CONTRACT, условия действий и совместимость прежнего SDLC_TRANSITION по `docs/technical/phase-gates.md`. Результат задачи проверяется через --check-result, регистрация — через --registration-input; роль и PASS не создают полномочий. Инструмент выводит полную исходную базу через `--print-baseline-manifest`, а с `--baseline-manifest` проверяет фактические изменения без исполнения кода продукта. `tools/check_product.py` отдельно проверяет состав; проверки средствами продукта запускаются только с явной опцией и положительным временем ожидания. Поведение продукта для неизменяемых свидетельств проверяется только на отдельной разрешённой копии. Жизненные циклы `OD-*`, Product Acceptance и Release Authorization остаются раздельными.\n".encode("utf-8"),
+        "sops/verify-work.md": (
+            "# Проверка Workspace\n\n"
+            "## Порядок\n\n"
+            "1. До записей получить полную исходную базу через `tools/check_workspace.py --print-baseline-manifest`.\n"
+            "2. Проверить Workspace без записи через `tools/check_workspace.py`: короткий `WORK_CONTRACT`, условия действий и совместимость прежнего `SDLC_TRANSITION` по `docs/technical/phase-gates.md`. "
+            "С `--baseline-manifest` проверяются фактические изменения; `--check-result` проверяет результат задачи, `--registration-input` — узкую регистрацию. Код продукта не исполняется.\n"
+            "3. Отдельно проверить состав через `tools/check_product.py`. Проверки средствами продукта запускаются только с явной опцией и положительным временем ожидания.\n"
+            "4. Поведение продукта для неизменяемых свидетельств проверить только на отдельной разрешённой копии.\n\n"
+            "Роль и PASS не создают полномочий. Жизненные циклы `OD-*`, Product Acceptance и Release Authorization остаются раздельными.\n"
+        ).encode("utf-8"),
         "tools/README.md": _read_source_file(source, "tools/README.md"),
         "tests/README.md": "# Тесты Workspace\n\n`test_project_profile.py` проверяет развёрнутый контракт Profile; `test_check_workspace.py` — нейтральные исполняемые заготовки для SDLC, полномочий и фактических изменений. Тесты продукта принадлежат его корню и не создаются Project Start.\n".encode("utf-8"),
     }
@@ -953,36 +962,36 @@ def _build_actions(distribution: dict, slug: str, display_name: str, wroad: str,
 
 def _human_preview(payload: dict, digest: str) -> str:
     lines = [
-        "Project Start v1 preview",
+        "Project Start v1 — предварительный просмотр",
         f"state: PREVIEW_READY",
-        f"source distribution: {payload['source_distribution']['identity']['path']}",
-        f"destination: {payload['target']['workspace_path']}",
+        f"Исходная поставка: {payload['source_distribution']['identity']['path']}",
+        f"Место назначения: {payload['target']['workspace_path']}",
         f"Product: {payload['product']['mode']} -> {payload['inputs']['slug']}/",
-        "initial SoT: sot_files",
-        "planning: WROAD-000001 active; active WBACK/WPLAN 0/0; WROAD-000001-OWNER-PLANNING",
-        "VCS exclusions:",
+        "Начальный SoT: sot_files",
+        "Планирование: WROAD-000001 active; активных WBACK/WPLAN 0/0; WROAD-000001-OWNER-PLANNING",
+        "Исключения VCS:",
     ]
     lines.extend(
         f"- {item['path']} [{item['classification']}]" for item in payload["vcs_exclusions"]
     )
     if not payload["vcs_exclusions"]:
         lines.append("- none")
-    lines.append("Portability warnings:")
+    lines.append("Предупреждения переносимости:")
     lines.extend(f"- {item['path']}: {item['reason']}" for item in payload["warnings"])
     if not payload["warnings"]:
         lines.append("- none")
-    lines.append("Exact path/action manifest:")
+    lines.append("Точный перечень путей и действий:")
     lines.extend(
         f"- {item['action']} {item['type']} {item['mode']} {item['path']}"
         for item in payload["actions"]
     )
-    lines.append("Verification plan:")
+    lines.append("План проверки:")
     lines.extend(f"- {item['id']}: {item['expected']}" for item in payload["verification_plan"])
     lines.extend(
         [
-            "Canonical Project Profile:",
+            "Канонический Project Profile:",
             payload["profile"]["content_utf8"].rstrip("\n"),
-            "Generated Workspace README:",
+            "Создаваемый README Workspace:",
             payload["generated_readme"]["content_utf8"].rstrip("\n"),
             f"PREVIEW_SHA256: {digest}",
         ]

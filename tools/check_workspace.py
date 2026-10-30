@@ -1668,7 +1668,7 @@ def _error_result(message):
 
 
 def main(argv=None) -> int:
-    parser = JsonArgumentParser(description="Generic read-only Workspace checker")
+    parser = JsonArgumentParser(description="Проверка Workspace без записи")
     parser.add_argument("--workspace", required=True, type=Path)
     parser.add_argument("--preservation-manifest", type=Path)
     parser.add_argument("--baseline-manifest", type=Path)

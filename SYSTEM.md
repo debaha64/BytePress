@@ -14,7 +14,7 @@
 | `domain:docs` | `docs/` | объяснения и устойчивый смысл |
 | `domain:sops` | `sops/` | нормативные процедуры |
 | `domain:roles` | `roles/` | ответственность и полномочия основных ролей фаз SDLC |
-| `domain:skills` | `skills/` | переносимые Agent Skills без расширения полномочий |
+| `domain:skills` | `skills/` | индекс отдельно устанавливаемых Agent Skills без расширения полномочий |
 | `domain:templates` | `templates/` | статические заготовки и формы будущих записей Workspace |
 | `domain:tests` | `tests/` | принадлежащие продукту исполняемые модули технической и регрессионной проверки Harness |
 | `domain:tools` | `tools/` | принадлежащие продукту исполняемые возможности Harness |
@@ -152,7 +152,7 @@ WPLAN Workspace перечисляет точные разрешённые по�
 | режим источника истины | корневой Project Profile после развёртывания; статическая поставка не имеет текущего SoT | `sops/sot.md` |
 | защищённые поверхности | этот реестр | `sops/project-management.md`, `sops/verify-work.md` |
 | основные роли фаз | `roles/` | `roles/README.md` |
-| переносимые Agent Skills | `skills/` | `skills/README.md` |
+| внешние Agent Skills | `skills/README.md` — договор отдельной установки; в поставке навыков нет | `skills/README.md` |
 | продуктовая приёмка | `WS_<Slug>/logs/decisions.md` | `sops/verify-work.md` |
 | терминология | `docs/terminology/glossary.md` | `sops/terminology.md` |
 | Создание Workspace через Project Start | `docs/technical/project-start.md` | `tools/new_project.py`, `tests/test_new_project.py` |

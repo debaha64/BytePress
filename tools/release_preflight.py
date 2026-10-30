@@ -808,7 +808,7 @@ class _Parser(argparse.ArgumentParser):
 
 
 def main(argv=None):
-    parser = _Parser(description='Read-only release evidence; external write и authorization отсутствуют.')
+    parser = _Parser(description='Проверка выпускных свидетельств без записи; результат не разрешает внешних изменений.')
     commands = parser.add_subparsers(dest='operation', required=True)
     for operation in ('preflight', 'readback'):
         p = commands.add_parser(operation)
