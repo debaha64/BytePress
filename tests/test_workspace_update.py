@@ -764,6 +764,43 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 self.assertEqual(value, after[path], path)
         self.assert_pass(self.run_checker(root))
 
+    def test_update_preserves_research_retention_and_original_decisions(self):
+        """REQ-200-03: procedural Update keeps project evidence byte/mode exact."""
+        root = self.patch_old_workspace()
+        domain = root / 'research/01_neutral'; domain.mkdir()
+        (domain / '00-index.md').write_text(
+            '# Нейтральное исследование\n\nСтатус: completed-unarchived\n'
+            'Сохранение: по решению владельца\n'
+            'Основание: фундаментальный вывод нужен между версиями.\n'
+            'Источник решения: [ответ](../../logs/decisions.md#retention-neutral).\n')
+        (domain / '01-evidence.md').write_bytes(b'neutral original observations\n')
+        (domain / 'results.md').write_bytes(b'completed research; retained evidence\n')
+        (domain / 'results.md').chmod(0o640)
+        legacy = root / 'research/02_legacy'; legacy.mkdir()
+        (legacy / '00-index.md').write_text('# Прежний индекс\n\nСтатус: completed-unarchived\n')
+        (legacy / 'results.md').write_bytes(b'legacy unmarked research\n')
+        (root / 'research/00-index.md').write_text(
+            '# Исследования\n\nСледующий ID исследования: `03`.\n\n'
+            '1. [Нейтральное](01_neutral/00-index.md).\n'
+            '2. [Прежнее](02_legacy/00-index.md).\n')
+        decisions = root / 'logs/decisions.md'
+        decisions.write_bytes(decisions.read_bytes() +
+            '\n## retention-neutral\n\nНейтральная реплика владельца: сохранить исследование01 между версиями.\n'.encode())
+        before = project_start.tree_manifest(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=self.authorize_update(root, reference, rows), rows=rows)
+        after = project_start.tree_manifest(root)
+        for path, value in before.items():
+            if path.startswith(('research/', 'logs/', 'Example/')):
+                self.assertEqual(value, after[path], path)
+        self.assertEqual((root / 'sops/research.md').read_bytes(),
+                         (reference / 'sops/research.md').read_bytes())
+        self.assertIn('## Сохранение между версиями', (root / 'sops/research.md').read_text())
+        self.assertNotIn('Сохранение:', (legacy / '00-index.md').read_text())
+        self.assert_pass(self.run_checker(root))
+
     def test_generated_agents_merge_preserves_private_meaning_and_project(self):
         """REQ-189-02: explicit reviewed merge, never COPY over private rules."""
         root = self.released_workspace()

@@ -1212,6 +1212,41 @@ class Candidate055Tests(ProjectStartCase):
                 if mode == 'existing':
                     self.assertEqual((workspace / 'Example/private.txt').read_bytes(), b'neutral product data')
 
+    def test_research_retention_delivered_for_new_and_existing(self):
+        """REQ-200-03: real Start carries rule/forms, no private retention decision."""
+        delivered = ('sops/research.md', 'sops/clean-exit.md',
+                     'docs/technical/artifact-lifecycle.md',
+                     'templates/research-domain-index.md', 'templates/research-results.md',
+                     'templates/archive-decision-record.md')
+        for mode in ('new', 'existing'):
+            with self.subTest(mode=mode):
+                parent = self.base / mode; parent.mkdir()
+                inputs = {'destination_parent': parent, 'product_mode': mode}
+                if mode == 'existing':
+                    product = self.base / 'neutral-product'; product.mkdir()
+                    (product / 'private.txt').write_bytes(b'neutral private Product')
+                    inputs['existing_product'] = product
+                self.apply(self.preview(**inputs), **inputs)
+                workspace = parent / 'WS_Example'
+                for relative in delivered:
+                    self.assertEqual((workspace / relative).read_bytes(),
+                                     (SOURCE_ROOT / relative).read_bytes(), relative)
+                self.assertIn('## Сохранение между версиями',
+                              (workspace / 'sops/research.md').read_text())
+                self.assertIn('research.md#сохранение-между-версиями',
+                              (workspace / 'sops/clean-exit.md').read_text())
+                self.assertEqual(list((workspace / 'research').iterdir()),
+                                 [workspace / 'research/00-index.md'])
+                self.assertNotIn('Сохранение:', (workspace / 'research/00-index.md').read_text())
+                self.assertNotIn('OD-000036', (workspace / 'logs/decisions.md').read_text())
+                self.assertFalse(list((workspace / 'skills').rglob('SKILL.md')))
+                for tool in ('check_workspace.py', 'check_product.py'):
+                    result = subprocess.run([sys.executable, '-B', str(workspace / 'tools' / tool),
+                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                if mode == 'existing':
+                    self.assertEqual((workspace / 'Example/private.txt').read_bytes(), b'neutral private Product')
+
     def test_map_names_project_and_reads_current_owners(self):
         preview = self.preview(display_name='Частный продукт Максима')
         self.apply(preview, display_name='Частный продукт Максима')

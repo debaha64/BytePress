@@ -16,7 +16,7 @@
 - [Запись риска](record-risk.md).
 - [Запись терминологического решения](record-terminology.md).
 - [Управление release/evidence](release-management.md).
-- [Исследования](research.md).
+- [Исследования](research.md) и [сохранение между версиями](research.md#сохранение-между-версиями).
 - [SDLC](sdlc.md).
 - [Режим источника истины](sot.md).
 - [Старт сессии](start-session.md).
