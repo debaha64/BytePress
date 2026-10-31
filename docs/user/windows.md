@@ -34,7 +34,7 @@ python -X utf8 -B tools/check_workspace.py --workspace .
 python -X utf8 -B tools/check_product.py --workspace .
 ```
 
-Ожидаются два PASS. Если нужен исходный TSV для `actual-delta`, сохраните stdout через Python `subprocess.run(..., stdout=поток_открытый_wb, check=True)` либо через `[IO.File]::WriteAllText` с `UTF8Encoding($false)`. Проверяйте результат задачи и реальную дельту по [verify-work](../../sops/verify-work.md). Права и восстановление при прерывании имеют [нативную семантику](../technical/project-start.md#нативная-файловая-семантика).
+Ожидаются два PASS. Команды компиляции и побайтового сохранения исходного TSV для `actual-delta` приведены в [управлении изменениями](../../sops/change-management.md#проверки). Они используют нативные Python и PowerShell; перенаправление `>` PowerShell5.1 для TSV не подходит. Проверяйте результат задачи и реальную дельту по [verify-work](../../sops/verify-work.md). Права и восстановление при прерывании имеют [нативную семантику](../technical/project-start.md#нативная-файловая-семантика).
 
 ## Снимок и проба восстановления
 

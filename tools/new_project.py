@@ -366,8 +366,14 @@ def _scan_tree(root: Path, label: str, *, reject_hardlinks: bool) -> list[dict]:
                 rows.append({"path": relative, "type": "directory", "mode": _mode(info)})
                 pending.append(path)
             elif entry.is_file(follow_symlinks=False):
-                if reject_hardlinks and info.st_nlink > 1:
-                    raise InspectionError(f"{label}: hardlink запрещён: {relative}")
+                if reject_hardlinks:
+                    # Windows DirEntry.stat may report st_nlink=0; query the file.
+                    try:
+                        link_count = path.lstat().st_nlink
+                    except OSError as error:
+                        raise InspectionError(f"{label} file metadata недоступны: {relative}: {error}") from error
+                    if link_count > 1:
+                        raise InspectionError(f"{label}: hardlink запрещён: {relative}")
                 try:
                     data = path.read_bytes()
                 except OSError as error:
@@ -461,7 +467,9 @@ def _valid_gitfile(data: bytes) -> bool:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
         return False
-    if text.endswith("\n"):
+    if text.endswith("\r\n"):
+        text = text[:-2]
+    elif text.endswith("\n"):
         text = text[:-1]
     if not text or "\n" in text or "\r" in text or not text.startswith("gitdir: "):
         return False

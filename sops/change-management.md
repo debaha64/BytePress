@@ -51,6 +51,17 @@ python3 -B tools/check_workspace.py --workspace <deployed-workspace>
 python3 -B tools/check_product.py --workspace <deployed-workspace>
 ```
 
+На POSIX используется блок `bash` выше. На нативной Windows выполните эквивалентные команды в PowerShell с доступным интерпретатором Python:
+
+```powershell
+python -X utf8 -B -c "from pathlib import Path; paths = (Path('tools/check_workspace.py'), Path('tools/check_product.py'), Path('tools/project_profile.py')); [compile(path.read_text(encoding='utf-8'), str(path), 'exec') for path in paths]"
+if ($LASTEXITCODE -ne 0) { throw 'compile failed' }
+python -X utf8 -B tools/check_workspace.py --workspace <deployed-workspace>
+if ($LASTEXITCODE -ne 0) { throw 'workspace check failed' }
+python -X utf8 -B tools/check_product.py --workspace <deployed-workspace>
+if ($LASTEXITCODE -ne 0) { throw 'product check failed' }
+```
+
 Команды выше выполняются из корня развёрнутого Workspace. `tools/new_project.py` и `tools/clean_product.py` принадлежат только исходной поставке и проверяются тестами продукта; развёрнутому Workspace они не нужны. Project Start не поставляет инструмент очистки. Если существующий Workspace сохраняет частный `tools/clean_workspace.py`, его используют по локальному договору очистки.
 
 При изменении Harness, инструментов или тестов добавляется полный применимый регрессионный набор Product Unit. Project Start дополнительно проверяется `tests/test_new_project.py` и настоящими временными E2E для нового и существующего продукта с манифестами источника до и после. Для затронутого продуктового кода добавляются его тесты и проверка запуска; обычная несвязанная правка не требует безусловного полного набора.
@@ -71,6 +82,14 @@ python3 -B tools/check_product.py --workspace <deployed-workspace>
 ```bash
 python3 -B tools/check_workspace.py --workspace <path> --print-baseline-manifest > <workspace-temp>/baseline.tsv
 ```
+
+На Windows машинный TSV сохраняется через бинарный поток Python; родительский каталог файла должен уже существовать:
+
+```powershell
+python -X utf8 -B -c "import subprocess,sys; subprocess.run([sys.executable,'-X','utf8','-B','tools/check_workspace.py','--workspace',sys.argv[1],'--print-baseline-manifest'],stdout=open(sys.argv[2],'wb'),check=True)" <path> <workspace-temp>/baseline.tsv
+if ($LASTEXITCODE -ne 0) { throw 'baseline failed' }
+```
+
 
 Полученный stdout имеет точный заголовок `manifest<TAB>1<TAB>complete<TAB>.` и отсортированные строки `type<TAB>mode<TAB>sha256-or--<TAB>relative-path`; этот файл затем передаётся через `--baseline-manifest`. Полнота относится ко всей постоянной области проверки: служебные каталоги `.git/.agents/.codex`, `temp/` и канонические удаляемые остатки исключаются одинаково при выводе исходной базы и вычислении фактических изменений.
 

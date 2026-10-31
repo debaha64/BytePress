@@ -6,6 +6,8 @@ VERSION/BOUNDARY-001; INV-001–013/015/016; SCN-001–010.
 
 from __future__ import annotations
 
+import base64
+import errno
 import hashlib
 import importlib.util
 import json
@@ -195,20 +197,27 @@ class PreviewTests(ProjectStartCase):
         with self.assertRaises(new_project.InspectionError):
             self.preview(source_distribution=distribution, destination_parent=nested_destination)
 
-    def test_cross_platform_risk_warns_but_invalid_unicode_path_fails(self):
+    def test_cross_platform_risk_warning_classification(self):
+        """The POSIX colon example is classified without creating a Windows ADS."""
+        warnings = new_project._portability_warnings([
+            {"path": "windows:risk.txt"}, {"path": "Case.txt"}, {"path": "case.txt"},
+        ])
+        self.assertTrue(any(item["path"] == "windows:risk.txt" for item in warnings))
+        self.assertTrue(any("collision" in item["reason"] for item in warnings))
+
+    @unittest.skipUnless(os.name == "posix", "POSIX colon filenames and raw invalid UTF-8 path bytes")
+    def test_posix_risk_warns_but_invalid_unicode_path_fails(self):
         """REQ-START/BOUNDARY-001; INV-004/007/013; SCN-002/003/009."""
         existing = self.existing()
-        (existing / "windows:risk.txt").write_text("opaque", encoding="utf-8")
-        preview = self.preview(
-            product_mode="existing",
-            existing_product=existing,
-        )
+        (existing / "windows:risk.txt").write_bytes(b"opaque")
+        preview = self.preview(product_mode="existing", existing_product=existing)
         self.assertTrue(any(item["path"] == "windows:risk.txt" for item in preview["warnings"]))
         bad = self.existing("invalid-unicode")
         file_descriptor = os.open(os.path.join(os.fsencode(bad), b"bad-\xff"), os.O_WRONLY | os.O_CREAT, 0o600)
         os.close(file_descriptor)
         with self.assertRaises(new_project.InspectionError):
             self.preview(product_mode="existing", existing_product=bad)
+        self.assertEqual(tree_manifest(self.destination), {})
 
     def test_read_only_known_target_component_limit_fails_before_authorization(self):
         """REQ-START/BOUNDARY-001; INV-007/013; SCN-009."""
@@ -218,14 +227,16 @@ class PreviewTests(ProjectStartCase):
         def target_limits(_path, name):
             return 20 if name == "PC_NAME_MAX" else 4096
 
-        with mock.patch.object(new_project.os, "pathconf", side_effect=target_limits):
+        with mock.patch.object(new_project.os, "pathconf", side_effect=target_limits, create=True):
             with self.assertRaises(new_project.InspectionError):
                 self.preview(product_mode="existing", existing_product=existing)
         self.assertEqual(tree_manifest(self.destination), {})
 
     def test_known_missing_atomic_commit_primitive_fails_in_preview(self):
         """REQ-START/BOUNDARY-001; INV-007/013; SCN-003/009."""
-        with mock.patch.object(new_project.sys, "platform", "darwin"):
+        with mock.patch.object(new_project.sys, "platform", "darwin"), \
+                mock.patch.object(new_project, "os", wraps=os) as platform_os:
+            platform_os.name = "posix"
             with self.assertRaises(new_project.InspectionError):
                 self.preview()
         self.assertEqual(tree_manifest(self.destination), {})
@@ -249,8 +260,8 @@ class NewProductTests(ProjectStartCase):
         (root / "plans/active/WPLAN-000001-example.md").write_text(form)
         (root / "plans/backlog.md").write_text("## WBACK-000001\n\nWROAD: WROAD-000001\nСтатус: active\nРезультат: Проверить вход\n")
         for _ in range(2):
-            check = subprocess.run([sys.executable, "-B", str(root / "tools/check_workspace.py"),
-                                    "--workspace", str(root)], capture_output=True, text=True, cwd=root)
+            check = subprocess.run([sys.executable, "-X", "utf8", "-B", str(root / "tools/check_workspace.py"),
+                                    "--workspace", str(root)], capture_output=True, text=True, encoding="utf-8", cwd=root)
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
         self.assertNotIn("SDLC_TRANSITION", form)
         self.assertEqual(len(list((root / "plans/active").glob("WPLAN-*.md"))), 1)
@@ -326,8 +337,8 @@ class NewProductTests(ProjectStartCase):
         self.assertFalse((root / "research/archives").exists())
         for checker in (workspace_checker, product_checker):
             completed = subprocess.run(
-                [sys.executable, "-B", str(checker), "--workspace", str(root), "--format", "json"],
-                cwd=root, stdin=subprocess.DEVNULL, text=True,
+                [sys.executable, "-X", "utf8", "-B", str(checker), "--workspace", str(root), "--format", "json"],
+                cwd=root, stdin=subprocess.DEVNULL, text=True, encoding="utf-8",
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
             )
             self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
@@ -347,10 +358,10 @@ class NewProductTests(ProjectStartCase):
                 environment.pop("PYTHONPATH", None)
                 environment["PYTHONDONTWRITEBYTECODE"] = "1"
                 completed = subprocess.run(
-                    [sys.executable, "-B", "-m", "unittest", "discover", "-s", "tests",
+                    [sys.executable, "-X", "utf8", "-B", "-m", "unittest", "discover", "-s", "tests",
                      "-p", "test_check_workspace.py", "-k", "durable_product_acceptance_in_later_release_wplan"],
                     cwd=root, env=environment, stdin=subprocess.DEVNULL,
-                    capture_output=True, text=True, check=False,
+                    capture_output=True, text=True, encoding="utf-8", check=False,
                 )
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
                 self.assertIn("Ran 1 test", completed.stderr)
@@ -367,8 +378,8 @@ class NewProductTests(ProjectStartCase):
             environment.pop("PYTHONPATH", None)
             environment["PYTHONDONTWRITEBYTECODE"] = "1"
             completed = subprocess.run(
-                [sys.executable, "-B", str(checker), "--workspace", str(root), "--format", "json", *map(str, extra)],
-                cwd=root, env=environment, stdin=subprocess.DEVNULL, text=True,
+                [sys.executable, "-X", "utf8", "-B", str(checker), "--workspace", str(root), "--format", "json", *map(str, extra)],
+                cwd=root, env=environment, stdin=subprocess.DEVNULL, text=True, encoding="utf-8",
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
             )
             return completed, json.loads(completed.stdout)
@@ -456,7 +467,7 @@ class NewProductTests(ProjectStartCase):
             plan_text = set_field(plan_text, label, value)
         surface_sections = {
             "### CREATE\n\n1. `<relative path>` — `<file:mode | directory:mode>`.":
-                "### CREATE — 1\n\n1. `tests/evidence.md` — `file:0644`.",
+                f"### CREATE — 1\n\n1. `tests/evidence.md` — `file:{stat.S_IMODE((root / 'plans/backlog.md').stat().st_mode):04o}`.",
             "### UPDATE\n\n1. `<relative path>` — `<непустое подмножество content,mode,type>`.":
                 "### UPDATE — 3\n\n1. `plans/active/WPLAN-000001-fixture.md` — `content`.\n"
                 "2. `logs/sessions.md` — `content`.\n"
@@ -483,9 +494,9 @@ class NewProductTests(ProjectStartCase):
         (root / "tests/arbitrary.md").write_text("BANANA\n", encoding="utf-8")
         before_baseline = tree_manifest(root)
         baseline_result = subprocess.run(
-            [sys.executable, "-B", str(checker), "--workspace", str(root), "--print-baseline-manifest"],
+            [sys.executable, "-X", "utf8", "-B", str(checker), "--workspace", str(root), "--print-baseline-manifest"],
             cwd=root, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}, stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", check=False,
         )
         self.assertEqual(baseline_result.returncode, 0, baseline_result.stdout + baseline_result.stderr)
         self.assertTrue(baseline_result.stdout.startswith("manifest\t1\tcomplete\t.\n"))
@@ -701,6 +712,9 @@ class NewProductTests(ProjectStartCase):
             f"from pathlib import Path\nPath({str(sentinel)!r}).write_text('ran')\nprint('native pass')\n",
             encoding="utf-8",
         )
+        interpreter = Path(sys.executable)
+        environment = {**os.environ, "PATH": str(interpreter.parent) + os.pathsep + os.environ.get("PATH", "")}
+        self.assertTrue(os.path.samefile(shutil.which(interpreter.name, path=environment["PATH"]), interpreter))
         profile_path = root / "Example.profile"
         profile_path.write_bytes(new_project.serialize_project_profile(profile_path.name, {
             "schema_version": 1,
@@ -709,21 +723,21 @@ class NewProductTests(ProjectStartCase):
             "display_name": "Example Product",
             "product_parts": {"Core": {"responsibility": "Neutral core"}},
             "product_native_checks": {
-                "unit": {"command": ["python3", "native.py"], "working_directory": "."}
+                "unit": {"command": [interpreter.name, "-X", "utf8", "-B", "native.py"], "working_directory": "."}
             },
         }))
         checker = root / "tools/check_product.py"
         composition = subprocess.run(
-            [sys.executable, "-B", str(checker), "--workspace", str(root), "--format", "json"],
-            cwd=root, stdin=subprocess.DEVNULL, text=True,
+            [sys.executable, "-X", "utf8", "-B", str(checker), "--workspace", str(root), "--format", "json"],
+            cwd=root, env=environment, stdin=subprocess.DEVNULL, text=True, encoding="utf-8",
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
         )
         self.assertEqual(composition.returncode, 0, composition.stdout + composition.stderr)
         self.assertFalse(sentinel.exists())
         native = subprocess.run(
-            [sys.executable, "-B", str(checker), "--workspace", str(root),
+            [sys.executable, "-X", "utf8", "-B", str(checker), "--workspace", str(root),
              "--run-native-checks", "--timeout-seconds", "3", "--format", "json"],
-            cwd=root, stdin=subprocess.DEVNULL, text=True,
+            cwd=root, env=environment, stdin=subprocess.DEVNULL, text=True, encoding="utf-8",
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
         )
         self.assertEqual(native.returncode, 0, native.stdout + native.stderr)
@@ -762,14 +776,18 @@ class ExistingProductTests(ProjectStartCase):
         hook = product / "hook.py"
         hook.write_text(f"from pathlib import Path; Path({str(sentinel)!r}).write_text('bad')\n", encoding="utf-8")
         hook.chmod(0o755)
+        (product / "readonly.bin").write_bytes(b"readonly\n")
+        (product / "readonly.bin").chmod(0o444)
         before = tree_manifest(product)
         result = self.apply(product_mode="existing", existing_product=product)
         target = Path(result["target_workspace"]) / "Example"
         self.assertEqual(tree_manifest(product), before)
         self.assertEqual(tree_manifest(target), before)
         self.assertFalse(sentinel.exists())
-        self.assertEqual(stat.S_IMODE((target / "never-run.py").stat().st_mode), 0o751)
-        self.assertEqual(stat.S_IMODE((target / "nested").stat().st_mode), 0o750)
+        self.assertFalse((target / "readonly.bin").stat().st_mode & stat.S_IWRITE)
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE((target / "never-run.py").stat().st_mode), 0o751)
+            self.assertEqual(stat.S_IMODE((target / "nested").stat().st_mode), 0o750)
 
     def test_targeted_tas_like_src_and_plans_remain_product_only(self):
         """REQ-TAS/START-001; INV-004/006/013; SCN-010."""
@@ -818,6 +836,64 @@ class ExistingProductTests(ProjectStartCase):
         for relative in exclusions:
             self.assertFalse((target / relative).exists())
 
+    def test_gitfile_exact_line_endings_and_preservation(self):
+        """REQ204-01/INV204-01..03: bytes, exclusions and no Git dependency."""
+        forms = (
+            b"gitdir: ../metadata/worktree\n", b"gitdir: ../metadata/worktree\r\n",
+            b"gitdir: ../metadata/worktree", b"gitdir: /absolute/with space\n",
+            b"gitdir: C:\\metadata\\worktree\r\n",
+            "gitdir: ../данные с пробелом\n".encode("utf-8"), b"gitdir: ../with\tinternal",
+        )
+        for index, data in enumerate(forms):
+            with self.subTest(gitfile=data):
+                self.assertTrue(new_project._valid_gitfile(data))
+                product = self.existing(f"gitfile-{index}")
+                (product / ".git").write_bytes(data)
+                (product / ".hidden").write_bytes(b"opaque\x00\xff")
+                (product / "readonly.bin").write_bytes(b"read only")
+                (product / "readonly.bin").chmod(0o444)
+                before = tree_manifest(product)
+                inputs = dict(slug=f"Gitfile{index}", product_mode="existing",
+                              existing_product=product, exclude_vcs_paths=(".git",))
+                with mock.patch.object(subprocess, "Popen", side_effect=AssertionError("Project Start must not run Git or Product code")):
+                    preview = self.preview(**inputs)
+                    self.assertEqual(tree_manifest(product), before)
+                    for digest in ("0" * 64,):
+                        with self.assertRaises(new_project.AuthorizationError):
+                            new_project.apply_project(**{**self.defaults, **inputs}, authorization_sha256=digest)
+                    result = self.apply(preview, **inputs)
+                target = Path(result["target_workspace"]) / inputs["slug"]
+                self.assertEqual(tree_manifest(product), before)
+                self.assertEqual(tree_manifest(target), {k: v for k, v in before.items() if k != ".git"})
+                self.assertFalse(self.staging_paths(slug=inputs["slug"]))
+
+    def test_gitfile_malformed_and_exclusion_rejections_are_read_only(self):
+        malformed = (
+            b"", b"gitdir:", b"gitdir: ", b"Gitdir: ../meta\n", b"gitdir:../meta\n",
+            b" gitdir: ../meta\n", b"gitdir:  ../meta\n", b"gitdir: ../meta \n",
+            b"gitdir: ../meta\t\n", b"gitdir: ../meta\r", b"gitdir: ../me\rta\n",
+            b"gitdir: ../me\nta\n", b"gitdir: ../meta\n\n", b"gitdir: ../meta\r\n\r\n",
+            b"\xef\xbb\xbfgitdir: ../meta\n", b"gitdir: ../\xff\n",
+        )
+        product = self.existing()
+        for data in malformed:
+            with self.subTest(malformed=data):
+                self.assertFalse(new_project._valid_gitfile(data))
+                (product / ".git").write_bytes(data)
+                before = tree_manifest(product)
+                with self.assertRaisesRegex(new_project.InspectionError, "gitfile"):
+                    self.preview(product_mode="existing", existing_product=product, exclude_vcs_paths=(".git",))
+                self.assertEqual(tree_manifest(product), before)
+                self.assertEqual(tree_manifest(self.destination), {})
+        (product / ".git").write_bytes(b"gitdir: ../metadata\r\n")
+        before = tree_manifest(product)
+        for exclusions in ((), ("nested/.git",), ("./.git",), (".git", "nested/.hg")):
+            with self.subTest(exclusions=exclusions):
+                with self.assertRaises((new_project.InspectionError, new_project.InputError)):
+                    self.preview(product_mode="existing", existing_product=product, exclude_vcs_paths=exclusions)
+                self.assertEqual(tree_manifest(product), before)
+                self.assertEqual(tree_manifest(self.destination), {})
+
     def test_malformed_or_unauthorized_vcs_metadata_fails(self):
         """REQ-SOT/START-001; INV-004/007/013; SCN-002/009."""
         malformed = self.existing("malformed")
@@ -833,19 +909,51 @@ class ExistingProductTests(ProjectStartCase):
         with self.assertRaises(new_project.InspectionError):
             self.preview(product_mode="existing", existing_product=regular_hg, exclude_vcs_paths=(".hg",))
 
-    def test_symlink_hardlink_and_special_nodes_fail_closed(self):
+    def test_symlink_fails_closed(self):
         """REQ-PRODUCT/START-001; INV-004/013; SCN-002/009."""
-        symlink_product = self.existing("symlink")
-        (symlink_product / "file").write_text("data", encoding="utf-8")
-        (symlink_product / "link").symlink_to("file")
-        hardlink_product = self.existing("hardlink")
-        (hardlink_product / "one").write_text("data", encoding="utf-8")
-        os.link(hardlink_product / "one", hardlink_product / "two")
-        fifo_product = self.existing("fifo")
-        os.mkfifo(fifo_product / "pipe")
-        for product in (symlink_product, hardlink_product, fifo_product):
-            with self.subTest(product=product.name), self.assertRaises(new_project.InspectionError):
-                self.preview(product_mode="existing", existing_product=product)
+        product = self.existing("symlink")
+        (product / "file").write_bytes(b"data")
+        try:
+            (product / "link").symlink_to("file")
+        except OSError as error:
+            if error.errno in {errno.EPERM, errno.EACCES, errno.ENOSYS, errno.ENOTSUP} or getattr(error, "winerror", None) == 1314:
+                self.skipTest(f"symlink creation unavailable: {error}")
+            raise
+        before = tree_manifest(product)
+        with self.assertRaisesRegex(new_project.InspectionError, "symlink"):
+            self.preview(product_mode="existing", existing_product=product)
+        self.assertEqual(tree_manifest(product), before)
+        self.assertEqual(tree_manifest(self.destination), {})
+
+    def test_hardlink_fails_closed(self):
+        """Runs independently of symlink capability."""
+        product = self.existing("hardlink")
+        (product / "one").write_bytes(b"data")
+        os.link(product / "one", product / "two")
+        before = tree_manifest(product)
+        with self.assertRaisesRegex(new_project.InspectionError, "hardlink"):
+            self.preview(product_mode="existing", existing_product=product)
+        self.assertEqual(tree_manifest(product), before)
+        self.assertEqual(tree_manifest(self.destination), {})
+
+    def test_file_metadata_error_fails_closed(self):
+        product = self.existing("metadata-error")
+        (product / "file").write_bytes(b"data")
+        before = tree_manifest(product)
+        with mock.patch.object(Path, "lstat", side_effect=PermissionError("metadata denied")):
+            with self.assertRaisesRegex(new_project.InspectionError, "file metadata.*file"):
+                new_project._scan_tree(product, "probe", reject_hardlinks=True)
+        self.assertEqual(tree_manifest(product), before)
+        self.assertEqual(tree_manifest(self.destination), {})
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO creation requires os.mkfifo")
+    def test_fifo_fails_closed(self):
+        product = self.existing("fifo")
+        os.mkfifo(product / "pipe")
+        with self.assertRaises(new_project.InspectionError):
+            self.preview(product_mode="existing", existing_product=product)
+        self.assertTrue(stat.S_ISFIFO((product / "pipe").lstat().st_mode))
+        self.assertEqual(tree_manifest(self.destination), {})
 
     def test_vcs_drift_or_changed_exclusions_invalidates_authorization(self):
         """REQ-SOT/START-001; INV-004/007/013; SCN-003/009."""
@@ -1038,13 +1146,13 @@ class CliTests(ProjectStartCase):
             "--product", "new",
             *map(str, extra),
         ]
-        return subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        return subprocess.run(args, text=True, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
 
     def test_public_operations_are_only_preview_and_apply(self):
         """REQ-START-001; INV-007; SCN-003/009."""
         help_result = subprocess.run(
-            [sys.executable, "-B", str(TOOL_PATH), "--help"],
-            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+            [sys.executable, "-X", "utf8", "-B", str(TOOL_PATH), "--help"],
+            text=True, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
         )
         self.assertEqual(help_result.returncode, 0)
         self.assertIn("preview", help_result.stdout)
@@ -1168,19 +1276,31 @@ class BootstrapStartTests(ProjectStartCase):
 
     def test_bootstrap_documented_change_management_commands_execute(self):
         root = Path(self.apply()["target_workspace"])
-        sop = (root / "sops/change-management.md").read_text()
-        commands = re.findall(r"```bash\n(.*?)```", sop, re.S)
+        sop = (root / "sops/change-management.md").read_text(encoding="utf-8")
+        shell = "powershell" if os.name == "nt" else "bash"
+        commands = re.findall(r"```" + shell + r"\n(.*?)```", sop, re.S)
         self.assertGreaterEqual(len(commands), 2)
         self.assertFalse((root / "tools/new_project.py").exists())
         self.assertFalse((root / "tools/clean_product.py").exists())
+        quote = (lambda text: "'" + text.replace("'", "''") + "'") if os.name == "nt" else shlex.quote
         for block in commands:
-            command = block.replace("<deployed-workspace>", shlex.quote(str(root)))
-            command = command.replace("<path>", shlex.quote(str(root)))
-            command = command.replace("<workspace-temp>/baseline.tsv", shlex.quote(str(self.base / "baseline.tsv")))
-            result = subprocess.run(["bash", "-e", "-c", command], cwd=root, text=True, capture_output=True,
-                                    env={**os.environ, "PYTHONPATH": "", "PYTHONDONTWRITEBYTECODE": "1"}, timeout=30)
+            command = block.replace("<deployed-workspace>", quote(str(root)))
+            command = command.replace("<path>", quote(str(root)))
+            command = command.replace("<workspace-temp>/baseline.tsv", quote(str(self.base / "baseline.tsv")))
+            if os.name == "nt":
+                command = re.sub(r"(?m)^python ", lambda _: "& " + quote(sys.executable) + " ", command)
+                command = "$ErrorActionPreference = 'Stop'\n" + command
+                payload = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
+                argv = ["powershell.exe", "-NoProfile", "-NonInteractive", "-EncodedCommand", payload]
+            else:
+                command = re.sub(r"(?m)^python3 ", lambda _: quote(sys.executable) + " -X utf8 ", command)
+                argv = ["bash", "-e", "-c", command]
+            result = subprocess.run(argv, cwd=root, text=True, encoding="utf-8", capture_output=True,
+                                    env={**os.environ, "PYTHONPATH": "", "PYTHONDONTWRITEBYTECODE": "1",
+                                         "PYTHONIOENCODING": "utf-8"}, timeout=30)
             self.assertEqual(result.returncode, 0, command + result.stdout + result.stderr)
-        self.assertTrue((self.base / "baseline.tsv").read_text().startswith("manifest\t1\tcomplete\t."))
+        self.assertTrue((self.base / "baseline.tsv").read_bytes().startswith(b"manifest\t1\tcomplete\t."))
+
 
 
 class Candidate055Tests(ProjectStartCase):
@@ -1206,8 +1326,8 @@ class Candidate055Tests(ProjectStartCase):
                 for relative in ('AGENTS.md', 'sops/README.md', 'sops/project-management.md'):
                     self.assertIn('known-problems.md', (workspace / relative).read_text())
                 for tool in ('check_workspace.py', 'check_product.py'):
-                    result = subprocess.run([sys.executable, '-B', str(workspace / 'tools' / tool),
-                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True)
+                    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(workspace / 'tools' / tool),
+                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True, encoding="utf-8")
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 if mode == 'existing':
                     self.assertEqual((workspace / 'Example/private.txt').read_bytes(), b'neutral product data')
@@ -1241,8 +1361,8 @@ class Candidate055Tests(ProjectStartCase):
                 self.assertNotIn('OD-000036', (workspace / 'logs/decisions.md').read_text())
                 self.assertFalse(list((workspace / 'skills').rglob('SKILL.md')))
                 for tool in ('check_workspace.py', 'check_product.py'):
-                    result = subprocess.run([sys.executable, '-B', str(workspace / 'tools' / tool),
-                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True)
+                    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(workspace / 'tools' / tool),
+                        '--workspace', str(workspace)], cwd=workspace, capture_output=True, text=True, encoding="utf-8")
                     self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 if mode == 'existing':
                     self.assertEqual((workspace / 'Example/private.txt').read_bytes(), b'neutral private Product')

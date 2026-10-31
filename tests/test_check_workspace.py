@@ -550,7 +550,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         }
         (root / "Example.profile").write_text(
             json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+            encoding="utf-8", newline="\n",
         )
         (root / "AGENTS.md").write_text("# Agent map\n", encoding="utf-8")
         (root / "SYSTEM.md").write_text(protected_registry("Example"), encoding="utf-8")
@@ -772,14 +772,14 @@ class WorkspaceCheckerTests(unittest.TestCase):
 
     def run_checker(self, root, *extra, env=None):
         completed = subprocess.run(
-            [sys.executable, "-B", str(root / "tools/check_workspace.py"),
+            [sys.executable, "-X", "utf8", "-B", str(root / "tools/check_workspace.py"),
              "--workspace", str(root), "--format", "json", *map(str, extra)],
             cwd=root,
             env=env,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            text=True, encoding="utf-8",
             check=False,
         )
         try:
@@ -1142,7 +1142,8 @@ class WorkspaceCheckerTests(unittest.TestCase):
         decisions = (root / "logs/decisions.md").read_bytes()
         self.assert_pass(self.run_checker(root))
         self.assertEqual((root / "logs/decisions.md").read_bytes(), decisions)
-        self.assertIn("RECORD_ID: PA-000001\nWPLAN_ID: WPLAN-000001", decisions.decode())
+        lines = decisions.decode("utf-8").splitlines()
+        self.assertIn(("RECORD_ID: PA-000001", "WPLAN_ID: WPLAN-000001"), zip(lines, lines[1:]))
         self.assertIn("WPLAN ID: WPLAN-000002", plan.read_text())
         self.assertIn("RELEASE_AUTHORIZATION_STATUS: not-performed", plan.read_text())
 
