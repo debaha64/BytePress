@@ -115,3 +115,5 @@ python3 -B tools/release_preflight.py readback --contract /path/WS_Example/temp/
 ```
 
 Machine — JSON с `verdict`, результатом проверок и происхождением наблюдений; ошибочный вход возвращает JSON `verdict: FAIL`, `external_writes: 0`, `error`. Точные входные схемы и достаточность свидетельств принадлежат [release-evidence](../docs/technical/release-evidence.md). Коды `0` PASS, `1` FAIL, `2` OWNER_ACTION_REQUIRED; синтаксическая ошибка также `2`, но с диагностикой stderr и без результата verdict. Текст ошибки не раскрывает аргументы с возможными учётными данными. `--timeout` ограничивает сетевое наблюдение, `--timeout-seconds` у инструмента проверки продукта — выполнение процесса; имена сохранены для действующих потребителей. Ни один результат не разрешает внешнюю запись.
+
+Для [нативной Windows](../docs/user/windows.md) используйте `python -X utf8 -B` вместо `python3 -B`. Source-only генератор не копируется в Workspace; Windows-инструкция развёртывается по фиксированному манифесту.

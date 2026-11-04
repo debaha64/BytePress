@@ -269,7 +269,7 @@ def _line_value(text: str, label: str) -> str:
 
 def _machine_fields(text: str) -> dict[str, str]:
     fields = {}
-    for key, value in re.findall(r"(?m)^([A-Z][A-Z0-9_]*)\s*:\s*(.+?)\s*$", text):
+    for key, value in re.findall(r"(?m)^([A-Z][A-Z0-9_]*)[ \t]*:[ \t]*(.+?)[ \t]*$", text):
         if key in fields:
             raise ContractError(f"duplicate machine field in record: {key}")
         fields[key] = value.strip().strip("`")
@@ -336,22 +336,56 @@ def _implementation_authority(workspace: Path, text: str, authority_ref: str) ->
     return record
 
 
-def _reference_evidence_fields(workspace: Path, reference: str) -> dict[str, str]:
+def _unfenced_text(text: str) -> str:
+    lines = []
+    fence = None
+    for line in text.splitlines():
+        match = re.match(r"^\s{0,3}(`{3,}|~{3,})", line)
+        if fence is None and match:
+            fence = match[1]
+        elif fence is not None and re.fullmatch(r"\s{0,3}" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*", line):
+            fence = None
+        elif fence is None:
+            lines.append(line)
+            continue
+        lines.append(" " * len(line))
+    return "\n".join(lines)
+
+
+def _evidence_section(workspace: Path, reference: str) -> str:
     relative, separator, token = reference.partition("#")
-    _checked_reference(workspace, reference, "EVIDENCE_REFS")
-    if not separator:
-        raise ContractError("EVIDENCE_REFS must be exact path#token references")
-    text = workspace.joinpath(*_declared_path(relative).parts).read_text(encoding="utf-8")
-    matches = []
+    if not separator or not token:
+        raise ContractError(f"EVIDENCE_REFS must be exact path#token references: {reference}")
+    candidate = workspace.joinpath(*_declared_path(relative).parts)
+    _regular(candidate, "f", reference)
+    candidate.resolve(strict=True).relative_to(workspace)
+    original = candidate.read_text(encoding="utf-8")
+    text = _unfenced_text(original)
     token_pattern = re.compile(rf"(?<![A-Za-z0-9_-]){re.escape(token)}(?![A-Za-z0-9_-])")
-    for block in re.split(r"\n\s*\n", text):
-        # Ссылка на собственный итог не является самим блоком результата.
-        candidate = re.sub(r"(?m)^[A-Z_]*REFS?:.*$", "", block)
-        if token_pattern.search(candidate):
-            matches.append(_machine_fields(block))
+    headings = list(re.finditer(r"(?m)^(#{1,6}) +(.+?) *#* *$", text))
+    counts = {}
+    matches = []
+    for index, heading in enumerate(headings):
+        base = _anchor(heading[2]); count = counts.get(base, 0); counts[base] = count + 1
+        anchor = base if count == 0 else f"{base}-{count}"
+        if token != anchor and not token_pattern.search(heading[2]):
+            continue
+        end = next((following.start() for following in headings[index + 1:]
+                    if len(following[1]) <= len(heading[1])), len(text))
+        matches.append(original[heading.end():end])
+    # Historical EVIDENCE_ID/token records retain their paragraph boundary.
+    if not matches:
+        for block in re.split(r"\n\s*\n", original):
+            candidate = re.sub(r"(?m)^[A-Z_]*REFS?:.*$", "", block)
+            if token_pattern.search(candidate):
+                matches.append(block)
     if len(matches) != 1:
         raise ContractError(f"EVIDENCE_REFS token must resolve to one structured evidence block: {reference}")
     return matches[0]
+
+
+def _reference_evidence_fields(workspace: Path, reference: str) -> dict[str, str]:
+    return _machine_fields(_evidence_section(workspace, reference))
 
 
 def _product_acceptance_record(
@@ -501,39 +535,37 @@ def _result_basis(workspace: Path, reference: str, evidence: dict[str, str]):
     markers = {"", "pass", "fail", "none", "pending", "true", "not-applicable", "not-performed"}
     keys = ("CHECKS", "EXPECTED", "ACTUAL")
     if any(key in evidence for key in keys):
-        if not all(evidence.get(key, "").strip().lower() not in markers for key in keys):
-            raise ContractError("task result requires checks, expected and actual observations")
+        for key in keys:
+            if not evidence.get(key):
+                raise ContractError(f"task result missing field {key}: {reference}")
+            if evidence[key].strip().lower() in markers:
+                raise ContractError(f"task result requires checks, expected and actual observations ({key}): {reference}")
         return
     # Совместимость с прежними подробными записями: основание находится в
     # разделе указанного результата, а не в произвольном PASS всего файла.
-    relative, _, token = reference.partition("#")
-    text = (workspace / relative).read_text(encoding="utf-8")
-    heading = re.search(rf"(?m)^(#{{1,6}}) [^\n]*{re.escape(token)}[^\n]*$", text)
-    if heading:
-        section = text[heading.end():]
-        boundary = re.search(rf"(?m)^#{{1,{len(heading[1])}}} ", section)
-        if boundary: section = section[:boundary.start()]
-        prose = re.sub(r"(?m)^[A-Z_]+:.*$", "", section).strip()
-        # Исторические записи содержат команды/измерения либо ссылку на
-        # подробное свидетельство. Одних типизированных полей недостаточно.
-        links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", prose)
-        local = [link.split('#', 1)[0] for link in links if not re.match(r"[a-z]+:", link)]
-        has_source = False
-        for value in local:
-            candidate = (workspace / relative).parent.joinpath(value)
-            if not value or not candidate.is_file() or candidate.resolve() == (workspace / relative).resolve():
-                continue
-            try:
-                candidate.resolve().relative_to(workspace)
-                body = candidate.read_text(encoding="utf-8").strip()
-            except (OSError, ValueError):
-                continue
-            words = set(re.findall(r"[\w-]+", body.lower()))
-            if words and not words.issubset(markers):
-                has_source = True
-        has_measurement = bool(re.search(r"(?:[0-9]+/[0-9]+|python3? .{4,}|Ran [0-9]+ tests)", prose))
-        if len(prose) >= 80 and (has_source or has_measurement):
-            return
+    relative, _, _token = reference.partition("#")
+    section = _evidence_section(workspace, reference)
+    prose = re.sub(r"(?m)^[A-Z_]+:.*$", "", section).strip()
+    # Исторические записи содержат команды/измерения либо ссылку на
+    # подробное свидетельство. Одних типизированных полей недостаточно.
+    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", prose)
+    local = [link.split('#', 1)[0] for link in links if not re.match(r"[a-z]+:", link)]
+    has_source = False
+    for value in local:
+        candidate = (workspace / relative).parent.joinpath(value)
+        if not value or not candidate.is_file() or candidate.resolve() == (workspace / relative).resolve():
+            continue
+        try:
+            candidate.resolve().relative_to(workspace)
+            body = candidate.read_text(encoding="utf-8").strip()
+        except (OSError, ValueError):
+            continue
+        words = set(re.findall(r"[\w-]+", body.lower()))
+        if words and not words.issubset(markers):
+            has_source = True
+    has_measurement = bool(re.search(r"(?:[0-9]+/[0-9]+|python3? .{4,}|Ran [0-9]+ tests)", prose))
+    if len(prose) >= 80 and (has_source or has_measurement):
+        return
     raise ContractError("task result has no sufficient verification basis")
 
 
@@ -576,8 +608,13 @@ def _check_task_result(workspace: Path, plan_path: Path | None = None):
         if reference.startswith("#"):
             reference = plans[0].relative_to(workspace).as_posix() + reference
         evidence = _reference_evidence_fields(workspace, reference)
-        if evidence.get("WPLAN_ID") != _single_field(text, "WPLAN ID") or evidence.get("VERDICT") != "PASS":
-            raise ContractError("task result evidence scope/verdict mismatch")
+        for key in ("WPLAN_ID", "VERDICT"):
+            if not evidence.get(key):
+                raise ContractError(f"task result missing field {key}: {reference}")
+        if evidence["WPLAN_ID"] != _single_field(text, "WPLAN ID"):
+            raise ContractError(f"task result WPLAN_ID mismatch: {reference}")
+        if evidence["VERDICT"] != "PASS":
+            raise ContractError(f"task result VERDICT mismatch: {reference}")
         _result_basis(workspace, reference, evidence)
     return {"assertions": checked}
 
@@ -867,6 +904,57 @@ def _plan_surface_declarations(workspace: Path, plan_path: Path | None = None):
                 )
     return declarations
 
+
+
+def _check_skill_projections(workspace: Path):
+    """Compare opted-in Codex projections with project-owned canonical files."""
+    service = workspace / '.agents'
+    projected_root = service / 'skills'
+    if not service.exists() and not service.is_symlink():
+        return {'projected': 0}
+    _regular(service, 'd', '.agents')
+    if not projected_root.exists() and not projected_root.is_symlink():
+        return {'projected': 0}
+    _regular(projected_root, 'd', '.agents/skills')
+
+    def tree(base):
+        result = {}
+        def visit(path):
+            info = path.lstat()
+            relative = path.relative_to(base).as_posix()
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+                raise ContractError(f'{path.relative_to(workspace)}: ссылка внутри копии навыка')
+            if stat.S_ISDIR(info.st_mode):
+                result[relative] = ('directory', None)
+                for child in sorted(path.iterdir()):
+                    visit(child)
+            elif stat.S_ISREG(info.st_mode):
+                result[relative] = ('file', _sha(path))
+            else:
+                raise ContractError(f'{path.relative_to(workspace)}: недопустимый тип навыка')
+        visit(base)
+        return result
+
+    count = 0
+    for projected in sorted(projected_root.iterdir()):
+        canonical = workspace / 'skills' / projected.name
+        _regular(canonical, 'd', f'skills/{projected.name}')
+        _regular(canonical / 'SKILL.md', 'f', f'skills/{projected.name}/SKILL.md')
+        if projected.is_symlink():
+            target = os.readlink(projected)
+            if Path(target).is_absolute() or projected.resolve() != canonical.resolve():
+                raise ContractError(f'.agents/skills/{projected.name}: ссылка не на проектную копию')
+            actual = tree(canonical)  # compatible previous relative projection
+        else:
+            _regular(projected, 'd', f'.agents/skills/{projected.name}')
+            actual = tree(projected)
+        expected = tree(canonical)
+        for relative in sorted(expected.keys() | actual.keys()):
+            if expected.get(relative) != actual.get(relative):
+                raise ContractError(f'.agents/skills/{projected.name}/{relative}: '
+                                    f'расхождение с skills/{projected.name}/{relative}')
+        count += 1
+    return {'projected': count}
 
 
 def _check_protected_surfaces(workspace: Path, product_name: str, plan_path: Path | None = None):
@@ -1288,9 +1376,15 @@ def _check_research_registry(workspace: Path):
     next_id = int(match.group(1))
     used = []
     for path in (workspace / "research").iterdir():
-        domain = re.match(r"^(\d+)_", path.name)
-        if domain:
-            used.append(int(domain.group(1)))
+        if path.name == "00-index.md":
+            _regular(path, "f", "research/00-index.md")
+            continue
+        numbered = re.match(r"^(\d+)(?:[_-]|\.)", path.name)
+        if numbered:
+            relative = "research/" + path.name
+            if path.is_symlink() or not path.is_dir() or not re.match(r"\d+_", path.name):
+                raise ContractError(f"{relative}: numbered research должен быть каталогом NN_slug")
+            used.append(int(numbered.group(1)))
     archives = workspace / "research/archives"
     if archives.is_dir() and not archives.is_symlink():
         for path in archives.iterdir():
@@ -1350,7 +1444,7 @@ def _anchor(value: str):
 def _anchors(path: Path):
     values = set()
     counts = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in _unfenced_text(path.read_text(encoding="utf-8")).splitlines():
         match = re.match(r"^#{1,6}\s+(.+?)\s*#*$", line)
         if not match:
             continue
@@ -1399,6 +1493,43 @@ def _check_links(workspace: Path, product_name: str):
                 continue
             if fragment and candidate.is_file() and fragment not in _anchors(candidate):
                 issues.append(f"{relative} -> {target}: missing anchor")
+        # Machine references are Workspace-relative, unlike Markdown links.
+        body = _unfenced_text(path.read_text(encoding="utf-8"))
+        for number, line in enumerate(body.splitlines(), 1):
+            match = re.fullmatch(r"SOURCE_REF:\s*(.+?)\s*", line)
+            if not match:
+                continue
+            target = match[1].strip("`")
+            if target in {"none", "unknown"} or "<" in target or re.match(r"[A-Za-z][A-Za-z0-9+.-]*:", target):
+                continue
+            address = f"{relative}:{number} SOURCE_REF -> {target}"
+            path_part, separator, fragment = target.partition("#")
+            try:
+                candidate = path if not path_part else workspace.joinpath(*_declared_path(path_part).parts)
+                _regular(candidate, "f", target)
+                candidate.resolve(strict=True).relative_to(workspace)
+            except (ContractError, OSError, ValueError):
+                issues.append(f"{address}: missing file/escape")
+                continue
+            if not separator or not fragment:
+                issues.append(f"{address}: missing fragment")
+                continue
+            source = _unfenced_text(candidate.read_text(encoding="utf-8"))
+            source = re.sub(r"(?m)^[A-Z_]*REFS?:.*$", "", source)
+            lines = re.fullmatch(r"lines=([1-9][0-9]*)-([1-9][0-9]*)", fragment)
+            if lines:
+                valid = int(lines[1]) <= int(lines[2]) <= len(candidate.read_text(encoding="utf-8").splitlines())
+            else:
+                # Historical references may use a complete heading's original case
+                # or an explicit EVIDENCE_ID. A prose occurrence is not an address.
+                headings = [match[1] for match in re.finditer(
+                    r"(?m)^#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", source)]
+                declarations = [match[1] for match in re.finditer(
+                    r"(?m)^EVIDENCE_ID:[ \t]*(\S+)[ \t]*$", source)]
+                valid = fragment in _anchors(candidate) or fragment in headings or fragment in declarations
+            if not valid:
+                issues.append(f"{address}: missing fragment")
+
     if issues:
         raise ContractError("; ".join(_raw_sorted(issues)[:10]))
 
@@ -1491,11 +1622,18 @@ def inspect_workspace(workspace_value, preservation_manifest=None, baseline_mani
     perform("sdlc-transition", lambda: _check_sdlc_transition(workspace))
     perform("plan-surfaces", lambda: _check_plan_surfaces(workspace))
     if check_result:
-        perform("task-result", lambda: _check_task_result(workspace))
+        def task_result():
+            owner = None
+            if not _active_plan_paths(workspace) and baseline_manifest is not None:
+                baseline = _load_baseline_manifest(workspace, Path(baseline_manifest))
+                owner = _delta_declaration_owner(workspace, baseline, _filesystem_manifest(workspace))
+            return _check_task_result(workspace, owner)
+        perform("task-result", task_result)
     perform("documentation-impact", lambda: _check_documentation_impact(workspace))
     if state["profile"] is not None:
         perform("protected-surfaces", lambda: _check_protected_surfaces(workspace, state["profile"].slug))
         perform("workspace-sot", lambda: _check_sot(workspace, state["profile"]))
+    perform("skill-projections", lambda: _check_skill_projections(workspace))
     perform("research-registry", lambda: _check_research_registry(workspace))
     archive = perform("research-archives", lambda: _check_research(workspace))
     if archive is not None:
@@ -1530,7 +1668,7 @@ def _error_result(message):
 
 
 def main(argv=None) -> int:
-    parser = JsonArgumentParser(description="Generic read-only Workspace checker")
+    parser = JsonArgumentParser(description="Проверка Workspace без записи")
     parser.add_argument("--workspace", required=True, type=Path)
     parser.add_argument("--preservation-manifest", type=Path)
     parser.add_argument("--baseline-manifest", type=Path)

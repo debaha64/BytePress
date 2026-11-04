@@ -550,7 +550,7 @@ class WorkspaceCheckerTests(unittest.TestCase):
         }
         (root / "Example.profile").write_text(
             json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+            encoding="utf-8", newline="\n",
         )
         (root / "AGENTS.md").write_text("# Agent map\n", encoding="utf-8")
         (root / "SYSTEM.md").write_text(protected_registry("Example"), encoding="utf-8")
@@ -772,14 +772,14 @@ class WorkspaceCheckerTests(unittest.TestCase):
 
     def run_checker(self, root, *extra, env=None):
         completed = subprocess.run(
-            [sys.executable, "-B", str(root / "tools/check_workspace.py"),
+            [sys.executable, "-X", "utf8", "-B", str(root / "tools/check_workspace.py"),
              "--workspace", str(root), "--format", "json", *map(str, extra)],
             cwd=root,
             env=env,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            text=True, encoding="utf-8",
             check=False,
         )
         try:
@@ -878,6 +878,22 @@ class WorkspaceCheckerTests(unittest.TestCase):
         (root / "research/00-index.md").write_text(
             "# Исследования\n\nСледующий research ID: `02`.\n", encoding="utf-8"
         )
+        self.assert_pass(self.run_checker(root))
+
+    def test_numbered_research_files_rejected_with_path(self):
+        for name in ('01-topic.md', '01_topic.md', '00-other.md', '01.md'):
+            with self.subTest(name=name):
+                root = self.fixture()
+                (root / 'research' / name).write_text('# misplaced formal research\n')
+                result = self.run_checker(root)
+                self.assert_fail(result, 'research-registry')
+                self.assertIn(name, str(result))
+
+    def test_research_root_index_and_nonnumbered_support_preserved(self):
+        root = self.fixture()
+        (root / 'research/README.md').write_text('# support\n')
+        (root / 'research/01_topic').mkdir()
+        (root / 'research/00-index.md').write_text('Следующий research ID: `02`.\n')
         self.assert_pass(self.run_checker(root))
 
     def test_active_wplan_consistency_and_checkpoint(self):
@@ -1126,7 +1142,8 @@ class WorkspaceCheckerTests(unittest.TestCase):
         decisions = (root / "logs/decisions.md").read_bytes()
         self.assert_pass(self.run_checker(root))
         self.assertEqual((root / "logs/decisions.md").read_bytes(), decisions)
-        self.assertIn("RECORD_ID: PA-000001\nWPLAN_ID: WPLAN-000001", decisions.decode())
+        lines = decisions.decode("utf-8").splitlines()
+        self.assertIn(("RECORD_ID: PA-000001", "WPLAN_ID: WPLAN-000001"), zip(lines, lines[1:]))
         self.assertIn("WPLAN ID: WPLAN-000002", plan.read_text())
         self.assertIn("RELEASE_AUTHORIZATION_STATUS: not-performed", plan.read_text())
 
@@ -1875,6 +1892,142 @@ ACTION: research
         path.write_text('[deliberate invalid test input](missing.md)\n')
         self.assert_pass(self.run_checker(root))
 
+
+    def test_result_section_layout_and_diagnostics(self):
+        record = ('## RESULT-TARGET\n\nExplanatory text is allowed.\n\n'
+                  'WPLAN_ID: WPLAN-000001\n\nVERDICT: PASS\n\n'
+                  'CHECKS: fixture checker, positive and negative cases\n\n'
+                  'EXPECTED: valid evidence with paragraphs\n\nACTUAL: all expected cases observed\n')
+        for fault, expected in ((None, None), ('WPLAN_ID', 'missing field WPLAN_ID'),
+                                ('VERDICT', 'missing field VERDICT'), ('CHECKS', 'missing field CHECKS'), ('EXPECTED', 'missing field EXPECTED'), ('ACTUAL', 'missing field ACTUAL'), ('empty-verdict','missing field VERDICT'),
+                                ('wrong-owner', 'WPLAN_ID mismatch'), ('wrong-verdict', 'VERDICT mismatch'),
+                                ('foreign-pass', 'missing field VERDICT')):
+            with self.subTest(fault=fault):
+                root=self.fixture(active=True); plan=self.short(root)
+                plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#RESULT-TARGET\n')
+                body=record
+                if fault in {'WPLAN_ID','VERDICT','CHECKS','EXPECTED','ACTUAL'}:
+                    body=re.sub(r'(?m)^'+fault+r':.*\n','',body)
+                if fault == 'empty-verdict': body=body.replace('VERDICT: PASS','VERDICT:')
+                if fault == 'wrong-owner': body=body.replace('WPLAN-000001','WPLAN-000002')
+                if fault == 'wrong-verdict': body=body.replace('VERDICT: PASS','VERDICT: FAIL')
+                if fault == 'foreign-pass': body=body.replace('VERDICT: PASS\n','')
+                body+='\n## OTHER-RESULT\nWPLAN_ID: WPLAN-000099\nVERDICT: PASS\n'
+                (root/'logs/quality.md').write_text(body)
+                result=self.run_checker(root,'--check-result')
+                if expected:
+                    self.assert_fail(result,'task-result'); self.assertIn(expected,str(result[1]['errors']))
+                    self.assertIn('logs/quality.md#RESULT-TARGET',str(result[1]['errors']))
+                else: self.assert_pass(result)
+
+    def test_result_heading_anchor_and_legacy_token_compatibility(self):
+        for title, token in (('## Result target','result-target'), ('EVIDENCE_ID: RESULT-TARGET','RESULT-TARGET'), ('## RESULT-TARGET\n```text','RESULT-TARGET')):
+            root=self.fixture(active=True); plan=self.short(root)
+            plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#'+token+'\n')
+            (root/'logs/quality.md').write_text(title+'\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: neutral fixture cases\nEXPECTED: exact owner evidence\nACTUAL: expected owner observed\n')
+            self.assert_pass(self.run_checker(root,'--check-result'))
+
+    def test_local_source_ref_missing_file_and_fragment(self):
+        for reference, expected in (('logs/sessions.md#owner-answer',None),
+                                    ('logs/sessions.md#OWNER-TOKEN',None),
+                                    ('#owner-answer',None),
+                                    ('logs/missing.md#owner-answer','missing file'),
+                                    ('logs/sessions.md#absent','missing fragment'),
+                                    ('logs/sessions.md#OWNER','missing fragment')):
+            with self.subTest(reference=reference):
+                root=self.fixture(active=True); self.short(root)
+                (root/'logs/sessions.md').write_text('## owner-answer\nNeutral owner response.\n\nEVIDENCE_ID: OWNER-TOKEN\n\nSOURCE_REF: '+reference+'\n')
+                result=self.run_checker(root)
+                if expected:
+                    self.assert_fail(result,'markdown-links')
+                    self.assertIn('SOURCE_REF',str(result[1]['errors'])); self.assertIn(reference,str(result[1]['errors']))
+                    self.assertIn(expected,str(result[1]['errors']))
+                else:self.assert_pass(result)
+        root=self.fixture(active=True); self.short(root)
+        (root/'logs/sessions.md').write_text('```text\nSOURCE_REF: logs/missing.md#absent\n```\nSOURCE_REF: https://example.invalid/source#source\nSOURCE_REF: codexlog:.codex/example.raw.log#lines=1-2\n')
+        self.assert_pass(self.run_checker(root))
+
+    def test_source_ref_exact_declarations(self):
+        """REQ-199-01/02: an address is a declaration, never a prose match."""
+        cases = [
+            ('## owner-answer\nNeutral answer.\n', 'owner-answer', True),
+            ('## Other\n## owner-answer\n## owner-answer\n', 'owner-answer-1', True),
+            ('## OWNER-TOKEN\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('### OWNER-TOKEN ###\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('EVIDENCE_ID: OWNER-TOKEN\nNeutral historical answer.\n', 'OWNER-TOKEN', True),
+            ('## other-answer\n', 'owner-answer', False),
+            ('## other-answer\nThe old owner-answer heading was removed.\n', 'owner-answer', False),
+            ('## Note about owner-answer\n', 'owner-answer', False),
+            ('## owner-answer extra\n', 'owner-answer', False),
+            ('## other-answer\nThe old OWNER-TOKEN was removed.\n', 'OWNER-TOKEN', False),
+            ('## Note about OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('EVIDENCE_ID: OTHER-OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('EVIDENCE_ID: OWNER-TOKEN extra\n', 'OWNER-TOKEN', False),
+            ('The declaration EVIDENCE_ID: OWNER-TOKEN was removed.\n', 'OWNER-TOKEN', False),
+            ('OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('SOURCE_REF: #OWNER-TOKEN\n', 'OWNER-TOKEN', False),
+            ('```text\n## owner-answer\n```\n', 'owner-answer', False),
+            ('~~~text\nEVIDENCE_ID: OWNER-TOKEN\n~~~\n', 'OWNER-TOKEN', False),
+        ]
+        for body, token, valid in cases:
+            for self_reference in (False, True):
+                with self.subTest(body=body, token=token, self_reference=self_reference):
+                    root = self.fixture(active=True); self.short(root)
+                    source = root / 'logs/sessions.md'
+                    source.write_text(body)
+                    reference = ('#' if self_reference else 'logs/sessions.md#') + token
+                    record = source if self_reference else root / 'logs/quality.md'
+                    with record.open('a') as stream:
+                        stream.write('\nSOURCE_REF: ' + reference + '\n')
+                    number = len(record.read_text().splitlines())
+                    result = self.run_checker(root)
+                    if valid:
+                        self.assert_pass(result)
+                    else:
+                        self.assert_fail(result, 'markdown-links')
+                        address = record.relative_to(root).as_posix() + ':' + str(number)
+                        self.assertIn(address + ' SOURCE_REF -> ' + reference + ': missing fragment', str(result[1]['errors']))
+
+    def test_source_ref_line_ranges(self):
+        """REQ-199-01: line addresses keep their physical-file contract."""
+        for fragment, valid in [('lines=1-3', True), ('lines=3-3', True),
+                                ('lines=3-2', False), ('lines=1-4', False),
+                                ('lines=0-1', False), ('lines=01-2', False)]:
+            with self.subTest(fragment=fragment):
+                root = self.fixture(active=True); self.short(root)
+                (root / 'logs/sessions.md').write_text('one\n```text\nthree\n')
+                (root / 'logs/quality.md').write_text('SOURCE_REF: logs/sessions.md#' + fragment + '\n')
+                result = self.run_checker(root)
+                if valid: self.assert_pass(result)
+                else: self.assert_fail(result, 'markdown-links')
+
+    def test_closing_check_result_selects_exact_baseline_plan(self):
+        for complete in (True, False):
+            with self.subTest(complete=complete):
+                root=self.fixture(active=True)
+                plan=self.short(root,'### CREATE\n\n1. `plans/completed/WPLAN-000001-example.md` — `file:0644`.\n\n### REMOVE\n\n1. `plans/active/WPLAN-000001-example.md` — `file`.')
+                body='EVIDENCE_ID: RESULT-TARGET\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\nCHECKS: fixture read-back\nEXPECTED: exact completed plan\nACTUAL: completed plan observed\n'
+                (root/'logs/quality.md').write_text(body)
+                plan.write_text(plan.read_text().replace('- [ ]','- [x]' if complete else '- [ ]')+'\nRESULT_REF: logs/quality.md#RESULT-TARGET\n')
+                (root/'plans/completed/WPLAN-000099-other.md').write_text('# Other\nWPLAN_ID: WPLAN-000099\nVERDICT: PASS\n')
+                baseline=self.write_baseline_manifest(root)
+                plan.write_text(plan.read_text().replace('Статус: active','Статус: completed'))
+                plan.rename(root/'plans/completed'/plan.name)
+                result=self.run_checker(root,'--baseline-manifest',baseline,'--check-result')
+                if complete:
+                    self.assert_pass(result)
+                    value=next(c['value'] for c in result[1]['checks'] if c['id']=='task-result')
+                    self.assertIsInstance(value,dict)
+                else:self.assert_fail(result,'task-result')
+
+    def test_result_legacy_basis_cannot_come_from_neighbour(self):
+        root=self.fixture(active=True); plan=self.short(root)
+        plan.write_text(plan.read_text().replace('- [ ]','- [x]')+'\nRESULT_REF: logs/quality.md#R1\n')
+        (root/'logs/quality.md').write_text('## R10\nA substantive historical explanation containing commands and measurements: python3 -B verify.py produced 8/8 cases, independently checked.\n\n## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n')
+        self.assert_fail(self.run_checker(root,'--check-result'),'task-result')
+        (root/'logs/quality.md').write_text('## R1\nWPLAN_ID: WPLAN-000001\nVERDICT: PASS\n\nA substantive historical explanation containing the actual measured outcome and a command preserved below for reproduction.\n```text\npython3 -B verify.py: 8/8 passed\n```\n')
+        self.assert_pass(self.run_checker(root,'--check-result'))
+
     def test_result_owned_by_plan_or_subject_and_legacy_reference(self):
         for place in ('plan', 'plan-fragment', 'research', 'legacy'):
             root=self.fixture(active=True); plan=self.short(root)
@@ -1981,6 +2134,63 @@ ACTION: research
             self.assertEqual(plan.read_bytes(),plan_bytes)
             self.assertEqual((root/'logs/decisions.md').read_bytes(),authority)
             self.assertEqual(len(list((root/'plans/active').glob('WPLAN-*.md'))),1)
+
+class ExternalSkillProjectionTests(unittest.TestCase):
+    """REQ-195-01: только соответствие подключённой проекции, не installer."""
+    def prepare(self):
+        helper = WorkspaceCheckerTests()
+        self.addCleanup(helper.doCleanups)
+        root = helper.fixture()
+        if os.name == 'nt':
+            # This pre-existing synthetic fixture uses text-mode writes; Profile is canonical LF.
+            profile = root / 'Example.profile'
+            profile.write_bytes(profile.read_bytes().replace(b'\r\n', b'\n'))
+        canonical = root / 'skills/external'
+        canonical.mkdir()
+        (canonical / 'SKILL.md').write_bytes(b'---\nname: external\ndescription: fixture\n---\n')
+        (canonical / 'references').mkdir()
+        (canonical / 'references/data.txt').write_bytes(b'exact resource\n')
+        projected = root / '.agents/skills/external'
+        projected.parent.mkdir(parents=True)
+        shutil.copytree(canonical, projected)
+        return helper, root, canonical, projected
+
+    def test_regular_projected_skill_and_resources(self):
+        helper, root, canonical, projected = self.prepare()
+        helper.assert_pass(helper.run_checker(root))
+        shutil.rmtree(root / '.agents')
+        helper.assert_pass(helper.run_checker(root))  # portable skills-only is valid
+
+    def test_projection_byte_drift_reports_path(self):
+        helper, root, canonical, projected = self.prepare()
+        (projected / 'references/data.txt').write_bytes(b'drift')
+        result = helper.run_checker(root)
+        helper.assert_fail(result, 'skill-projections')
+        self.assertIn('external/references/data.txt', str(result))
+
+    def test_projection_missing_extra_and_canonical_missing(self):
+        for kind in ('missing', 'extra', 'canonical-missing'):
+            with self.subTest(kind=kind):
+                helper, root, canonical, projected = self.prepare()
+                if kind == 'missing': (projected / 'SKILL.md').unlink()
+                elif kind == 'extra': (projected / 'extra.txt').write_bytes(b'extra')
+                else: shutil.rmtree(canonical)
+                helper.assert_fail(helper.run_checker(root), 'skill-projections')
+
+    def test_projection_refuses_resource_symlink(self):
+        if os.name == 'nt': self.skipTest('POSIX symlink without special Windows rights')
+        helper, root, canonical, projected = self.prepare()
+        (projected / 'references/data.txt').unlink()
+        (projected / 'references/data.txt').symlink_to(canonical / 'references/data.txt')
+        helper.assert_fail(helper.run_checker(root), 'skill-projections')
+
+    def test_projection_preserves_legacy_relative_link(self):
+        if os.name == 'nt': self.skipTest('POSIX symlink without special Windows rights')
+        helper, root, canonical, projected = self.prepare()
+        shutil.rmtree(projected)
+        projected.symlink_to('../../skills/external', target_is_directory=True)
+        helper.assert_pass(helper.run_checker(root))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

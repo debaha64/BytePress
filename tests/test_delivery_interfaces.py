@@ -12,6 +12,16 @@ import test_new_project as start
 SOURCE = Path(__file__).resolve().parents[1]
 
 class DeliveryInterfacesTests(start.ProjectStartCase):
+    def test_generated_verification_uses_work_contract(self):
+        preview = start.new_project.build_preview(**self.defaults)
+        start.new_project.apply_project(**self.defaults, authorization_sha256=preview['preview_sha256'])
+        root = self.defaults['destination_parent'] / ('WS_' + self.defaults['slug'])
+        text = (root / 'sops/verify-work.md').read_text()
+        self.assertNotIn('разрешённой фазе', text)
+        self.assertIn('WORK_CONTRACT', text)
+        self.assertNotIn('new_project.py', text)
+        self.assertNotIn('clean_product.py', text)
+
     def test_versions_flow_from_distribution_to_deployed_profile(self):
         for version in ('0.5.4-dev.1', '0.5.4-rc.2', '0.5.4'):
             with self.subTest(version=version):

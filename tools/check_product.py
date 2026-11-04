@@ -322,7 +322,7 @@ def _error_result(message):
 
 
 def main(argv=None) -> int:
-    parser = JsonArgumentParser(description="Generic Product composition and native-check verifier", add_help=True)
+    parser = JsonArgumentParser(description="Проверка состава продукта и явно выбранных проверок средствами продукта", add_help=True)
     parser.add_argument("--workspace", required=True, type=Path)
     parser.add_argument("--run-native-checks", action="store_true")
     parser.add_argument("--native-check")

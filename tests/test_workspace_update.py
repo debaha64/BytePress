@@ -236,7 +236,11 @@ class WorkspaceUpdateTests(unittest.TestCase):
         }
         rows = []
         for path in sorted(self.changed_deployed_paths(reference)):
-            if actions.get(path) == "COPY":
+            if path == "sops/known-problems.md":
+                kind, reason = "GENERATED_MERGE", "Merge causal catalog; preserve private additions and modes."
+            elif path == "skills/README.md":
+                kind, reason = "GENERATED_MERGE", "Preserve external skill navigation, license and provenance."
+            elif actions.get(path) == "COPY":
                 kind, reason = "COPY", "Exact copied Harness contract without private overlay."
             else:
                 self.assertIn(path, generated, "Changed generated contract needs explicit disposition: " + path)
@@ -307,7 +311,8 @@ class WorkspaceUpdateTests(unittest.TestCase):
                     hashlib.sha256(path.read_bytes()).hexdigest() if kind == "file" else "")
         return result
 
-    def apply_patch_contracts(self, root, reference, preview, *, authorization=None, rows=None):
+    def apply_patch_contracts(self, root, reference, preview, *, authorization=None, rows=None, reviewed_merges=None):
+        reviewed_merges = reviewed_merges or {}
         plans = list((root / "plans/active").glob("WPLAN-*.md"))
         recovery = authorization.get("recovery") if authorization else None
         if plans:
@@ -341,6 +346,15 @@ class WorkspaceUpdateTests(unittest.TestCase):
                 path = row["path"]
                 if path in {"feedback", "feedback/README.md"}:
                     continue  # Existing user data is preserved, never a copied contract overlay.
+                if path in reviewed_merges:
+                    merge = reviewed_merges[path]
+                    self.assertEqual(row['disposition'], 'GENERATED_MERGE')
+                    self.assertEqual((root / path).read_bytes(), merge['before'])
+                    self.assertEqual(hashlib.sha256(merge['after']).hexdigest(), row['merged_sha256'])
+                    self.assertEqual(hashlib.sha256(merge['private']).hexdigest(), row['preserved_sha256'])
+                    self.assertTrue(merge['before'].endswith(merge['private']))
+                    self.assertEqual(merge['after'], (reference / path).read_bytes() + merge['private'])
+                    continue
                 if not (released / path).exists():
                     self.assertFalse((root / path).exists(), "New contract conflicts with private path: " + path)
                 else:
@@ -353,6 +367,9 @@ class WorkspaceUpdateTests(unittest.TestCase):
         for row in rows:
             path = row["path"]
             if path == "Example.profile" or row["disposition"] == "PRESERVE":
+                continue
+            if path in reviewed_merges:
+                (root / path).write_bytes(reviewed_merges[path]['after'])
                 continue
             if path in {"feedback", "feedback/README.md"}:
                 if not (root / path).exists():
@@ -554,7 +571,8 @@ class WorkspaceUpdateTests(unittest.TestCase):
         paths = ("Example", "plans", "research", "skills", "logs")
         result = {
             p.relative_to(root).as_posix(): (p.stat().st_mode & 0o7777, hashlib.sha256(history_bytes(p)).hexdigest())
-            for prefix in paths for p in (root / prefix).rglob("*") if p.is_file()
+            for prefix in paths for p in (root / prefix).rglob("*")
+            if p.is_file() and p.relative_to(root).as_posix() != "skills/README.md"
         }
         folder = root / "feedback"
         if folder.exists():
@@ -678,6 +696,144 @@ class WorkspaceUpdateTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-B", "-c", probe],
                                     cwd=product, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_update_preserves_installed_external_skills_and_projection(self):
+        """REQ-195-01: private skills/README merge, files and .agents remain exact."""
+        root = self.released_workspace()
+        for name in ('simple-first', 'decision-interview', 'translate-to-technical-russian', 'private-external'):
+            folder = root / 'skills' / name
+            folder.mkdir()
+            (folder / 'SKILL.md').write_bytes(('fixture ' + name + '\n').encode())
+            (folder / 'references').mkdir()
+            (folder / 'references/data.txt').write_bytes(b'private resource')
+            target = root / '.agents/skills' / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(folder, target)
+        (root / 'skills/SkillPack-LICENSE').write_bytes(b'fixture license; not SkillPack source')
+        private = b'\nExternal SkillPack provenance and private skill navigation.\n'
+        catalog = root / 'skills/README.md'
+        catalog.write_bytes(catalog.read_bytes() + private)
+        before = project_start.tree_manifest(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        authority = self.authorize_update(root, reference, rows)
+        with self.assertRaisesRegex(AssertionError, 'Private contract overlay'):
+            self.apply_patch_contracts(root, reference, preview, authorization=authority, rows=rows)
+        self.assertEqual(before, project_start.tree_manifest(root))
+        row = next(row for row in rows if row['path'] == 'skills/README.md')
+        self.assertEqual(row['disposition'], 'GENERATED_MERGE')
+        merged = (reference / 'skills/README.md').read_bytes() + private
+        row['merged_sha256'] = hashlib.sha256(merged).hexdigest()
+        row['preserved_sha256'] = hashlib.sha256(private).hexdigest()
+        reviewed = {'skills/README.md': {'before': catalog.read_bytes(), 'after': merged, 'private': private}}
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=self.authorize_update(root, reference, rows), rows=rows, reviewed_merges=reviewed)
+        after = project_start.tree_manifest(root)
+        for path, value in before.items():
+            if path.startswith(('skills/', '.agents/')) and path != 'skills/README.md':
+                self.assertEqual(value, after[path], path)
+        self.assertTrue(catalog.read_bytes().endswith(private))
+        self.assert_pass(self.run_checker(root))
+
+    def test_known_problems_update_preserves_private_addition(self):
+        """REQ-199-04: private catalog collision refuses writes until reviewed merge."""
+        root = self.patch_old_workspace()
+        catalog = root / 'sops/known-problems.md'
+        private = '\n## Частное дополнение\n\nДля проекта подтверждён внешний договор хранения данных.\n'.encode()
+        catalog.write_bytes(private); catalog.chmod(0o640)
+        before = self.patch_tree(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        row = next(row for row in rows if row['path'] == 'sops/known-problems.md')
+        self.assertEqual(row['disposition'], 'GENERATED_MERGE')
+        with self.assertRaisesRegex(AssertionError, 'New contract conflicts with private path'):
+            self.apply_patch_contracts(root, reference, preview,
+                authorization=self.authorize_update(root, reference, rows), rows=rows)
+        self.assertEqual(before, self.patch_tree(root))
+        merged = (reference / 'sops/known-problems.md').read_bytes() + private
+        row['merged_sha256'] = hashlib.sha256(merged).hexdigest()
+        row['preserved_sha256'] = hashlib.sha256(private).hexdigest()
+        reviewed = {'sops/known-problems.md': {'before': private, 'after': merged, 'private': private}}
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=self.authorize_update(root, reference, rows), rows=rows, reviewed_merges=reviewed)
+        self.assertEqual(catalog.read_bytes(), merged)
+        self.assertEqual(catalog.stat().st_mode & 0o7777, 0o640)
+        after = self.patch_tree(root)
+        for path, value in before.items():
+            if path.startswith(('Example/', 'plans/', 'research/', 'logs/')) and path != 'plans/completed/README.md':
+                self.assertEqual(value, after[path], path)
+        self.assert_pass(self.run_checker(root))
+
+    def test_update_preserves_research_retention_and_original_decisions(self):
+        """REQ-200-03: procedural Update keeps project evidence byte/mode exact."""
+        root = self.patch_old_workspace()
+        domain = root / 'research/01_neutral'; domain.mkdir()
+        (domain / '00-index.md').write_text(
+            '# Нейтральное исследование\n\nСтатус: completed-unarchived\n'
+            'Сохранение: по решению владельца\n'
+            'Основание: фундаментальный вывод нужен между версиями.\n'
+            'Источник решения: [ответ](../../logs/decisions.md#retention-neutral).\n')
+        (domain / '01-evidence.md').write_bytes(b'neutral original observations\n')
+        (domain / 'results.md').write_bytes(b'completed research; retained evidence\n')
+        (domain / 'results.md').chmod(0o640)
+        legacy = root / 'research/02_legacy'; legacy.mkdir()
+        (legacy / '00-index.md').write_text('# Прежний индекс\n\nСтатус: completed-unarchived\n')
+        (legacy / 'results.md').write_bytes(b'legacy unmarked research\n')
+        (root / 'research/00-index.md').write_text(
+            '# Исследования\n\nСледующий ID исследования: `03`.\n\n'
+            '1. [Нейтральное](01_neutral/00-index.md).\n'
+            '2. [Прежнее](02_legacy/00-index.md).\n')
+        decisions = root / 'logs/decisions.md'
+        decisions.write_bytes(decisions.read_bytes() +
+            '\n## retention-neutral\n\nНейтральная реплика владельца: сохранить исследование01 между версиями.\n'.encode())
+        before = project_start.tree_manifest(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=self.authorize_update(root, reference, rows), rows=rows)
+        after = project_start.tree_manifest(root)
+        for path, value in before.items():
+            if path.startswith(('research/', 'logs/', 'Example/')):
+                self.assertEqual(value, after[path], path)
+        self.assertEqual((root / 'sops/research.md').read_bytes(),
+                         (reference / 'sops/research.md').read_bytes())
+        self.assertIn('## Сохранение между версиями', (root / 'sops/research.md').read_text())
+        self.assertNotIn('Сохранение:', (legacy / '00-index.md').read_text())
+        self.assert_pass(self.run_checker(root))
+
+    def test_generated_agents_merge_preserves_private_meaning_and_project(self):
+        """REQ-189-02: explicit reviewed merge, never COPY over private rules."""
+        root = self.released_workspace()
+        private = '\n## Частные условия\n\nРасчётная валюта EUR; рабочие данные владельца сохранять.\n'.encode()
+        agents = root / 'AGENTS.md'
+        agents.write_bytes(agents.read_bytes() + private)
+        agents.chmod(0o640)
+        product = root / 'Example/private.txt'; product.write_bytes(b'owner product')
+        before = self.patch_tree(root)
+        reference, preview = self.patch_reference()
+        rows = self.patch_disposition(reference, preview)
+        with self.assertRaisesRegex(AssertionError, 'Private contract overlay'):
+            self.apply_patch_contracts(root, reference, preview,
+                authorization=self.authorize_update(root, reference, rows), rows=rows)
+        self.assertEqual(before, self.patch_tree(root))
+        after = (reference / 'AGENTS.md').read_bytes() + private
+        row = next(row for row in rows if row['path'] == 'AGENTS.md')
+        self.assertEqual(row['disposition'], 'GENERATED_MERGE')
+        row['merged_sha256'] = hashlib.sha256(after).hexdigest()
+        row['preserved_sha256'] = hashlib.sha256(private).hexdigest()
+        reviewed = {'AGENTS.md': {'before': agents.read_bytes(), 'after': after, 'private': private}}
+        authority = self.authorize_update(root, reference, rows)
+        self.apply_patch_contracts(root, reference, preview,
+            authorization=authority, rows=rows, reviewed_merges=reviewed)
+        self.assertEqual(agents.read_bytes(), after)
+        self.assertEqual(agents.stat().st_mode & 0o7777, 0o640)
+        self.assertEqual(product.read_bytes(), b'owner product')
+        for path, value in before.items():
+            if path.startswith(('Example/', 'plans/', 'research/', 'logs/')) and path != 'plans/completed/README.md':
+                self.assertEqual(value, self.patch_tree(root)[path], path)
+        self.assertEqual(json.loads((root/'Example.profile').read_text())['harness_version'], '0.5.2')
+        self.assert_pass(self.run_checker(root))
+
 
 class EvidenceSourceTests(unittest.TestCase):
     """ES-REQ-01..04: deployed forms/SOP, real records and phase handoff."""

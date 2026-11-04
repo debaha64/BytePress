@@ -7,7 +7,7 @@
 - [Решение об архиве](archive-decision-record.md).
 - [Запись изменений](change-record.md).
 - [Отчёт исполнителя](codex-report.md).
-- [{{Название задачи}}](codex-task.md).
+- [Запрос задачи](codex-task.md).
 - [Записи решений OD-* и PA-*](decision-record.md).
 - [Архитектура](docs-architecture-architecture.md).
 - [Модель предметной области](docs-architecture-domain-model.md).
@@ -16,25 +16,25 @@
 - [Требования к продукту](docs-product-prd.md).
 - [Стратегия тестирования](docs-technical-testing.md).
 - [Глоссарий](docs-terminology-glossary.md).
-- [{{Задача пользователя}}](docs-user-guide.md).
-- [{{Название раздела}}](domain-readme.md).
+- [Пользовательская инструкция](docs-user-guide.md).
+- [Индекс раздела](domain-readme.md).
 - [Свидетельство интервью](interview-evidence-record.md).
 - [Интервью](interview.md).
-- [{{title}}](log-file.md).
+- [Журнал](log-file.md).
 - [Запись в `logs/releases.md`](log-release-record.md).
-- [Пакет решения владельца: {{тема}}](owner-decision-package.md).
-- [{{name}}](product-readme.md).
+- [Пакет решения владельца](owner-decision-package.md).
+- [README продукта](product-readme.md).
 - [Запись качества](quality-record.md).
-- [{{Название реестра}}](registry-file.md).
-- [{{Запись реестра}}](registry-item.md).
+- [Реестр](registry-file.md).
+- [Запись реестра](registry-item.md).
 - [Свидетельство готовности к выпуску](release-readiness-record.md).
 - [Запись решения о выпуске и теге (`release/tag`)](release-tag-decision-record.md).
 - [Исследование {{NN_slug}}](research-domain-index.md).
 - [Запись исследования: {{тема}}](research-record.md).
 - [Результаты исследования: <тема>](research-results.md).
 - [Запись риска](risk-record.md).
-- [{{professional_role_name}}](role.md).
-- [{{Название процедуры}}](sop.md).
+- [Контракт роли](role.md).
+- [Процедура](sop.md).
 - [Спецификация: <предмет>](specification.md).
 - [SYSTEM.md](system.md).
 - [Терминологическое решение](terminology-record.md).

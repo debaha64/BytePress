@@ -7,6 +7,7 @@
 - [Управление изменениями](change-management.md).
 - [Чистое завершение](clean-exit.md).
 - [Интервью](interview.md).
+- [Известные проблемы](known-problems.md) — причинные классы, признаки и реакция.
 - [Управляемый проход агента](managed-agent-pass.md) — сохранённый вход к управлению проектом для поставки Project Start.
 - [Управление проектом](project-management.md).
 - [Запись изменений](record-change.md).
@@ -15,7 +16,7 @@
 - [Запись риска](record-risk.md).
 - [Запись терминологического решения](record-terminology.md).
 - [Управление release/evidence](release-management.md).
-- [Исследования](research.md).
+- [Исследования](research.md) и [сохранение между версиями](research.md#сохранение-между-версиями).
 - [SDLC](sdlc.md).
 - [Режим источника истины](sot.md).
 - [Старт сессии](start-session.md).
